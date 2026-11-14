@@ -41,6 +41,7 @@ let selectedHour = 0; // 0–167, hourly samples within the seven-day landing st
 let daily: DailyResult | null = null;
 let moon: LunarScene | null = null;
 let overview: OverviewScene | null = null;
+let disposeOverviewMessages: (() => void) | null = null;
 const verdictNames: Record<Verdict, string> = {
   clear: 'Clear',
   partial: 'Partial',
@@ -83,7 +84,7 @@ app.innerHTML = [
   '  <section id="overview-view" class="overview-view" aria-label="Sun Earth Moon overview">',
   '    <div class="overview-window">',
   '      <div class="overview-caption"><strong id="overview-source">THE SUN · EARTH · MOON</strong><span id="overview-note">Illustrative sizes, positions and motion — not to scale; not ephemeris geometry</span></div>',
-  '      <p id="overview-mission-message" class="overview-mission-message">Of everything in the solar system, the Sun determines the sunlight available for a lunar lander\'s potential power, while Earth determines when a direct radio link is geometrically possible. The other planets\' gravitational pull is already included in NASA/JPL Horizons data; their light and radio contributions are negligible for this comparison.</p>',
+  '      <p id="overview-mission-message" class="overview-mission-message">Of everything in the solar system, the Sun determines the sunlight available for a lunar lander\'s potential power, while Earth determines when a direct radio link is geometrically possible. Other planets: their gravity is already in our numbers. JPL planetary ephemerides include their gravitational effects; their light is negligible compared with sunlight. Radio from other planets is not modeled.</p>',
   '      <div id="overview-stage" class="overview-stage" aria-label="Solar system overview visualization"></div>',
   '      <div class="overview-footer"><p id="overview-disclaimer">Choose the Moon to explore real landing sites and verified Sun/Earth visibility at your selected UTC date and hour.</p><button id="enter-explore" type="button">Explore the Moon and landing sites</button></div>',
   '    </div>',
@@ -367,12 +368,24 @@ if (embedUrl) {
   frame.className = 'overview-iframe';
   frame.title = 'OzAILabs Solar System Simulator — embedded interactive overview';
   embedUrl.searchParams.set('lunarEmbed', '1');
+  embedUrl.searchParams.set('parentOrigin', window.location.origin);
   frame.src = embedUrl.href;
   frame.loading = 'eager';
   frame.referrerPolicy = 'strict-origin-when-cross-origin';
   frame.allow = 'fullscreen';
   frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-pointer-lock allow-downloads allow-forms');
   overviewStage.replaceChildren(frame);
+  // Only accept navigation from the exact trusted simulator iframe origin.
+  const onSimulatorMessage = (event: MessageEvent): void => {
+    if (event.source !== frame.contentWindow || event.origin !== embedUrl.origin) return;
+    const data = event.data;
+    if (data && typeof data === 'object' &&
+        data.type === 'lunar-navigator:open-explore' && data.body === 'moon') {
+      openView('explore');
+    }
+  };
+  window.addEventListener('message', onSimulatorMessage);
+  disposeOverviewMessages = () => window.removeEventListener('message', onSimulatorMessage);
   find<HTMLElement>('overview-source').textContent = 'SOLAR SYSTEM · OzAILabs simulator';
   find<HTMLElement>('overview-note').textContent = 'Full solar system · separate simulator time; our mission clock controls Explore, Compare and Stand here';
   find<HTMLElement>('overview-disclaimer').textContent =
@@ -443,6 +456,7 @@ void initializeSceneLighting();
 window.addEventListener('pagehide', () => {
   moon?.destroy();
   overview?.destroy();
+  disposeOverviewMessages?.();
   destroyStarfield();
   sideCard?.destroy();
   compareGrid?.destroy();
