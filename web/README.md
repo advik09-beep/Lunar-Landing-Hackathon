@@ -43,28 +43,23 @@ frontend imports sibling `/lib` and `/data` files. Current working commands:
 - Build: `cd web && npm run build`
 - Output directory: `web/dist`
 
-### OzAILabs overview embedding
+### OzAILabs overview embedding — deployed 2026-11-14
 
-The approved first Overview is [OzAILabs/SolarSystemSimulator](https://github.com/OzAILabs/SolarSystemSimulator),
-**forked under the project owner's GitHub account and separately deployed**.
-The upstream README states MIT licensing; it also credits textures from
-Solar System Scope (CC BY 4.0), Planet Pixel Emporium, USGS Astrogeology,
-and Steve Albers. Verify source-specific attribution when deploying the fork.
+- **Upstream:** [OzAILabs/SolarSystemSimulator](https://github.com/OzAILabs/SolarSystemSimulator)
+- **Project fork:** [advik09-beep/SolarSystemSimulator](https://github.com/advik09-beep/SolarSystemSimulator), default branch `master`
+- **Separate public Vercel production site:** https://solar-system-simulator-usmdo-club.vercel.app/
+- **Vercel project:** `solar-system-simulator` in the USMDO Club team; Vite framework, install `npm install`, build `npm run build`, output `dist`
+- **Main app's production build-time env:** `VITE_SOLAR_OVERVIEW_URL=https://solar-system-simulator-usmdo-club.vercel.app/` in `lunar-landing-hackathon`
+- **Main app public URL:** https://lunar-landing-hackathon.vercel.app/
 
-1. Fork the upstream GitHub repository under `advik09-beep`.
-2. Import the fork as a **separate Vercel project** in USMDO Club; use Vite's
-   normal `npm install`, `npm run build`, and `dist` output. The upstream
-   repo currently includes `public/textures` and `public/ephemeris` assets.
-3. After confirming its public HTTPS link loads, set
-   `VITE_SOLAR_OVERVIEW_URL=https://<your-public-simulator-domain>` in the
-   **main** lunar-landing-hackathon Vercel project's Production environment,
-   then redeploy the main project (Vite injects the value at build time).
-4. Verify the Overview iframe is functional, accessible without login, and
-   that its interactive controls work inside a frame. The embedded simulator
-   shows the **whole solar system**, and its time controls are **not synchronized**
-   with the Moon landing date or hour. The "Explore" exit goes to our verified
-   Moon-fixed view without changing shared selection.
+The Overview embeds the complete original simulator in a sandboxed HTTPS
+iframe. It displays the whole solar system; the simulator's time control is
+**not synchronized** with the lunar landing-date/hour controls. The visible
+"Explore" button returns to the Moon-fixed scientific explorer without
+altering the shared selection. The three-body fallback remains available if
+the env value is absent at build time.
 
-Until the fork deployment URL is configured, the previous functional
-three-body Overview is retained as a fallback. No arbitrary, invented,
-or private external URL is embedded.
+Upstream README claims MIT licensing for code. Texture sources include Solar
+System Scope (CC BY 4.0), Planet Pixel Emporium, USGS Astrogeology, and Steve
+Albers; reuse rights for images are separate from source-code licensing.
+The main app credits both the original author/source and our deployed fork.
