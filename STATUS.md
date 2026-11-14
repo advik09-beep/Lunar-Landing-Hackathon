@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D14 OzAILabs — LIVE / PASS | Fork deployed independently at solar-system-simulator-usmdo-club.vercel.app; configured and browser-tested public iframe in Overview, with source/texture credits and Explore exit; no Lane A edits. |
+| Advik + ChatGPT (Lane B) | Visual cleanup + objectives audit — IN PROGRESS | Clean simulator embed; remove Earth sphere in Explore; original decorative nebula; auditing NASA challenge gaps |
 | Sheldon (Lane A human) | — | Planning stop 2026-11-14: D12-D18 signed; acceptance run done |
 | Claude Code (Lane A) | 15 (D17 amendment) | Clearance + slip tolerance, 'Sun and Earth score', 'Why these weights?' DONE; stopped. Next: D18 on Sheldon's go |
 
