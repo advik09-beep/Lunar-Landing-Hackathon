@@ -1,0 +1,47 @@
+name: One-time NASA 2025 4K Moon texture
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/vendor-nasa-moon-4k.yml']
+permissions:
+  contents: write
+jobs:
+  vendor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create high-detail 4K color map from NASA SVS 2025 TIFF
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p web/public/moon
+          curl --fail --show-error --silent --location --retry 3 --max-time 120 \
+            'https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/lroc_color_16bit_srgb_4k.tif' -o /tmp/lroc_2025_4k.tif
+          python3 -m pip install --quiet pillow
+          python3 - <<'PY'
+          from PIL import Image
+          from pathlib import Path
+          source=Image.open('/tmp/lroc_2025_4k.tif')
+          assert source.size == (4096,2048), source.size
+          rgb=source.convert('RGB')
+          dest=Path('web/public/moon/lroc_color_4k.jpg')
+          rgb.save(dest,format='JPEG',quality=90,optimize=True,subsampling=2)
+          assert 350000 < dest.stat().st_size < 12000000, dest.stat().st_size
+          print('NASA 2025 4K map',source.mode,'->',rgb.mode,'bytes',dest.stat().st_size)
+          PY
+          sha256sum web/public/moon/lroc_color_4k.jpg
+      - name: Commit image to repo once (not at deploy time)
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add web/public/moon/lroc_color_4k.jpg
+          git commit -m 'Vendor NASA SVS 2025 CGI Moon Kit 4K JPEG under web/public/moon'
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git rebase origin/main
+            if git push origin HEAD:main; then exit 0; fi
+            sleep 2
+          done
+          exit 1
