@@ -16,7 +16,7 @@ dateIn.value = params.get("date") ?? "2026-09-19";
 const hourIn = document.querySelector<HTMLInputElement>("#hour")!;
 const hourOut = document.querySelector<HTMLOutputElement>("#hour-out")!;
 hourIn.value = params.get("hour") ?? "0";
-const showHourLabel = () => { hourOut.textContent = `hour ${Number(hourIn.value) + 1} of 168 (${new Date(Date.parse(dateIn.value + "T00:00:00Z") + Number(hourIn.value) * 3.6e6).toISOString().slice(0, 16).replace("T", " ")} UTC)`; };
+const showHourLabel = () => { hourOut.textContent = `day ${Math.floor(Number(hourIn.value) / 24) + 1} of 7 (${new Date(Date.parse(dateIn.value + "T00:00:00Z") + Number(hourIn.value) * 3.6e6).toISOString().slice(0, 16).replace("T", " ")} UTC)`; };
 const select = (siteId: string, landingDate: string, hour = Number(hourIn.value)) => {
   siteSel.value = siteId;
   dateIn.value = landingDate;
@@ -26,7 +26,10 @@ const select = (siteId: string, landingDate: string, hour = Number(hourIn.value)
   for (const p of panels) p.update({ siteId, landingDate, hour });
 };
 
+const levelSel = document.querySelector<HTMLSelectElement>("#level")!;
+levelSel.addEventListener("change", () => { for (const p of panels) p.update({ level: levelSel.value as "educator" | "researcher" }); });
 const props = (): PanelProps => ({
+  level: levelSel.value as "educator" | "researcher",
   siteId: siteSel.value,
   landingDate: dateIn.value,
   hour: Number(hourIn.value),

@@ -17,7 +17,7 @@ export const mountSideCard: MountPanel = (container, props) => {
   root.append(body);
 
   let current: PanelProps = { ...props };
-  let mode: Mode = "plain";
+  let mode: Mode = props.level === "researcher" ? "numbers" : "plain"; // v1.3: follows the shell's level when given
   let token = 0;
   let view: { site: Site; state: State; summary: Summary; horizon: Horizon; start: string; metrics: Metrics } | null = null;
   // D16 power calculator inputs (Researcher view); kept while the panel lives.
@@ -83,7 +83,7 @@ export const mountSideCard: MountPanel = (container, props) => {
   const hourNow = () => clampHour(current.hour, V.VERDICT_RULE.STAY_DAYS * 24);
   const atHour = (st: State) => hourNow() === 0
     ? `At the start of the stay (${fmtUtc(st.sampleUtc)})`
-    : `At hour ${hourNow() + 1} of the stay (${fmtUtc(st.sampleUtc)})`;
+    : `On day ${Math.floor(hourNow() / 24) + 1} of the stay (${fmtUtc(st.sampleUtc)})`;
 
   function paint() {
     if (!view) return;
@@ -104,10 +104,10 @@ export const mountSideCard: MountPanel = (container, props) => {
         <p class="small"><span class="tag cat" data-cat="${site.category}">${site.category === "historic" ? "HISTORIC LANDING" : "CANDIDATE SITE"}</span> ${esc(V.SITE_CATEGORIES[site.category])}</p>
         ${pointNote ? `<p class="muted small">${esc(pointNote)}.</p>` : ""}
       </header>
-      <div class="switch" role="group" aria-label="Reading level: Educator or Researcher">
+      ${current.level ? "" : `<div class="switch" role="group" aria-label="Reading level: Educator or Researcher">
         <button type="button" data-action="mode-plain" aria-pressed="${mode === "plain"}">Educator</button>
         <button type="button" data-action="mode-numbers" aria-pressed="${mode === "numbers"}">Researcher</button>
-      </div>
+      </div>`}
       <div class="verdict" data-verdict="${summary.verdict}">
         <span class="symbol" aria-hidden="true">${w.symbol}</span>
         <div><strong>${esc(w.label)}</strong><span class="why-short">: ${esc(verdictShort(summary.verdict, state.horizonModel))}</span></div>
@@ -148,10 +148,10 @@ export const mountSideCard: MountPanel = (container, props) => {
       if (!me?.available || !top?.available) return `<div class="score"><h3>${esc(V.SCORE_LABEL)} <span class="proto">PROTOTYPE</span></h3><p class="muted">Not available for this landing date.</p></div>`;
       // D21: name the top candidate site; past landings are comparisons, never proposals.
       const candLine = topCand
-        ? (topCand.siteId === site.id ? `This is the top candidate site for a landing on ${esc(current.landingDate)}.` : `The top candidate site for a landing on ${esc(current.landingDate)} is <strong>${esc(topCand.name)}</strong> (${Math.round(topCand.score!)} out of 100).`)
+        ? (topCand.siteId === site.id ? `This is the top candidate site for a landing on ${esc(current.landingDate)}.` : `The top candidate site for a landing on ${esc(current.landingDate)} is <strong>${esc(topCand.shortName)}</strong> (${Math.round(topCand.score!)} out of 100).`)
         : "";
       const allLine = top.category === "historic"
-        ? ` Counting past landings too, the highest score belongs to ${top.siteId === site.id ? "this site" : esc(top.name)} (${Math.round(top.score!)}), a past landing shown for comparison.`
+        ? ` Counting past landings too, the highest score belongs to ${top.siteId === site.id ? "this site" : esc(top.shortName)} (${Math.round(top.score!)}), a past landing shown for comparison.`
         : "";
       const topLine = candLine + allLine;
       return `<div class="score"><h3>${esc(V.SCORE_LABEL)} <span class="proto">PROTOTYPE</span></h3>
@@ -166,9 +166,8 @@ export const mountSideCard: MountPanel = (container, props) => {
       const change = (h: number | null, up: boolean, set: string, rise: string) =>
         h === null ? "no change within the data (up to 60 days)" : `${up ? set : rise} in ${h} h`;
       const ranges = V.getCoverage().sites.find((c) => c.siteId === site.id)?.ranges ?? [];
-      const src = V.getTimeline(site.id, view!.start, 1).source;
       return `
-        <h3>${esc(atHour(state))}, hourly sample</h3>
+        <h3>${esc(atHour(state))}</h3>
         <table>
           <thead><tr><th></th><th>Elevation</th><th>Azimuth</th><th>Horizon there</th><th>Margin</th><th>Next change</th></tr></thead>
           <tbody>
@@ -191,18 +190,18 @@ export const mountSideCard: MountPanel = (container, props) => {
         ${scoreResearcher()}
         <h3>Sources</h3>
         <ul class="sources small">
-          <li>Sun and Earth angles: ${esc(src)}.</li>
-          <li>Horizon: ${flat ? "flat (0° in every direction)" : `${esc(horizon.source)}${horizon.observer ? ` Observer ${Math.abs(horizon.observer.groundHeightM).toFixed(1)} m ${horizon.observer.groundHeightM >= 0 ? "above" : "below"} the 1737.4 km reference sphere + ${horizon.observer.mastM} m assumed mast.` : ""} ${esc(horizon.verifiedMeaning ?? "")}`}</li>
+          <li>Sun and Earth angles: NASA JPL Horizons, the Sun's and Earth's directions as seen from this site.</li>
+          <li>Horizon: ${flat ? "flat (0° in every direction)" : `${esc(horizon.source)}${horizon.observer ? ` Observer ${Math.abs(horizon.observer.groundHeightM).toFixed(1)} m ${horizon.observer.groundHeightM >= 0 ? "above" : "below"} the 1737.4 km reference sphere + ${horizon.observer.mastM} m assumed mast.` : ""} ${horizon.verified ? "Checked by our method tests; not ground truth." : ""}`}</li>
           <li>Site coordinates: <a href="${esc(site.source)}" target="_blank" rel="noopener">${esc(site.source)}</a>${site.coordsVerified ? "" : " (unverified)"}</li>
           <li>Coverage for this site: ${ranges.map(([a, b]) => `${esc(fmtUtc(a))} to ${esc(fmtUtc(b))}`).join("; ")}.</li>
         </ul>
-        <button type="button" class="csv" data-action="csv">Download CSV (${days * 24} hourly rows)</button>`;
+        <button type="button" class="csv" data-action="csv">Download hourly data (CSV)</button>`;
     }
 
     // D16 metrics (terrain-aware hourly data).
     function metricsHtml(): string {
       const m = view!.metrics;
-      return `<h3>Power and comms metrics (${m.hours} h, terrain-aware)</h3>
+      return `<h3>Power and communication over the ${V.VERDICT_RULE.STAY_DAYS}-day stay</h3>
         <table class="kv">
           <tr><th>Sunlight share</th><td>${pct(m.pctLit)}</td><th>Earth-in-view share</th><td>${pct(m.pctComms)}</td></tr>
           <tr><th>Longest dark stretch</th><td>${m.longestDarkHours} h</td><th>Longest contact gap</th><td>${m.longestContactGapHours} h</td></tr>
@@ -240,7 +239,7 @@ export const mountSideCard: MountPanel = (container, props) => {
           ${WEIGHT_KEYS.map(([k, w]) => `<tr><td>${w}</td><td>${esc(V.SCORE_TERMS[k])}</td><td>${c[k].toFixed(3)}</td><td>${W[k]}</td></tr>`).join("")}
         </tbody></table>
         ${whyWeights("researcher")}
-        <p class="small">Score for this site at default weights: <strong>${me.score!.toFixed(1)}</strong> / 100 (rank ${r.ranking.indexOf(me) + 1} of ${r.ranking.filter((x) => x.available).length}). Adjust the weights and see the ranking update in <em>Compare dates</em>.</p>`;
+        <p class="small">Score for this site at default weights: <strong>${me.score!.toFixed(1)}</strong> / 100 (rank ${r.ranking.indexOf(me) + 1} of ${r.ranking.filter((x) => x.available).length}). Adjust the weights and see the ranking update in <em>Compare</em>.</p>`;
     }
   }
 
@@ -299,8 +298,11 @@ export const mountSideCard: MountPanel = (container, props) => {
       const changed = (next.siteId !== undefined && next.siteId !== current.siteId) ||
         (next.landingDate !== undefined && next.landingDate !== current.landingDate);
       const hourChanged = next.hour !== undefined && next.hour !== current.hour;
+      const levelChanged = next.level !== undefined && next.level !== current.level;
+      if (next.level) mode = next.level === "researcher" ? "numbers" : "plain";
       current = { ...current, ...next };
       if (changed) load();
+      else if (levelChanged && view && !hourChanged) { paint(); renderCalc(); }
       else if (hourChanged && view) { view.state = V.getState(view.site.id, Date.parse(view.start) + hourNow() * 3.6e6); paint(); renderCalc(); }
     },
     destroy() { token++; host.remove(); },
@@ -340,44 +342,44 @@ function earthNote(st: State): string {
 }
 
 const CSS = `
-.card { padding: 18px 20px; border: 1px solid var(--llp-border, #344b69); border-radius: 14px; background: var(--llp-bg, #132138); line-height: 1.5; }
-h2 { margin: 0 0 4px; font-size: 1.2rem; }
+.card { padding: var(--_pad); border: 1px solid var(--_border); border-radius: 14px; background: var(--_bg); line-height: 1.5; }
+h2 { margin: 0 0 4px; font-size: var(--_fs-lg); }
 h3 { margin: 18px 0 6px; font-size: .95rem; }
 p { margin: 6px 0; }
-.small { font-size: .82rem; }
-.switch { display: inline-flex; margin: 12px 0; border: 1px solid var(--llp-border, #344b69); border-radius: 999px; overflow: hidden; }
+.small { font-size: var(--_fs-sm); }
+.switch { display: inline-flex; margin: 12px 0; border: 1px solid var(--_border); border-radius: 999px; overflow: hidden; }
 .switch button { padding: 6px 16px; border: 0; background: transparent; color: inherit; }
-.switch button[aria-pressed="true"] { background: var(--llp-accent, #2f5d9a); font-weight: 650; }
+.switch button[aria-pressed="true"] { background: var(--_accent); font-weight: 650; }
 .verdict { display: flex; gap: 12px; align-items: center; padding: 10px 14px; border-radius: 10px; border: 2px solid; }
 .verdict .symbol { font-size: 1.6rem; line-height: 1; }
 .verdict strong { font-size: 1.15rem; }
-.verdict[data-verdict="clear"] { border-color: var(--llp-clear, #4fbf7a); background: rgba(79,191,122,.12); }
-.verdict[data-verdict="partial"] { border-color: var(--llp-partial, #e0b84f); background: rgba(224,184,79,.12); }
-.verdict[data-verdict="out"] { border-color: var(--llp-out, #e06a5f); background: rgba(224,106,95,.12); }
-.verdict[data-verdict="edge"] { border-color: var(--llp-edge, #b48cf0); background: rgba(180,140,240,.12); border-style: dashed; }
+.verdict[data-verdict="clear"] { border-color: var(--_clear); background: rgba(79,191,122,.12); }
+.verdict[data-verdict="partial"] { border-color: var(--_partial); background: linear-gradient(90deg, rgba(79,191,122,.18) 50%, transparent 50%); }
+.verdict[data-verdict="out"] { border-color: var(--_out); background: rgba(148,163,184,.10); }
+.verdict[data-verdict="edge"] { border-color: var(--_edge); background: rgba(180,140,240,.12); border-style: dashed; }
 .tag { display: inline-block; padding: 1px 7px; margin-right: 4px; border-radius: 6px; font-size: .72rem; font-weight: 700; letter-spacing: .06em; border: 1px solid currentColor; }
-.tag[data-model="flat"] { color: var(--llp-warn, #ffd49d); }
-.tag[data-model="lola"] { color: var(--llp-clear, #4fbf7a); }
+.tag[data-model="flat"] { color: var(--_muted); }
+.tag[data-model="lola"] { color: var(--_clear); }
 .horizon-label { font-size: .88rem; }
 .why { font-size: 1.02rem; }
 ul { padding-left: 18px; margin: 6px 0; }
 .status li { margin: 4px 0; }
 table { width: 100%; border-collapse: collapse; font-size: .85rem; font-variant-numeric: tabular-nums; }
-th, td { text-align: left; padding: 4px 6px; border-bottom: 1px solid var(--llp-border, #344b69); vertical-align: top; }
-thead th { color: var(--llp-muted, #a8bbd3); font-weight: 600; }
-.kv th { color: var(--llp-muted, #a8bbd3); font-weight: 500; }
-.sources a { color: var(--llp-link, #9cc6ff); word-break: break-all; }
+th, td { text-align: left; padding: 4px 6px; border-bottom: 1px solid var(--_border); vertical-align: top; }
+thead th { color: var(--_muted); font-weight: 600; }
+.kv th { color: var(--_muted); font-weight: 500; }
+.sources a { color: var(--_link); word-break: break-all; }
 .days { display: flex; justify-content: space-between; gap: 8px; margin-top: 16px; }
-.days button, .csv { padding: 6px 12px; border: 1px solid var(--llp-border, #344b69); border-radius: 8px; background: transparent; color: inherit; }
+.days button, .csv { padding: 6px 12px; border: 1px solid var(--_border); border-radius: 8px; background: transparent; color: inherit; }
 .csv { margin-top: 10px; }
 .exits { display: flex; gap: 8px; margin-top: 10px; }
-.score { margin-top: 14px; padding: 10px 14px; border: 1px solid var(--llp-border, #344b69); border-radius: 10px; }
+.score { margin-top: 14px; padding: 10px 14px; border: 1px solid var(--_border); border-radius: 10px; }
 .score .big { font-size: 1.05rem; }
-.tag.cat[data-cat="historic"] { color: var(--llp-muted, #a8bbd3); }
-.tag.cat[data-cat="candidate"] { color: var(--llp-link, #9cc6ff); }
-.proto { display: inline-block; padding: 0 6px; border-radius: 5px; font-size: .68rem; letter-spacing: .06em; border: 1px dashed var(--llp-warn, #ffd49d); color: var(--llp-warn, #ffd49d); vertical-align: middle; }
+.tag.cat[data-cat="historic"] { color: var(--_muted); }
+.tag.cat[data-cat="candidate"] { color: var(--_link); }
+.proto { display: inline-block; padding: 0 6px; border-radius: 5px; font-size: .68rem; letter-spacing: .06em; border: 1px dashed var(--_muted); color: var(--_muted); vertical-align: middle; }
 .calc { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px 12px; margin: 6px 0; font-size: .85rem; }
-.calc label { display: grid; gap: 3px; color: var(--llp-muted, #a8bbd3); }
-.calc input, .calc select { font: inherit; padding: 4px 6px; border-radius: 6px; border: 1px solid var(--llp-border, #344b69); background: transparent; color: var(--llp-text, #ecf2ff); }
-.exits button { flex: 1; padding: 8px 12px; border: 1px solid var(--llp-accent, #2f5d9a); border-radius: 8px; background: var(--llp-accent, #2f5d9a); color: inherit; font-weight: 600; }
+.calc label { display: grid; gap: 3px; color: var(--_muted); }
+.calc input, .calc select { font: inherit; padding: 4px 6px; border-radius: 6px; border: 1px solid var(--_border); background: transparent; color: var(--_text); }
+.exits button { flex: 1; padding: 8px 12px; border: 1px solid var(--_accent); border-radius: 8px; background: var(--_accent); color: inherit; font-weight: 600; }
 `;

@@ -19,13 +19,41 @@ export function createPanelRoot(container: HTMLElement, kind: string, css: strin
   return { host, root };
 }
 
+/** D30 colour roles and scale (identical in shell and panels). Contrast on the card colour #132138:
+ *  sun 9.6:1, earth 6.3:1, clear 7.0:1, out 6.3:1, edge 6.1:1, text 14.4:1, muted 8.2:1, warn 6.8:1, link 9.2:1. */
+export const THEME = Object.freeze({
+  sun: "#F2C14E",       // gold = the Sun and sunlight (only)
+  earth: "#5AA9E6",     // blue = Earth and contact (only)
+  clear: "#4FBF7A",     // verdict Clear: solid green
+  partial: "#4FBF7A",   // verdict Partial: half-filled green outline (same green, never yellow)
+  out: "#94A3B8",       // verdict Out: slate grey
+  edge: "#B48CF0",      // verdict On the edge: violet
+  text: "#ECF2FF", muted: "#A8BBD3", warn: "#F28B82", link: "#9CC6FF",
+  bg: "#132138", page: "#091322", border: "#344B69", accent: "#2F5D9A", focus: "#9CC6FF",
+  horizon: "#E8E2D0", ground: "#2A2620", groundLine: "#4A443A", sky: "#0D1A2E",
+});
+
 const BASE_CSS = `
-:host { display: block; color: var(--llp-text, #ecf2ff); font: inherit; }
+:host {
+  display: block; font: inherit;
+  /* Private copies: each takes the shell's --llp-* value if set, else the D30 default. */
+  --_sun: var(--llp-sun, ${THEME.sun}); --_earth: var(--llp-earth, ${THEME.earth});
+  --_clear: var(--llp-clear, ${THEME.clear}); --_partial: var(--llp-partial, ${THEME.partial});
+  --_out: var(--llp-out, ${THEME.out}); --_edge: var(--llp-edge, ${THEME.edge});
+  --_text: var(--llp-text, ${THEME.text}); --_muted: var(--llp-muted, ${THEME.muted}); --_warn: var(--llp-warn, ${THEME.warn});
+  --_link: var(--llp-link, ${THEME.link}); --_bg: var(--llp-bg, ${THEME.bg}); --_border: var(--llp-border, ${THEME.border});
+  --_accent: var(--llp-accent, ${THEME.accent}); --_focus: var(--llp-focus, ${THEME.focus});
+  --_horizon: var(--llp-horizon, ${THEME.horizon}); --_ground: var(--llp-ground, ${THEME.ground});
+  --_ground-line: var(--llp-ground-line, ${THEME.groundLine}); --_sky: var(--llp-sky, ${THEME.sky});
+  /* D30 type and spacing scale */
+  --_fs-xs: .75rem; --_fs-sm: .84rem; --_fs-md: .95rem; --_fs-lg: 1.1rem; --_pad: 12px 14px; --_gap: 8px;
+  color: var(--_text);
+}
 * { box-sizing: border-box; }
-.muted { color: var(--llp-muted, #a8bbd3); }
-.warn { color: var(--llp-warn, #ffd49d); }
+.muted { color: var(--_muted); }
+.warn { color: var(--_warn); }
 button { font: inherit; cursor: pointer; }
-:focus-visible { outline: 2px solid var(--llp-focus, #8fc1ff); outline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--_focus); outline-offset: 2px; }
 `;
 
 export const esc = (s: unknown): string =>
@@ -71,9 +99,9 @@ export function whyWeights(level: "educator" | "researcher"): string {
 }
 export const WHY_WEIGHTS_CSS = `
 .why-weights { margin: 6px 0; font-size: .84rem; }
-.why-weights summary { cursor: pointer; color: var(--llp-link, #9cc6ff); text-decoration: underline; display: inline; }
+.why-weights summary { cursor: pointer; color: var(--_link); text-decoration: underline; display: inline; }
 .why-weights p, .why-weights ul { margin: 6px 0; }
-.meaning { font-size: .82rem; color: var(--llp-muted, #a8bbd3); }
+.meaning { font-size: .82rem; color: var(--_muted); }
 `;
 
 export function addDays(date: string, n: number): string {

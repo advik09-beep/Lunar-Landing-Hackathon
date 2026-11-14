@@ -23,7 +23,7 @@ export const mountCompareGrid: MountPanel = (container, props) => {
   let windowStart = addDays(current.landingDate, -BEFORE);
   let token = 0;
   // D17 best-site score: reading level and Researcher weights (live ranking).
-  let scoreMode: "educator" | "researcher" = "educator";
+  let scoreMode: "educator" | "researcher" = props.level ?? "educator"; // v1.3
   let weights: Weights = { ...V.SCORE_DEFAULT_WEIGHTS };
   let rankFilter: RankFilter = "all"; // D21: all sites / candidate sites / historic landings
 
@@ -89,7 +89,7 @@ export const mountCompareGrid: MountPanel = (container, props) => {
         const tip = `${s.name}, landing ${d}: ${w.label}${edgeWhy}. Over ${days} days: sunlight ${pct(r.pctLit)}, Earth in view ${pct(r.pctComms)}, both ${pct(r.pctBoth)}, longest dark ${r.longestDarkHours} h.`;
         return `<td class="${selCell ? "selcell" : ""}"><button type="button" class="v" data-verdict="${r.verdict}" data-action="cell" data-site="${s.id}" data-date="${d}" title="${esc(tip)}" aria-label="${esc(tip)}">${w.symbol}</button></td>`;
       }).join("");
-      return `<tr class="${selRow ? "selrow" : ""}"><th scope="row"><button type="button" data-action="site" data-site="${s.id}" ${selRow ? 'aria-current="true"' : ""}>${esc(s.name)}</button> <span class="tag" data-model="${model === "FLAT" ? "flat" : "lola"}">${model}</span>${s.category === "historic" ? ' <span class="tag hist" title="Historic landing, shown for comparison">PAST</span>' : ""}</th>${cells}</tr>`;
+      return `<tr class="${selRow ? "selrow" : ""}"><th scope="row"><button type="button" data-action="site" data-site="${s.id}" title="${esc(s.name)}" ${selRow ? 'aria-current="true"' : ""}>${esc(s.shortName)}</button>${model === "FLAT" ? ' <span class="tag" data-model="flat">FLAT</span>' : ""}${s.category === "historic" ? ' <span class="tag hist" title="Historic landing, shown for comparison">Historic</span>' : ""}</th>${cells}</tr>`;
     }).join("");
 
     const strip = await stripHtml(current.siteId, dates, days);
@@ -118,7 +118,7 @@ export const mountCompareGrid: MountPanel = (container, props) => {
       </table></div>
       ${strip}
       <section class="score-box" aria-label="Best-site score"></section>
-      <p class="muted small">Verdicts and percentages come from the daily summary (getDaily); the strip comes from hourly data (getTimeline). ${[...terrain.values()].some((t) => t !== "lola") ? "FLAT rows use a flat horizon; TERRAIN rows use" : "Every row uses"} the LOLA terrain horizon for one point per site. Updated in ${ms} ms.</p>`;
+      <p class="muted small">Each cell summarises a 7-day stay; the strip shows it hour by hour. ${[...terrain.values()].some((t) => t !== "lola") ? "FLAT rows use a flat horizon; other rows use" : "Every site uses"} a terrain horizon from NASA's LOLA elevation maps, for one point per site.</p>`;
   }
 
   // ---- D17: best-site score for the selected landing date (PROTOTYPE) ----
@@ -129,10 +129,10 @@ export const mountCompareGrid: MountPanel = (container, props) => {
     box.innerHTML = `
       <h3>${esc(V.SCORE_LABEL)} for a landing on ${esc(current.landingDate)} <span class="proto">PROTOTYPE</span></h3>
       <p class="meaning">${esc(V.SCORE_MEANING)}</p>
-      <div class="switch" role="group" aria-label="Reading level: Educator or Researcher">
+      ${current.level ? "" : `<div class="switch" role="group" aria-label="Reading level: Educator or Researcher">
         <button type="button" data-action="score-educator" aria-pressed="${scoreMode === "educator"}">Educator</button>
         <button type="button" data-action="score-researcher" aria-pressed="${scoreMode === "researcher"}">Researcher</button>
-      </div>
+      </div>`}
       ${scoreMode === "researcher" ? `
         <p class="small">${esc(V.SCORE_FORMULA_TEXT)}</p>
         <div class="weights">${terms.map(([k, w]) => `<label><span>${w}: ${esc(V.SCORE_TERMS[k])}</span>
@@ -158,15 +158,15 @@ export const mountCompareGrid: MountPanel = (container, props) => {
     const group = rankFilter === "candidate" ? "candidate site" : rankFilter === "historic" ? "historic landing" : "site";
     const histNote = (x: { category: string }) => (x.category === "historic" ? ` <span class="cmp">past landing, shown for comparison</span>` : "");
     if (scoreMode === "educator") {
-      out.innerHTML = `<p class="big">For a landing on ${esc(current.landingDate)}, the top ${group} by our prototype ${esc(V.SCORE_LABEL)} is <strong>${esc(top.name)}</strong>, scoring <strong>${Math.round(top.score!)}</strong> out of 100${top.category === "historic" ? " (a past landing, shown for comparison)" : ""}.</p>
-        <ol class="rank">${avail.map((x) => `<li${x.siteId === current.siteId ? ' class="sel"' : ""}>${esc(x.name)}: ${Math.round(x.score!)}${histNote(x)}</li>`).join("")}</ol>
+      out.innerHTML = `<p class="big">For a landing on ${esc(current.landingDate)}, the top ${group} by our prototype ${esc(V.SCORE_LABEL)} is <strong>${esc(top.shortName)}</strong>, scoring <strong>${Math.round(top.score!)}</strong> out of 100${top.category === "historic" ? " (a past landing, shown for comparison)" : ""}.</p>
+        <ol class="rank">${avail.map((x) => `<li${x.siteId === current.siteId ? ' class="sel"' : ""}>${esc(x.shortName)}: ${Math.round(x.score!)}${histNote(x)}</li>`).join("")}</ol>
         <p class="muted small">Historic landings are past missions, included so educators can compare them with candidate sites.</p>
         <p class="muted small">Uses the default weights. The Researcher view explains the calculation.</p>`;
       return;
     }
-    out.innerHTML = `<p class="small">${r.isDefault ? "Default weights." : "Custom weights: the ranking below is yours, not the Educator default."} Top site: <strong>${esc(top.name)}</strong> (${top.score === null ? "–" : top.score.toFixed(1)}).</p>
+    out.innerHTML = `<p class="small">${r.isDefault ? "Default weights." : "Custom weights: the ranking below is yours, not the Educator default."} Top site: <strong>${esc(top.shortName)}</strong> (${top.score === null ? "–" : top.score.toFixed(1)}).</p>
       <table class="ranktable"><thead><tr><th>#</th><th>Site</th><th>Score</th><th>S</th><th>E</th><th>D</th><th>G</th><th>C</th><th>T</th></tr></thead><tbody>
-      ${avail.map((x, i) => `<tr${x.siteId === current.siteId ? ' class="sel"' : ""}><td>${i + 1}</td><td><button type="button" data-action="site" data-site="${x.siteId}">${esc(x.name)}</button>${histNote(x)}</td><td>${x.score === null ? "–" : x.score.toFixed(1)}</td>${WEIGHT_KEYS.map(([k]) => `<td>${x.components![k].toFixed(2)}</td>`).join("")}</tr>`).join("")}
+      ${avail.map((x, i) => `<tr${x.siteId === current.siteId ? ' class="sel"' : ""}><td>${i + 1}</td><td><button type="button" data-action="site" data-site="${x.siteId}" title="${esc(x.name)}">${esc(x.shortName)}</button>${histNote(x)}</td><td>${x.score === null ? "–" : x.score.toFixed(1)}</td>${WEIGHT_KEYS.map(([k]) => `<td>${x.components![k].toFixed(2)}</td>`).join("")}</tr>`).join("")}
       </tbody></table>
       ${r.ranking.length > avail.length ? `<p class="muted small">${r.ranking.length - avail.length} site(s) have no data for this date.</p>` : ""}`;
   }
@@ -203,7 +203,7 @@ export const mountCompareGrid: MountPanel = (container, props) => {
       summary = `Selected stay (${days} days from ${esc(current.landingDate)}): sunlight ${pct(s.pctLit)}, Earth in view ${pct(s.pctComms)}, both ${pct(s.pctBoth)}, longest dark stretch ${s.longestDarkHours} h.`;
     } catch { summary = `No data for a ${days}-day stay from ${esc(current.landingDate)}.`; }
     return `
-      <h3>Hour by hour: ${esc(site.name)}</h3>
+      <h3>Hour by hour: ${esc(site.shortName)}</h3>
       <p class="muted small">Top half filled = sunlight; bottom half filled = Earth in view; both = full bar; neither = empty. Hatched = no data. The outlined block is the selected stay; the dashed line is the selected hour.</p>
       <svg class="strip" viewBox="0 0 ${W} ${Hh + 18}" role="img" aria-label="${esc(`Hourly sunlight and Earth in view for ${site.name}, ${dates[0]} to ${dates[dates.length - 1]}. ${summary}`)}">
         <defs><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" class="nodata-bg"/><line x1="0" y1="0" x2="0" y2="6" class="hatch"/></pattern></defs>
@@ -221,6 +221,7 @@ export const mountCompareGrid: MountPanel = (container, props) => {
   return {
     update(next) {
       const hourChanged = next.hour !== undefined && next.hour !== current.hour;
+      if (next.level && next.level !== scoreMode) { scoreMode = next.level; current = { ...current, level: next.level }; renderScoreBox(); }
       const siteChanged = next.siteId !== undefined && next.siteId !== current.siteId;
       const dateChanged = next.landingDate !== undefined && next.landingDate !== current.landingDate;
       current = { ...current, ...next };
@@ -235,61 +236,61 @@ export const mountCompareGrid: MountPanel = (container, props) => {
 };
 
 const CSS = `
-.card { padding: 18px 20px; border: 1px solid var(--llp-border, #344b69); border-radius: 14px; background: var(--llp-bg, #132138); line-height: 1.45; }
-h2 { margin: 0 0 4px; font-size: 1.2rem; }
+.card { padding: var(--_pad); border: 1px solid var(--_border); border-radius: 14px; background: var(--_bg); line-height: 1.45; }
+h2 { margin: 0 0 4px; font-size: var(--_fs-lg); }
 h3 { margin: 18px 0 4px; font-size: .95rem; }
 p { margin: 6px 0; }
-.small { font-size: .82rem; }
+.small { font-size: var(--_fs-sm); }
 .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 10px 0; font-size: .85rem; align-items: center; }
 .window { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 8px 0; font-size: .85rem; }
-.window button { padding: 5px 10px; border: 1px solid var(--llp-border, #344b69); border-radius: 8px; background: transparent; color: inherit; }
+.window button { padding: 5px 10px; border: 1px solid var(--_border); border-radius: 8px; background: transparent; color: inherit; }
 .scroll { overflow-x: auto; }
 table.grid { border-collapse: separate; border-spacing: 2px; font-size: .78rem; }
 .grid th, .grid td { padding: 0; text-align: center; }
-.grid thead th button { width: 26px; padding: 2px 0; border: 0; background: transparent; color: var(--llp-muted, #a8bbd3); font-size: .72rem; white-space: nowrap; }
-.grid thead th.sel button { color: var(--llp-text, #ecf2ff); font-weight: 700; text-decoration: underline; }
-.grid th[scope="row"] { text-align: left; padding-right: 8px; white-space: nowrap; position: sticky; left: 0; background: var(--llp-bg, #132138); }
+.grid thead th button { width: 26px; padding: 2px 0; border: 0; background: transparent; color: var(--_muted); font-size: .72rem; white-space: nowrap; }
+.grid thead th.sel button { color: var(--_text); font-weight: 700; text-decoration: underline; }
+.grid th[scope="row"] { text-align: left; padding-right: 8px; white-space: nowrap; position: sticky; left: 0; background: var(--_bg); }
 .grid th[scope="row"] button { border: 0; background: transparent; color: inherit; padding: 2px 0; text-align: left; font-size: .8rem; max-width: 230px; overflow: hidden; text-overflow: ellipsis; vertical-align: middle; }
 .grid tr.selrow th[scope="row"] button { font-weight: 700; }
-.corner { text-align: left; color: var(--llp-muted, #a8bbd3); font-weight: 500; }
+.corner { text-align: left; color: var(--_muted); font-weight: 500; }
 .v { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 5px; border: 1px solid transparent; color: #0b1322; font-weight: 700; font-size: .85rem; line-height: 1; padding: 0; }
 button.v { cursor: pointer; }
-.v[data-verdict="clear"] { background: var(--llp-clear, #4fbf7a); }
-.v[data-verdict="partial"] { background: var(--llp-partial, #e0b84f); }
-.v[data-verdict="out"] { background: var(--llp-out, #e06a5f); }
-.v[data-verdict="edge"] { background: var(--llp-edge, #b48cf0); border: 1px dashed #0b1322; }
-.v.na, td.na span { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; color: var(--llp-muted, #a8bbd3); background: transparent; border: 1px dashed var(--llp-border, #344b69); border-radius: 5px; }
-td.selcell .v, td.selcell span { outline: 3px solid var(--llp-text, #ecf2ff); outline-offset: 1px; }
+.v[data-verdict="clear"] { background: var(--_clear); }
+.v[data-verdict="partial"] { background: linear-gradient(90deg, var(--_partial) 50%, transparent 50%); border: 2px solid var(--_partial); color: var(--_text); }
+.v[data-verdict="out"] { background: var(--_out); }
+.v[data-verdict="edge"] { background: var(--_edge); border: 1px dashed #0b1322; }
+.v.na, td.na span { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; color: var(--_muted); background: transparent; border: 1px dashed var(--_border); border-radius: 5px; }
+td.selcell .v, td.selcell span { outline: 3px solid var(--_text); outline-offset: 1px; }
 .tag { display: inline-block; padding: 0 5px; border-radius: 5px; font-size: .62rem; font-weight: 700; letter-spacing: .05em; border: 1px solid currentColor; vertical-align: middle; }
-.tag[data-model="flat"] { color: var(--llp-warn, #ffd49d); }
-.tag[data-model="lola"] { color: var(--llp-clear, #4fbf7a); }
+.tag[data-model="flat"] { color: var(--_muted); }
+.tag[data-model="lola"] { color: var(--_clear); }
 svg.strip { width: 100%; height: auto; display: block; }
 .filter { display: inline-flex; gap: 6px; align-items: center; margin: 6px 0 0 10px; font-size: .85rem; }
-.filter select { font: inherit; padding: 2px 6px; border-radius: 6px; border: 1px solid var(--llp-border, #344b69); background: transparent; color: inherit; }
-.cmp { font-size: .75rem; color: var(--llp-muted, #a8bbd3); font-style: italic; }
-.tag.hist { color: var(--llp-muted, #a8bbd3); }
-.score-box { margin-top: 16px; padding: 10px 14px; border: 1px solid var(--llp-border, #344b69); border-radius: 10px; }
+.filter select { font: inherit; padding: 2px 6px; border-radius: 6px; border: 1px solid var(--_border); background: transparent; color: inherit; }
+.cmp { font-size: .75rem; color: var(--_muted); font-style: italic; }
+.tag.hist { color: var(--_muted); }
+.score-box { margin-top: 16px; padding: 10px 14px; border: 1px solid var(--_border); border-radius: 10px; }
 .score-box .big { font-size: 1.02rem; }
-.proto { display: inline-block; padding: 0 6px; border-radius: 5px; font-size: .68rem; letter-spacing: .06em; border: 1px dashed var(--llp-warn, #ffd49d); color: var(--llp-warn, #ffd49d); vertical-align: middle; }
-.switch { display: inline-flex; margin: 6px 0; border: 1px solid var(--llp-border, #344b69); border-radius: 999px; overflow: hidden; }
+.proto { display: inline-block; padding: 0 6px; border-radius: 5px; font-size: .68rem; letter-spacing: .06em; border: 1px dashed var(--_muted); color: var(--_muted); vertical-align: middle; }
+.switch { display: inline-flex; margin: 6px 0; border: 1px solid var(--_border); border-radius: 999px; overflow: hidden; }
 .switch button { padding: 4px 14px; border: 0; background: transparent; color: inherit; font-size: .85rem; }
-.switch button[aria-pressed="true"] { background: var(--llp-accent, #2f5d9a); font-weight: 650; }
+.switch button[aria-pressed="true"] { background: var(--_accent); font-weight: 650; }
 .weights { display: grid; gap: 4px; margin: 6px 0; font-size: .82rem; }
 .weights label { display: grid; grid-template-columns: 1fr 160px 32px; gap: 8px; align-items: center; }
-.reset { padding: 4px 10px; border: 1px solid var(--llp-border, #344b69); border-radius: 8px; background: transparent; color: inherit; font-size: .8rem; }
+.reset { padding: 4px 10px; border: 1px solid var(--_border); border-radius: 8px; background: transparent; color: inherit; font-size: .8rem; }
 ol.rank { margin: 6px 0; padding-left: 22px; font-size: .88rem; }
 .rank li.sel, .ranktable tr.sel td { font-weight: 700; }
 .ranktable { border-collapse: collapse; font-size: .82rem; margin-top: 6px; font-variant-numeric: tabular-nums; }
-.ranktable th, .ranktable td { padding: 2px 8px; border-bottom: 1px solid var(--llp-border, #344b69); text-align: left; }
+.ranktable th, .ranktable td { padding: 2px 8px; border-bottom: 1px solid var(--_border); text-align: left; }
 .ranktable button { border: 0; background: transparent; color: inherit; padding: 0; font: inherit; cursor: pointer; text-decoration: underline; }
 .strip .bg { fill: rgba(255,255,255,.04); }
-.strip .sun { fill: var(--llp-sun, #f2c94c); }
-.strip .earth { fill: var(--llp-earth, #5aa9e6); }
-.strip .mid { stroke: var(--llp-border, #344b69); stroke-width: 1; }
-.strip .stay { fill: none; stroke: var(--llp-text, #ecf2ff); stroke-width: 3; }
-.strip .cursor { stroke: var(--llp-text, #ecf2ff); stroke-width: 2; stroke-dasharray: 4 2; }
+.strip .sun { fill: var(--_sun); }
+.strip .earth { fill: var(--_earth); }
+.strip .mid { stroke: var(--_border); stroke-width: 1; }
+.strip .stay { fill: none; stroke: var(--_text); stroke-width: 3; }
+.strip .cursor { stroke: var(--_text); stroke-width: 2; stroke-dasharray: 4 2; }
 .strip .nodata { fill: url(#hatch); }
 .strip .nodata-bg { fill: transparent; }
-.strip .hatch { stroke: var(--llp-border, #344b69); stroke-width: 2; }
-.strip text { fill: var(--llp-muted, #a8bbd3); font-size: 11px; }
+.strip .hatch { stroke: var(--_border); stroke-width: 2; }
+.strip text { fill: var(--_muted); font-size: 11px; }
 `;

@@ -6,7 +6,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 |-----|------|-----------|
 | Advik + ChatGPT (Lane B) | D29 steps 1–4 — PASS / STOPPED | LunLux shell and mission subtitle; mounted scrolling Planner; paused solar system visible behind dimmed title card; embedded sound OFF by default with accessible speaker toggle. Main + fork Vercel READY; Chromium PASS, no page errors. |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
-| Claude Code (Lane A) | D29 rename done | Lane A files renamed to LunLux; stopped |
+| Claude Code (Lane A) | D30 Lane A part done | Panels follow the D30 theme, short names, Historic tag, interface v1.3 (shared reading level); stopped |
 
 Acceptance (both humans): steps 1, 2, 3, 6, 8 PASS; step 4 and 7 pending earlier findings. Signed: D7–D23 (see PLAN), **D24–D28** (title card + tour nav, tour captions, why the south pole, one clock, A/B scenarios + requirements filter). Rule: no status-only pushes.
 Waiting on Sheldon: review the revised captions, the south-pole one-liner and the D28 planner on web/panels.html.
@@ -1481,4 +1481,26 @@ SOUTH_POLE.sources;          // [{ name, url }]
   - "Lunar Landing Site Navigator" now appears only in the notes saying it was renamed.
 - **Lane B:** please rename your visible strings (page title, headings, Credits, footer). `APP_NAME` / `APP_TAGLINE` can be imported from `lib/visibility.js`.
 - **Checks:** all nine check scripts and every panel test PASS; `/web` build OK.
+
+### 2026-11-14 — D30 presentation pass: recorded; Lane A panel part DONE
+- **D30 recorded in PLAN.md.** Plain-language brief for the shell in **DESIGN.md → "Presentation pass"**: structure items 1–7, the colour table with contrast ratios and a CSS block to paste, the type/spacing scale, and the plain-language rule.
+- **Colour roles** (contrast on the card `#132138`):
+  - Sun `#F2C14E` gold (9.6:1), Earth `#5AA9E6` blue (6.3:1).
+  - Clear `#4FBF7A` solid green (7.0:1); **Partial = the same green as a half-filled outline**, so yellow now only means the Sun; Out `#94A3B8` slate (6.3:1); On the edge `#B48CF0` violet, dashed (6.1:1).
+  - Warning `#F28B82` coral, link `#9CC6FF`. Text on the accent is 5.9:1.
+- **Panels:**
+  - All colours go through private variables that default to these values and still take the shell's `--llp-*`. `THEME` is exported from `web/src/panels/shared.ts`.
+  - Tighter card padding (12 × 14 px) and the shared type scale.
+  - Prototype/estimate/FLAT tags are no longer yellow.
+- **Plain language:**
+  - Removed "(getDaily)/(getTimeline)", the API version and the row counts.
+  - "hour n of 168" → "day d of 7"; "At hour n of the stay" → "On day d of the stay".
+  - The horizon "verified" note now says "Checked by our method tests; not ground truth." The Horizons query string in the side card's sources became "NASA JPL Horizons, the Sun's and Earth's directions as seen from this site".
+  - A DOM test scans the side card, grid, Researcher and planner text for lane names, API, function names, file paths and "168 hourly": none found.
+- **Short site names:** `shortName` in `data/sites.js` and `listSites()` (Apollo 11, Apollo 12, Apollo 17, Chandrayaan-3, IM-1, IM-2, Cabeus B peak, Haworth, Malapert, Nobile Rim 2). Used in the grid, rankings, requirements, planner and top-site lines; the full name stays in the card and as a tooltip.
+- **Grid rows:** TERRAIN tag removed (FLAT would still show if a site lacked terrain); "PAST" → "Historic".
+- **Panel interface v1.3:** `level?: "educator" | "researcher"` in the props and `update({ level })`. The side card and the Compare grid's score box follow it and hide their own switches. Researcher (Report) and planner are always full views.
+  - **Lane B:** pass `level` from your single header switch when mounting, and call `update({ level })` on every panel when it changes.
+- **Bug caught before committing:** the bulk colour replacement had also rewritten the theme definitions into self-references (`--_sun: var(--_sun)`), which would have left the colours undefined. The theme test caught it and it was restored.
+- **Checks:** all nine check scripts PASS. Panel tests PASS, including the new v1.3/theme/plain-language test; the original D16 panel test was retired, since the D17 test replaces it. `/web` build OK.
 

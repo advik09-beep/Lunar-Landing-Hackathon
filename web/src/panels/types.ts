@@ -1,4 +1,4 @@
-// Lane A panel interface v1.2 (PLAN D9; v1.1 adds onOpenView; v1.2 adds the shared hour for D13, 2026-11-14). Lane B mounts panels and owns the shared selection;
+// Panel interface v1.3 (PLAN D9; v1.1 onOpenView; v1.2 shared hour (D13); v1.3 shared reading level (D30), 2026-11-14). Lane B mounts panels and owns the shared selection;
 // panels never change the selection themselves — they ask through the two callbacks.
 
 export interface PanelProps {
@@ -20,11 +20,14 @@ export interface PanelProps {
    *  If given, panels never change the hour themselves; the shell decides and calls update({ hour }).
    *  If omitted, the horizon view keeps its own local hour as in v1.1. */
   onHourSelected?: (hour: number) => void;
+  /** v1.3, optional: reading level from the shell's single Educator / Researcher switch (D30).
+   *  When given, panels follow it and hide their own switches. */
+  level?: "educator" | "researcher";
 }
 
 export interface PanelHandle {
   /** Shell pushes a new selection. Only the fields given change. */
-  update(next: Partial<Pick<PanelProps, "siteId" | "landingDate" | "hour">>): void;
+  update(next: Partial<Pick<PanelProps, "siteId" | "landingDate" | "hour" | "level">>): void;
   /** Removes the panel's DOM and listeners. The container itself is left in place. */
   destroy(): void;
 }

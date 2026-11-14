@@ -59,7 +59,7 @@ export const mountPlanner: MountPanel = (container, props) => {
   });
 
   function paint() {
-    const opts = (sel: string) => V.listSites().map((s) => `<option value="${s.id}"${s.id === sel ? " selected" : ""}>${esc(s.name)}${s.category === "historic" ? " (past landing)" : ""}</option>`).join("");
+    const opts = (sel: string) => V.listSites().map((s) => `<option value="${s.id}"${s.id === sel ? " selected" : ""}>${esc(s.shortName)}${s.category === "historic" ? " (historic)" : ""}</option>`).join("");
     body.innerHTML = `
       <h2>Compare two scenarios (A/B)</h2>
       <p class="muted small">Each scenario is a site and a landing date (a 7-day stay from 00:00 UTC). Differences are listed in plain words.</p>
@@ -93,7 +93,7 @@ export const mountPlanner: MountPanel = (container, props) => {
   function paintSaved() {
     const box = body.querySelector(".saved");
     if (!box) return;
-    const nm = (id: string) => V.listSites().find((s) => s.id === id)?.name ?? id;
+    const nm = (id: string) => V.listSites().find((s) => s.id === id)?.shortName ?? id;
     box.innerHTML = saved.length
       ? `<ul>${saved.map((p, i) => `<li>A: ${esc(nm(p.a.siteId))}, ${p.a.landingDate} · B: ${esc(nm(p.b.siteId))}, ${p.b.landingDate}
           <button type="button" data-action="load" data-i="${i}">Load</button> <button type="button" data-action="delete" data-i="${i}" aria-label="Delete saved pair ${i + 1}">Delete</button></li>`).join("")}</ul>
@@ -112,7 +112,7 @@ export const mountPlanner: MountPanel = (container, props) => {
       const f = (v: number | null, d = 0) => (v === null ? "–" : v.toFixed(d));
       const verdict = (v: string) => (v === "edge" ? "On the edge" : v[0].toUpperCase() + v.slice(1));
       const row = (name: string, va: string, vb: string) => `<tr><th>${esc(name)}</th><td>${esc(va)}</td><td>${esc(vb)}</td></tr>`;
-      out.innerHTML = `<table><thead><tr><th></th><th>A: ${esc(c.a.name)}, ${c.a.landingDate}</th><th>B: ${esc(c.b.name)}, ${c.b.landingDate}</th></tr></thead><tbody>
+      out.innerHTML = `<table><thead><tr><th></th><th>A: ${esc(c.a.shortName)}, ${c.a.landingDate}</th><th>B: ${esc(c.b.shortName)}, ${c.b.landingDate}</th></tr></thead><tbody>
         ${row("Verdict", verdict(c.a.verdict), verdict(c.b.verdict))}
         ${row("Sun and Earth score (prototype)", f(c.a.score, 1), f(c.b.score, 1))}
         ${row("Sunlight share", f(c.a.pctLit) + "%", f(c.b.pctLit) + "%")}
@@ -141,7 +141,7 @@ export const mountPlanner: MountPanel = (container, props) => {
     out.innerHTML = `<p class="small"><strong>${r.passCount} of ${r.results.length}</strong> sites meet ${Object.keys(limits).length ? "every limit you set" : "your limits (none set: every site passes)"} for a stay from ${esc(current.landingDate)}.</p>
       <ul class="reqlist">${r.results.map((x: Any) => `<li class="${x.pass ? "pass" : "fail"}"><span class="mark" aria-hidden="true">${x.pass ? "✓" : "✕"}</span>
         <strong>${x.pass ? "PASS" : x.available ? "FAIL" : "NO DATA"}</strong>
-        <button type="button" data-action="site" data-site="${x.siteId}">${esc(x.name)}</button>${x.category === "historic" ? ' <span class="muted small">(past landing, comparison)</span>' : ""}
+        <button type="button" data-action="site" data-site="${x.siteId}" title="${esc(x.name)}">${esc(x.shortName)}</button>${x.category === "historic" ? ' <span class="muted small">(historic landing, comparison)</span>' : ""}
         <div class="small">${esc(x.words)}</div></li>`).join("")}</ul>`;
   }
 
@@ -165,30 +165,30 @@ export const mountPlanner: MountPanel = (container, props) => {
 };
 
 const CSS = `
-.card { padding: 18px 20px; border: 1px solid var(--llp-border, #344b69); border-radius: 14px; background: var(--llp-bg, #132138); line-height: 1.45; }
+.card { padding: var(--_pad); border: 1px solid var(--_border); border-radius: 14px; background: var(--_bg); line-height: 1.45; }
 h2 { margin: 0 0 4px; font-size: 1.15rem; }
-h2:not(:first-child) { margin-top: 22px; border-top: 1px solid var(--llp-border, #344b69); padding-top: 14px; }
+h2:not(:first-child) { margin-top: 22px; border-top: 1px solid var(--_border); padding-top: 14px; }
 h3 { margin: 14px 0 4px; font-size: .95rem; }
 p { margin: 6px 0; }
-.small { font-size: .82rem; }
+.small { font-size: var(--_fs-sm); }
 .scen { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-fieldset { border: 1px solid var(--llp-border, #344b69); border-radius: 10px; padding: 8px 10px; display: grid; gap: 6px; font-size: .85rem; }
+fieldset { border: 1px solid var(--_border); border-radius: 10px; padding: 8px 10px; display: grid; gap: 6px; font-size: .85rem; }
 legend { font-weight: 700; padding: 0 4px; }
-label { display: grid; gap: 3px; color: var(--llp-muted, #a8bbd3); }
-select, input { font: inherit; padding: 4px 6px; border-radius: 6px; border: 1px solid var(--llp-border, #344b69); background: transparent; color: var(--llp-text, #ecf2ff); }
-button { padding: 4px 10px; border: 1px solid var(--llp-border, #344b69); border-radius: 8px; background: transparent; color: inherit; font-size: .82rem; }
+label { display: grid; gap: 3px; color: var(--_muted); }
+select, input { font: inherit; padding: 4px 6px; border-radius: 6px; border: 1px solid var(--_border); background: transparent; color: var(--_text); }
+button { padding: 4px 10px; border: 1px solid var(--_border); border-radius: 8px; background: transparent; color: inherit; font-size: .82rem; }
 .row { display: flex; gap: 8px; margin: 8px 0; }
 table { width: 100%; border-collapse: collapse; font-size: .84rem; font-variant-numeric: tabular-nums; margin: 6px 0; }
-th, td { text-align: left; padding: 4px 6px; border-bottom: 1px solid var(--llp-border, #344b69); }
-tbody th { color: var(--llp-muted, #a8bbd3); font-weight: 500; }
+th, td { text-align: left; padding: 4px 6px; border-bottom: 1px solid var(--_border); }
+tbody th { color: var(--_muted); font-weight: 500; }
 ul { padding-left: 18px; margin: 4px 0; }
 .reqs { display: grid; gap: 6px; font-size: .85rem; margin: 6px 0; }
-.req { display: grid; grid-template-columns: auto 1fr 80px 24px; gap: 8px; align-items: center; color: var(--llp-text, #ecf2ff); }
+.req { display: grid; grid-template-columns: auto 1fr 80px 24px; gap: 8px; align-items: center; color: var(--_text); }
 .filter { display: inline-grid; margin: 4px 0; font-size: .85rem; }
 .reqlist { list-style: none; padding: 0; }
 .reqlist li { padding: 6px 8px; border-left: 4px solid; margin: 4px 0; border-radius: 4px; }
-.reqlist li.pass { border-color: var(--llp-clear, #4fbf7a); }
-.reqlist li.fail { border-color: var(--llp-out, #e06a5f); border-left-style: dashed; }
+.reqlist li.pass { border-color: var(--_clear); }
+.reqlist li.fail { border-color: var(--_out); border-left-style: dashed; }
 .reqlist .mark { font-weight: 700; margin-right: 4px; }
 .reqlist button { border: 0; padding: 0; text-decoration: underline; font-size: .9rem; }
 `;

@@ -184,6 +184,27 @@ and researchers get the numbers behind them.
   the title card, and the simulator's sound is off by default with a
   visible toggle (Lane B).
 
+- D30 Presentation pass (both humans, 2026-11-14). Structure (Lane B):
+  one home page "Tour" (title, Start tour, the simulator; no sliders or
+  legend); four tabs Tour, Explore, Compare, Report; Credits becomes a
+  small "Data and methods" link; Explore = 3D Moon + side card with a
+  Globe / Horizon switch, the Moon stays in view while the card scrolls,
+  site picker instead of long lists; Compare = dates grid, two scenarios,
+  requirements; one slim one-row toolbar on Explore, Compare and Report
+  (site picker grouped Candidate sites / Historic landings, landing date
+  with -7 / +7, hour slider, the inspected-moment note as an info tip);
+  legend = one row of four chips on Explore and Compare only; globe
+  markers = small pins in the verdict colour with its symbol, a ring on
+  the selected site. Theme (both lanes): identical colour roles (gold =
+  Sun and sunlight; blue = Earth and contact; Clear green, Partial
+  half-green outline, Out slate grey, On the edge violet; symbols and
+  words always), one type and spacing scale with tighter card padding,
+  plain language on screen (no lane names, API versions, file paths or
+  "168 hourly samples"). Lane A: apply the theme in every panel, short
+  site names for lists, no TERRAIN tag, "Historic" instead of "PAST",
+  and one shell-wide Educator / Researcher switch (panel interface v1.3).
+  Details: DESIGN.md, "Presentation pass".
+
 ## Settled earlier (do not reopen without both humans)
 - 10 fixed sites: 3 Apollo, Chandrayaan-3, IM-1, IM-2, 4 south pole
   representative points.

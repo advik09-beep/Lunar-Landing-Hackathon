@@ -77,9 +77,9 @@ export const mountResearcher: MountPanel = (container, props) => {
       <header>
         <p class="audience">RESEARCHER VIEW — written for researchers and mission designers</p>
         <h2>${esc(s.name)}</h2>
-        <p class="muted">${esc(fmtCoords(s.lat, s.lon))} · ${s.category === "historic" ? "historic landing (a past mission, shown for comparison)" : "candidate site"} · 7-day stay from ${esc(current.landingDate)} 00:00 UTC · hourly data · API ${esc(A.apiVersion)}</p>
+        <p class="muted">${esc(fmtCoords(s.lat, s.lon))} · ${s.category === "historic" ? "historic landing (a past mission, shown for comparison)" : "candidate site"} · 7-day stay from ${esc(current.landingDate)} 00:00 UTC</p>
         <div class="dl"><button type="button" data-action="download-json">Download full analysis (JSON)</button>
-          <button type="button" data-action="download-csv">Download hourly data (CSV, ${m.hours} rows)</button></div>
+          <button type="button" data-action="download-csv">Download hourly data (CSV)</button></div>
       </header>
 
       <h3>What NASA weighs when choosing a landing region</h3>
@@ -218,26 +218,26 @@ function profileSvg(h: number[]): string {
 }
 
 const CSS = `
-.card { padding: 18px 20px; border: 1px solid var(--llp-border, #344b69); border-radius: 14px; background: var(--llp-bg, #132138); line-height: 1.45; }
-.audience { margin: 0 0 4px; font-size: .75rem; font-weight: 700; letter-spacing: .08em; color: var(--llp-warn, #ffd49d); }
-h2 { margin: 0 0 4px; font-size: 1.2rem; }
-h3 { margin: 20px 0 6px; font-size: 1rem; border-top: 1px solid var(--llp-border, #344b69); padding-top: 12px; }
+.card { padding: var(--_pad); border: 1px solid var(--_border); border-radius: 14px; background: var(--_bg); line-height: 1.45; }
+.audience { margin: 0 0 4px; font-size: var(--_fs-xs); font-weight: 700; letter-spacing: .08em; color: var(--_link); }
+h2 { margin: 0 0 4px; font-size: var(--_fs-lg); }
+h3 { margin: 20px 0 6px; font-size: 1rem; border-top: 1px solid var(--_border); padding-top: 12px; }
 h4 { margin: 12px 0 4px; font-size: .9rem; }
 p { margin: 6px 0; }
-.small { font-size: .82rem; }
+.small { font-size: var(--_fs-sm); }
 .dl { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
-.dl button { padding: 6px 12px; border: 1px solid var(--llp-accent, #2f5d9a); border-radius: 8px; background: var(--llp-accent, #2f5d9a); color: inherit; font-weight: 600; }
+.dl button { padding: 6px 12px; border: 1px solid var(--_accent); border-radius: 8px; background: var(--_accent); color: inherit; font-weight: 600; }
 table { width: 100%; border-collapse: collapse; font-size: .82rem; font-variant-numeric: tabular-nums; margin: 4px 0; }
-th, td { text-align: left; padding: 4px 6px; border-bottom: 1px solid var(--llp-border, #344b69); vertical-align: top; }
-.kv th { color: var(--llp-muted, #a8bbd3); font-weight: 500; width: 22%; }
-a { color: var(--llp-link, #9cc6ff); word-break: break-word; }
+th, td { text-align: left; padding: 4px 6px; border-bottom: 1px solid var(--_border); vertical-align: top; }
+.kv th { color: var(--_muted); font-weight: 500; width: 22%; }
+a { color: var(--_link); word-break: break-word; }
 ul { padding-left: 18px; margin: 4px 0; }
-.tag.est { display: inline-block; padding: 0 6px; border-radius: 5px; font-size: .68rem; letter-spacing: .06em; border: 1px dashed var(--llp-warn, #ffd49d); color: var(--llp-warn, #ffd49d); }
+.tag.est { display: inline-block; padding: 0 6px; border-radius: 5px; font-size: .68rem; letter-spacing: .06em; border: 1px dashed var(--_muted); color: var(--_muted); }
 .calc { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px 12px; margin: 6px 0; font-size: .85rem; }
-.calc label { display: grid; gap: 3px; color: var(--llp-muted, #a8bbd3); }
-.calc input, .calc select { font: inherit; padding: 4px 6px; border-radius: 6px; border: 1px solid var(--llp-border, #344b69); background: transparent; color: var(--llp-text, #ecf2ff); }
+.calc label { display: grid; gap: 3px; color: var(--_muted); }
+.calc input, .calc select { font: inherit; padding: 4px 6px; border-radius: 6px; border: 1px solid var(--_border); background: transparent; color: var(--_text); }
 svg.profile { width: 100%; height: auto; display: block; margin: 6px 0; }
-.profile .hz { fill: none; stroke: var(--llp-horizon, #e8e2d0); stroke-width: 1.5; }
-.profile .zero { stroke: var(--llp-muted, #a8bbd3); stroke-dasharray: 4 3; }
-.profile text { fill: var(--llp-muted, #a8bbd3); font-size: 10px; }
+.profile .hz { fill: none; stroke: var(--_horizon); stroke-width: 1.5; }
+.profile .zero { stroke: var(--_muted); stroke-dasharray: 4 3; }
+.profile text { fill: var(--_muted); font-size: 10px; }
 `;

@@ -3,7 +3,7 @@
 import * as raw from "../../../lib/visibility.js";
 
 export interface Site {
-  id: string; name: string; lat: number; lon: number; kind: string;
+  id: string; shortName: string; name: string; lat: number; lon: number; kind: string;
   landingDate: string | null; source: string; coordsVerified: boolean; note: string;
   category: "candidate" | "historic"; // D21
 }
@@ -57,7 +57,7 @@ export interface Power {
 }
 export type Weights = { sunlight: number; earth: number; shortDark: number; shortGap: number; clearance: number; slip: number };
 export type RankFilter = "all" | "candidate" | "historic";
-export interface RankRow { siteId: string; name: string; category: "candidate" | "historic"; score: number | null; available: boolean;
+export interface RankRow { siteId: string; name: string; shortName: string; category: "candidate" | "historic"; score: number | null; available: boolean;
   components?: Record<keyof Weights, number>; }
 export interface Ranking { landingDate: string; weights: Weights; isDefault: boolean; formula: string; prototype: true; filter: RankFilter; ranking: RankRow[] }
 
