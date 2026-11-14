@@ -102,3 +102,7 @@ h2 { margin: 0; font-size: 1.75rem; line-height: 1.23; letter-spacing: -.035em; 
 .credits-view h3 { font-size: 1rem; margin: 20px 0 4px; }
 .credits-view p { color: #c3d2e7; margin: 5px 0 14px; }
 .credits-view a { color: #9fc9ff; text-underline-offset: 3px; }
+
+/* Scene-state feedback for verified Moon-fixed Sun/Earth directions. */
+.lighting-status { margin: -5px 21px 18px; font-size: .75rem; line-height: 1.5; color: #a8c5e4; }
+.lighting-status[data-state="unavailable"] { color: #e1bb86; }
