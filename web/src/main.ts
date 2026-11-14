@@ -1,6 +1,8 @@
 import './style.css';
 import { listSites, loadDaily, getDaily, loadScene, getSceneState, MOCK, API_VERSION, VERDICT_RULE } from '../../lib/visibility.js';
 import { LunarScene, type MoonSite, type Verdict, type SceneState } from './moon';
+import { OverviewScene } from './overview';
+import { mountStarfield } from './starfield';
 import { mountSideCard, mountCompareGrid, mountHorizonView, type PanelHandle } from './panels';
 
 interface Site extends MoonSite {
@@ -38,6 +40,7 @@ let selectedSite = sites[0].id;
 let selectedHour = 0; // 0–167, hourly samples within the seven-day landing stay
 let daily: DailyResult | null = null;
 let moon: LunarScene | null = null;
+let overview: OverviewScene | null = null;
 const verdictNames: Record<Verdict, string> = {
   clear: 'Clear',
   partial: 'Partial',
@@ -50,7 +53,7 @@ app.innerHTML = [
   '<main class="app-shell">',
   '  <header class="topbar">',
   '    <div class="brand"><span class="brand-kicker">NASA SPACE APPS 2026</span><strong>Lunar Landing Site Navigator</strong></div>',
-  '    <nav class="primary-nav" aria-label="Application views"><button id="nav-explore" type="button" class="nav-active" aria-pressed="true">Explore in 3D</button><button id="nav-compare" type="button" aria-pressed="false">Compare dates</button><button id="nav-horizon" type="button" aria-pressed="false">Stand here</button><button id="nav-credits" type="button" aria-pressed="false">Credits</button></nav>',
+  '    <nav class="primary-nav" aria-label="Application views"><button id="nav-overview" type="button" class="nav-active" aria-pressed="true">Overview</button><button id="nav-explore" type="button" aria-pressed="false">Explore in 3D</button><button id="nav-compare" type="button" aria-pressed="false">Compare dates</button><button id="nav-horizon" type="button" aria-pressed="false">Stand here</button><button id="nav-credits" type="button" aria-pressed="false">Credits</button></nav>',
   '    <span class="real-data-chip">JPL Horizons · real data</span>',
   '  </header>',
   '  <section class="intro-block">',
@@ -67,7 +70,14 @@ app.innerHTML = [
   '    <div class="clock-input-row"><label for="hour-slider">Hour within seven-day stay</label><input id="hour-slider" type="range" min="0" max="167" value="0" step="1" aria-label="Hour of the stay"><output id="hour-output" for="hour-slider">Hour 1 of 168 · 2026-11-14 00:00 UTC</output></div>',
   '    <p id="data-status" class="data-status" role="status" aria-live="polite">Loading validated daily summaries…</p>',
   '  </section>',
-  '  <section id="explore-view" class="explorer" aria-label="Interactive lunar landing site explorer">',
+  '  <section id="overview-view" class="overview-view" aria-label="Sun Earth Moon overview">',
+  '    <div class="overview-window">',
+  '      <div class="overview-caption"><strong>THE SUN · EARTH · MOON</strong><span>Illustrative sizes, positions and motion — not to scale; not ephemeris geometry</span></div>',
+  '      <div id="overview-stage" class="overview-stage" aria-label="Clickable 3D Moon in a Sun Earth Moon illustration"></div>',
+  '      <div class="overview-footer"><p>Choose the Moon to explore real landing sites and verified Sun/Earth visibility at your selected UTC date and hour.</p><button id="enter-explore" type="button">Explore the Moon and landing sites</button></div>',
+  '    </div>',
+  '  </section>',
+  '  <section id="explore-view" class="explorer" aria-label="Interactive lunar landing site explorer" hidden>',
   '    <div class="scene-column">',
   '      <div class="moon-window">',
   '        <div class="scene-heading"><span>MOON-FIXED VIEW</span><span>3D · Drag to rotate · Scroll to zoom</span></div>',
@@ -98,7 +108,7 @@ app.innerHTML = [
   '    <h3>Scientific ephemerides and terrain</h3>',
   '    <p>Sun and Earth directions, visibility and stay summaries: <a href="https://ssd.jpl.nasa.gov/horizons/" target="_blank" rel="noopener noreferrer">NASA/JPL Horizons</a>. Malapert horizon elevation: NASA Lunar Orbiter Laser Altimeter (LOLA), Lunar Reconnaissance Orbiter. These are the scientific sources; the globe texture is not a DEM.</p>',
   '    <h3>3D rendering library</h3>',
-  '    <p><a href="https://threejs.org/" target="_blank" rel="noopener noreferrer">Three.js</a> and OrbitControls, copyright Three.js authors, <a href="https://github.com/mrdoob/three.js/blob/master/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>. The interactive globe code was developed for this project; no external orbital scene has been imported.</p>',
+  '    <p><a href="https://threejs.org/" target="_blank" rel="noopener noreferrer">Three.js</a> and OrbitControls, copyright Three.js authors, <a href="https://github.com/mrdoob/three.js/blob/master/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>. The interactive globe and three-body overview were written for this project. Background starfield concept inspired by <a href="https://github.com/etrepat/starfield" target="_blank" rel="noopener noreferrer">etrepat/starfield</a>, copyright (c) 2010 Estanislau Trepat, <a href="https://github.com/etrepat/starfield/blob/develop/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>; legacy Three.js source was not copied.</p>',
   '    <h3>Implementation and limitations</h3>',
   '    <p>Site coordinates, visibility analysis, data checks and horizon panels: Lane A. App shell, Three.js globe, panel integration and hosting: Lane B. Moon-fixed Sun lighting and the displayed Earth direction now use verified hourly JPL Horizons scene data. The globe has no terrain shadows; Earth size and display distance are not to scale. Any future borrowed assets must be added here with attribution and license before release.</p>',
   '  </section>',
@@ -152,17 +162,18 @@ const cleanVerdict = (value: string): Verdict => ['clear', 'partial', 'out', 'ed
 let sideCard: PanelHandle | null = null;
 let compareGrid: PanelHandle | null = null;
 let horizonView: PanelHandle | null = null;
-type View = 'explore' | 'compare' | 'horizon' | 'credits';
-let activeView: View = 'explore';
+type View = 'overview' | 'explore' | 'compare' | 'horizon' | 'credits';
+let activeView: View = 'overview';
 
 function openView(view: View): void {
   activeView = view;
-  for (const name of ['explore', 'compare', 'horizon', 'credits'] as View[]) {
+  for (const name of ['overview', 'explore', 'compare', 'horizon', 'credits'] as View[]) {
     find<HTMLElement>(name + '-view').hidden = name !== view;
     const button = find<HTMLButtonElement>('nav-' + name);
     button.classList.toggle('nav-active', name === view);
     button.setAttribute('aria-pressed', String(name === view));
   }
+  overview?.setVisible(view === 'overview');
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
@@ -281,6 +292,16 @@ for (const [id, offset] of [['date-prev', -7], ['date-next', 7]] as Array<[strin
 find<HTMLButtonElement>('polar-view').addEventListener('click', () => moon?.focusSouthPole());
 find<HTMLButtonElement>('reset-view').addEventListener('click', () => moon?.resetView());
 
+const destroyStarfield = mountStarfield();
+try {
+  overview = new OverviewScene(find<HTMLDivElement>('overview-stage'), () => openView('explore'));
+  overview.setVisible(true);
+} catch (error) {
+  console.warn('Overview scene unavailable:', error);
+  find<HTMLDivElement>('overview-stage').textContent = '3D overview unavailable. Use the Explore button to open the Moon.';
+}
+find<HTMLButtonElement>('enter-explore').addEventListener('click', () => openView('explore'));
+
 try {
   moon = new LunarScene(find<HTMLDivElement>('moon-stage'), sites, chooseSite);
   moon.focusSite(selectedSite);
@@ -302,7 +323,7 @@ const panelProps = {
 sideCard = mountSideCard(find<HTMLDivElement>('side-card-mount'), panelProps);
 compareGrid = mountCompareGrid(find<HTMLDivElement>('compare-mount'), panelProps);
 horizonView = mountHorizonView(find<HTMLDivElement>('horizon-mount'), panelProps);
-for (const name of ['explore', 'compare', 'horizon', 'credits'] as View[]) {
+for (const name of ['overview', 'explore', 'compare', 'horizon', 'credits'] as View[]) {
   find<HTMLButtonElement>('nav-' + name).addEventListener('click', () => openView(name));
 }
 updateButtons();
@@ -335,6 +356,8 @@ void initializeSceneLighting();
 
 window.addEventListener('pagehide', () => {
   moon?.destroy();
+  overview?.destroy();
+  destroyStarfield();
   sideCard?.destroy();
   compareGrid?.destroy();
   horizonView?.destroy();
