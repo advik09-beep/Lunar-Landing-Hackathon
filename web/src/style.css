@@ -89,3 +89,9 @@ h2 { margin: 0; font-size: 1.75rem; line-height: 1.23; letter-spacing: -.035em; 
 .site-footer { color: #8094b0; font-size: .7rem; margin: 30px 0 10px; line-height: 1.65; }
 .site-footer code { color: #a5bbd9; }
 @media (min-width: 1500px) { .moon-stage { height: 650px; } }
+
+/* D9 panel integration: shell controls visibility; Lane A styles remain in Shadow DOM. */
+.primary-nav button { border: 0; background: transparent; color: #aebed5; font-size: .82rem; padding: 11px 16px; border-radius: 9px; white-space: nowrap; }
+.primary-nav button.nav-active { background: #283754; color: #eff5ff; font-weight: 650; }
+.panel-view { margin-top: 12px; min-width: 0; }
+.panel-view[hidden], .explorer[hidden] { display: none !important; }
