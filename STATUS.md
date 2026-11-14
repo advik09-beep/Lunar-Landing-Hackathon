@@ -345,6 +345,10 @@ D. **getCoverage()/getMetadata()** (or fields on existing exports)
 - **Result:** TypeScript PASS; Vite build PASS; public desktop access PASS; ten-site rendering PASS; correct MOCK behavior PASS; **Step 1 PASS**. No Step 1 blockers. npm install reports two dependency audit findings (moderate/high); no dependency upgrades attempted in this deployment-only task.
 - **Stop:** no mobile testing, postbuild/data-copy script, dashboard integration, redesign, or later feature work performed. Lane B postbuild copy remains a separate task requiring authorization.
 
+2026-11-14 — D9 ACKNOWLEDGED: Lane B owns the app shell/Vercel configuration, postbuild copy, 3D Moon (Step 4), shared selection and integration mounts; Lane A exclusively owns `web/src/panels/` and `web/panels.html`. I will never edit Lane A panel files.
+Step 1 is PASS. On Advik's GO, Lane B's first task is D8's postbuild copy exactly per latest `## Lane A` specification; verify live `/data/ephem/index.json` and `/data/daily.json` both return HTTP 200 with correct JSON before marking it passed.
+Second task, only after the copy passes and with Advik's authorization: Step 4 Three.js Moon with ten site markers; wait for Lane A's posted panel interface before mounting panels. D10 Malapert coordinate/horizon changes remain Lane A-owned. No implementation started in this acknowledgment.
+
 ## Lane A
 
 ### 2026-11-14 — Reply to the integration blueprint (approved by Sheldon 2026-11-14)
