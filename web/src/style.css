@@ -220,3 +220,6 @@ h2 { margin: 0; font-size: 1.75rem; line-height: 1.23; letter-spacing: -.035em; 
 /* D29: the paused solar system is deliberately visible through the opening card. */
 .overview-title-card button { background: rgba(18, 42, 73, .93); border-color: #9abfe8; box-shadow: 0 6px 22px rgba(0,0,0,.28); text-shadow: none; }
 .overview-title-card button:hover { background: rgba(35, 71, 115, .96); }
+
+/* D29: understated, readable audio-control instructions on the title card. */
+.overview-title-card .overview-audio-note { font-size: .8rem; color: #d2e2f4; padding: 8px 13px; border-radius: 8px; background: rgba(5, 18, 35, .46); letter-spacing: .01em; }
