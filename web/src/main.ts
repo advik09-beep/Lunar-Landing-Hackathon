@@ -49,7 +49,7 @@ app.innerHTML = [
   '<main class="app-shell">',
   '  <header class="topbar">',
   '    <div class="brand"><span class="brand-kicker">NASA SPACE APPS 2026</span><strong>Lunar Landing Site Navigator</strong></div>',
-  '    <nav class="primary-nav" aria-label="Application views"><button id="nav-explore" type="button" class="nav-active" aria-pressed="true">Explore in 3D</button><button id="nav-compare" type="button" aria-pressed="false">Compare dates</button><button id="nav-horizon" type="button" aria-pressed="false">Stand here</button></nav>',
+  '    <nav class="primary-nav" aria-label="Application views"><button id="nav-explore" type="button" class="nav-active" aria-pressed="true">Explore in 3D</button><button id="nav-compare" type="button" aria-pressed="false">Compare dates</button><button id="nav-horizon" type="button" aria-pressed="false">Stand here</button><button id="nav-credits" type="button" aria-pressed="false">Credits</button></nav>',
   '    <span class="real-data-chip">JPL Horizons · real data</span>',
   '  </header>',
   '  <section class="intro-block">',
@@ -84,6 +84,18 @@ app.innerHTML = [
   '  </section>',
   '  <section id="compare-view" class="panel-view" aria-label="Compare landing dates" hidden><div id="compare-mount"></div></section>',
   '  <section id="horizon-view" class="panel-view" aria-label="Stand here horizon panorama" hidden><div id="horizon-mount"></div></section>',
+  '  <section id="credits-view" class="panel-view credits-view" aria-label="Project credits" hidden>',
+  '    <h2>Credits and sources</h2>',
+  '    <p>We distinguish scientific data from visual illustration. The Moon image is aesthetic imagery; it is not used to calculate landing-site visibility.</p>',
+  '    <h3>NASA Scientific Visualization Studio — CGI Moon Kit</h3>',
+  '    <p>Moon surface color map: <a href="https://svs.gsfc.nasa.gov/4720" target="_blank" rel="noopener noreferrer">NASA SVS CGI Moon Kit (2025), lroc_color_2k.jpg</a>. Credit: NASA\'s Scientific Visualization Studio. Derived from LROC color data with polar albedo fill. NASA media usage is governed by <a href="https://www.nasa.gov/nasa-brand-center/images-and-media/" target="_blank" rel="noopener noreferrer">NASA media usage guidelines</a>; no separate software license is asserted for the imagery.</p>',
+  '    <h3>Scientific ephemerides and terrain</h3>',
+  '    <p>Sun and Earth directions, visibility and stay summaries: <a href="https://ssd.jpl.nasa.gov/horizons/" target="_blank" rel="noopener noreferrer">NASA/JPL Horizons</a>. Malapert horizon elevation: NASA Lunar Orbiter Laser Altimeter (LOLA), Lunar Reconnaissance Orbiter. These are the scientific sources; the globe texture is not a DEM.</p>',
+  '    <h3>3D rendering library</h3>',
+  '    <p><a href="https://threejs.org/" target="_blank" rel="noopener noreferrer">Three.js</a> and OrbitControls, copyright Three.js authors, <a href="https://github.com/mrdoob/three.js/blob/master/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>. The interactive globe code was developed for this project; no external orbital scene has been imported.</p>',
+  '    <h3>Implementation and limitations</h3>',
+  '    <p>Site coordinates, visibility analysis, data checks and horizon panels: Lane A. App shell, Three.js globe, panel integration and hosting: Lane B. Current illumination is illustrative; true Sun/Earth directions in the Moon-fixed view remain Step 8. Any future borrowed assets must be added here with attribution and license before release.</p>',
+  '  </section>',
   '  <footer class="site-footer">Site coordinates and visibility: shared scientific data API <code>/lib/visibility.js</code> · API <span id="api-version"></span> · Moon image: NASA Scientific Visualization Studio, CGI Moon Kit (aesthetic color map; not scientific terrain).</footer>',
   '</main>',
 ].join('\n');
@@ -126,12 +138,12 @@ const cleanVerdict = (value: string): Verdict => ['clear', 'partial', 'out', 'ed
 let sideCard: PanelHandle | null = null;
 let compareGrid: PanelHandle | null = null;
 let horizonView: PanelHandle | null = null;
-type View = 'explore' | 'compare' | 'horizon';
+type View = 'explore' | 'compare' | 'horizon' | 'credits';
 let activeView: View = 'explore';
 
 function openView(view: View): void {
   activeView = view;
-  for (const name of ['explore', 'compare', 'horizon'] as View[]) {
+  for (const name of ['explore', 'compare', 'horizon', 'credits'] as View[]) {
     find<HTMLElement>(name + '-view').hidden = name !== view;
     const button = find<HTMLButtonElement>('nav-' + name);
     button.classList.toggle('nav-active', name === view);
@@ -231,7 +243,7 @@ const panelProps = {
 sideCard = mountSideCard(find<HTMLDivElement>('side-card-mount'), panelProps);
 compareGrid = mountCompareGrid(find<HTMLDivElement>('compare-mount'), panelProps);
 horizonView = mountHorizonView(find<HTMLDivElement>('horizon-mount'), panelProps);
-for (const name of ['explore', 'compare', 'horizon'] as View[]) {
+for (const name of ['explore', 'compare', 'horizon', 'credits'] as View[]) {
   find<HTMLButtonElement>('nav-' + name).addEventListener('click', () => openView(name));
 }
 updateButtons();
