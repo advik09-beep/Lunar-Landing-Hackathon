@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { createNebulaBackground } from './nebula';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 export type MoonSite = {
@@ -52,8 +53,7 @@ export class LunarScene {
   private renderer: THREE.WebGLRenderer;
   private readonly ambientLight: THREE.AmbientLight;
   private readonly sunLight: THREE.DirectionalLight;
-  private readonly earthBody: THREE.Mesh;
-  private readonly earthLabel: THREE.Sprite;
+  private readonly nebula: THREE.CanvasTexture;
   private scene = new THREE.Scene();
   private camera: THREE.PerspectiveCamera;
   private controls: OrbitControls;
@@ -83,6 +83,9 @@ export class LunarScene {
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.5;
     this.container.appendChild(this.renderer.domElement);
+
+    this.nebula = createNebulaBackground();
+    this.scene.background = this.nebula;
 
     this.camera = new THREE.PerspectiveCamera(42, 1, 0.01, 100);
     this.camera.position.set(2.6, 1.4, 3.4);
@@ -127,36 +130,6 @@ export class LunarScene {
       new THREE.MeshBasicMaterial({ color: 0x9ab4db, transparent: true, opacity: 0.035, side: THREE.BackSide, depthWrite: false }),
     );
     this.scene.add(atmosphere);
-
-    // A small Earth drawn along the actual sub-Earth direction. Distance and
-    // apparent radius are intentionally exaggerated for education, not scale.
-    this.earthBody = new THREE.Mesh(
-      new THREE.SphereGeometry(0.20, 48, 32),
-      new THREE.MeshStandardMaterial({
-        color: 0x4699cc, roughness: 1, metalness: 0, emissive: 0x071523, emissiveIntensity: 0.08,
-      }),
-    );
-    this.earthBody.visible = false;
-    this.scene.add(this.earthBody);
-
-    const earthLabelCanvas = document.createElement('canvas');
-    earthLabelCanvas.width = 512;
-    earthLabelCanvas.height = 96;
-    const labelCtx = earthLabelCanvas.getContext('2d');
-    if (labelCtx) {
-      labelCtx.fillStyle = '#e2f1ff';
-      labelCtx.font = 'bold 27px sans-serif';
-      labelCtx.textAlign = 'center';
-      labelCtx.fillText('EARTH · NOT TO SCALE', 256, 58);
-    }
-    const labelTexture = new THREE.CanvasTexture(earthLabelCanvas);
-    labelTexture.colorSpace = THREE.SRGBColorSpace;
-    this.earthLabel = new THREE.Sprite(
-      new THREE.SpriteMaterial({ map: labelTexture, transparent: true, depthWrite: false }),
-    );
-    this.earthLabel.scale.set(0.87, 0.17, 1);
-    this.earthLabel.visible = false;
-    this.scene.add(this.earthLabel);
 
     const gridMaterial = new THREE.LineBasicMaterial({ color: 0x7692bb, transparent: true, opacity: 0.19 });
     for (const lat of [-60, -30, 0, 30, 60]) {
@@ -265,24 +238,17 @@ export class LunarScene {
       throw new Error('Invalid Moon-fixed direction vectors from scene data');
     }
     const sun = toThree(state.sun.dir).normalize();
-    const earth = toThree(state.earth.dir).normalize();
     // The Moon is fixed; the actual Sun direction changes with UTC.
     this.sunLight.position.copy(sun).multiplyScalar(10);
     this.sunLight.intensity = 3.2;
     this.ambientLight.intensity = 0.065;
 
-    this.earthBody.position.copy(earth).multiplyScalar(2.6);
-    this.earthLabel.position.copy(this.earthBody.position).add(new THREE.Vector3(0, 0.28, 0));
-    this.earthBody.visible = true;
-    this.earthLabel.visible = true;
   }
 
   clearSceneState(): void {
     // Never retain a previous date's lighting when data are unavailable.
     this.sunLight.intensity = 0;
     this.ambientLight.intensity = 0.32; // neutral inspection light, not ephemeris
-    this.earthBody.visible = false;
-    this.earthLabel.visible = false;
   }
 
   setVerdicts(values: Map<string, Verdict>): void {
@@ -377,6 +343,7 @@ export class LunarScene {
         material.dispose();
       }
     });
+    this.nebula.dispose();
     this.renderer.dispose();
     this.renderer.domElement.remove();
   }

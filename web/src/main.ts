@@ -63,7 +63,7 @@ app.innerHTML = [
   '  </section>',
   '  <aside id="mock-notice" class="mock-notice" hidden>DEMO / SIMULATED VALUES — NOT FOR MISSION USE</aside>',
   '  <section id="global-clock" class="global-clock" aria-label="Shared landing date and time controls">',
-  '    <div class="clock-top"><strong>Mission timeline · one clock for every view</strong><span>UTC · 7-day stay · 168 hourly samples</span></div>',
+  '    <div class="clock-top"><strong>Landing-site timeline · Explore, Compare and Stand here</strong><span>UTC · 7-day stay · 168 hourly samples</span></div>',
   '    <div class="clock-input-row"><button id="date-prev" type="button" aria-label="Move landing date seven days earlier">−7 days</button><label for="landing-date">Landing date</label><input id="landing-date" type="date" value="2026-11-14" aria-label="Landing date UTC"><button id="date-next" type="button" aria-label="Move landing date seven days later">+7 days</button><output id="date-output" for="landing-date">2026-11-14</output></div>',
   '    <label class="clock-slider-label" for="date-slider">Change landing date (2026–2029)</label>',
   '    <input id="date-slider" type="range" min="0" max="1453" value="317" step="1" aria-label="Change landing date between 2026 and 2029">',
@@ -125,7 +125,7 @@ app.innerHTML = [
   '    <h3>Solar-system overview — upstream simulator</h3>',
   '    <p>Approved upstream: <a href="https://github.com/OzAILabs/SolarSystemSimulator" target="_blank" rel="noopener noreferrer">OzAILabs/SolarSystemSimulator</a>. The authors describe its source as MIT-licensed in the README. Its planetary textures are separately sourced from <a href="https://www.solarsystemscope.com/textures/" target="_blank" rel="noopener noreferrer">Solar System Scope</a> (CC BY 4.0), Planet Pixel Emporium, NASA/USGS Astrogeology and Steve Albers; attribution and individual reuse terms follow the upstream README. Our public <a href="https://github.com/advik09-beep/SolarSystemSimulator" target="_blank" rel="noopener noreferrer">GitHub fork</a> runs separately at <a href="https://solar-system-simulator-usmdo-club.vercel.app/" target="_blank" rel="noopener noreferrer">solar-system-simulator-usmdo-club.vercel.app</a>; the embedded full solar system is not synchronized to this app\'s landing-date control.</p>',
   '    <h3>Implementation and limitations</h3>',
-  '    <p>Site coordinates, visibility analysis, data checks and horizon panels: Lane A. App shell, Three.js globe, panel integration and hosting: Lane B. Moon-fixed Sun lighting and the displayed Earth direction now use verified hourly JPL Horizons scene data. The globe has no terrain shadows; Earth size and display distance are not to scale. Any future borrowed assets must be added here with attribution and license before release.</p>',
+  '    <p>Site coordinates, visibility analysis, data checks and horizon panels: Lane A. App shell, Three.js globe, panel integration and hosting: Lane B. Moon-fixed Sun lighting uses verified hourly JPL Horizons scene data. Earth position and terrain visibility remain available in the Stand here horizon view. The globe has no terrain shadows; The explorer nebula is original procedural decorative artwork, not an observed or simulated lunar sky. Any future borrowed assets must be added here with attribution and license before release.</p>',
   '  </section>',
   '  <footer class="site-footer">Site coordinates and visibility: shared scientific data API <code>/lib/visibility.js</code> · API <span id="api-version"></span> · Moon image: NASA Scientific Visualization Studio, CGI Moon Kit (aesthetic color map; not scientific terrain).</footer>',
   '</main>',
@@ -277,9 +277,9 @@ function updateSceneLighting(): void {
     const sceneState = getSceneState(utc) as SceneState;
     moon?.setSceneState(sceneState);
     lightingStatus.textContent =
-      'JPL Horizons Sun/Earth directions · ' + sceneState.sampleUtc +
+      'JPL Horizons Sun lighting · ' + sceneState.sampleUtc +
       ' · Earth ' + Math.round(sceneState.earth.distKm).toLocaleString() +
-      ' km away (display not to scale). The globe does not model local terrain blocking.';
+      ' km away (Earth shown in Stand here). Decorative nebula, not an observed sky. The globe does not model local terrain blocking.';
     lightingStatus.dataset.state = 'ready';
   } catch (error) {
     moon?.clearSceneState();
@@ -365,6 +365,7 @@ if (embedUrl) {
   const frame = document.createElement('iframe');
   frame.className = 'overview-iframe';
   frame.title = 'OzAILabs Solar System Simulator — embedded interactive overview';
+  embedUrl.searchParams.set('lunarEmbed', '1');
   frame.src = embedUrl.href;
   frame.loading = 'eager';
   frame.referrerPolicy = 'strict-origin-when-cross-origin';
@@ -374,7 +375,7 @@ if (embedUrl) {
   find<HTMLElement>('overview-source').textContent = 'SOLAR SYSTEM · OzAILabs simulator';
   find<HTMLElement>('overview-note').textContent = 'Forked from OzAILabs · MIT stated in upstream README · full solar system';
   find<HTMLElement>('overview-disclaimer').textContent =
-    'Interactive solar-system simulator. Its time and orbital view are separate from our landing-date control. Select Explore to study the Moon with verified site data.';
+    'Interactive solar-system simulator. This is a visual overview with its own time; the landing-site timeline controls Explore, Compare and Stand here. Select Explore to study the Moon with verified site data.';
 } else {
   try {
     overview = new OverviewScene(overviewStage, () => openView('explore'));
