@@ -7,6 +7,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { VERDICT_RULE, verdictOf } from "../lib/verdict.js";
+import { CLEARANCE_FULL_DEG } from "../lib/score.js";
 
 const DATA = join(dirname(fileURLToPath(import.meta.url)), "..", "data");
 const H = 3600e3, D = 864e5;
@@ -15,7 +16,7 @@ const EDGE = VERDICT_RULE.EDGE_DEG;
 const index = JSON.parse(readFileSync(join(DATA, "ephem", "index.json"), "utf8"));
 
 const out = { ...VERDICT_RULE, horizonModels: Object.fromEntries(Object.keys(index.sites).map((id) => [id, index.horizons?.[id] ? "lola" : "flat"])), hoursPerStay: N,
-  columns: ["litH", "commsH", "bothH", "sunEdgeH", "earthEdgeH", "longestDarkH", "verdict", "darkPeriods", "contactWindows", "longestGapH"],
+  columns: ["litH", "commsH", "bothH", "sunEdgeH", "earthEdgeH", "longestDarkH", "verdict", "darkPeriods", "contactWindows", "longestGapH", "sunClearPermille", "earthClearPermille"],
   builtUtc: new Date().toISOString(), sites: {} };
 
 for (const [siteId, chunks] of Object.entries(index.sites)) {
@@ -40,6 +41,7 @@ for (const [siteId, chunks] of Object.entries(index.sites)) {
       const i0 = (day - r.start) / H;
       let lit = 0, comms = 0, both = 0, se = 0, ee = 0, dark = 0, longest = 0;
       let darkPeriods = 0, contactWindows = 0, gap = 0, longestGap = 0, prevL = null, prevC = null; // D16
+      let sunClr = 0, earthClr = 0; // D17 amendment: clearance while visible
       for (let i = i0; i < i0 + N; i++) {
         const s = r.sunM[i], e = r.earthM[i]; // margins above the horizon in use
         const L = s > 0, C = e > 0;
@@ -47,11 +49,13 @@ for (const [siteId, chunks] of Object.entries(index.sites)) {
         if (Math.abs(s) <= EDGE) se++; if (Math.abs(e) <= EDGE) ee++;
         dark = L ? 0 : dark + 1; longest = Math.max(longest, dark);
         gap = C ? 0 : gap + 1; longestGap = Math.max(longestGap, gap);
+        if (L) sunClr += Math.min(s, CLEARANCE_FULL_DEG) / CLEARANCE_FULL_DEG; if (C) earthClr += Math.min(e, CLEARANCE_FULL_DEG) / CLEARANCE_FULL_DEG;
         if (!L && prevL !== false) darkPeriods++; if (C && prevC !== true) contactWindows++; prevL = L; prevC = C;
       }
       const pct = (k) => (100 * k) / N;
       rows.push([lit, comms, both, se, ee, longest,
-        verdictOf({ pctBoth: pct(both), pctSunEdge: pct(se), pctEarthEdge: pct(ee) }), darkPeriods, contactWindows, longestGap]);
+        verdictOf({ pctBoth: pct(both), pctSunEdge: pct(se), pctEarthEdge: pct(ee) }), darkPeriods, contactWindows, longestGap,
+        lit ? Math.round((1000 * sunClr) / lit) : 0, comms ? Math.round((1000 * earthClr) / comms) : 0]);
     }
     if (rows.length) out.sites[siteId].push({ firstDate: new Date(firstDay).toISOString().slice(0, 10), rows });
   }

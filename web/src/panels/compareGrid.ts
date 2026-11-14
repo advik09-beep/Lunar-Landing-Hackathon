@@ -3,7 +3,7 @@
 // that day, straight from getDaily() (the daily summary). Timeline strip: hourly sunlight /
 // Earth-in-view for the selected site over the same dates, from getTimeline().
 import { V, type Verdict, type Weights } from "./data";
-import { createPanelRoot, esc, pct, VERDICT_WORDS, EDGE_WORDS, addDays } from "./shared";
+import { createPanelRoot, esc, pct, VERDICT_WORDS, EDGE_WORDS, addDays, whyWeights, WHY_WEIGHTS_CSS, WEIGHT_KEYS } from "./shared";
 import type { MountPanel, PanelProps } from "./types";
 
 const COLS = 28;          // landing dates shown at once
@@ -14,7 +14,7 @@ interface DailyRow { date: string; pctLit: number; pctComms: number; pctBoth: nu
 interface Daily { sites: Record<string, (DailyRow | null)[]>; STAY_DAYS: number }
 
 export const mountCompareGrid: MountPanel = (container, props) => {
-  const { host, root } = createPanelRoot(container, "comparegrid", CSS);
+  const { host, root } = createPanelRoot(container, "comparegrid", CSS + WHY_WEIGHTS_CSS);
   const body = document.createElement("section");
   body.className = "card";
   root.append(body);
@@ -123,9 +123,10 @@ export const mountCompareGrid: MountPanel = (container, props) => {
   function renderScoreBox() {
     const box = body.querySelector(".score-box");
     if (!box) return;
-    const terms: [keyof Weights, string][] = [["sunlight", "wS"], ["earth", "wE"], ["shortDark", "wD"], ["shortGap", "wG"]];
+    const terms = WEIGHT_KEYS;
     box.innerHTML = `
-      <h3>Best-site score for a landing on ${esc(current.landingDate)} <span class="proto">PROTOTYPE</span></h3>
+      <h3>${esc(V.SCORE_LABEL)} for a landing on ${esc(current.landingDate)} <span class="proto">PROTOTYPE</span></h3>
+      <p class="meaning">${esc(V.SCORE_MEANING)}</p>
       <div class="switch" role="group" aria-label="Reading level: Educator or Researcher">
         <button type="button" data-action="score-educator" aria-pressed="${scoreMode === "educator"}">Educator</button>
         <button type="button" data-action="score-researcher" aria-pressed="${scoreMode === "researcher"}">Researcher</button>
@@ -134,7 +135,8 @@ export const mountCompareGrid: MountPanel = (container, props) => {
         <p class="small">${esc(V.SCORE_FORMULA_TEXT)}</p>
         <div class="weights">${terms.map(([k, w]) => `<label><span>${w}: ${esc(V.SCORE_TERMS[k])}</span>
           <input type="range" min="0" max="100" step="1" value="${weights[k]}" data-weight="${k}" aria-label="Weight ${w}"/> <b data-weight-label="${k}">${weights[k]}</b></label>`).join("")}</div>
-        <button type="button" class="reset" data-action="reset-weights">Reset to default weights (${terms.map(([k, w]) => `${w} ${V.SCORE_DEFAULT_WEIGHTS[k]}`).join(", ")})</button>` : ""}
+        <button type="button" class="reset" data-action="reset-weights">Reset to default weights (${terms.map(([k, w]) => `${w} ${V.SCORE_DEFAULT_WEIGHTS[k]}`).join(", ")})</button>
+        ${whyWeights("researcher")}` : whyWeights("educator")}
       <div class="rank-out" aria-live="polite"></div>`;
     renderRanking();
   }
@@ -148,14 +150,14 @@ export const mountCompareGrid: MountPanel = (container, props) => {
     if (!avail.length) { out.innerHTML = `<p class="muted">Not available for this date (outside the data range).</p>`; return; }
     const top = avail[0];
     if (scoreMode === "educator") {
-      out.innerHTML = `<p class="big">For a landing on ${esc(current.landingDate)}, the best site by our prototype score is <strong>${esc(top.name)}</strong>, scoring <strong>${Math.round(top.score!)}</strong> out of 100.</p>
+      out.innerHTML = `<p class="big">For a landing on ${esc(current.landingDate)}, the top site by our prototype ${esc(V.SCORE_LABEL)} is <strong>${esc(top.name)}</strong>, scoring <strong>${Math.round(top.score!)}</strong> out of 100.</p>
         <ol class="rank">${avail.map((x) => `<li${x.siteId === current.siteId ? ' class="sel"' : ""}>${esc(x.name)}: ${Math.round(x.score!)}</li>`).join("")}</ol>
         <p class="muted small">Uses the default weights. The Researcher view explains the calculation.</p>`;
       return;
     }
     out.innerHTML = `<p class="small">${r.isDefault ? "Default weights." : "Custom weights: the ranking below is yours, not the Educator default."} Top site: <strong>${esc(top.name)}</strong> (${top.score === null ? "–" : top.score.toFixed(1)}).</p>
-      <table class="ranktable"><thead><tr><th>#</th><th>Site</th><th>Score</th><th>S</th><th>E</th><th>D</th><th>G</th></tr></thead><tbody>
-      ${avail.map((x, i) => `<tr${x.siteId === current.siteId ? ' class="sel"' : ""}><td>${i + 1}</td><td><button type="button" data-action="site" data-site="${x.siteId}">${esc(x.name)}</button></td><td>${x.score === null ? "–" : x.score.toFixed(1)}</td>${(["sunlight", "earth", "shortDark", "shortGap"] as const).map((k) => `<td>${x.components![k].toFixed(2)}</td>`).join("")}</tr>`).join("")}
+      <table class="ranktable"><thead><tr><th>#</th><th>Site</th><th>Score</th><th>S</th><th>E</th><th>D</th><th>G</th><th>C</th><th>T</th></tr></thead><tbody>
+      ${avail.map((x, i) => `<tr${x.siteId === current.siteId ? ' class="sel"' : ""}><td>${i + 1}</td><td><button type="button" data-action="site" data-site="${x.siteId}">${esc(x.name)}</button></td><td>${x.score === null ? "–" : x.score.toFixed(1)}</td>${WEIGHT_KEYS.map(([k]) => `<td>${x.components![k].toFixed(2)}</td>`).join("")}</tr>`).join("")}
       </tbody></table>
       ${r.ranking.length > avail.length ? `<p class="muted small">${r.ranking.length - avail.length} site(s) have no data for this date.</p>` : ""}`;
   }

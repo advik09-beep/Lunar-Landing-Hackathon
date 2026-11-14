@@ -49,9 +49,9 @@ export interface Power {
   irradianceWm2: number; peakW: number; averageW: number; energyWh: number; loadEnergyWh: number; balanceWh: number;
   poweredHours: number; longestNoPowerHours: number; batteryWh: number; assumptions: string[]; estimate: true;
 }
-export type Weights = { sunlight: number; earth: number; shortDark: number; shortGap: number };
+export type Weights = { sunlight: number; earth: number; shortDark: number; shortGap: number; clearance: number; slip: number };
 export interface RankRow { siteId: string; name: string; score: number | null; available: boolean;
-  components?: { sunlight: number; earth: number; shortDark: number; shortGap: number }; }
+  components?: Record<keyof Weights, number>; }
 export interface Ranking { landingDate: string; weights: Weights; isDefault: boolean; formula: string; prototype: true; ranking: RankRow[] }
 
 interface Api {
@@ -70,6 +70,7 @@ interface Api {
   scoreOf(m: Metrics, weights?: Partial<Weights>): { score: number | null; components: Record<keyof Weights, number>; weights: Weights };
   SCORE_DEFAULT_WEIGHTS: Weights; SCORE_TERMS: Record<keyof Weights, string>; SCORE_FORMULA_TEXT: string;
   SOLAR_IRRADIANCE_W_M2: number; SOLAR_IRRADIANCE_SOURCE: string;
+  SCORE_LABEL: string; SCORE_MEANING: string; WEIGHT_REASONS: Record<keyof Weights, string>; WEIGHTS_STATEMENT: string; WEIGHTS_EDUCATOR_TEXT: string;
 }
 
 export const V = raw as unknown as Api;

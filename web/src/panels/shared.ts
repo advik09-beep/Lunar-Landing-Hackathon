@@ -1,5 +1,5 @@
 // Shared helpers for Lane A panels: style isolation (Shadow DOM), wording, formatting.
-import type { Verdict } from "./data";
+import { V, type Verdict, type Weights } from "./data";
 
 /**
  * Creates the panel's own element inside the shell's container and attaches a Shadow DOM to it.
@@ -59,6 +59,22 @@ export function clampHour(h: number | undefined, hours: number): number {
   const n = Math.round(Number(h ?? 0));
   return Number.isFinite(n) ? Math.min(hours - 1, Math.max(0, n)) : 0;
 }
+
+/** D17: the six weights in display order with their symbols. */
+export const WEIGHT_KEYS: [keyof Weights, string][] = [["sunlight", "wS"], ["earth", "wE"], ["shortDark", "wD"], ["shortGap", "wG"], ["clearance", "wC"], ["slip", "wT"]];
+/** Clickable "Why these weights?" (a native <details>, keyboard accessible). */
+export function whyWeights(level: "educator" | "researcher"): string {
+  const body = level === "educator"
+    ? `<p>${esc(V.WEIGHTS_EDUCATOR_TEXT)}</p>`
+    : `<ul>${WEIGHT_KEYS.map(([k, w]) => `<li><strong>${w} = ${V.SCORE_DEFAULT_WEIGHTS[k]}:</strong> ${esc(V.WEIGHT_REASONS[k])}</li>`).join("")}</ul><p>${esc(V.WEIGHTS_STATEMENT)}</p>`;
+  return `<details class="why-weights"><summary>Why these weights?</summary>${body}</details>`;
+}
+export const WHY_WEIGHTS_CSS = `
+.why-weights { margin: 6px 0; font-size: .84rem; }
+.why-weights summary { cursor: pointer; color: var(--llp-link, #9cc6ff); text-decoration: underline; display: inline; }
+.why-weights p, .why-weights ul { margin: 6px 0; }
+.meaning { font-size: .82rem; color: var(--llp-muted, #a8bbd3); }
+`;
 
 export function addDays(date: string, n: number): string {
   return new Date(Date.parse(date + "T00:00:00Z") + n * 864e5).toISOString().slice(0, 10);

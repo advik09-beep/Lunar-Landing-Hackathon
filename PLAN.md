@@ -107,6 +107,18 @@ and researchers get the numbers behind them.
   the ranking live. The Educator score always uses the default weights
   and says so. Both views give the same number at default weights.
   Lane A proposes the formula; label it prototype.
+  D17 amendment (both humans, 2026-11-14): (1) scores bunched at 100,
+  which read as "perfect". The scale is NOT compressed or capped; instead
+  100 is harder to earn by two terms from existing data: clearance (how
+  far above the terrain skyline the Sun and Earth sit while visible) and
+  slip tolerance (how well the score holds if the landing date moves up
+  to 3 days either way). Renamed "Sun and Earth score", with one line
+  saying what 100 does and does not mean (not overall site safety).
+  (2) A clickable "Why these weights?" next to the score in both views:
+  plain sentences in Educator, one line of reasoning per weight in
+  Researcher, stating that the weights are this team's judgment, not a
+  NASA standard, and that the Researcher view lets you change them. Both
+  views still give the same number at default weights.
 - D18 Researcher tab: comprehensive per-site analysis on screen with a
   download, clearly labeled as for researchers. Research what mission
   designers actually need from official NASA sources and cite them.

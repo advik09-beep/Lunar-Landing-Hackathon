@@ -6,10 +6,10 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 |-----|------|-----------|
 | Advik + ChatGPT (Lane B) | D14 OzAILabs — IN PROGRESS | Fork advik09-beep/SolarSystemSimulator verified and visible to Vercel; creating separate public deployment, then wiring approved iframe and checking desktop. |
 | Sheldon (Lane A human) | — | Planning stop 2026-11-14: D12-D18 signed; acceptance run done |
-| Claude Code (Lane A) | 14 + 15 (D16, D17) | D16 metrics + power calculator and D17 best-site score DONE inside the existing panels; stopped. Next: D18 Researcher tab on Sheldon's go |
+| Claude Code (Lane A) | 15 (D17 amendment) | Clearance + slip tolerance, 'Sun and Earth score', 'Why these weights?' DONE; stopped. Next: D18 on Sheldon's go |
 
 Acceptance (both humans, 2026-11-14): steps 1, 2, 3, 6, 8 **PASS**. Step 4 not yet (markers don't recolor on date change; pole sites can't be told apart). Step 7 not yet (hour slider too hard to find). Signed 2026-11-14: D7–D11 (see PLAN); **D12–D18** (terrain all sites, date+hour slider, overview scene, legend, power/comms metrics, best-site score, Researcher tab). Side card switch renamed Educator / Researcher.
-Waiting on Sheldon: review D16/D17 (formula below); go for D18.
+Waiting on Sheldon: review the amended score (formula and spread in the Lane A entry); go for D18.
 Waiting on Advik: D13 (uses panel interface v1.2), D14, D15; step 4 fixes.
 
 ## Continuous two-agent coordination protocol (agreed 2026-11-14)
@@ -1133,4 +1133,57 @@ interface PanelHandle { update(next: Partial<Pick<PanelProps, "siteId" | "landin
 - **DOM test (happy-dom, real data):** the Educator texts above, the Researcher metrics, the calculator defaults reproducing 323 W / 54.3 kWh / 3.1 kWh, switching to fixed flat giving 4.7 kWh, grid sliders re-ranking live (sunlight-only puts Nobile Rim 2 first), and Reset restoring 97.1.
 - **All checks:** `check_visibility` (API 1.4.0), `check_ephem`, `check_scene`, `check_horizon`, `check_metrics` PASS. `cd web && npm run build` OK.
 - README updated: D16/D17 description, five check scripts, limits. PLAN already records that D17 replaces "no single best-site score".
+
+### 2026-11-14 — D17 amendment: clearance + slip tolerance, "Sun and Earth score", "Why these weights?" (DONE)
+**Recorded in PLAN.md as the D17 amendment (both humans).** Scale not compressed or capped; 100 is harder to earn for real reasons.
+
+**New formula in plain words (PROTOTYPE):** six sub-scores between 0 and 1 for the 7-day stay:
+- **S** sunlight share.
+- **E** Earth-in-view share.
+- **D** 1 − longest dark stretch ÷ 168 h.
+- **G** 1 − longest gap without Earth ÷ 168 h.
+- **C, clearance (new):** while each body is visible, how far it sits above the terrain skyline, scored min(height above skyline, 15°) ÷ 15° and averaged over the visible hours. Sun and Earth are averaged; 0 if a body is never visible. Grazing the skyline scores low.
+- **T, slip tolerance (new):** compute the score from the first five terms for the landing date and for each date up to 3 days either side. T = 1 − (today's five-term score − the lowest in that window) ÷ 100. A score that collapses if the date slips loses points; dates outside the data are skipped.
+
+**Score = weighted average × 100. Default weights:** sunlight 25, Earth 20, short dark 15, short gap 10, clearance 15, slip tolerance 15 (sum 100). With custom weights, divide by their sum; all zero → no score.
+
+**Spread, all sites, every landing date 2026-01-04 to 2029-12-22 (14,490 site-dates):**
+
+| | Old formula (S/E/D/G 35/25/25/15) | New formula |
+|---|---|---|
+| Score ≥ 95 | 3,173 (21.9%) | **1,493 (10.3%)** |
+| Score = 100 | 2,638 | **95** |
+| Bands 0–20 / 20–40 / 40–60 / 60–80 / 80–100 | 904 / 884 / 5,406 / 2,474 / 4,822 | 478 / 1,093 / 5,406 / 3,233 / 4,280 |
+
+- Why: the pole sites no longer reach the top, because the Sun and Earth graze their skylines (e.g. Cabeus B, IM-2: hundreds of 95+ dates → 0).
+- The near-side sites keep high scores only when the Sun and Earth stay high and stable all week.
+
+**Label:** "**Sun and Earth score**". On screen, in both views: "100 means the Sun and Earth stay in view, well above the skyline, for the whole 7-day stay, and the answer holds if the landing slips by up to 3 days. It does not mean the site is safe: slopes, boulders, temperatures, landing hazards and mission risks are not included."
+
+**"Why these weights?"** A clickable control (native `<details>`) next to the score in both views, in the side card and the Compare grid.
+- **Educator text:** "Sunlight counts most, because without power nothing else works, and talking to Earth comes next. We also reward sites where the Sun and Earth sit well above the skyline and where the answer stays good if the landing date slips. These weights are this team's judgment, not a NASA standard. The Researcher view lets you change them."
+- **Researcher:** one line per weight:
+  - **wS 25:** sunlight is weighted most: without power nothing else runs.
+  - **wE 20:** Earth contact next: without it, no commands up or data down.
+  - **wD 15:** one long blackout is harder to survive than the same darkness spread out.
+  - **wG 10:** a lander can store data and wait, but long silences add risk.
+  - **wC 15:** a body grazing the skyline can be lost to a small change in position or terrain detail.
+  - **wT 15:** real launch dates move.
+  - Then the same team-judgment statement.
+
+**/lib (API 1.5.0):**
+- `lib/score.js` exports `SCORE_LABEL`, `SCORE_MEANING`, `WEIGHT_REASONS`, `WEIGHTS_STATEMENT`, `WEIGHTS_EDUCATOR_TEXT`, `CLEARANCE_FULL_DEG` (15), `SLIP_DAYS` (3), `baseScore`, `slipTolerance`, and `scoreOf(metrics, weights, window)`.
+- `getMetrics` and `getDaily` rows gain `sunClearance`, `earthClearance`, `clearance` (0.001 precision, identical in both); `daily.json` gains two columns.
+- `getRanking` computes slip tolerance from each site's ±3-day window; new `getScore(siteId, date, weights?)` gives the same number from the hourly data.
+
+**Worked example (check script):** IM-2, 2026-11-14:
+- S 0.792, E 1.000, D 0.815, G 1.000.
+- C = (Sun 0.276 + Earth 0.354) ÷ 2 = 0.315.
+- Five-term scores −3..+3 days: 48.2, 60.7, 70.9, 78.5, 86.2, 90.0, 91.1 → drop 30.3 → T 0.697.
+- Score **77.2** (was 88.1). Top site that date: Chandrayaan-3, 91.8.
+
+**Checks:**
+- `check_metrics` PASS: daily clearance = getMetrics on all 14,694 rows; ranking = getScore for every site; hand example; Educator = Researcher at defaults; re-ranking; all-zero → no score; spread printed, with new 95+ count < old.
+- DOM test: new label and meaning line; both "Why these weights?" texts (6 reason lines in Researcher); Educator 77 = Researcher 77.2; grid has 6 sliders plus C/T columns, re-ranks live, and Reset restores 91.8.
+- `check_visibility` (API 1.5.0), `check_ephem`, `check_scene`, `check_horizon` PASS. `/web` build OK. README updated.
 

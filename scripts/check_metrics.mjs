@@ -35,11 +35,11 @@ for (const s of sites) for (const [a, b] of V.getCoverage().sites.find((c) => c.
   for (const r of V.getDaily(startDay, n).sites[s.id]) {
     if (!r) continue;
     const m = V.getMetrics(s.id, `${r.date}T00:00:00Z`);
-    for (const k of ["pctLit", "pctComms", "longestDarkHours", "darkPeriods", "longestContactGapHours", "contactWindows"]) if (!near(r[k], m[k])) { m2++; break; }
+    for (const k of ["pctLit", "pctComms", "longestDarkHours", "darkPeriods", "longestContactGapHours", "contactWindows", "sunClearance", "earthClearance", "clearance"]) if (!near(r[k], m[k])) { m2++; break; }
     rows++;
   }
 }
-ok(m2 === 0 && rows === 14694, `all ${rows} daily rows: D16 fields equal getMetrics`);
+ok(m2 === 0 && rows === 14694, `all ${rows} daily rows: D16 fields and clearance equal getMetrics`);
 
 // 3. Power: a worked example a judge can follow.
 console.log("\nWorked power example: IM-2, 7-day stay from 2026-11-14 00:00 UTC, sun-tracking panel 1 m², 30% efficient, lander draws 100 W");
@@ -70,31 +70,60 @@ const bad = (o, re, m) => { try { V.computePower({ ...ex, ...o }); ok(false, m);
 bad({ areaM2: 0 }, /areaM2/, "rejects zero area"); bad({ efficiency: 1.5 }, /efficiency/, "rejects efficiency > 100%");
 bad({ panel: "tilted" }, /panel/, "rejects unknown panel type"); bad({ loadW: -1 }, /loadW/, "rejects negative load");
 
-// 4. D17 score (PROTOTYPE).
+// 4. D17 "Sun and Earth score" (PROTOTYPE, with the 2026-11-14 amendment: clearance + slip tolerance).
 const date = "2026-11-14";
 const r = V.getRanking(date);
 ok(r.prototype === true && r.isDefault && JSON.stringify(r.weights) === JSON.stringify(V.SCORE_DEFAULT_WEIGHTS), "ranking is labeled prototype and uses the default weights");
+ok(V.SCORE_LABEL === "Sun and Earth score" && /does not mean the site is safe/.test(V.SCORE_MEANING), "label 'Sun and Earth score' with a line on what 100 does and does not mean");
+ok(/not a NASA standard/.test(V.WEIGHTS_STATEMENT) && Object.keys(V.WEIGHT_REASONS).length === 6, "a reason for each of the six weights, stated as the team's judgment");
 let m4 = 0;
-for (const x of r.ranking) {
-  const s2 = V.scoreOf(V.getMetrics(x.siteId, `${date}T00:00:00Z`)).score;
-  if (!near(x.score, s2) || x.score < 0 || x.score > 100) m4++;
-}
-ok(m4 === 0, "every site's score equals scoreOf(getMetrics) and lies in 0..100");
+for (const x of r.ranking) { const g = V.getScore(x.siteId, date).score; if (!near(x.score, g) || x.score < 0 || x.score > 100) m4++; }
+ok(m4 === 0, "every site: ranking score (daily summary) equals getScore (hourly data), within 0..100");
 ok(r.ranking.every((x, i) => i === 0 || r.ranking[i - 1].score >= x.score), "ranking is sorted best first");
-const explicit = V.getRanking(date, { sunlight: 35, earth: 25, shortDark: 25, shortGap: 15 });
+const explicit = V.getRanking(date, { ...V.SCORE_DEFAULT_WEIGHTS });
 ok(explicit.ranking.every((x, i) => x.siteId === r.ranking[i].siteId && x.score === r.ranking[i].score), "Educator (defaults) and Researcher at default weights give identical numbers");
-const sunOnly = V.getRanking(date, { sunlight: 100, earth: 0, shortDark: 0, shortGap: 0 });
+const sunOnly = V.getRanking(date, { sunlight: 100, earth: 0, shortDark: 0, shortGap: 0, clearance: 0, slip: 0 });
 ok(sunOnly.ranking.map((x) => x.siteId).join() !== r.ranking.map((x) => x.siteId).join() && !sunOnly.isDefault, "changing weights re-ranks (sunlight-only weights give a different order)");
-ok(V.getRanking(date, { sunlight: 0, earth: 0, shortDark: 0, shortGap: 0 }).ranking.every((x) => x.score === null), "all-zero weights give no score (not a fake number)");
+ok(V.getRanking(date, { sunlight: 0, earth: 0, shortDark: 0, shortGap: 0, clearance: 0, slip: 0 }).ranking.every((x) => x.score === null), "all-zero weights give no score (not a fake number)");
 
-// Worked score example (same stay as the power example).
-const mm = V.getMetrics("im2", `${date}T00:00:00Z`), sc = V.scoreOf(mm);
+// Worked score example (same stay as the power example), every term from first principles.
+const t0 = Date.parse(`${date}T00:00:00Z`);
+const tl2 = V.getTimeline("im2", t0, 7).samples;
+const K = V.CLEARANCE_FULL_DEG;
+const clr = (vis, key) => { const v = tl2.filter((x) => x[vis]); return v.length ? Math.round((1000 * v.reduce((a, x) => a + Math.min(x[key], K) / K, 0)) / v.length) : 0; };
+const Csun = clr("lit", "sunMarginDeg"), Cearth = clr("comms", "earthMarginDeg"), C = Math.round((Csun + Cearth) / 2) / 1000;
+const mm = V.getMetrics("im2", t0);
 const S = mm.pctLit / 100, E = mm.pctComms / 100, D = 1 - mm.longestDarkHours / 168, G = 1 - mm.longestContactGapHours / 168;
-const hand = (100 * (35 * S + 25 * E + 25 * D + 15 * G)) / 100;
-console.log(`\nWorked score example: IM-2, ${date}: S = ${S.toFixed(3)}, E = ${E.toFixed(3)}, D = 1 − ${mm.longestDarkHours}/168 = ${D.toFixed(3)}, G = 1 − ${mm.longestContactGapHours}/168 = ${G.toFixed(3)}`);
-console.log(`  score = 100 × (35·${S.toFixed(3)} + 25·${E.toFixed(3)} + 25·${D.toFixed(3)} + 15·${G.toFixed(3)}) ÷ 100 = ${hand.toFixed(1)}`);
-ok(near(sc.score, hand), `scoreOf = hand calculation (${sc.score.toFixed(1)})`);
+const W = V.SCORE_DEFAULT_WEIGHTS;
+const base5 = (m) => (100 * (W.sunlight * m.pctLit / 100 + W.earth * m.pctComms / 100 + W.shortDark * (1 - m.longestDarkHours / 168) + W.shortGap * (1 - m.longestContactGapHours / 168) + W.clearance * m.clearance)) / (W.sunlight + W.earth + W.shortDark + W.shortGap + W.clearance);
+const bases = [-3, -2, -1, 0, 1, 2, 3].map((k) => base5(V.getMetrics("im2", t0 + k * 864e5)));
+const T = 1 - Math.max(0, bases[3] - Math.min(...bases)) / 100;
+const hand = (W.sunlight * S + W.earth * E + W.shortDark * D + W.shortGap * G + W.clearance * C + W.slip * T) * 100 / 100;
+console.log(`\nWorked score example: IM-2, ${date} (default weights ${Object.values(W).join("/")}):`);
+console.log(`  S = ${S.toFixed(3)}, E = ${E.toFixed(3)}, D = 1 − ${mm.longestDarkHours}/168 = ${D.toFixed(3)}, G = 1 − ${mm.longestContactGapHours}/168 = ${G.toFixed(3)}`);
+console.log(`  C = (Sun ${(Csun / 1000).toFixed(3)} + Earth ${(Cearth / 1000).toFixed(3)}) ÷ 2 = ${C.toFixed(3)}   (mean of min(height above skyline, ${K}°) ÷ ${K}° while visible)`);
+console.log(`  five-term scores for ${date} −3..+3 days: ${bases.map((b) => b.toFixed(1)).join(", ")} → drop ${(bases[3] - Math.min(...bases)).toFixed(1)} → T = ${T.toFixed(3)}`);
+console.log(`  score = (25·${S.toFixed(3)} + 20·${E.toFixed(3)} + 15·${D.toFixed(3)} + 10·${G.toFixed(3)} + 15·${C.toFixed(3)} + 15·${T.toFixed(3)}) × 100 ÷ 100 = ${hand.toFixed(1)}`);
+ok(near(V.getScore("im2", date).score, hand, 1e-9), `getScore = hand calculation (${hand.toFixed(1)})`);
 console.log(`  top site for ${date}: ${r.ranking[0].name} (${r.ranking[0].score.toFixed(1)})`);
+
+// 5. Spread: how many site-dates score 95 or more, old formula vs amended formula (all sites, 2026-01-04 .. 2029-12-22).
+const oldScore = (m) => 35 * m.pctLit / 100 + 25 * m.pctComms / 100 + 25 * (1 - m.longestDarkHours / 168) + 15 * (1 - m.longestContactGapHours / 168);
+let nOld = 0, nNew = 0, nTot = 0, n100Old = 0, n100New = 0;
+const histOld = [0, 0, 0, 0, 0], histNew = [0, 0, 0, 0, 0];
+for (let t = Date.parse("2026-01-04T00:00:00Z"); t <= Date.parse("2029-12-22T00:00:00Z"); t += 864e5) {
+  const d = new Date(t).toISOString().slice(0, 10);
+  const rk = V.getRanking(d);
+  for (const x of rk.ranking) {
+    if (!x.available) continue;
+    const o = oldScore(x.metrics), n = x.score;
+    nTot++; if (o >= 95) nOld++; if (n >= 95) nNew++; if (o >= 99.95) n100Old++; if (n >= 99.95) n100New++;
+    histOld[Math.min(4, Math.floor(o / 20))]++; histNew[Math.min(4, Math.floor(n / 20))]++;
+  }
+}
+console.log(`\nSpread over ${nTot} site-dates: score >= 95 old ${nOld} (${(100 * nOld / nTot).toFixed(1)}%) -> new ${nNew} (${(100 * nNew / nTot).toFixed(1)}%); score 100 old ${n100Old} -> new ${n100New}`);
+console.log(`  bands 0-20/20-40/40-60/60-80/80-100: old ${histOld.join("/")}  new ${histNew.join("/")}`);
+ok(nNew < nOld, "fewer site-dates reach 95+ under the amended formula (scale not compressed or capped)");
 
 if (fails) { console.error(`${fails} check(s) failed`); process.exit(1); }
 console.log("PASS");

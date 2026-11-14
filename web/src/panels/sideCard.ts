@@ -4,13 +4,13 @@
 // v1.2: Sun and Earth status are shown at the shared hour of the stay (props.hour, default 0).
 // All values come from /lib/visibility.js; nothing is calculated here except formatting.
 import { V, type Site, type State, type Summary, type Horizon, type Metrics } from "./data";
-import { createPanelRoot, esc, deg, az, pct, VERDICT_WORDS, verdictShort, addDays, fmtUtc, clampHour } from "./shared";
+import { createPanelRoot, esc, deg, az, pct, VERDICT_WORDS, verdictShort, addDays, fmtUtc, clampHour, whyWeights, WHY_WEIGHTS_CSS, WEIGHT_KEYS } from "./shared";
 import type { MountPanel, PanelProps } from "./types";
 
 type Mode = "plain" | "numbers"; // shown as Educator / Researcher
 
 export const mountSideCard: MountPanel = (container, props) => {
-  const { host, root } = createPanelRoot(container, "sidecard", CSS);
+  const { host, root } = createPanelRoot(container, "sidecard", CSS + WHY_WEIGHTS_CSS);
   const body = document.createElement("section");
   body.className = "card";
   body.setAttribute("aria-live", "polite");
@@ -139,13 +139,14 @@ export const mountSideCard: MountPanel = (container, props) => {
       const r = V.getRanking(current.landingDate);
       const me = r.ranking.find((x) => x.siteId === site.id);
       const top = r.ranking[0];
-      if (!me?.available || !top?.available) return `<div class="score"><h3>Best-site score <span class="proto">PROTOTYPE</span></h3><p class="muted">Not available for this landing date.</p></div>`;
+      if (!me?.available || !top?.available) return `<div class="score"><h3>${esc(V.SCORE_LABEL)} <span class="proto">PROTOTYPE</span></h3><p class="muted">Not available for this landing date.</p></div>`;
       const topLine = top.siteId === site.id
         ? `This is the top site for a landing on ${esc(current.landingDate)}.`
         : `The top site for a landing on ${esc(current.landingDate)} is <strong>${esc(top.name)}</strong> (${Math.round(top.score!)} out of 100).`;
-      return `<div class="score"><h3>Best-site score <span class="proto">PROTOTYPE</span></h3>
-        <p class="big"><strong>${Math.round(me.score!)}</strong> out of 100 for this site.</p>
+      return `<div class="score"><h3>${esc(V.SCORE_LABEL)} <span class="proto">PROTOTYPE</span></h3>
+        <p class="big"><strong>${Math.round(me.score!)}</strong> out of 100 for this site. ${whyWeights("educator")}</p>
         <p>${topLine}</p>
+        <p class="meaning">${esc(V.SCORE_MEANING)}</p>
         <p class="muted small">Uses the default weights. The Researcher view explains the calculation.</p></div>`;
     }
 
@@ -217,14 +218,15 @@ export const mountSideCard: MountPanel = (container, props) => {
     function scoreResearcher(): string {
       const r = V.getRanking(current.landingDate);
       const me = r.ranking.find((x) => x.siteId === site.id);
-      if (!me?.available) return `<h3>Best-site score <span class="proto">PROTOTYPE</span></h3><p class="muted">Not available for this landing date.</p>`;
+      if (!me?.available) return `<h3>${esc(V.SCORE_LABEL)} <span class="proto">PROTOTYPE</span></h3><p class="muted">Not available for this landing date.</p>`;
       const W = V.SCORE_DEFAULT_WEIGHTS, c = me.components!;
-      const row = (k: keyof typeof W, name: string) => `<tr><td>${esc(name)}</td><td>${esc(V.SCORE_TERMS[k])}</td><td>${c[k].toFixed(3)}</td><td>${W[k]}</td></tr>`;
-      return `<h3>Best-site score <span class="proto">PROTOTYPE</span></h3>
+      return `<h3>${esc(V.SCORE_LABEL)} <span class="proto">PROTOTYPE</span></h3>
+        <p class="meaning">${esc(V.SCORE_MEANING)}</p>
         <p class="small">${esc(V.SCORE_FORMULA_TEXT)}</p>
-        <table><thead><tr><th>Term</th><th>Meaning</th><th>Value</th><th>Default weight</th></tr></thead><tbody>
-          ${row("sunlight", "wS")}${row("earth", "wE")}${row("shortDark", "wD")}${row("shortGap", "wG")}
+        <table><thead><tr><th>Weight</th><th>Term</th><th>Value</th><th>Default weight</th></tr></thead><tbody>
+          ${WEIGHT_KEYS.map(([k, w]) => `<tr><td>${w}</td><td>${esc(V.SCORE_TERMS[k])}</td><td>${c[k].toFixed(3)}</td><td>${W[k]}</td></tr>`).join("")}
         </tbody></table>
+        ${whyWeights("researcher")}
         <p class="small">Score for this site at default weights: <strong>${me.score!.toFixed(1)}</strong> / 100 (rank ${r.ranking.indexOf(me) + 1} of ${r.ranking.filter((x) => x.available).length}). Adjust the weights and see the ranking update in <em>Compare dates</em>.</p>`;
     }
   }

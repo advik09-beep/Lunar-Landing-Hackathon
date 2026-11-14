@@ -30,14 +30,23 @@ The 10 sites: Apollo 11, 12 and 17; Chandrayaan-3; Intuitive Machines IM-1 and I
 - It uses NASA's solar irradiance at the Moon (1361 W/m², [NASA NSSDCA Moon Fact Sheet](https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html)). Every assumption is listed on screen, and the result is labeled an **estimate**.
 - Comms is geometry only: a data rate would need antenna details.
 
-**Best-site score (D17, prototype):** one number from 0 to 100 per site and landing date:
+**Sun and Earth score (D17, prototype):** one number from 0 to 100 per site and landing date:
 
-> score = 100 × (35·S + 25·E + 25·D + 15·G) ÷ 100
+> score = 100 × (25·S + 20·E + 15·D + 10·G + 15·C + 15·T) ÷ 100
 
-- S = sunlight share; E = Earth-in-view share; D = 1 − longest dark stretch ÷ stay length; G = 1 − longest gap without Earth ÷ stay length.
+| Term | What it measures (0 to 1) |
+|---|---|
+| S | sunlight share of the stay |
+| E | Earth-in-view share of the stay |
+| D | 1 − longest dark stretch ÷ stay length |
+| G | 1 − longest gap without Earth ÷ stay length |
+| C | clearance: how far the Sun and Earth sit above the skyline while visible (full credit at 15° or more) |
+| T | slip tolerance: how little the score drops if the landing moves up to ±3 days |
+
+- **What 100 means:** the Sun and Earth stay in view, well above the skyline, for the whole stay, and the answer holds if the date slips. **What it doesn't mean:** that the site is safe. Slopes, boulders, temperatures and landing hazards aren't included.
 - The **Educator** view shows the score and names the top site in plain words, always with these default weights.
-- The **Researcher** view shows the formula and lets you change the four weights, with the ranking updating live.
-- Both give the same number at the default weights. Sunlight and Earth contact trade off, so the "best" site depends on the weights you choose.
+- The **Researcher** view shows the formula and lets you change all six weights, with the ranking updating live.
+- Both give the same number at the default weights. A clickable **"Why these weights?"** explains the choice. The weights are this team's judgment, not a NASA standard.
 
 ## Run it locally
 Needs Node.js 18 or newer.
@@ -70,7 +79,7 @@ The data are static JSON files in `data/`. There is no backend.
 | `node scripts/check_visibility.mjs` | Every function in `lib/visibility.js` returns the agreed shapes, and screen values equal the files. All 14,694 rows of the daily summary equal a fresh calculation from the hourly data. Out-of-range dates give "unavailable", never a guess. Includes the terrain test: at Malapert on 2026-09-19 06:00 UTC the Sun is 1.05° above a flat horizon but hidden behind a ridge 1.84 km away. |
 | `node scripts/check_horizon.mjs [siteId]` | A terrain horizon (default Malapert) is sane: it reads the elevation maps consistently (each site's fine map agrees with a coarser map near the site, mean differences ~2–15 m), it never falls below what geometry allows, the search isn't cut off by any map edge, and it finds hours where flat says "Sun up" but terrain says "blocked". The elevation-map comparisons need the raw maps: run `node scripts/fetch_lola.mjs <siteId ...>` first (~2.1 GB for all 10 sites, not in git). |
 | `node scripts/check_scene.mjs` | The Moon-fixed Sun and Earth directions for the 3D view agree with the site data: within 0.0034° of the hand-checked values, and within 0.0065° over 58,440 site-hours. At each of the 49 full moons in 2026–2029, the point with the Sun overhead and the point with Earth overhead are within 5° of each other. |
-| `node scripts/check_metrics.mjs` | The D16 metrics equal an hour-by-hour recount, and all 14,694 daily rows carry the same values. A worked power example a judge can follow: IM-2, 7 days from 2026-11-14, 1 m² sun-tracking panel at 30%, 100 W load gives 1361 × 1 × 0.30 = 408.3 W × 133 sunlit hours = 54.3 kWh, average 323 W, and a battery of 100 W × 31 h = 3.1 kWh. The D17 score matches a hand calculation (IM-2: 88.1), the Educator and Researcher numbers agree at default weights, and changing weights re-ranks. |
+| `node scripts/check_metrics.mjs` | The D16 metrics equal an hour-by-hour recount, and all 14,694 daily rows carry the same values. A worked power example a judge can follow: IM-2, 7 days from 2026-11-14, 1 m² sun-tracking panel at 30%, 100 W load gives 1361 × 1 × 0.30 = 408.3 W × 133 sunlit hours = 54.3 kWh, average 323 W, and a battery of 100 W × 31 h = 3.1 kWh. The D17 score matches a hand calculation (IM-2: 77.2, all six terms worked out), the Educator and Researcher numbers agree at default weights, changing weights re-ranks, and the share of site-dates scoring 95+ falls from 21.9% (old formula) to 10.3%. |
 
 **Terrain (all 10 sites, prototype):**
 - Built from NASA's LOLA elevation maps (PDS Geosciences).
@@ -95,7 +104,7 @@ The data are static JSON files in `data/`. There is no backend.
 ## Known limits
 - **Sun and Earth are treated as points.** The Sun's disc is about 0.5° wide, so near the horizon real sunlight is partial while we show all-or-nothing.
 - **"Sunlight" is not power and "Earth in view" is not a guaranteed link.** They mean the body is above the horizon. The power calculator is an estimate with its assumptions listed (no dust, temperature or conversion losses; mean irradiance; Sun treated as a point).
-- **The best-site score is a prototype.** Its formula and default weights were proposed by Lane A and can be changed in the Researcher view.
+- **The Sun and Earth score is a prototype.** Its formula and default weights were proposed by Lane A (the team's judgment, not a NASA standard) and can be changed in the Researcher view. It is not a measure of overall site safety.
 - **Cabeus B's view toward Earth is set by ground 0.26–0.7 km away** (76% of Earth hours). That ground slopes downhill around a high point, so it decides how far *below* level Earth can be seen, not a ridge in the way. It's the same situation as Malapert's eastern bins (6°–8°). We kept the point on purpose.
 - **Terrain is modelled at all 10 sites, as a prototype.** Each horizon is for one point; nearby spots differ. The observer height (2 m mast) is assumed. Near-site maps are 20–60 m per pixel, so features smaller than that aren't resolved (e.g. the ~20 m crater IM-2 rests in).
 - **The four south-pole sites are representative points** of ~15 km candidate regions, not landing spots.
