@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | 1 — IN PROGRESS | prototype_01: verifying current source/build and deploying the 10-site catalog to Vercel; desktop only |
+| Advik + ChatGPT (Lane B) | 1 — BLOCKED | Vercel Git linking requires a GitHub Login Connection; local runtime/network unavailable. No public URL or Step 1 pass. |
 | Sheldon (Lane A human) | — | Step 2 PASSED 2026-11-14; GO given for Lane A's half of step 5 |
 | Claude Code (Lane A) | 5 (Lane A half DONE) | Stopped. Lane A half of step 5 done 2026-11-14; waiting for Lane B postbuild copy. Step 7 not started. |
 
@@ -321,6 +321,18 @@ D. **getCoverage()/getMetadata()** (or fields on existing exports)
 **Review questions for Claude:** (1) Does this EXACT prompt respect PLAN v2 Step 1 and approved API? (2) Do you foresee any issue with install/build/output overrides or root-only `package.json`? (3) Is there any source compatibility concern with the current `web/vite.config.ts` or `web/tsconfig.json` that Codex should know to diagnose, not preemptively patch? Please explicitly confirm or amend before Advik says GO.
 
 **Current status:** Waiting for Claude's review and Advik's GO; zero frontend changes, zero build/deploy tests, and no Step 1 pass claimed by this entry.
+
+
+### 2026-11-14 — prototype_01 execution: Step 1 BLOCKED
+
+- Read current PLAN.md v2 in full, DESIGN.md, STATUS header and both lane updates; inspected current web configuration/main.ts and visibility API. Current frontend imports listSites() and MOCK; API exports MOCK=false and API_VERSION=1.1.0. Static inspection confirms expected banner logic, but browser behavior was not tested.
+- Start/status commit: 97f933e599ffdbf325cd21ef052a0aea5af7c52c. Files modified by this execution: STATUS.md only (Lane B row and section). No Lane A source, plan, design, or later-step work changed.
+- Local checkout/build blocker: workspace is empty; cloning at workspace root fails with ".git: Operation not permitted". Clone into /tmp then fails with "Could not resolve host: github.com". Read latest main through the authorized GitHub connector instead. Node/npm/gh are absent from PATH, standard Node install locations are absent, and primary runtime environment variables are unset. npm install/typecheck/build/preview were NOT executed; package-lock.json was NOT generated or committed. Claude's prior checks are not claimed as tests run here.
+- Vercel connection works: only team returned is USMDO Club (team_xGusENTubcXSpn18WL74ewAz), no lunar project. Attempted Git-linked project lunar-landing-hackathon for advik09-beep/Lunar-Landing-Hackathon. Literal rootDirectory "." was rejected (invalid_root_directory); retried omitting rootDirectory, which represents repository root.
+- Blocking Vercel error on corrected request: HTTP 400 bad_request: "Failed to link advik09-beep/Lunar-Landing-Hackathon. You need to add a Login Connection to your GitHub account first." No project/deployment created; project listing afterward remains empty. Vercel deployment URL: none.
+- Temporary remote build fallback also unavailable: sandbox creation requires projectId, and the requested Git-linked project cannot be created. No sandbox was created.
+- Results: TypeScript NOT RUN; Vite build NOT RUN; desktop public access NOT RUN; ten-site rendering NOT RUN; MOCK browser behavior NOT RUN; JS/CSS/runtime verification NOT RUN. Step 1 BLOCKED, not PASS.
+- Required next dependency: account owner adds GitHub Login Connection in Vercel account settings, then retry the Git-linked project and complete normal npm lockfile generation/build and actual desktop public-page verification. Do not start postbuild data copy or any later step.
 
 ## Lane A
 
