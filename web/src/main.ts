@@ -82,9 +82,9 @@ app.innerHTML = [
   '  </section>',
   '  <section id="overview-view" class="overview-view" aria-label="Sun Earth Moon overview">',
   '    <div class="overview-window">',
-  '      <div class="overview-caption"><strong>THE SUN · EARTH · MOON</strong><span>Illustrative sizes, positions and motion — not to scale; not ephemeris geometry</span></div>',
-  '      <div id="overview-stage" class="overview-stage" aria-label="Clickable 3D Moon in a Sun Earth Moon illustration"></div>',
-  '      <div class="overview-footer"><p>Choose the Moon to explore real landing sites and verified Sun/Earth visibility at your selected UTC date and hour.</p><button id="enter-explore" type="button">Explore the Moon and landing sites</button></div>',
+  '      <div class="overview-caption"><strong id="overview-source">THE SUN · EARTH · MOON</strong><span id="overview-note">Illustrative sizes, positions and motion — not to scale; not ephemeris geometry</span></div>',
+  '      <div id="overview-stage" class="overview-stage" aria-label="Solar system overview visualization"></div>',
+  '      <div class="overview-footer"><p id="overview-disclaimer">Choose the Moon to explore real landing sites and verified Sun/Earth visibility at your selected UTC date and hour.</p><button id="enter-explore" type="button">Explore the Moon and landing sites</button></div>',
   '    </div>',
   '  </section>',
   '  <section id="explore-view" class="explorer" aria-label="Interactive lunar landing site explorer" hidden>',
@@ -121,7 +121,9 @@ app.innerHTML = [
   '    <h3>Scientific ephemerides and terrain</h3>',
   '    <p>Sun and Earth directions, visibility and stay summaries: <a href="https://ssd.jpl.nasa.gov/horizons/" target="_blank" rel="noopener noreferrer">NASA/JPL Horizons</a>. Malapert horizon elevation: NASA Lunar Orbiter Laser Altimeter (LOLA), Lunar Reconnaissance Orbiter. These are the scientific sources; the globe texture is not a DEM.</p>',
   '    <h3>3D rendering library</h3>',
-  '    <p><a href="https://threejs.org/" target="_blank" rel="noopener noreferrer">Three.js</a> and OrbitControls, copyright Three.js authors, <a href="https://github.com/mrdoob/three.js/blob/master/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>. The interactive globe and three-body overview were written for this project. Background starfield concept inspired by <a href="https://github.com/etrepat/starfield" target="_blank" rel="noopener noreferrer">etrepat/starfield</a>, copyright (c) 2010 Estanislau Trepat, <a href="https://github.com/etrepat/starfield/blob/develop/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>; legacy Three.js source was not copied.</p>',
+  '    <p><a href="https://threejs.org/" target="_blank" rel="noopener noreferrer">Three.js</a> and OrbitControls, copyright Three.js authors, <a href="https://github.com/mrdoob/three.js/blob/master/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>. The interactive globe and three-body overview were written for this project. Original drifting starfield visually informed by <a href="https://www.huescreen.com/starfield/" target="_blank" rel="noopener noreferrer">Hue Screen Starfield</a> (no code or assets copied), and previously by <a href="https://github.com/etrepat/starfield" target="_blank" rel="noopener noreferrer">etrepat/starfield</a>, copyright (c) 2010 Estanislau Trepat, <a href="https://github.com/etrepat/starfield/blob/develop/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>; legacy Three.js source was not copied.</p>',
+  '    <h3>Solar-system overview — upstream simulator</h3>',
+  '    <p>Approved upstream: <a href="https://github.com/OzAILabs/SolarSystemSimulator" target="_blank" rel="noopener noreferrer">OzAILabs/SolarSystemSimulator</a>. The authors describe its source as MIT-licensed in the README. Its planetary textures are separately sourced from <a href="https://www.solarsystemscope.com/textures/" target="_blank" rel="noopener noreferrer">Solar System Scope</a> (CC BY 4.0), Planet Pixel Emporium, NASA/USGS Astrogeology and Steve Albers; attribution and individual reuse terms follow the upstream README. Once our forked Vercel deployment is configured, this frame displays the full solar system and is not synchronized to this app\'s landing-date control.</p>',
   '    <h3>Implementation and limitations</h3>',
   '    <p>Site coordinates, visibility analysis, data checks and horizon panels: Lane A. App shell, Three.js globe, panel integration and hosting: Lane B. Moon-fixed Sun lighting and the displayed Earth direction now use verified hourly JPL Horizons scene data. The globe has no terrain shadows; Earth size and display distance are not to scale. Any future borrowed assets must be added here with attribution and license before release.</p>',
   '  </section>',
@@ -340,12 +342,47 @@ find<HTMLButtonElement>('polar-view').addEventListener('click', () => moon?.focu
 find<HTMLButtonElement>('reset-view').addEventListener('click', () => moon?.resetView());
 
 const destroyStarfield = mountStarfield();
-try {
-  overview = new OverviewScene(find<HTMLDivElement>('overview-stage'), () => openView('explore'));
-  overview.setVisible(true);
-} catch (error) {
-  console.warn('Overview scene unavailable:', error);
-  find<HTMLDivElement>('overview-stage').textContent = '3D overview unavailable. Use the Explore button to open the Moon.';
+
+// D14 amendment: embed the separately deployed user fork of OzAILabs.
+// The fork/deployment URL is configured at build time, never guessed.
+// Until it exists, retain the previous functional 3-body scene rather
+// than displaying a broken or unauthenticated external iframe.
+const configuredOverviewUrl = (import.meta as ImportMeta & {
+  env?: { VITE_SOLAR_OVERVIEW_URL?: string }
+}).env?.VITE_SOLAR_OVERVIEW_URL?.trim();
+let embedUrl: URL | null = null;
+if (configuredOverviewUrl) {
+  try {
+    const parsed = new URL(configuredOverviewUrl);
+    if (parsed.protocol === 'https:') embedUrl = parsed;
+    else console.warn('OzAILabs overview URL must use HTTPS');
+  } catch {
+    console.warn('Invalid OzAILabs overview URL; using fallback scene');
+  }
+}
+const overviewStage = find<HTMLDivElement>('overview-stage');
+if (embedUrl) {
+  const frame = document.createElement('iframe');
+  frame.className = 'overview-iframe';
+  frame.title = 'OzAILabs Solar System Simulator — embedded interactive overview';
+  frame.src = embedUrl.href;
+  frame.loading = 'eager';
+  frame.referrerPolicy = 'strict-origin-when-cross-origin';
+  frame.allow = 'fullscreen';
+  frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-pointer-lock allow-downloads allow-forms');
+  overviewStage.replaceChildren(frame);
+  find<HTMLElement>('overview-source').textContent = 'SOLAR SYSTEM · OzAILabs simulator';
+  find<HTMLElement>('overview-note').textContent = 'Forked from OzAILabs · MIT stated in upstream README · full solar system';
+  find<HTMLElement>('overview-disclaimer').textContent =
+    'Interactive solar-system simulator. Its time and orbital view are separate from our landing-date control. Select Explore to study the Moon with verified site data.';
+} else {
+  try {
+    overview = new OverviewScene(overviewStage, () => openView('explore'));
+    overview.setVisible(true);
+  } catch (error) {
+    console.warn('Overview scene unavailable:', error);
+    overviewStage.textContent = '3D overview unavailable. Use the Explore button to open the Moon.';
+  }
 }
 find<HTMLButtonElement>('enter-explore').addEventListener('click', () => openView('explore'));
 
