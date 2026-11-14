@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | 4 — REVIEW | D8 live JSON PASS; Three.js Moon, date controls, ten markers and Lane A side card deployed; desktop browser tests pass; human acceptance pending. |
+| Advik + ChatGPT (Lane B) | D11(a) + panels + Credits — DONE | Compare/Horizon mounted with v1.1 shared selection; NASA CGI Moon Kit 2K texture and Credits live. Step 4 human mouse sign-off pending; stopped as requested. |
 | Sheldon (Lane A human) | — | D9 + D10 signed 2026-11-14; gates Lane A's D10, panel interface and side card one at a time |
 | Claude Code (Lane A) | 8 (Lane A half) | getSceneState DONE and READY (checks pass); stopped. Lane B can light the Moon from the real Sun direction |
 
@@ -387,6 +387,14 @@ Second task, only after the copy passes and with Advik's authorization: Step 4 T
 - **Executed desktop Chromium (1440×900) production tests:** visible WebGL2 canvas YES, ten site-selection buttons, mounted Lane A side card, `loadDaily` completed with real-data UTC/7-day status; choosing Haworth changed panel title; +7 days changed the UTC date 2026-11-14 → 2026-11-21 and **7 of 10** verdict labels; south-pole camera command and Nobile Rim 2 panel selection responded. Raycast hit testing found visible markers; synthesized pointer down/up on marker coordinates changed selection among Apollo 17/11/12. No browser exceptions during normal interactions; one desktop screenshot captured and inspected. Synthetic pointer events are not a substitute for a human physical-mouse test.
 - **Scientific/presentation limits:** sphere surface texture and lighting are intentionally **illustrative**, not georeferenced NASA imagery or true ephemeris illumination; true Moon-fixed lighting remains Step 8. Site coordinates/verdicts are real scientific data from Lane A. South-pole points are geographically clustered; polar view + site selector distinguish them.
 - **Acceptance request to Sheldon/Claude and Advik:** Step 4 is **implemented, deployed and functionally tested**, but final **human sign-off remains pending**; confirm real mouse/camera user experience, south-pole distinguishability, and whether approved PLAN Step 4 criteria are sufficiently met. No new NASA texture, orbital simulator, or terrain mesh was started; see the separate Lane B design-consensus proposal immediately above.
+
+### 2026-11-14 — User GO: D9 panel mounts, D11(a) NASA map, Credits; STOP
+- **Read first:** PLAN.md D11, newest Lane A entries answering five questions, panel interface v1.1, Compare grid and Horizon view. Lane B changed only `web/src/main.ts`, `web/src/style.css`, `web/src/moon.ts`, `web/package.json`, and new `web/scripts/copy-moon.mjs`; no Lane A-owned files touched.
+- **Task 1 COMPLETE:** mounted `mountCompareGrid` and `mountHorizonView` alongside `mountSideCard`; passed v1.1 `onOpenView` for "Stand here" and "Compare other dates"; shell pushes both siteId and landingDate to all three mounted panels on each selection change. Live Chromium: all three panels mounted, 280 grid cells, grid site/date click updated shared selection and horizon view, side-card "Stand here" exit opened horizon, no page exceptions. Commits `75a7a82`, `a53f03d`.
+- **Task 2 COMPLETE:** D11(a) NASA SVS CGI Moon Kit `lroc_color_2k.jpg` 2048×1024 (457,942 bytes), downloaded and validated at build time by `web/scripts/copy-moon.mjs` into `dist/moon/`, production URL `/moon/lroc_color_2k.jpg` HTTP 200. Texture applied to default `SphereGeometry` UVs with no rotation, east-positive frame per Lane A alignment audit. Production Chromium confirmed texture HTTP 200, Apollo 12 and Apollo 17 selectable and side card updated, NASA credit displayed, no page exceptions. NASA color imagery for looks; lighting still illustrative, terrain scientific only in horizon panel. Commits `405a16d`, `bb3367d`, `6e9ec77`, `26854e8`.
+- **Task 3 STARTED / functional:** new Credits navigation/panel lists NASA SVS image and NASA media guidelines, JPL Horizons, LOLA/LRO, Three.js/OrbitControls MIT license, source-versus-illustration limitations. Live Chromium verified Credits tab opens and content renders without page exceptions. Commits `843bdf7`, `759f713`.
+- **Verification:** `npm run typecheck` PASS, `npm run build` PASS, postbuild both data and NASA JPEG PASS; live Vercel URL `https://lunar-landing-hackathon.vercel.app`. Main JS chunk warning >500 kB remains non-fatal. Step 4 physical mouse sign-off remains pending. Lane A's new `getSceneState` Step 8 work acknowledged but not implemented by Lane B because Advik instructed STOP after Credits. D11(b) overview scene and D11(c) zoom not started. Layout polish deferred.
+
 
 ## Lane A
 
