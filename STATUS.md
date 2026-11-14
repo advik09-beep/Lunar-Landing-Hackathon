@@ -8,7 +8,7 @@ PLAN.md v2 is the one plan and wins over this file. Right now:
 | Sheldon (Lane A human) | 2 | Three hand-checks of our numbers against the JPL Horizons web app |
 | Claude Code (Lane A) | 2 | Waiting on Sheldon's hand-checks, then widening the data download |
 
-Waiting on Sheldon: the three Horizons hand-checks (rows in the Lane A entry "M1 download script, 7-day test window").
+Waiting on Sheldon: remaining Horizons hand-checks (check 1 Sun PASSED; check 1 Earth, checks 2 and 3 pending; rows in the Lane A entry "M1 download script, 7-day test window").
 Waiting on Advik: step 1 live URL showing the 10 sites on a phone.
 
 ## Continuous two-agent coordination protocol (agreed 2026-11-14)
@@ -387,4 +387,53 @@ Lane A will add `export const API_VERSION = "1.0.0"` and `export const READY = {
 - Verdict numbers: STAY_DAYS = 7, CLEAR_PCT = 90, OUT_PCT = 10, EDGE_DEG = 2 (PLAN D5). These replace the "Open" note in the contract entry.
 - DESIGN.md marked approved: Explore is 3D from the start, the flat-first step is gone, the Plain / Numbers section is added, and it uses PLAN step numbers.
 - Lane A is on step 2, blocked on Sheldon's hand-checks. No step work started in this entry.
+
+### 2026-11-14 — Contract v1 exported on MOCK data; answers to Lane B; hand-check 1 (Sun) passed
+**Hand-check 1, Sun: PASSED.** Apollo 11, 2026-11-14 12:00 UTC. The Horizons web app (Sheldon) gives az 91.485723 / el -7.066737; our file gives 91.4857 / -7.0667. Difference < 0.0001°. **Pending:** check 1 Earth (277.5874 / 64.3200), check 2 (im1), check 3 (sp_malapert). Step 2 has not passed.
+
+**Answer 1 — mock-ready source for verdicts: contract v1 is now exported from `/lib/visibility.js` on MOCK data.** `MOCK` stays `true`, so keep the banner. Existing exports keep their names and fields; they only gained new fields.
+- New exports: `API_VERSION = "1.0.0"`, `READY` (true = callable with the documented shape; `getSceneState` and `getHorizon` are false), `VERDICT_RULE = { STAY_DAYS: 7, CLEAR_PCT: 90, OUT_PCT: 10, EDGE_DEG: 2 }`, `await loadSite(id)`, `getCoverage()`, `getTimeline(id, startUtc, days, stepHours=1)`, `await loadDaily()`, `getDaily("YYYY-MM-DD", days)`.
+- `getState` adds `sunMarginDeg`, `earthMarginDeg` (elevation minus horizon elevation at that azimuth; flat horizon ⇒ equals elevation), `sunEdge`, `earthEdge` (|margin| ≤ EDGE_DEG), `edgeDeg`, `horizonModel: "flat"|"lola"`. Legacy `terrain` is kept and means the same as `horizonModel`.
+- `getSummary` adds `pctSunEdge`, `pctEarthEdge`, `verdict: "clear"|"partial"|"out"|"edge"`, `verdictRule` (display text). Rule order: edge first (either >50%), then clear (pctBoth ≥ 90), out (pctBoth ≤ 10), else partial.
+- **Markers and grid:** `await loadDaily()` once, then `getDaily(startDate, days)` → `{ apiVersion, mock, STAY_DAYS, CLEAR_PCT, OUT_PCT, EDGE_DEG, verdictRule, sites: { <id>: [row|null, ...] } }`. Every field in a row describes the **7-day stay starting 00:00Z on `row.date`**, so a row equals `getSummary(id, date, 7)`. `null` = that stay is outside the site's coverage; show "unavailable". 10 sites × 56 days computes in ~12 ms on mock.
+- **Behaviour changes to know about:** `getState` and `getSummary` now throw `RangeError("OUT_OF_COVERAGE ...")` outside coverage. Mock coverage mirrors the planned real coverage: 2026-01-01..2030-01-01 for all sites, plus ±15 days around each pre-2026 landing. `hoursToSunChange` / `hoursToEarthChange` are now whole hours found by an hourly scan, `null` if there's no change within coverage or within 60 days (e.g. Earth never sets at the Apollo sites).
+- `getTimeline` throws `NOT_LOADED` until `loadSite(id)` has run (mock too). Its start is rounded down to the hour; there is no interpolation. On mock, `getState` and `getSummary` do **not** require `loadSite`, but the real version will, so always `await loadSite(id)` before the first call for a site.
+- Test: `node scripts/check_visibility.mjs` calls every export, checks the shapes, and prints `PASS` (ran 2026-11-14: PASS).
+
+**Answer 2 — Numbers view fields and CSV.**
+- From `getState(id, t)`: `sunEl`, `sunAz`, `sunMarginDeg`, `earthEl`, `earthAz`, `earthMarginDeg`, `lit`, `comms`, `hoursToSunChange` (label "to sunset" if `lit`, else "to sunrise"), `hoursToEarthChange` ("to Earthset" / "to Earthrise"), `horizonModel`, `sunEdge`, `earthEdge`, `edgeDeg`. Show `null` countdowns as "none in coverage".
+- From `getSummary(id, landingUtc, VERDICT_RULE.STAY_DAYS)`: `pctLit`, `pctComms`, `pctBoth`, `longestDarkHours`, `pctSunEdge`, `pctEarthEdge`, `verdict`, `verdictRule`.
+- Source: `getTimeline(...).source` (ephemeris) and `listSites()[i].source` / `.note` (site coordinates). Coverage: `getCoverage().sites[i].ranges`. Mock flag: `MOCK`.
+- **CSV:** build from `getTimeline(id, landingUtc, VERDICT_RULE.STAY_DAYS)`, one row per hourly sample over the stay (168 rows). Header lines first, each starting `#`:
+  ```
+  # site_id,apollo11
+  # site_name,Apollo 11 (Tranquility Base)
+  # lat_deg,0.67408
+  # lon_east_deg,23.47297
+  # horizon_model,flat
+  # ephemeris_source,<getTimeline().source>
+  # site_source,<listSites()[i].source>
+  # mock,true
+  # api_version,1.0.0
+  # stay,<first utc>..<last utc> (7 days, hourly; azimuth clockwise from north; UTC)
+  utc,sun_el_deg,sun_az_deg,sun_margin_deg,earth_el_deg,earth_az_deg,earth_margin_deg,sun_up,earth_in_view,sun_edge,earth_edge
+  2026-11-14T00:00:00Z,...
+  ```
+  Numbers are printed as returned (no rounding in the file); booleans as `true` / `false`.
+
+**Answer 3 — frame and marker placement.**
+- Our Horizons output header (live query, 2026-11-14) says: `Center pole/equ : MEAN_ME (high precision) {East-longitude positive}` and `Center radii : 1737.4, 1737.4, 1737.4 km`. So our angles use a Moon-fixed mean-Earth/polar-axis frame, east-positive longitude, planetocentric latitude, on a 1737.4 km sphere. **Correction:** earlier Lane A entries wrote `MOON_ME`; the label Horizons actually prints is `MEAN_ME`, so use that.
+- `listSites()` lat/lon are east-positive degrees, -180..180. **Caveat:** most site sources don't state their frame (see Lane A source log), so I haven't verified that they're in exactly MEAN_ME. The difference between lunar frame conventions is expected to be small at globe scale, but that's also unverified. The 4 south-pole sites are representative points of ~15 km regions and should be labeled that way.
+- **Yes:** Lane B may place markers from `listSites()` on a Moon-fixed sphere (radius R, ignore altitude; our data uses 0 km). The Moon mesh does not rotate with time in this frame. Formula, Moon-fixed axes (+Z = north pole, +X = 0° lat / 0° lon, +Y = 0° lat / 90°E):
+  `x = R·cos(lat)·cos(lon)`, `y = R·cos(lat)·sin(lon)`, `z = R·sin(lat)` (lat, lon in radians).
+  In Three.js (Y up), use `three = (x, z, -y)`. That's a proper rotation (no mirror): north is +Y, and 90°E is −Z, so a camera on +X looking at the Moon sees east on its right.
+- **Texture alignment check:**
+  - Use an equirectangular Moon map whose own documentation says 0° longitude is the centre column and longitude increases eastward.
+  - Draw thin debug lines at lon 0°, ±90° and lat ±60°.
+  - The 0° meridian must pass through the map's 0° column. A marker at (lat 0, lon 90) must sit on the map's 90°E column, on the right as seen from +X.
+  - Then zoom on the three Apollo markers: each must sit on its landing area in the texture (Apollo 11 in Mare Tranquillitatis, Apollo 12 in Oceanus Procellarum, Apollo 17 in the Taurus-Littrow valley).
+  - If the meridian is off, rotate the Moon mesh about Three.js Y until it lines up. Never move the markers.
+- Lighting stays illustrative until step 8 (`getSceneState`, `READY.getSceneState === false`).
+
+**Lane A next single task (unchanged):** finish step 2 after the remaining hand-checks: widen the download, then `/data/README.md`.
 
