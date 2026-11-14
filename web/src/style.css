@@ -270,3 +270,8 @@ body[data-view="overview"] .overview-clock-status { position:absolute; bottom:0;
 .info-column { overflow-y:auto; min-height:0; overscroll-behavior:contain; padding-right:4px; }
 .explore-south-pole-note { display:none; }
 #horizon-view { margin:0; flex:1; min-height:0; overflow:auto; }
+
+/* D30.4: grouped comparison tools and a bounded report reading area. */
+#compare-view,#researcher-view,#credits-view { height:calc(100dvh - 380px); min-height:350px; max-height:none; overflow:auto; overscroll-behavior:contain; padding:0 4px 16px 0; }
+#compare-view #planner-view { max-height:none; overflow:visible; margin-top:16px; padding:0; }
+#compare-mount,#planner-mount,#researcher-mount { min-width:0; }

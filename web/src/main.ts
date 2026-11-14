@@ -197,6 +197,7 @@ function setExploreMode(mode: 'globe' | 'horizon'): void {
   find<HTMLElement>('globe-mode').setAttribute('aria-pressed', String(mode === 'globe'));
   find<HTMLElement>('horizon-mode').setAttribute('aria-pressed', String(mode === 'horizon'));
   moon?.setVisible(activeView === 'explore' && mode === 'globe');
+  if (activeView === 'explore') updateAllPanels();
 }
 find<HTMLElement>('explore-view').querySelector('.scene-column')!.append(find<HTMLElement>('horizon-view'));
 find<HTMLElement>('globe-mode').addEventListener('click', () => setExploreMode('globe'));
@@ -216,6 +217,7 @@ function startSolarTour(): void {
 }
 function openView(view: View): void {
   if (view === 'horizon') { exploreMode = 'horizon'; view = 'explore'; }
+  if (view === 'planner') view = 'compare';
   activeView = view;
   document.body.dataset.view = view;
   find<HTMLElement>('global-clock').hidden = view === 'overview';
@@ -226,20 +228,37 @@ function openView(view: View): void {
     button?.classList.toggle('nav-active', name === view);
     button?.setAttribute('aria-pressed', String(name === view));
   }
+  if (view === 'compare') find<HTMLElement>('planner-view').hidden = false;
+  updateAllPanels();
   setExploreMode(exploreMode);
   overview?.setVisible(view === 'overview');
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
-function updateAllPanels(): void {
-  const next = { siteId: selectedSite, landingDate: selectedDate, hour: selectedHour, level: readingLevel };
-  sideCard?.update(next);
-  compareGrid?.update(next);
-  horizonView?.update(next);
-  researcherView?.update(next);
-  plannerView?.update({siteId: selectedSite, landingDate: selectedDate, level: readingLevel});
+// Only visible views receive expensive data updates. Panels keep their own state.
+const panelSelections = new WeakMap<PanelHandle, string>();
+function updatePanel(panel: PanelHandle, wholeStay = false): void {
+  const props = { siteId: selectedSite, landingDate: selectedDate, level: readingLevel, ...(wholeStay ? {} : {hour:selectedHour}) };
+  const key = JSON.stringify(props);
+  if (panelSelections.get(panel) !== key) { panel.update(props); panelSelections.set(panel,key); }
 }
-
+function updateAllPanels(): void {
+  if (activeView === 'explore') {
+    sideCard ??= mountSideCard(find<HTMLDivElement>('side-card-mount'), currentPanelProps());
+    updatePanel(sideCard);
+    if (exploreMode === 'horizon') {
+      horizonView ??= mountHorizonView(find<HTMLDivElement>('horizon-mount'), currentPanelProps());
+      updatePanel(horizonView);
+    }
+  } else if (activeView === 'compare') {
+    compareGrid ??= mountCompareGrid(find<HTMLDivElement>('compare-mount'), currentPanelProps());
+    plannerView ??= mountPlanner(find<HTMLDivElement>('planner-mount'), currentPanelProps());
+    updatePanel(compareGrid); updatePanel(plannerView,true);
+  } else if (activeView === 'researcher') {
+    researcherView ??= mountResearcher(find<HTMLDivElement>('researcher-mount'), currentPanelProps());
+    updatePanel(researcherView,true);
+  }
+}
 
 function updateButtons(): void { sitePicker.value = selectedSite; }
 
@@ -460,21 +479,12 @@ try {
   stage.classList.add('scene-unavailable');
   console.warn('WebGL lunar scene unavailable:', error);
 }
-const panelProps = {
-  siteId: selectedSite,
-  landingDate: selectedDate,
-  hour: selectedHour,
-  level: readingLevel,
-  onHourSelected: setHour,
-  onSiteSelected: chooseSite,
-  onDateSelected: setLandingDate,
-  onOpenView: (view: 'compare' | 'horizon') => openView(view),
-};
-sideCard = mountSideCard(find<HTMLDivElement>('side-card-mount'), panelProps);
-compareGrid = mountCompareGrid(find<HTMLDivElement>('compare-mount'), panelProps);
-horizonView = mountHorizonView(find<HTMLDivElement>('horizon-mount'), panelProps);
-researcherView = mountResearcher(find<HTMLDivElement>('researcher-mount'), panelProps);
-plannerView = mountPlanner(find<HTMLDivElement>('planner-mount'), panelProps);
+function currentPanelProps() {
+  return { siteId: selectedSite, landingDate: selectedDate, hour: selectedHour, level: readingLevel,
+    onHourSelected: setHour, onSiteSelected: chooseSite, onDateSelected: setLandingDate,
+    onOpenView: (view: 'compare' | 'horizon') => openView(view) };
+}
+find<HTMLElement>('compare-view').append(find<HTMLElement>('planner-view'));
 for (const name of ['overview', 'explore', 'compare', 'horizon', 'researcher', 'planner', 'credits'] as View[]) {
   if (name !== 'overview') document.getElementById('nav-' + name)?.addEventListener('click', () => openView(name));
 }
@@ -482,6 +492,7 @@ for (const level of ['educator','researcher'] as const) {
   find<HTMLButtonElement>('level-' + level).addEventListener('click', () => {
     readingLevel = level;
     for (const name of ['educator','researcher']) find<HTMLElement>('level-' + name).setAttribute('aria-pressed', String(name === level));
+    for (const panel of [sideCard,compareGrid,horizonView,researcherView,plannerView]) panel?.update({level});
     updateAllPanels();
   });
 }

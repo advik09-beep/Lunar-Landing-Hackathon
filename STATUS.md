@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D30 structure 3 — built; checking deployment | Explore Globe/Horizon switch, fixed visual with scrolling card, site picker replaces lists; hidden Moon rendering suspended. Structure 2 Vercel READY. |
+| Advik + ChatGPT (Lane B) | D30 structure 4 — built; checking deployment | Compare groups grid, scenarios and requirements; Report scrolls internally; panels load/update only when visible. Structure 3 Vercel READY. |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | D30 Lane A part done | Panels follow the D30 theme, short names, Historic tag, interface v1.3 (shared reading level); stopped |
 
@@ -511,6 +511,11 @@ Second task, only after the copy passes and with Advik's authorization: Step 4 T
 ### 2026-11-14 — D30 presentation pass, structure 3
 - Explore Globe/Horizon switch, fixed visual with scrolling card, site picker replaces lists; hidden Moon rendering suspended. Structure 2 Vercel READY.
 - Files: web/src/main.ts, web/src/style.css, web/src/moon.ts. TypeScript and Vite/postbuild executed: PASS. Production deployment verification follows this commit. Scientific APIs and Lane A panels unchanged.
+
+
+### 2026-11-14 — D30 presentation pass, structure 4
+- Compare groups grid, scenarios and requirements; Report scrolls internally; panels load/update only when visible. Structure 3 Vercel READY.
+- Files: web/src/main.ts, web/src/style.css. TypeScript and Vite/postbuild executed: PASS. Production deployment verification follows this commit. Scientific APIs and Lane A panels unchanged.
 
 ## Lane A
 
