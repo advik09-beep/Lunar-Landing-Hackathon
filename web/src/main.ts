@@ -1,6 +1,7 @@
 import './style.css';
 import { listSites, loadDaily, getDaily, MOCK, API_VERSION, VERDICT_RULE } from '../../lib/visibility.js';
 import { LunarScene, type MoonSite, type Verdict } from './moon';
+import { mountSideCard, type PanelHandle } from './panels';
 
 interface Site extends MoonSite {
   kind?: string;
@@ -74,20 +75,11 @@ app.innerHTML = [
   '      </div>',
   '    </div>',
   '    <aside class="info-column">',
-  '      <div class="selected-info">',
-  '        <p class="eyebrow">SELECTED LOCATION</p>',
-  '        <h2 id="selected-name">Selecting site…</h2>',
-  '        <p id="selected-coordinates" class="selected-coordinates"></p>',
-  '        <div id="selected-verdict" class="verdict-label unavailable">Loading conditions</div>',
-  '        <p id="selected-description" class="selected-description">Select a marker on the Moon or choose a site below.</p>',
-  '        <div id="selected-metrics" class="site-metrics"></div>',
-  '        <p class="study-note">The verdict describes potential sunlight and direct Earth line of sight, not guaranteed electrical power or communications. Flat-horizon estimates do not account for terrain.</p>',
-  '      </div>',
+  '      <div id="side-card-mount" class="side-card-mount" aria-label="Site conditions and Plain Numbers details"></div>',
   '      <div class="site-browser">',
   '        <div class="site-list-header"><h3>Landing sites</h3><span>10 locations</span></div>',
   '        <div id="site-buttons" class="site-buttons" role="group" aria-label="Choose a lunar landing site"></div>',
   '      </div>',
-  '      <div id="future-panel-slot" class="future-panel-slot">Plain / Numbers panel integration will follow Claude’s published module interface.</div>',
   '    </aside>',
   '  </section>',
   '  <footer class="site-footer">Site coordinates and visibility: shared scientific data API <code>/lib/visibility.js</code> · API <span id="api-version"></span> · Lunar surface illustration is not a registered topographic map.</footer>',
@@ -127,49 +119,11 @@ for (const site of sites) {
   statusById.set(site.id, verdict);
 }
 
-const formatLat = (latitude: number): string => Math.abs(latitude).toFixed(2) + '°' + (latitude >= 0 ? 'N' : 'S');
-const formatLon = (longitude: number): string => Math.abs(longitude).toFixed(2) + '°' + (longitude >= 0 ? 'E' : 'W');
 const cleanVerdict = (value: string): Verdict => ['clear', 'partial', 'out', 'edge'].includes(value) ? value as Verdict : 'unavailable';
 
-function updateSidebar(): void {
-  const site = sites.find(s => s.id === selectedSite);
-  if (!site) return;
-  find<HTMLElement>('selected-name').textContent = site.name;
-  find<HTMLElement>('selected-coordinates').textContent =
-    formatLat(site.lat) + ' · ' + formatLon(site.lon) + (site.coordsVerified === false ? ' · coordinates not yet verified' : '');
-  const row = daily?.sites[site.id]?.[0];
-  const verdict: Verdict = row ? cleanVerdict(row.verdict) : 'unavailable';
-  const label = find<HTMLElement>('selected-verdict');
-  label.className = 'verdict-label ' + verdict;
-  label.textContent = verdictNames[verdict];
-  const description = find<HTMLElement>('selected-description');
-  if (!row) {
-    description.textContent = 'Conditions for this seven-day stay are outside the validated daily summary coverage or not yet loaded.';
-  } else if (verdict === 'edge') {
-    description.textContent = 'The Sun or Earth stays close to the local horizon for much of this stay. Terrain can change the result.';
-  } else if (verdict === 'clear') {
-    description.textContent = 'Both the Sun and Earth are potentially visible for at least 90% of this seven-day stay.';
-  } else if (verdict === 'out') {
-    description.textContent = 'The Sun and Earth are simultaneously visible for 10% or less of this stay.';
-  } else {
-    description.textContent = 'Sunlight and direct Earth visibility vary during this stay. Changing the landing date may change the conditions.';
-  }
+let sideCard: PanelHandle | null = null;
 
-  const metrics = find<HTMLElement>('selected-metrics');
-  metrics.replaceChildren();
-  const entries: Array<[string, string]> = row
-    ? [['Sun above horizon', row.pctLit.toFixed(0) + '% of stay'], ['Earth in view', row.pctComms.toFixed(0) + '% of stay'], ['Both together', row.pctBoth.toFixed(0) + '% of stay']]
-    : [['Conditions', 'Unavailable for this date']];
-  for (const [title, value] of entries) {
-    const item = document.createElement('div');
-    item.className = 'metric-row';
-    const name = document.createElement('span');
-    name.textContent = title;
-    const val = document.createElement('strong');
-    val.textContent = value;
-    item.append(name, val);
-    metrics.append(item);
-  }
+function updateButtons(): void {
   for (const [id, button] of buttonById) {
     button.classList.toggle('active', id === selectedSite);
     button.setAttribute('aria-pressed', String(id === selectedSite));
@@ -177,15 +131,16 @@ function updateSidebar(): void {
 }
 
 function chooseSite(id: string): void {
-  if (!sites.some(s => s.id === id)) return;
+  if (!sites.some(site => site.id === id)) return;
   selectedSite = id;
   moon?.focusSite(id);
-  updateSidebar();
+  updateButtons();
+  sideCard?.update({ siteId: id });
 }
 
 function updateDaily(): void {
   if (!daily) {
-    updateSidebar();
+    updateButtons();
     return;
   }
   const colors = new Map<string, Verdict>();
@@ -200,7 +155,7 @@ function updateDaily(): void {
     }
   }
   moon?.setVerdicts(colors);
-  updateSidebar();
+  updateButtons();
 }
 
 function setLandingDate(date: string): void {
@@ -208,6 +163,7 @@ function setLandingDate(date: string): void {
   if (!Number.isFinite(timestamp)) return;
   selectedDate = new Date(timestamp).toISOString().slice(0, 10);
   select.value = selectedDate;
+  sideCard?.update({ landingDate: selectedDate });
   if (dataReady) {
     try {
       daily = getDaily(selectedDate, 1) as DailyResult;
@@ -240,7 +196,13 @@ try {
   stage.classList.add('scene-unavailable');
   console.warn('WebGL lunar scene unavailable:', error);
 }
-updateSidebar();
+sideCard = mountSideCard(find<HTMLDivElement>('side-card-mount'), {
+  siteId: selectedSite,
+  landingDate: selectedDate,
+  onSiteSelected: chooseSite,
+  onDateSelected: setLandingDate,
+});
+updateButtons();
 
 async function initializeData(): Promise<void> {
   try {
@@ -254,4 +216,4 @@ async function initializeData(): Promise<void> {
 }
 void initializeData();
 
-window.addEventListener('pagehide', () => moon?.destroy(), { once: true });
+window.addEventListener('pagehide', () => { moon?.destroy(); sideCard?.destroy(); }, { once: true });
