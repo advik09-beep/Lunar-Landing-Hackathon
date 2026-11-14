@@ -75,14 +75,12 @@ app.innerHTML = [
   '    <p>Explore ten lunar landing locations. Change the landing date to discover how sunlight and direct Earth visibility affect a seven-day mission.</p>',
   '  </section>',
   '  <aside id="mock-notice" class="mock-notice" hidden>DEMO / SIMULATED VALUES — NOT FOR MISSION USE</aside>',
-  '  <section id="global-clock" class="global-clock" aria-label="Shared landing date and time controls">',
-  '    <div class="clock-top"><strong>Landing-site timeline · all views</strong><span>UTC · 7-day stay · 168 hourly samples</span></div>',
-  '    <div class="clock-input-row"><button id="date-prev" type="button" aria-label="Move landing date seven days earlier">−7 days</button><label for="landing-date">Landing date</label><input id="landing-date" type="date" value="2026-11-14" aria-label="Landing date UTC"><button id="date-next" type="button" aria-label="Move landing date seven days later">+7 days</button><output id="date-output" for="landing-date">2026-11-14</output></div>',
-  '    <label class="clock-slider-label" for="date-slider">Change landing date (2026–2029)</label>',
-  '    <input id="date-slider" type="range" min="0" max="1453" value="317" step="1" aria-label="Change landing date between 2026 and 2029">',
-  '    <div class="clock-input-row"><label for="hour-slider">Moment inspected within the stay (not landing time)</label><input id="hour-slider" type="range" min="0" max="167" value="0" step="1" aria-label="Hour of the stay"><output id="hour-output" for="hour-slider">Hour 1 of 168 · 2026-11-14 00:00 UTC</output></div>',
-  '    <p class="clock-clarification">The seven-day stay starts at <strong>00:00 UTC on the landing date</strong>. The hour slider only selects the moment inspected; it does not change the start of the stay.</p>',
-  '    <p id="data-status" class="data-status" role="status" aria-live="polite">Loading validated daily summaries…</p>',
+  '  <section id="global-clock" class="global-clock" aria-label="Landing site and time" hidden>',
+  '    <label class="toolbar-site" for="site-picker">Site <select id="site-picker" aria-label="Landing site"></select></label>',
+  '    <div class="toolbar-date"><button id="date-prev" type="button" aria-label="Move landing date seven days earlier">−7</button><label class="sr-only" for="landing-date">Landing date UTC</label><input id="landing-date" type="date" value="2026-11-14" aria-label="Landing date UTC"><button id="date-next" type="button" aria-label="Move landing date seven days later">+7</button></div>',
+  '    <label class="toolbar-hour" for="hour-slider">Inspect <input id="hour-slider" type="range" min="0" max="167" value="0" step="1" aria-label="Moment inspected within the seven-day stay"><output id="hour-output" for="hour-slider">Day 1 · 00:00 UTC</output></label>',
+  '    <details class="clock-tip"><summary aria-label="About the date and inspection time">ⓘ</summary><p>The 7-day stay starts at 00:00 UTC on the landing date. The slider chooses the moment you inspect within that stay; it does not move the landing time. Hourly data.</p></details>',
+  '    <p id="data-status" class="sr-only" role="status" aria-live="polite">Loading conditions…</p>',
   '  </section>',
   '  <section id="verdict-legend" class="verdict-legend" aria-label="What landing condition colors mean">',
   '    <div class="verdict-guide-heading"><strong>What do the marker colors mean?</strong><span>Each verdict covers the full 7-day stay, not only the selected hour.</span></div>',
@@ -107,7 +105,7 @@ app.innerHTML = [
   '  </section>',
   '  <section id="explore-view" class="explorer" aria-label="Interactive lunar landing site explorer" hidden>',
   '    <div class="scene-column">',
-  '      <div class="explore-controls"><div class="view-toggle" role="group" aria-label="Explore view"><button id="globe-mode" type="button" aria-pressed="true">Globe</button><button id="horizon-mode" type="button" aria-pressed="false">Horizon</button></div><label class="site-picker-wrap" for="site-picker">Site <select id="site-picker" aria-label="Landing site"></select></label></div>',
+  '      <div class="explore-controls"><div class="view-toggle" role="group" aria-label="Explore view"><button id="globe-mode" type="button" aria-pressed="true">Globe</button><button id="horizon-mode" type="button" aria-pressed="false">Horizon</button></div></div>',
   '      <div class="moon-window">',
   '        <div class="scene-heading"><span>MOON-FIXED VIEW</span><span>3D · Drag to rotate · Scroll to zoom</span></div>',
   '        <p id="explore-south-pole-note" class="explore-south-pole-note"></p>',
@@ -159,13 +157,11 @@ const status = find<HTMLParagraphElement>('data-status');
 const lightingStatus = find<HTMLParagraphElement>('lighting-status');
 const select = find<HTMLInputElement>('landing-date');
 find<HTMLElement>('explore-south-pole-note').textContent = SOUTH_POLE.oneLine;
-const dateSlider = find<HTMLInputElement>('date-slider');
 const hourSlider = find<HTMLInputElement>('hour-slider');
-const dateOutput = find<HTMLOutputElement>('date-output');
 const hourOutput = find<HTMLOutputElement>('hour-output');
 const DATE_MIN = Date.UTC(2026, 0, 1);
 const DATE_MAX = Date.UTC(2029, 11, 24);
-dateSlider.max = String(Math.round((DATE_MAX - DATE_MIN) / 86400000));
+select.max = '2029-12-24';
 
 for (const category of ['candidate','historic'] as const) {
   const group = document.createElement('optgroup');
@@ -220,7 +216,7 @@ function openView(view: View): void {
   if (view === 'planner') view = 'compare';
   activeView = view;
   document.body.dataset.view = view;
-  find<HTMLElement>('global-clock').hidden = view === 'overview';
+  find<HTMLElement>('global-clock').hidden = view === 'overview' || view === 'credits';
   find<HTMLElement>('verdict-legend').hidden = view === 'overview';
   for (const name of ['overview', 'explore', 'compare', 'horizon', 'researcher', 'planner', 'credits'] as View[]) {
     find<HTMLElement>(name + '-view').hidden = name !== view;
@@ -312,8 +308,6 @@ function setLandingDate(date: string): void {
   if (!Number.isFinite(timestamp)) return;
   selectedDate = new Date(timestamp).toISOString().slice(0, 10);
   select.value = selectedDate;
-  dateOutput.textContent = selectedDate;
-  dateSlider.value = String(Math.max(0, Math.min(Number(dateSlider.max), Math.round((timestamp - DATE_MIN) / 86400000))));
   renderClockHour();
   syncOverviewClock();
   updateAllPanels();
@@ -334,7 +328,8 @@ function renderClockHour(): void {
   const utc = new Date(Date.parse(selectedDate + 'T00:00:00Z') + selectedHour * 3600000)
     .toISOString().slice(0, 16).replace('T', ' ');
   hourSlider.value = String(selectedHour);
-  hourOutput.textContent = 'Hour ' + (selectedHour + 1) + ' of 168 · ' + utc + ' UTC';
+  hourOutput.textContent = 'Day ' + (Math.floor(selectedHour / 24) + 1) + ' · ' + utc.slice(11) + ' UTC';
+  hourOutput.title = utc + ' UTC';
 }
 
 function setHour(value: number): void {
@@ -349,7 +344,6 @@ function setHour(value: number): void {
 
 let dataReady = false;
 select.addEventListener('change', () => setLandingDate(select.value));
-dateSlider.addEventListener('input', () => setLandingDate(new Date(DATE_MIN + Number(dateSlider.value) * 86400000).toISOString().slice(0, 10)));
 hourSlider.addEventListener('input', () => setHour(Number(hourSlider.value)));
 for (const [id, offset] of [['date-prev', -7], ['date-next', 7]] as Array<[string, number]>) {
   find<HTMLButtonElement>(id).addEventListener('click', () => {

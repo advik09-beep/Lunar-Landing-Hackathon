@@ -275,3 +275,18 @@ body[data-view="overview"] .overview-clock-status { position:absolute; bottom:0;
 #compare-view,#researcher-view,#credits-view { height:calc(100dvh - 380px); min-height:350px; max-height:none; overflow:auto; overscroll-behavior:contain; padding:0 4px 16px 0; }
 #compare-view #planner-view { max-height:none; overflow:visible; margin-top:16px; padding:0; }
 #compare-mount,#planner-mount,#researcher-mount { min-width:0; }
+
+/* D30.5: one compact line shared by analysis views. */
+.sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+.global-clock { display:flex; align-items:center; gap:20px; padding:12px 14px; margin:12px 0 8px; border-radius:8px; }
+.toolbar-site,.toolbar-hour,.toolbar-date { display:flex; align-items:center; gap:8px; font-size:.84rem; white-space:nowrap; }
+.toolbar-site select { width:185px; }
+.toolbar-date { gap:4px; }
+.toolbar-date button { padding:6px 8px; }
+.toolbar-date input { width:146px; padding:6px; color-scheme:dark; }
+.toolbar-hour { flex:1; min-width:0; }
+.global-clock #hour-slider { min-width:80px; width:100%; flex:1; }
+.toolbar-hour output { font-size:.75rem; color:#A8BBD3; min-width:120px; }
+.clock-tip { position:relative; flex:none; }
+.clock-tip summary { cursor:pointer; list-style:none; font-size:1.1rem; color:#A8BBD3; }
+.clock-tip p { position:absolute; top:24px; right:0; z-index:20; width:290px; margin:0; padding:12px 14px; background:#132138; border:1px solid #344B69; border-radius:8px; font-size:.84rem; line-height:1.5; box-shadow:0 8px 30px #0008; white-space:normal; }
