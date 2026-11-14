@@ -10,7 +10,7 @@ const throwsMsg = (fn, re, msg) => { try { fn(); ok(false, msg + " (did not thro
 const T = "2026-11-14T12:00:00Z";
 
 ok(typeof V.MOCK === "boolean", "MOCK boolean");
-ok(V.API_VERSION === "1.1.0", "API_VERSION 1.1.0");
+ok(V.API_VERSION === "1.2.0", "API_VERSION 1.2.0");
 has(V.READY, ["listSites", "getState", "getSummary", "loadSite", "getCoverage", "getTimeline", "loadDaily", "getDaily", "setDataBase", "getSceneState", "getHorizon"], "READY");
 ok(V.VERDICT_RULE.STAY_DAYS === 7 && V.VERDICT_RULE.CLEAR_PCT === 90 && V.VERDICT_RULE.OUT_PCT === 10 && V.VERDICT_RULE.EDGE_DEG === 2, "verdict numbers 7/90/10/2");
 ok(typeof V.setDataBase === "function", "setDataBase exported");
@@ -35,7 +35,15 @@ for (const s of sites) {
   const st = V.getState(s.id, T);
   has(st, ["sunEl", "sunAz", "earthEl", "earthAz", "lit", "comms", "hoursToSunChange", "hoursToEarthChange", "terrain",
     "sunMarginDeg", "earthMarginDeg", "sunEdge", "earthEdge", "edgeDeg", "horizonModel", "sampleUtc"], `getState(${s.id})`);
-  ok(st.horizonModel === "flat" && st.sunMarginDeg === st.sunEl && st.earthMarginDeg === st.earthEl, `${s.id} flat margin = elevation`);
+  if (s.id === "sp_malapert") {
+    const hz = V.getHorizon(s.id);
+    ok(st.horizonModel === "lola" && st.terrain === "real", "sp_malapert uses the LOLA terrain horizon");
+    ok(st.sunMarginDeg === st.sunEl - hz.elevationDeg[Math.round(st.sunAz) % 360] && st.lit === st.sunMarginDeg > 0, "sp_malapert margin = elevation - terrain horizon at that azimuth");
+  } else {
+    ok(st.horizonModel === "flat" && st.terrain === "flat" && st.sunMarginDeg === st.sunEl && st.earthMarginDeg === st.earthEl, `${s.id} flat margin = elevation`);
+    const fh = V.getHorizon(s.id);
+    ok(fh.model === "flat" && fh.elevationDeg.length === 360 && fh.elevationDeg.every((x) => x === 0), `${s.id} getHorizon flat = 360 zeros`);
+  }
   ok(st.sunAz >= 0 && st.sunAz < 360 && st.earthAz >= 0 && st.earthAz < 360, `${s.id} azimuth in [0,360)`);
   ok(st.hoursToEarthChange === null || st.hoursToEarthChange > 0, `${s.id} countdown null or > 0`);
   const sum = V.getSummary(s.id, T, 7);
@@ -51,6 +59,20 @@ const st = V.getState("apollo11", "2026-11-14T12:59:00Z");
 ok(st.sampleUtc === T, "getState reads the start of the hour");
 ok(st.sunAz === f.sunAz[i] && st.sunEl === f.sunEl[i] && st.earthAz === f.earthAz[i] && st.earthEl === f.earthEl[i], "getState equals file values");
 ok(st.sunAz === 91.486 && st.sunEl === -7.067, "apollo11 hand-check row (Sun) 91.486 / -7.067");
+
+// Step 7 test: an hour where the flat horizon says "Sun up" and the terrain says "blocked".
+// 2026-09-19 06:00 UTC at sp_malapert: Sun az 85.638, el 1.020; terrain horizon in bin 86 is
+// 5.541 deg (a ridge 3.24 km east). Found by scripts/check_horizon.mjs.
+{
+  const b = V.getState("sp_malapert", "2026-09-19T06:00:00Z");
+  const hz = V.getHorizon("sp_malapert");
+  ok(hz.model === "lola" && hz.elevationDeg.length === 360 && hz.verified === true && hz.resolutionDeg === 1, "getHorizon(sp_malapert) shape");
+  ok(b.sunEl > 0 && b.sunEl === 1.02, `blocked case: Sun above the flat horizon (el ${b.sunEl})`);
+  ok(b.lit === false && b.sunMarginDeg < -4, `blocked case: terrain says dark (margin ${b.sunMarginDeg.toFixed(3)})`);
+  ok(hz.blockDistKm[86] > 2, `blocked case: blocker is a distant ridge (${hz.blockDistKm[86]} km), not the point's own slope`);
+  const flatWouldSay = b.sunEl > 0;
+  ok(flatWouldSay && !b.lit, "flat says lit, terrain says dark");
+}
 
 // Countdown is consistent with the timeline.
 const st2 = V.getState("apollo11", T);
@@ -75,6 +97,7 @@ ok(cov.sites.length === 10, "coverage for 10 sites");
 const a11 = cov.sites.find((s) => s.siteId === "apollo11").ranges;
 ok(a11.length === 2 && a11[1][0] === "2026-01-01T00:00:00Z" && a11[1][1] === "2029-12-31T23:00:00Z", "apollo11 ranges: landing + 2026-2029");
 ok(cov.sites.find((s) => s.siteId === "sp_haworth").ranges.length === 1, "pole site: one range");
+ok(cov.sites.find((s) => s.siteId === "sp_malapert").terrain === "lola" && cov.sites.filter((s) => s.terrain === "lola").length === 1, "coverage: only sp_malapert is lola");
 throwsMsg(() => V.getState("apollo11", "2030-01-01T00:00:00Z"), /OUT_OF_COVERAGE/, "out of coverage throws");
 throwsMsg(() => V.getSummary("apollo11", "2029-12-30T00:00:00Z", 7), /OUT_OF_COVERAGE/, "summary past end throws");
 const land = V.getState("apollo11", "1969-07-20T20:17:40Z");

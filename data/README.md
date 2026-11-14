@@ -13,7 +13,8 @@ header of our own Horizons output, on 2026-11-14. Sources:
 | `ephem/<siteId>/<YYYY>.json` | Hourly Sun and Earth azimuth/elevation for calendar years 2026, 2027, 2028, 2029 (00:00 Jan 1 to 23:00 Dec 31 UTC). |
 | `ephem/<siteId>/landing.json` | Same quantities, landing day 00:00 UTC −15 days to +15 days (inclusive, 721 rows). Only for landings before 2026: apollo11, apollo12, apollo17, chandrayaan3, im1, im2. |
 | `ephem/index.json` | Every chunk file with its first and last UTC time and row count. |
-| `daily.json` | Per-day stay summary for all sites (built by `node scripts/build_daily.mjs`). For every UTC date D whose 7-day stay (D 00:00Z, 168 hourly samples) is fully covered: `[litH, commsH, bothH, sunEdgeH, earthEdgeH, longestDarkH, verdict]`, grouped per site in contiguous segments `{ firstDate, rows }`. Flat horizon; edge = \|elevation\| ≤ EDGE_DEG (2°). Rule constants are in the file header and in `lib/verdict.js`. ~410 KB, 14,694 rows. |
+| `ephem/sp_malapert/horizon.json` | Terrain horizon (step 7) for sp_malapert only: 360 elevation angles (deg), bin i = azimuth [i−0.5, i+0.5) clockwise from north, plus blocking distance, observer, method and source. Built by `node scripts/compute_horizon.mjs` from LOLA DEMs fetched by `node scripts/fetch_lola.mjs` into `data/raw/` (gitignored, ~485 MB). Checked by `node scripts/check_horizon.mjs`. Listed in `ephem/index.json` under `horizons`. |
+| `daily.json` | Per-day stay summary for all sites (built by `node scripts/build_daily.mjs`). For every UTC date D whose 7-day stay (D 00:00Z, 168 hourly samples) is fully covered: `[litH, commsH, bothH, sunEdgeH, earthEdgeH, longestDarkH, verdict]`, grouped per site in contiguous segments `{ firstDate, rows }`. Margins use the terrain horizon where one exists (sp_malapert), else flat; edge = \|margin\| ≤ EDGE_DEG (2°). Rule constants are in the file header and in `lib/verdict.js`. ~410 KB, 14,694 rows. |
 
 Each chunk file holds: `siteId, lat, lon, altKm, start, end, stepHours (1), count, decimals (3), timeScale ("UTC"), source, apiVersion, fetchedUtc, horizonsHeader` (lines copied from the Horizons output) and four arrays `sunAz, sunEl, earthAz, earthEl`. Row `i` is at `start + i hours`.
 
@@ -65,3 +66,15 @@ What it means for us (our own calculation, not a doc statement): after 2027-02-0
 - Flat horizon only. Terrain is step 7.
 - The frame used by most site-coordinate sources is not stated (see the STATUS.md Lane A source log). The four south-pole sites are representative points of ~15 km regions, not landing points.
 - The Chandrayaan-3 landing time is a secondary source and approximate; the IM-2 time is minute-precision only.
+
+## Terrain horizon (step 7, sp_malapert only)
+- **DEMs (PDS Geosciences, LOLA GDR polar):** `ldem_80s_20m` (20 m/px; only rows within ±22 km of the site, via HTTP range), `ldem_80s_80m` (80 m, to 80°S), `ldem_75s_120m` (120 m, to 75°S), `ldem_60s_240m` (240 m, to 60°S). https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/polar/img/
+- **Label facts:** polar stereographic centred on −90°, sphere 1737.4 km, "MEAN EARTH/POLAR AXIS OF DE421", LSB 16-bit, `HEIGHT = DN × 0.5` m, "Map values are relative to a radius of 1737.4 km" (same sphere as our Horizons data). Orientation from `catalog/dsmap_polar.cat`: "In the south, Longitude 0 extends straight up from the center, and Longitude 90 East extends to the right." Preliminary LOLA data (products created 2017).
+- **Method:**
+  - Observer on the 20 m DEM surface at the site (4830.5 m above the sphere) + 2 m mast (ASSUMED).
+  - Rays every 0.1° of azimuth along great circles. Exact spherical geometry (curvature included). Bilinear heights from the finest DEM covering each point.
+  - A ray stops when even the DEM maximum height (7027 m, label DERIVED_MAXIMUM) could no longer rise above the best angle found, so beyond that point nothing can change the result. Every one of the 360 bins stopped this way before any data edge, so the search is complete in every direction, including north toward Earth.
+  - Bin value = maximum of its ten rays.
+- **Sanity numbers:** smooth-sphere horizon dip for this observer 4.268° at 129.6 km. Southern horizon −3.6° set by terrain ~123 km away, close to the smooth-sphere value as expected for a high observer. 24 bins dip below −4.268° (terrain below the sphere).
+- **Sensitivity (important):** the representative point sits on a slope rising ~6° to the north (+21 m over 200 m). The northern horizon (Earth's direction, az 352–358: ~5.6°) is set by ground 140–180 m away and changes with position: 1.6° if the observer is 200 m further north, 8.0–8.6° if 200 m south, 3.4° with a 10 m mast. Directions blocked by distant ridges (e.g. east, south) barely change. Ray density 10 → 20 per degree: no change.
+

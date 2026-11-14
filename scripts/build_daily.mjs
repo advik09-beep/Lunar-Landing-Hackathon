@@ -14,30 +14,33 @@ const N = VERDICT_RULE.STAY_DAYS * 24;
 const EDGE = VERDICT_RULE.EDGE_DEG;
 const index = JSON.parse(readFileSync(join(DATA, "ephem", "index.json"), "utf8"));
 
-const out = { ...VERDICT_RULE, horizonModel: "flat", hoursPerStay: N,
+const out = { ...VERDICT_RULE, horizonModels: Object.fromEntries(Object.keys(index.sites).map((id) => [id, index.horizons?.[id] ? "lola" : "flat"])), hoursPerStay: N,
   columns: ["litH", "commsH", "bothH", "sunEdgeH", "earthEdgeH", "longestDarkH", "verdict"],
   builtUtc: new Date().toISOString(), sites: {} };
 
 for (const [siteId, chunks] of Object.entries(index.sites)) {
+  // Terrain horizon if this site has one (step 7); otherwise flat (0 deg everywhere).
+  const hz = index.horizons?.[siteId] ? JSON.parse(readFileSync(join(DATA, "ephem", index.horizons[siteId]), "utf8")).elevationDeg : null;
+  const horizonAt = (az) => (hz ? hz[Math.round(az) % 360] : 0);
   // Merge chunks into contiguous runs of samples.
   const runs = [];
   for (const c of chunks.slice().sort((a, b) => Date.parse(a.start) - Date.parse(b.start))) {
     const d = JSON.parse(readFileSync(join(DATA, "ephem", c.file), "utf8"));
     const start = Date.parse(d.start);
     const last = runs.at(-1);
-    if (last && start === last.start + last.sunEl.length * H) {
-      last.sunEl.push(...d.sunEl); last.earthEl.push(...d.earthEl);
-    } else runs.push({ start, sunEl: [...d.sunEl], earthEl: [...d.earthEl] });
+    if (last && start === last.start + last.sunM.length * H) {
+      for (let i = 0; i < d.count; i++) { last.sunM.push(d.sunEl[i] - horizonAt(d.sunAz[i])); last.earthM.push(d.earthEl[i] - horizonAt(d.earthAz[i])); }
+    } else runs.push({ start, sunM: d.sunEl.map((e, i) => e - horizonAt(d.sunAz[i])), earthM: d.earthEl.map((e, i) => e - horizonAt(d.earthAz[i])) });
   }
   out.sites[siteId] = [];
   for (const r of runs) {
     const firstDay = Math.ceil(r.start / D) * D;
     const rows = [];
-    for (let day = firstDay; (day - r.start) / H + N <= r.sunEl.length; day += D) {
+    for (let day = firstDay; (day - r.start) / H + N <= r.sunM.length; day += D) {
       const i0 = (day - r.start) / H;
       let lit = 0, comms = 0, both = 0, se = 0, ee = 0, dark = 0, longest = 0;
       for (let i = i0; i < i0 + N; i++) {
-        const s = r.sunEl[i], e = r.earthEl[i];
+        const s = r.sunM[i], e = r.earthM[i]; // margins above the horizon in use
         const L = s > 0, C = e > 0;
         if (L) lit++; if (C) comms++; if (L && C) both++;
         if (Math.abs(s) <= EDGE) se++; if (Math.abs(e) <= EDGE) ee++;

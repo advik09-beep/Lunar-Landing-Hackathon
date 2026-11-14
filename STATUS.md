@@ -6,10 +6,10 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 |-----|------|-----------|
 | Advik + ChatGPT (Lane B) | 1 — IN PROGRESS | Vercel repo connected; verifying build/lockfile in a temporary Node build environment, then desktop production page |
 | Sheldon (Lane A human) | — | Step 2 PASSED 2026-11-14; GO given for Lane A's half of step 5 |
-| Claude Code (Lane A) | 7 (Lane A, sp_malapert) | Stage 1 reported (product + method); waiting for Sheldon's go on stage 2 |
+| Claude Code (Lane A) | 7 (Lane A half, sp_malapert) | Stages 2-4 DONE 2026-11-14; stopped. Lane B can build the horizon view on getHorizon. |
 
 Step 2 Real numbers: **PASSED 2026-11-14**. Signed 2026-11-14: D7 desktop only; D8 data copied at build + fetched per site, setDataBase added.
-Waiting on Sheldon: go on step 7 stage 2 (download + compute the sp_malapert horizon).
+Waiting on Sheldon: decide whether the sp_malapert horizon is good enough as-is (north horizon is sensitive to the exact point; see Lane A entry) and whether to do pole sites 2-4.
 Waiting on Advik: step 1 live URL showing the 10 sites in a desktop browser; then Lane B's postbuild copy for step 5 (spec in Lane A section).
 
 ## Continuous two-agent coordination protocol (agreed 2026-11-14)
@@ -572,4 +572,51 @@ Alternative: Lane A bundles the data into JS modules that Vite code-splits. This
 - **Then:** margin = elevation − horizon(azimuth); lit / comms use the margin (Sun and Earth still treated as points).
 - **Cost:** ~237 MB download (115.5 MB + ~122 MB). Measured 3.7 MB/s from PDS on Sheldon's connection, so about 1–2 minutes; computing takes seconds. Raw DEM files stay out of git (scratch/gitignored); only the 360-value profile and its provenance get committed.
 - **Known limits to state on screen:** representative point, not a landing spot (the horizon changes over a few hundred metres); preliminary 2017 LOLA DEM; 2 m observer height assumed; Sun and Earth as points (the Sun's disc is ~0.5° wide, so partial sunlight near the edge is shown as all-or-nothing); 1° azimuth bins.
+
+### 2026-11-14 — Step 7 (terrain), Lane A half, stages 2-4 DONE for sp_malapert
+**Change from stage 1 (Sheldon):** extend beyond the 80°S map edge, because Earth sits to the north for this site.
+- Done with two coarser products from the same PDS folder: `ldem_75s_120m` (116,250,752 bytes) and `ldem_60s_240m` (120,435,200 bytes). Rays use 20 m → 80 m → 120 m → 240 m, each beyond the previous map's edge.
+- **Worst case for the north: zero.** A ray stops only when even the highest point in the DEMs (7027 m) could no longer rise above the best angle already found. For every one of the 360 bins that happened before any data edge, so no terrain beyond our maps can change the profile.
+- In the north the local slope gives a ~5.6° horizon. That already rules out anything beyond ~22 km.
+- **Observer altitude:** 4830.5 m above the 1737.4 km sphere (20 m DEM; the 80 m DEM gives 4824.5 m) + 2 m assumed mast. **Smooth-sphere horizon dip:** 4.268° at 129.6 km.
+
+**Stage 2 — profile:** `data/ephem/sp_malapert/horizon.json`.
+- Contents: 360 values, −4.63° to +6.48°; bin i = azimuth [i−0.5, i+0.5) clockwise from north, as in our Horizons data. Also stored: blocking distance per bin, observer, method, source.
+- Scripts: `scripts/fetch_lola.mjs` (485 MB into `data/raw/`, gitignored, 34 s); `scripts/compute_horizon.mjs` (2.5 s).
+- The raw DEMs are not in git. Method and sources are in `/data/README.md`.
+
+**Stage 3 — checks** (`node scripts/check_horizon.mjs` → PASS), in judge-friendly terms:
+1. **Same terrain from different maps:** the 20 m and 80 m maps agree at the site (4831.5 vs 4824.5 m) and within 5.9 m on average at 200 nearby points. The 80/120/240 m maps agree within 5.6–10.5 m at 200 points from 81–84°S, all longitudes. So every file is read the same way.
+2. **Geometry:**
+   - Toward the pole the horizon is −3.6°, close to the 4.27° drop a perfectly smooth Moon would give a viewer 4.8 km up.
+   - Nothing is below the lowest possible angle (−7.26°, the tangent to the deepest terrain).
+   - Doubling the ray density changes nothing.
+3. **Search complete:** no bin was cut off by a data edge.
+4. **Flat says lit, terrain says blocked:**
+   - Over 2026–2029 the Sun is above the flat horizon but behind terrain for 15,738 h, and visible over terrain while below the flat line for 8,263 h. That happens because the observer is high and looks over terrain to the south.
+   - Overall, Sun visible 50.4% (flat) → 29.1% (terrain); Earth visible 69.1% → 41.2%.
+   - **Robust example for the demo:** **2026-09-19 06:00 UTC**, Sun az 85.6°, el +1.02° (flat: lit). Terrain horizon at az 86° is 5.54°, set by a ridge 3.24 km east (terrain: dark, margin −4.52°). In every sensitivity run that direction stays between 5.2° and 8.4°, so this case doesn't depend on the exact point.
+
+**IMPORTANT caveat for both humans:**
+- The representative point sits on a slope rising ~6° to the north (+21 m over 200 m).
+- Earth's direction (az 352–358) is blocked at ~5.6° by ground only 140–180 m away. Many of the blocked hours come from that near slope, not from distant ridges.
+- Moving the observer 200 m changes the northern horizon from 1.6° (north) to 8–8.6° (south) or ~4° / ~11.8° (east / west); a 10 m mast gives 3.4°.
+- So the far-terrain results (south, east) are solid; the north-facing (Earth) result depends on exactly where you stand.
+- Suggested on-screen wording: "Terrain horizon for one representative point; nearby spots differ, especially toward Earth."
+
+**Stage 4 — in /lib (API_VERSION 1.2.0):**
+- `getHorizon(siteId)` → `{ siteId, model, resolutionDeg: 1, elevationDeg[360], source, verified }`.
+  - For sp_malapert it also returns `verifiedMeaning`, `azimuth`, `blockDistKm[360]`, `observer`, `smoothSphereDipDeg`, `method`.
+  - Flat sites return 360 zeros, `model: "flat"`, `verified: false`.
+  - Needs `loadSite` first, like the other sync calls.
+- For sp_malapert, `getState`, timeline samples and `getSummary` use margin = elevation − terrain horizon at that azimuth. `lit` and `comms` are margin > 0, and the edge test is |margin| ≤ 2°. `horizonModel: "lola"`, legacy `terrain: "real"` (PLAN's original values), and `getCoverage` lists `terrain: "lola"` for this site only.
+- `data/daily.json` was rebuilt with the terrain margins for sp_malapert. `ephem/index.json` now has a `horizons` map.
+- `READY.getHorizon = true`.
+- **Lane B:** no change to the postbuild copy. `horizon.json` is inside `data/ephem/`, which is already copied.
+- **Evidence:**
+  - `check_visibility` PASS, including the new blocked-Sun test and checks that only sp_malapert is lola.
+  - Every daily row equals `getSummary` (17,190 checks).
+  - `check_ephem` PASS; `check_horizon` PASS.
+  - `cd web && npm run build` (typecheck + build) OK.
+- **Not done:** pole sites 2–4 (sp_cabeus_b_peak, sp_haworth, sp_nobile_rim2) stay flat. The same scripts would work for them, but each needs its own 20 m window. **Lane A stops here.**
 

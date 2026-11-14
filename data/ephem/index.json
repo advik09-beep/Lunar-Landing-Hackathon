@@ -299,5 +299,8 @@
     "count": 8760
    }
   ]
+ },
+ "horizons": {
+  "sp_malapert": "sp_malapert/horizon.json"
  }
 }

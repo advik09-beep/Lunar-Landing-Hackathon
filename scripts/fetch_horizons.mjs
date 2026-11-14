@@ -125,9 +125,11 @@ for (const site of todo) {
 }
 
 // Rebuild the index from whatever chunk files exist.
-const index = { stepHours: 1, timeScale: "UTC", decimals: DECIMALS, sites: {} };
+// Terrain horizons (step 7, scripts/compute_horizon.mjs) live in the same site folders as horizon.json.
+const index = { stepHours: 1, timeScale: "UTC", decimals: DECIMALS, sites: {}, horizons: {} };
 for (const id of readdirSync(OUT_DIR).filter((d) => !d.includes("."))) {
-  index.sites[id] = readdirSync(join(OUT_DIR, id)).filter((f) => f.endsWith(".json")).sort().map((f) => {
+  if (existsSync(join(OUT_DIR, id, "horizon.json"))) index.horizons[id] = `${id}/horizon.json`;
+  index.sites[id] = readdirSync(join(OUT_DIR, id)).filter((f) => /^(\d{4}|landing)\.json$/.test(f)).sort().map((f) => {
     const d = JSON.parse(readFileSync(join(OUT_DIR, id, f), "utf8"));
     return { file: `${id}/${f}`, start: d.start, end: d.end, count: d.count };
   });

@@ -1,0 +1,96 @@
+// Step 7 stage 3: sanity checks for a terrain horizon profile, plus a search of our
+// Horizons data for hours where the flat horizon says "Sun up" and the terrain says "blocked".
+// Usage: node scripts/check_horizon.mjs [siteId=sp_malapert]
+// DEM checks run only if the raw LOLA files are present in data/raw/ (they are not in git).
+import { readFileSync, existsSync, readdirSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
+const siteId = process.argv[2] ?? "sp_malapert";
+const hz = JSON.parse(readFileSync(join(ROOT, "data", "ephem", siteId, "horizon.json"), "utf8"));
+const R = 1737400, d2r = Math.PI / 180, r2d = 180 / Math.PI;
+let fails = 0;
+const ok = (c, m) => { if (!c) { console.error("FAIL:", m); fails++; } else console.log("ok  ", m); };
+const horizonAt = (az) => hz.elevationDeg[Math.round(az) % 360];
+
+// 1. Shape and provenance.
+ok(hz.model === "lola" && hz.resolutionDeg === 1 && hz.elevationDeg.length === 360 && hz.elevationDeg.every(Number.isFinite), "360 finite values, model lola, 1 deg bins");
+ok(hz.edgeLimitedBins.length === 0, "no azimuth limited by the 60S data edge (search is complete for every bin)");
+
+// 2. Geometry bounds. A point on the sphere at height h, seen from height hObs, can't appear lower
+// than the tangent to the sphere of radius R+h: angle >= -acos((R+h)/(R+hObs)). Use the DEM minimum
+// (label DERIVED_MINIMUM of the products, -9126.5 m) as the most negative height.
+const hObs = hz.observer.heightAboveSphereM, Ro = R + hObs;
+const lowest = -Math.acos((R - 9126.5) / Ro) * r2d;
+ok(Math.min(...hz.elevationDeg) >= lowest, `horizon never below the tangent to the deepest terrain (${lowest.toFixed(2)} deg)`);
+ok(Math.abs(hz.smoothSphereDipDeg - Math.acos(R / Ro) * r2d) < 1e-3, `smooth-sphere dip ${hz.smoothSphereDipDeg} deg for an observer ${hObs} m above the sphere`);
+const below = hz.elevationDeg.filter((e) => e < -hz.smoothSphereDipDeg).length;
+console.log(`     ${below} of 360 bins dip below the smooth-sphere horizon (terrain lower than the 1737.4 km sphere, e.g. toward the polar depressions)`);
+
+// 3. DEM read checks (raw files needed).
+const RAW = join(ROOT, "data", "raw");
+if (existsSync(join(RAW, "ldem_80s_80m.img"))) {
+  const open = (file, N, off, scale, firstRow = 0) => {
+    const b = readFileSync(join(RAW, file));
+    const D = new Int16Array(b.buffer, b.byteOffset, b.length / 2);
+    return (lat, lon) => {
+      const rr = 2 * R * Math.tan(((90 + lat) * d2r) / 2);
+      const col = Math.round(off + (rr * Math.sin(lon * d2r)) / scale), row = Math.round(off - (rr * Math.cos(lon * d2r)) / scale) - firstRow;
+      return 0.5 * D[row * N + col];
+    };
+  };
+  const W = JSON.parse(readFileSync(join(RAW, "ldem_80s_20m_malapert_rows.json"), "utf8"));
+  const d20 = open("ldem_80s_20m_malapert_rows.img", 30400, 15199.5, 20, W.firstRow);
+  const d80 = open("ldem_80s_80m.img", 7600, 3799.5, 80);
+  const d120 = open("ldem_75s_120m.img", 7624, 3811.5, 120);
+  const d240 = open("ldem_60s_240m.img", 7760, 3879.5, 240);
+  const mad = (pts, a, b) => pts.reduce((s, [la, lo]) => s + Math.abs(a(la, lo) - b(la, lo)), 0) / pts.length;
+  const near = [], ring = [];
+  for (let i = 0; i < 200; i++) { // deterministic spread of points
+    near.push([hz.observer.lat + 0.3 * Math.sin(i * 1.7), hz.observer.lon + 4 * Math.cos(i * 2.3)]); // within ~10 km
+    ring.push([-81 - 3 * ((i * 0.618) % 1), (i * 37) % 360 - 180]);                                     // 81S-84S, all longitudes
+  }
+  const g = d20(hz.observer.lat, hz.observer.lon), g80 = d80(hz.observer.lat, hz.observer.lon);
+  ok(Math.abs(g - g80) < 60, `site height 20 m DEM ${g} m vs 80 m DEM ${g80} m (same place, same orientation)`);
+  const m1 = mad(near, d20, d80), m2 = mad(ring, d80, d120), m3 = mad(ring, d120, d240);
+  ok(m1 < 60, `20 m vs 80 m DEM, 200 points near the site: mean |diff| ${m1.toFixed(1)} m`);
+  ok(m2 < 150 && m3 < 250, `80 m vs 120 m: ${m2.toFixed(1)} m; 120 m vs 240 m: ${m3.toFixed(1)} m (200 points, 81-84S, all longitudes)`);
+} else console.log("skip DEM read checks (data/raw not present; run scripts/fetch_lola.mjs)");
+
+// 4. Search our Horizons data (2026-2029 hourly) for flat-vs-terrain disagreements.
+const dir = join(ROOT, "data", "ephem", siteId);
+let farBest = null, farCount = 0;
+let n = 0, sunBlocked = 0, sunUnblocked = 0, earthBlocked = 0, earthUnblocked = 0, best = null;
+const examples = [];
+for (const f of readdirSync(dir).filter((f) => /^\d{4}\.json$/.test(f)).sort()) {
+  const d = JSON.parse(readFileSync(join(dir, f), "utf8"));
+  for (let i = 0; i < d.count; i++) {
+    n++;
+    const sh = horizonAt(d.sunAz[i]), eh = horizonAt(d.earthAz[i]);
+    const flatLit = d.sunEl[i] > 0, terrLit = d.sunEl[i] > sh;
+    if (flatLit && !terrLit) {
+      sunBlocked++;
+      const utc = new Date(Date.parse(d.start) + i * 3600e3).toISOString().replace(".000Z", "Z");
+      const ex = { utc, sunAz: d.sunAz[i], sunEl: d.sunEl[i], horizonDeg: sh, blockKm: hz.blockDistKm[Math.round(d.sunAz[i]) % 360], by: sh - d.sunEl[i] };
+      if (examples.length < 3) examples.push(ex);
+      if (!best || ex.by > best.by && ex.sunEl >= 1) best = ex;
+      // Robust case: blocker at least 2 km away (not the point's own local slope), Sun >= 1 deg up, >= 1 deg below terrain.
+      if (ex.blockKm >= 2 && ex.sunEl >= 1 && ex.by >= 1) { farCount++; if (!farBest || ex.by > farBest.by) farBest = ex; }
+    }
+    if (!flatLit && terrLit) sunUnblocked++;
+    if (d.earthEl[i] > 0 && d.earthEl[i] <= eh) earthBlocked++;
+    if (d.earthEl[i] <= 0 && d.earthEl[i] > eh) earthUnblocked++;
+  }
+}
+console.log(`     ${n} hours 2026-2029: Sun up on flat but blocked by terrain ${sunBlocked} h; Sun down on flat but visible over terrain ${sunUnblocked} h`);
+console.log(`     Earth up on flat but blocked ${earthBlocked} h; Earth down on flat but visible ${earthUnblocked} h`);
+for (const e of examples) console.log("     first cases:", JSON.stringify(e));
+if (best) console.log("     clearest case (any distance):", JSON.stringify(best));
+console.log(`     robust cases (blocker >= 2 km away, Sun >= 1 deg up, >= 1 deg below terrain): ${farCount} h`);
+if (farBest) console.log("     clearest robust case:", JSON.stringify(farBest));
+ok(sunBlocked > 0, "at least one hour: flat says Sun up, terrain says blocked");
+ok(farCount > 0, "at least one such hour where the blocking ridge is >= 2 km away");
+
+if (fails) { console.error(`${fails} check(s) failed`); process.exit(1); }
+console.log("PASS");
