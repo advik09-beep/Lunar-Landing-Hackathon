@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D23 tour 2/4 — IN PROGRESS | STATUS row and all-10 NASA LOLA Credits corrected (Vercel READY); adding one explicit Sun/Earth mission-purpose message to Overview. |
+| Advik + ChatGPT (Lane B) | D23 tour 3/4 — IN PROGRESS | All-ten LOLA Credits and prominent Sun/Earth overview message deployed (Vercel READY); now simplifying fork tour to Sun, eight planets, Moon; no other clickable bodies or fact cards. |
 | Sheldon (Lane A human) | — | Planning stop 2026-11-14: weights confirmed; D19–D23 signed |
 | Claude Code (Lane A) | D19 done | D19 discs, Earth's shadow, Earth whole-disc rule, Sun distance DONE; stopped for report. Next: D21, then D18 (with D20, D22) |
 
