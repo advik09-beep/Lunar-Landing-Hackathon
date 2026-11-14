@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D30 structure 6 — built; checking deployment | Compact four-chip verdict legend only on Explore and Compare. Structure 5 Vercel READY. |
+| Advik + ChatGPT (Lane B) | D30 structure 7 — built; checking deployment | Small symbol-bearing verdict pins with selected-site ring; exact shared THEME colors. Structure 6 Vercel READY. |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | D30 Lane A part done | Panels follow the D30 theme, short names, Historic tag, interface v1.3 (shared reading level); stopped |
 
@@ -526,6 +526,11 @@ Second task, only after the copy passes and with Advik's authorization: Step 4 T
 ### 2026-11-14 — D30 presentation pass, structure 6
 - Compact four-chip verdict legend only on Explore and Compare. Structure 5 Vercel READY.
 - Files: web/src/main.ts, web/src/style.css. TypeScript and Vite/postbuild executed: PASS. Production deployment verification follows this commit. Scientific APIs and Lane A panels unchanged.
+
+
+### 2026-11-14 — D30 presentation pass, structure 7
+- Small symbol-bearing verdict pins with selected-site ring; exact shared THEME colors. Structure 6 Vercel READY.
+- Files: web/src/moon.ts. TypeScript and Vite/postbuild executed: PASS. Production deployment verification follows this commit. Scientific APIs and Lane A panels unchanged.
 
 ## Lane A
 

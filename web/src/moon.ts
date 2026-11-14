@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { THEME } from './panels/shared';
 import { createNebulaBackground } from './nebula';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -25,18 +26,15 @@ const toThree = ([x, y, z]: readonly number[]): THREE.Vector3 =>
 
 type Marker = {
   site: MoonSite;
-  object: THREE.Mesh;
+  object: THREE.Sprite;
   halo: THREE.Mesh;
   normal: THREE.Vector3;
 };
 
-const palette: Record<Verdict, number> = {
-  clear: 0x9accff,
-  partial: 0x4b89c9,
-  out: 0x27374f,
-  edge: 0xeab14e,
-  unavailable: 0x7b859a,
+const palette: Record<Verdict,string> = {
+  clear:THEME.clear, partial:THEME.partial, out:THEME.out, edge:THEME.edge, unavailable:THEME.warn,
 };
+const symbols: Record<Verdict,string> = {clear:'✓',partial:'◐',out:'✕',edge:'⚠',unavailable:'?'};
 
 function spherePoint(lat: number, lon: number, radius = 1): THREE.Vector3 {
   // Mean Earth / polar-axis frame, east-positive. Display rotation: (x,z,-y).
@@ -58,6 +56,20 @@ export class LunarScene {
   private camera: THREE.PerspectiveCamera;
   private controls: OrbitControls;
   private markers: Marker[] = [];
+  private pinTextures = new Map<Verdict, THREE.CanvasTexture>();
+  private pinTexture(verdict: Verdict): THREE.CanvasTexture {
+    const cached = this.pinTextures.get(verdict); if (cached) return cached;
+    const canvas = document.createElement('canvas'); canvas.width=96; canvas.height=128;
+    const c=canvas.getContext('2d')!;
+    c.strokeStyle=palette[verdict]; c.fillStyle=THEME.bg; c.lineWidth=5;
+    if(verdict==='edge') c.setLineDash([7,5]);
+    c.beginPath(); c.moveTo(28,72); c.lineTo(48,112); c.lineTo(68,72); c.closePath(); c.fill(); c.stroke();
+    c.beginPath(); c.arc(48,44,34,0,Math.PI*2); c.fillStyle=verdict==='clear'?palette.clear:THEME.bg; c.fill(); c.stroke();
+    c.setLineDash([]);
+    if(verdict==='partial') { c.save(); c.beginPath(); c.rect(12,8,36,72); c.clip(); c.beginPath(); c.arc(48,44,31,0,Math.PI*2); c.fillStyle=palette.partial; c.globalAlpha=.35; c.fill(); c.restore(); }
+    c.fillStyle=verdict==='clear'?'#0B1322':palette[verdict]; c.font='bold 39px sans-serif'; c.textAlign='center'; c.textBaseline='middle'; c.fillText(symbols[verdict],48,45);
+    const texture=new THREE.CanvasTexture(canvas); texture.colorSpace=THREE.SRGBColorSpace; this.pinTextures.set(verdict,texture); return texture;
+  }
   private readonly poleCallouts: Array<{id:string;sprite:THREE.Sprite;leader:THREE.Line}> = [];
   private raycaster = new THREE.Raycaster();
   private pointer = new THREE.Vector2();
@@ -148,16 +160,13 @@ export class LunarScene {
       this.scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(points), gridMaterial));
     }
 
-    const poleSiteIds = sites.filter(s => s.kind === 'south-pole').map(s => s.id);
-    const poleLetters = ['A', 'B', 'C', 'D'];
     for (const site of sites) {
       if (!Number.isFinite(site.lat) || !Number.isFinite(site.lon)) continue;
       const normal = spherePoint(site.lat, site.lon);
-      const marker = new THREE.Mesh(
-        new THREE.SphereGeometry(0.036, 16, 12),
-        new THREE.MeshBasicMaterial({ color: palette.unavailable }),
-      );
-      marker.position.copy(normal).multiplyScalar(1.058);
+      const marker = new THREE.Sprite(new THREE.SpriteMaterial({ map:this.pinTexture('unavailable'), transparent:true, depthWrite:false }));
+      marker.scale.set(.105,.14,1);
+      marker.center.set(.5,.12);
+      marker.position.copy(normal).multiplyScalar(1.035);
       marker.userData.siteId = site.id;
       const halo = new THREE.Mesh(
         new THREE.RingGeometry(0.047, 0.058, 32),
@@ -165,38 +174,9 @@ export class LunarScene {
       );
       halo.position.copy(normal).multiplyScalar(1.054);
       halo.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal);
-      halo.visible = true; // neutral outline keeps dark 'Out' markers identifiable
+      halo.visible = false; // only the selected site has a ring
       this.scene.add(halo, marker);
       this.markers.push({ site, object: marker, halo, normal });
-      const poleIndex = poleSiteIds.indexOf(site.id);
-      if (poleIndex !== -1 && poleIndex < poleLetters.length) {
-        const letter = poleLetters[poleIndex];
-        const badgeCanvas = document.createElement('canvas');
-        badgeCanvas.width = badgeCanvas.height = 128;
-        const bc = badgeCanvas.getContext('2d');
-        if (bc) {
-          bc.fillStyle='#14273d'; bc.beginPath(); bc.arc(64,64,49,0,Math.PI*2); bc.fill();
-          bc.strokeStyle='#d4efff'; bc.lineWidth=8; bc.stroke();
-          bc.fillStyle='#fff'; bc.textAlign='center'; bc.textBaseline='middle';
-          bc.font='bold 72px sans-serif'; bc.fillText(letter,64,68);
-        }
-        const tex = new THREE.CanvasTexture(badgeCanvas);
-        tex.colorSpace=THREE.SRGBColorSpace;
-        const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:tex, transparent:true,depthTest:true,depthWrite:false}));
-        const angle=(45+90*poleIndex)*Math.PI/180;
-        const offset=new THREE.Vector3(Math.cos(angle)*.22,-.06,Math.sin(angle)*.22);
-        const target=normal.clone().multiplyScalar(1.16).add(offset);
-        sprite.position.copy(target);
-        sprite.scale.set(.19,.19,1);
-        sprite.visible=false;
-        const leader=new THREE.Line(
-          new THREE.BufferGeometry().setFromPoints([normal.clone().multiplyScalar(1.065),target]),
-          new THREE.LineBasicMaterial({color:0xd2e6ff,transparent:true,opacity:.76,depthTest:true}),
-        );
-        leader.visible=false;
-        this.scene.add(sprite,leader);
-        this.poleCallouts.push({id:site.id,sprite,leader});
-      }
     }
 
     this.onPointerDown = (e) => { this.downPosition = { x: e.clientX, y: e.clientY }; this.targetCamera = null; };
@@ -263,9 +243,10 @@ export class LunarScene {
     for (const m of this.markers) {
       const verdict = values.get(m.site.id) ?? 'unavailable';
       descriptions.push(m.site.name + ': ' + verdict);
-      (m.object.material as THREE.MeshBasicMaterial).color.setHex(palette[verdict]);
+      m.object.material.map = this.pinTexture(verdict);
+      m.object.material.needsUpdate = true;
       // Never cover an opaque verdict-colored marker with a larger white halo.
-      m.halo.visible = true;
+      m.halo.visible = m.site.id === this.selected;
       (m.halo.material as THREE.MeshBasicMaterial).opacity = m.site.id === this.selected ? .85 : .40;
     }
     // Also expose marker meaning to assistive technology, not only colors.
@@ -328,6 +309,8 @@ export class LunarScene {
   };
 
   destroy(): void {
+    for (const texture of this.pinTextures.values()) texture.dispose();
+    this.pinTextures.clear();
     cancelAnimationFrame(this.animationFrame);
     this.resizeObserver.disconnect();
     this.renderer.domElement.removeEventListener('pointerdown', this.onPointerDown);
