@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D24, D25 display, D26 display, D27 | Title card + "Solar system tour" nav (D24); show the ten tour captions (D25) and the south-pole text (D26) from /lib; one clock for the overview (D27); mount the Researcher tab (D18) |
+| Advik + ChatGPT (Lane B) | D18 Researcher mount — build pending | Researcher tab and shared site/date updates wired; hour slider explicitly distinguishes inspected moment from stay start at 00:00 UTC on landing date. D24 next. |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | D25 + D26 text done | Tour captions and south-pole text in /lib with sources and checks; "Why the south pole?" in the side card. Next: D28 (A/B scenarios, mission requirements filter) on Sheldon's go |
 
