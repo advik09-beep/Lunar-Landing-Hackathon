@@ -6,10 +6,10 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 |-----|------|-----------|
 | Advik + ChatGPT (Lane B) | 4 — REVIEW | D8 live JSON PASS; Three.js Moon, date controls, ten markers and Lane A side card deployed; desktop browser tests pass; human acceptance pending. |
 | Sheldon (Lane A human) | — | D9 + D10 signed 2026-11-14; gates Lane A's D10, panel interface and side card one at a time |
-| Claude Code (Lane A) | 6 (Compare grid panel) | D11 recorded; Lane B's 5 questions answered; panel interface v1.1; building Compare grid + timeline strip |
+| Claude Code (Lane A) | 6 (Compare grid panel) | Compare grid + timeline strip built and pushed; stopped. Next Lane A panel: horizon view (step 7) on Sheldon's go |
 
 Step 1 Live URL: **PASS** (Lane B, 2026-11-14). Step 2 Real numbers: **PASSED 2026-11-14**. Signed 2026-11-14: D7 desktop only; D8 data copy + setDataBase; D9 Lane A builds the side card, Compare grid and horizon view as panels in web/src/panels/; D10 move sp_malapert to the highest ground within 1 km; D11 visual scope (Lane B): (a) NASA CGI Moon Kit map, (b) not-to-scale Sun-Earth-Moon overview scene, (c) seamless zoom if time; Credits panel; cut (c) then (b).
-Waiting on Sheldon: open web/panels.html (cd web && npm run dev, then http://localhost:5173/panels.html) and review the side card; go for the Compare grid next.
+Waiting on Sheldon: review the Compare grid on web/panels.html (cd web && npm run dev → http://localhost:5173/panels.html); go for the horizon view panel.
 Waiting on Advik: human mouse test of step 4 on the live site; D11(a) Moon map (alignment answer in Lane A entry "Answers to Lane B's five questions"); mount the Compare grid when ready.
 
 ## Continuous two-agent coordination protocol (agreed 2026-11-14)
@@ -800,4 +800,28 @@ onOpenView?: (view: "horizon" | "compare") => void;   // side card exits: "Stand
 ```
 - The side card shows the two exit buttons only when `onOpenView` is passed. Lane B decides what opening a view means (e.g. show the horizon panel or the Compare grid for the current selection).
 - v1 callers keep working unchanged. `PANEL_INTERFACE_VERSION = "1.1"` is exported from `web/src/panels/index.ts`.
+
+### 2026-11-14 — Compare dates grid panel + timeline strip (step 6, Lane A part) READY to mount
+**API:** `mountCompareGrid(container, props)` from `web/src/panels/index.ts`, same `PanelProps` / `PanelHandle` as the side card (interface v1.1). It uses `onSiteSelected` and `onDateSelected`; `onOpenView` is not used.
+- **Grid:** 10 site rows × 28 landing-date columns.
+  - When first mounted, and whenever the selected date moves outside the window, the window is placed so the selected date is the 8th column. A date inside the window doesn't move it. "◀ 14 days earlier / 14 days later ▶" move the window without changing the selection.
+  - Each cell = verdict for a 7-day stay from 00:00 UTC that date, straight from `getDaily()`, shown as **symbol + color** (✓ ◐ ✕ ⚠, edge also dashed). Every cell has a tooltip/aria-label in words: verdict, sunlight %, Earth %, both %, longest dark stretch.
+  - No-data stays show a dashed "–" (never guessed). Rows carry a FLAT / TERRAIN tag.
+  - Clicking a cell calls `onSiteSelected(site)` then `onDateSelected(date)`; a row name calls `onSiteSelected`; a column date calls `onDateSelected`. The selected cell is outlined, the selected row bold, the selected date underlined.
+- **Timeline strip (inside the panel, per Sheldon):** hourly for the selected site over the same 28 days, from `getTimeline()`.
+  - Encoded by position, not only color: top half filled = sunlight, bottom half filled = Earth in view, both = full bar, neither = empty, hatched = no data.
+  - The selected 7-day stay is outlined, and a sentence under it gives the stay's percentages (`getSummary`).
+- **Lane B:** mount it wherever the Compare dates tab lives, and call `update({siteId, landingDate})` on it with the same shared selection as the side card. With interface v1.1, `onOpenView("compare")` from the side card is your cue to show this tab. Lane B can theme the strip colors with `--llp-sun` / `--llp-earth`.
+- **Test page:** `web/panels.html` now mounts the side card (with `onOpenView`) and the grid on one shared selection.
+- **Evidence (2026-11-14), DOM emulator (happy-dom, scratch only) with real /data:**
+  - 280 cells, all equal to `getDaily` (PLAN step 6: "cells equal the daily summary").
+  - Strip bars equal hourly `lit` / `comms` (410 / 672 for sp_malapert, 2026-09-12..10-09).
+  - Cell/row/column clicks → callbacks.
+  - New site + date via `update()` rendered in **57 ms** (step 6: under 1 second).
+  - The window stays put for dates inside it, re-centres outside, and the buttons move it 14 days.
+  - Past the end of coverage: no-data cells + hatched strip.
+  - Side card exits → `onOpenView("horizon")` / `("compare")`; a v1 caller without `onOpenView` gets no exit buttons.
+  - No global styles; `destroy()` leaves the container empty.
+  - `check_visibility`, `check_ephem`, `check_horizon` PASS; `cd web && npm run build` OK.
+  - **Not yet seen in a real browser:** Sheldon to open `panels.html`.
 

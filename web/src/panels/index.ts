@@ -2,4 +2,5 @@
 export type { PanelProps, PanelHandle, MountPanel } from "./types";
 export const PANEL_INTERFACE_VERSION = "1.1";
 export { mountSideCard } from "./sideCard";
-// Coming next (D9): mountCompareGrid (step 6, includes the timeline strip), mountHorizonView (step 7).
+export { mountCompareGrid } from "./compareGrid"; // step 6, includes the timeline strip
+// Coming next (D9): mountHorizonView (step 7).

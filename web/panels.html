@@ -8,7 +8,9 @@
       /* Test page only (Lane A). The real app shell is Lane B's index.html. */
       :root { font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; color: #ecf2ff; background: #091322; }
       body { margin: 0; padding: 24px; }
-      main { max-width: 760px; margin: 0 auto; }
+      main { max-width: 1100px; margin: 0 auto; }
+      #side-card { max-width: 760px; }
+      h2.section { font-size: 1rem; color: #a8bbd3; margin: 28px 0 8px; }
       h1 { font-size: 1.3rem; margin: 0 0 6px; }
       .note { color: #a8bbd3; font-size: .85rem; margin: 0 0 16px; }
       form { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; margin-bottom: 16px; }
@@ -20,13 +22,15 @@
   <body>
     <main>
       <h1>Lane A panels — test page</h1>
-      <p class="note">Standalone page for checking Lane A panels with real data. It plays the shell's role: it owns the selection and mounts the side card.</p>
+      <p class="note">Standalone page for checking Lane A panels with real data. It plays the shell's role: it owns the selection and mounts the side card and the Compare dates grid (with its timeline strip).</p>
       <form id="pick" onsubmit="return false">
         <label>Site <select id="site"></select></label>
         <label>Landing date (UTC) <input id="date" type="date" /></label>
       </form>
       <p id="log" role="status"></p>
       <div id="side-card"></div>
+      <h2 class="section">Compare dates (step 6)</h2>
+      <div id="compare-grid"></div>
     </main>
     <script type="module" src="/src/panels/demo.ts"></script>
   </body>
