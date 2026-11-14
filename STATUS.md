@@ -1,11 +1,11 @@
 # STATUS — Lunar Landing Site Navigator
 
-Current milestone: M0 SETUP. No milestone has passed yet.
-Lane A (Claude Code): MOCK /lib/visibility.js and /data/sites.js committed (10 sites, all sourced).
-Lane B (ChatGPT/Codex): web/index.html is committed and imports only listSites() from ../lib/visibility.js.
-Failing test: No confirmed public live URL yet. listSites() now exists.
-Next single task for Lane A: M1 step 1 — confirm the Horizons lunar-surface observer setup from its docs, then fetch one verified site (Apollo 11) as a test.
-Next Lane B blocker: configure/verify static hosting and run M0 acceptance test once the shared module is available.
+Current milestone: M1 REAL NUMBERS (Lane A). M0 still open on the live-URL check. No milestone has passed yet.
+Lane A (Claude Code): M1 step 1 DONE (Horizons lunar-surface observer setup confirmed on a live Apollo 11 query). M1 download script built; 7-day test window fetched for all 10 sites (2026-11-14..2026-11-21, hourly). Not widened yet.
+Lane B (ChatGPT/Codex): Vite/TS app in /web imports listSites() and MOCK from ../lib/visibility.js.
+Failing test: M1 hand-check: 3 site/time queries in the Horizons web app must match data/ephem within 0.1 deg (not yet run by a human). M0: no confirmed public live URL.
+Next single task for Lane A: after the human hand-check, widen the script to 2026-2029 + 30 days around each past landing, then write /data/README.md.
+Next Lane B blocker: configure/verify static hosting and run M0 acceptance test.
 
 ## Continuous two-agent coordination protocol (agreed 2026-11-14)
 
@@ -286,3 +286,17 @@ D. **getCoverage()/getMetadata()** (or fields on existing exports)
 - Apollo 11 at 1969-07-20 20:17 UTC: Sun az 88.81°, el 10.70° (low morning Sun in the east — PLAN M1 check passes for this one case). Earth az 272.19°, el 59.22°.
 - Site altitude was set to 0 km. No sourced elevation for Apollo 11 yet; it barely affects Sun/Earth angles.
 - Next: the M1 download script for verified sites, small window first. Then /data/README.md recording these settings.
+
+### 2026-11-14 — M1 download script, 7-day test window (M1 NOT passed)
+- `scripts/fetch_horizons.mjs` (Node 18+, no deps). Usage: `node scripts/fetch_horizons.mjs [START] [STOP] [siteId ...]`. Default window 2026-11-14 00:00 .. 2026-11-21 00:00 UTC, 1 h step.
+- Output: `data/ephem/<siteId>.json`, 169 rows per site, columns as arrays `sunAz, sunEl, earthAz, earthEl` starting at `start`, `stepHours: 1`. Each file keeps the Horizons header lines it was made from.
+- The script fails loudly if the header lacks MEAN_ME / East-longitude positive / AIRLESS / UT time column, if a row is missing, or if Sun and Earth times differ.
+- Settings confirmed in the docs (API doc + manual): endpoint `https://ssd.jpl.nasa.gov/api/horizons.api`; `SITE_COORD` = E-lon deg, lat deg, alt km; Moon is east-longitude positive; quantity 4 is degrees, azimuth clockwise from north; CSV data between `$$SOE`/`$$EOE`. No API rate limit is documented; the script sends one request at a time with a 1 s pause.
+- Sanity checks (not the formal M1 tests): Earth el 45-74 deg at Apollo 11/12/17 and -2..+8.6 deg at the south-pole sites. Earth azimuth flips with longitude sign: west at Apollo 11 (23.5E), east at Apollo 12 (23.4W), ~62 deg at Cabeus B (68.8W), ~297 deg at Nobile Rim 2 (58.7E). This is what east-positive longitude predicts.
+- UNVERIFIED: all site altitudes set to 0 km above the 1737.4 km sphere. The Horizons EOP file predicts UT1 only to 2027-02-08; check how that affects UTC output beyond that date before widening.
+- `lib/visibility.js` still MOCK; it does not read these files yet.
+- Hand-check rows for a human (Horizons web app, observer = these coords @301, quantity 4, airless):
+  - apollo11 23.47297E 0.67408, 2026-11-14 12:00 UTC: Sun az 91.4857 el -7.0667; Earth az 277.5874 el 64.3200
+  - im1 1.44E -80.13, 2026-11-17 08:00 UTC: Sun az 84.9258 el 2.4573; Earth az 352.8771 el 9.2952
+  - sp_malapert 0.3E -86.0, 2026-11-20 06:00 UTC: Sun az 50.4114 el 4.0976; Earth az 352.4058 el 7.4541
+
