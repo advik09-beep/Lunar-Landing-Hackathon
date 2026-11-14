@@ -186,3 +186,6 @@ h2 { margin: 0; font-size: 1.75rem; line-height: 1.23; letter-spacing: -.035em; 
   opacity: 1;
   mix-blend-mode: screen;
 }
+
+/* D23: explicit mission-purpose statement, visible before the solar-system iframe. */
+.overview-mission-message { margin: 14px 22px 10px; padding: 14px 18px; border-left: 3px solid #8cc7ff; border-radius: 8px; background: rgba(19,40,64,.93); color: #e8f3ff; font-size: .9rem; line-height: 1.65; }
