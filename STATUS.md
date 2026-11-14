@@ -1,11 +1,15 @@
 # STATUS — Lunar Landing Site Navigator
 
-Current milestone: M1 REAL NUMBERS (Lane A). M0 still open on the live-URL check. No milestone has passed yet.
-Lane A (Claude Code): M1 step 1 DONE (Horizons lunar-surface observer setup confirmed on a live Apollo 11 query). M1 download script built; 7-day test window fetched for all 10 sites (2026-11-14..2026-11-21, hourly). Not widened yet.
-Lane B (ChatGPT/Codex): Vite/TS app in /web imports listSites() and MOCK from ../lib/visibility.js.
-Failing test: M1 hand-check: 3 site/time queries in the Horizons web app must match data/ephem within 0.1 deg (not yet run by a human). M0: no confirmed public live URL.
-Next single task for Lane A: after the human hand-check, widen the script to 2026-2029 + 30 days around each past landing, then write /data/README.md.
-Next Lane B blocker: configure/verify static hosting and run M0 acceptance test.
+PLAN.md v2 is the one plan and wins over this file. Right now:
+
+| Who | Step | Doing now |
+|-----|------|-----------|
+| Advik + ChatGPT (Lane B) | 1 | Build the web app and get a public live URL |
+| Sheldon (Lane A human) | 2 | Three hand-checks of our numbers against the JPL Horizons web app |
+| Claude Code (Lane A) | 2 | Waiting on Sheldon's hand-checks, then widening the data download |
+
+Waiting on Sheldon: the three Horizons hand-checks (rows in the Lane A entry "M1 download script, 7-day test window").
+Waiting on Advik: step 1 live URL showing the 10 sites on a phone.
 
 ## Continuous two-agent coordination protocol (agreed 2026-11-14)
 
@@ -363,3 +367,12 @@ Lane A will add `export const API_VERSION = "1.0.0"` and `export const READY = {
 **Coverage:** DESIGN.md asks for at least 8 weeks ahead of today (so to at least 2027-01-09). The approved M1 range (2026-2029) includes this. Today there are only 7 days (2026-11-14..21), and widening waits for the hand-check. Open point carried over: Horizons' EOP (Earth-rotation) file predicts only to 2027-02-08, and I still have to check its effect on UTC timestamps past that date.
 
 **Lane A next single task (unchanged):** after Sheldon's hand-check passes, widen the M1 download, then write `/data/README.md`.
+
+### 2026-11-14 — PLAN v2 adopted
+- PLAN.md replaced with PLAN v2. Step numbers 1-9 replace M0-M7 and B0-B7.
+- D1-D6 are signed by both humans (per Sheldon, 2026-11-14).
+- Contract v1 (the entry above) is APPROVED, including `await loadSite(siteId)` and the daily summary file (PLAN D4). Readiness flags are unchanged: everything marked NOT READY there is still not built.
+- Verdict numbers: STAY_DAYS = 7, CLEAR_PCT = 90, OUT_PCT = 10, EDGE_DEG = 2 (PLAN D5). These replace the "Open" note in the contract entry.
+- DESIGN.md marked approved: Explore is 3D from the start, the flat-first step is gone, the Plain / Numbers section is added, and it uses PLAN step numbers.
+- Lane A is on step 2, blocked on Sheldon's hand-checks. No step work started in this entry.
+
