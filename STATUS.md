@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D18 + D24 PASS; D27 build pending | Researcher mounted, title card and tour navigation ready; shared date/hour sent to simulator with explicit no-validated-planetary-ephemeris disclaimer. D25/D26 display next. |
+| Advik + ChatGPT (Lane B) | D18/D24/D27 implemented; D25/D26 display build pending | Tour captions and sources read from Lane A /lib; Moon stop full south-pole explanation and one-line Explore header. Vercel acceptance pending. |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | D25 + D26 text done | Tour captions and south-pole text in /lib with sources and checks; "Why the south pole?" in the side card. Next: D28 (A/B scenarios, mission requirements filter) on Sheldon's go |
 

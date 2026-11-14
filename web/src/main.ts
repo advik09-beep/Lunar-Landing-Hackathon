@@ -1,5 +1,5 @@
 import './style.css';
-import { listSites, loadDaily, getDaily, loadScene, getSceneState, MOCK, API_VERSION, VERDICT_RULE } from '../../lib/visibility.js';
+import { listSites, loadDaily, getDaily, loadScene, getSceneState, MOCK, API_VERSION, VERDICT_RULE, TOUR_STOPS, SOUTH_POLE } from '../../lib/visibility.js';
 import { LunarScene, type MoonSite, type Verdict, type SceneState } from './moon';
 import { OverviewScene } from './overview';
 import { mountStarfield } from './starfield';
@@ -96,6 +96,7 @@ app.innerHTML = [
   '      <div class="overview-caption"><strong id="overview-source">THE SUN · EARTH · MOON</strong><span id="overview-note">Illustrative sizes, positions and motion — not to scale; not ephemeris geometry</span></div>',
   '      <p id="overview-mission-message" class="overview-mission-message">Of everything in the solar system, the Sun determines the sunlight available for a lunar lander\'s potential power, while Earth determines when a direct radio link is geometrically possible. Other planets: their gravity is already in our numbers. JPL planetary ephemerides include their gravitational effects; their light is negligible compared with sunlight. Radio from other planets is not modeled.</p>',
   '      <div id="overview-stage" class="overview-stage" aria-label="Solar system overview visualization"></div>',
+  '      <div id="tour-science-caption" class="tour-science-caption" hidden aria-live="polite"></div>',
   '      <p id="overview-clock-status" class="overview-clock-status" role="status">Simulator planetary ephemeris is not validated for the selected date.</p>',
   '      <div id="overview-title-card" class="overview-title-card"><h2>Our Moon in the solar system</h2><p>Only the Sun and Earth determine the sunlight and direct Earth visibility we evaluate for a lunar lander. Other planets’ gravity is already included in NASA’s ephemerides.</p><div><button id="start-tour" type="button">Start tour</button><button id="skip-moon" type="button">Skip to the Moon</button></div></div>',
   '      <div class="overview-footer"><p id="overview-disclaimer">Choose the Moon to explore real landing sites and verified Sun/Earth visibility at your selected UTC date and hour.</p><button id="enter-explore" type="button">Explore the Moon and landing sites</button></div>',
@@ -105,6 +106,7 @@ app.innerHTML = [
   '    <div class="scene-column">',
   '      <div class="moon-window">',
   '        <div class="scene-heading"><span>MOON-FIXED VIEW</span><span>3D · Drag to rotate · Scroll to zoom</span></div>',
+  '        <p id="explore-south-pole-note" class="explore-south-pole-note"></p>',
   '        <div id="moon-stage" class="moon-stage" aria-label="Interactive 3D Moon with landing markers"></div>',
   '        <div class="scene-controls"><button type="button" id="reset-view">Full Moon</button><button type="button" id="polar-view">South pole view</button><span>NASA SVS Moon imagery · JPL Horizons Sun lighting · no terrain mesh</span></div>',
   '        <p id="lighting-status" class="lighting-status" role="status" aria-live="polite">Loading Sun/Earth directions from JPL Horizons…</p>',
@@ -135,6 +137,8 @@ app.innerHTML = [
   '    <p>Moon surface color map: <a href="https://svs.gsfc.nasa.gov/4720" target="_blank" rel="noopener noreferrer">NASA SVS CGI Moon Kit (2025), official 2K JPEG and 4K color JPEG derived once from the 2025 4096×2048 sRGB TIFF</a>. Credit: NASA\'s Scientific Visualization Studio. Derived from LROC color data with polar albedo fill. NASA media usage is governed by <a href="https://www.nasa.gov/nasa-brand-center/images-and-media/" target="_blank" rel="noopener noreferrer">NASA media usage guidelines</a>; no separate software license is asserted for the imagery.</p>',
   '    <h3>Scientific ephemerides and terrain</h3>',
   '    <p>Sun and Earth directions, visibility and stay summaries: <a href="https://ssd.jpl.nasa.gov/horizons/" target="_blank" rel="noopener noreferrer">NASA/JPL Horizons</a>. Terrain horizons at all ten landing sites use NASA Lunar Reconnaissance Orbiter Laser Altimeter (LOLA) GDR elevation maps via PDS Geosciences, including polar and global coverage; observer coordinates, map sources and resolution for each site are documented in data/README.md. NASA/JPL Horizons supplies Sun/Earth ephemerides. The decorative Moon texture is not terrain elevation data.</p>',
+  '    <h3>NASA planet facts and tour captions</h3>',
+  '    <p>Tour captions are authored in Lane A’s /lib/tour.js, using NASA science.nasa.gov planet fact pages, NASA SVS and JPL Horizons. Planet brightness figures are from our own JPL Horizons magnitude queries, labeled as team calculations.</p>',
   '    <h3>3D rendering library</h3>',
   '    <p><a href="https://threejs.org/" target="_blank" rel="noopener noreferrer">Three.js</a> and OrbitControls, copyright Three.js authors, <a href="https://github.com/mrdoob/three.js/blob/master/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>. The interactive globe and three-body overview were written for this project. Original drifting starfield visually informed by <a href="https://www.huescreen.com/starfield/" target="_blank" rel="noopener noreferrer">Hue Screen Starfield</a> (no code or assets copied), and previously by <a href="https://github.com/etrepat/starfield" target="_blank" rel="noopener noreferrer">etrepat/starfield</a>, copyright (c) 2010 Estanislau Trepat, <a href="https://github.com/etrepat/starfield/blob/develop/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>; legacy Three.js source was not copied.</p>',
   '    <h3>Solar-system overview — upstream simulator</h3>',
@@ -158,6 +162,7 @@ const siteButtons = find<HTMLDivElement>('site-buttons');
 const status = find<HTMLParagraphElement>('data-status');
 const lightingStatus = find<HTMLParagraphElement>('lighting-status');
 const select = find<HTMLInputElement>('landing-date');
+find<HTMLElement>('explore-south-pole-note').textContent = SOUTH_POLE.oneLine;
 const dateSlider = find<HTMLInputElement>('date-slider');
 const hourSlider = find<HTMLInputElement>('hour-slider');
 const dateOutput = find<HTMLOutputElement>('date-output');
@@ -226,6 +231,7 @@ function showTourTitle(): void {
   find<HTMLElement>('overview-title-card').hidden = false;
 }
 function startSolarTour(): void {
+  find<HTMLElement>('tour-science-caption').hidden = true;
   find<HTMLElement>('overview-title-card').hidden = true;
   openView('overview');
   const frame = find<HTMLIFrameElement>('overview-stage').querySelector('iframe');
@@ -407,6 +413,50 @@ if (embedUrl) {
   const onSimulatorMessage = (event: MessageEvent): void => {
     if (event.source !== frame.contentWindow || event.origin !== embedUrl.origin) return;
     const data = event.data;
+    if (data && typeof data === 'object' && data.type === 'lunar-navigator:tour-stop') {
+      const stop = TOUR_STOPS.find((item: { id: string }) => item.id === data.bodyId);
+      if (!stop) return;
+      const caption = find<HTMLElement>('tour-science-caption');
+      caption.replaceChildren();
+      const title = document.createElement('strong');
+      title.textContent = stop.title;
+      const body = document.createElement('p');
+      body.textContent = stop.text;
+      caption.append(title, body);
+      const sources = document.createElement('p');
+      sources.append('Sources: ');
+      for (const [index, source] of stop.sources.entries()) {
+        if (index) sources.append(' · ');
+        const a = document.createElement('a');
+        a.href = source.url;
+        a.textContent = source.name;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        sources.append(a);
+      }
+      caption.append(sources);
+      if (stop.id === 'moon') {
+        const details = document.createElement('details');
+        const summary = document.createElement('summary');
+        summary.textContent = 'Why the south pole?';
+        details.append(summary);
+        for (const paragraph of SOUTH_POLE.full) {
+          const p = document.createElement('p');
+          p.textContent = paragraph;
+          details.append(p);
+        }
+        for (const source of SOUTH_POLE.sources) {
+          const a = document.createElement('a');
+          a.href = source.url;
+          a.textContent = source.name + ' · ';
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          details.append(a);
+        }
+        caption.append(details);
+      }
+      caption.hidden = false;
+    }
     if (data && typeof data === 'object' &&
         data.type === 'lunar-navigator:open-explore' && data.body === 'moon') {
       openView('explore');
