@@ -6,7 +6,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 |-----|------|-----------|
 | Advik + ChatGPT (Lane B) | D11(a) + panels + Credits — DONE | Compare/Horizon mounted with v1.1 shared selection; NASA CGI Moon Kit 2K texture and Credits live. Step 4 human mouse sign-off pending; stopped as requested. |
 | Sheldon (Lane A human) | — | D9 + D10 signed 2026-11-14; gates Lane A's D10, panel interface and side card one at a time |
-| Claude Code (Lane A) | 8 (Lane A half) | getSceneState DONE and READY (checks pass); stopped. Lane B can light the Moon from the real Sun direction |
+| Claude Code (Lane A) | 9 (submission docs) | Root README.md written and pushed; waiting for Sheldon's go |
 
 Step 1 Live URL: **PASS** (Lane B, 2026-11-14). Step 2 Real numbers: **PASSED 2026-11-14**. Signed 2026-11-14: D7 desktop only; D8 data copy + setDataBase; D9 Lane A builds the side card, Compare grid and horizon view as panels in web/src/panels/; D10 move sp_malapert to the highest ground within 1 km; D11 visual scope (Lane B): (a) NASA CGI Moon Kit map, (b) not-to-scale Sun-Earth-Moon overview scene, (c) seamless zoom if time; Credits panel; cut (c) then (b).
 Waiting on Sheldon: review panels on web/panels.html (cd web && npm run dev → http://localhost:5173/panels.html?site=sp_malapert&date=2026-09-19); next Lane A task on your go.
@@ -908,4 +908,9 @@ Frame: Moon-fixed, east-positive; +X = 0°N 0°E, +Y = 0°N 90°E, +Z = north po
    - At 2026-11-14 12:00 UTC, Apollo 11 should sit just past the terminator on the night side (its Sun elevation is −7.07°).
    - sp_malapert at 2026-09-19 06:00 UTC should be on the day side (Sun +1.05° above level). The globe shows no terrain, so ridge-blocking appears only in the side card and horizon view. Say so on screen.
 7. Hourly samples: snap to `sc.sampleUtc`; don't interpolate in /web. `getSceneState` throws `OUT_OF_COVERAGE` outside 2026–2029 / the landing windows, which the shell should show as "lighting unavailable".
+
+### 2026-11-14 — Root README.md written (for the submission)
+- `README.md` at the repo root covers: what the project is, the live link, how to run it, how the numbers were verified (the seven hand-checks and the four check scripts: `check_ephem`, `check_visibility`, `check_horizon`, `check_scene`), data sources and credits, known limits, and how AI tools were used.
+- Shared file at the repo root (Sheldon's request). Lane B: please flag anything in the "Lane B" or "Credits" lines that's inaccurate, and Lane A will fix it.
+- It describes 3D lighting as illustrative (true as of `a0f5eb5`). Update that line once Lane B wires in `getSceneState`.
 
