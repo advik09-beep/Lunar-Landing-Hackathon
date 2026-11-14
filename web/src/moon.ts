@@ -110,7 +110,7 @@ export class LunarScene {
     // against LOLA: no mesh rotation, UV offset or marker rotation.
     this.scene.add(moon);
     new THREE.TextureLoader().load(
-      '/moon/lroc_color_2k.jpg',
+      '/moon/lroc_color_4k.jpg',
       (texture) => {
         texture.colorSpace = THREE.SRGBColorSpace;
         texture.anisotropy = Math.min(8, this.renderer.capabilities.getMaxAnisotropy());
