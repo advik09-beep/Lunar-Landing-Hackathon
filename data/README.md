@@ -13,6 +13,7 @@ header of our own Horizons output, on 2026-11-14. Sources:
 | `ephem/<siteId>/<YYYY>.json` | Hourly Sun and Earth azimuth/elevation for calendar years 2026, 2027, 2028, 2029 (00:00 Jan 1 to 23:00 Dec 31 UTC). |
 | `ephem/<siteId>/landing.json` | Same quantities, landing day 00:00 UTC −15 days to +15 days (inclusive, 721 rows). Only for landings before 2026: apollo11, apollo12, apollo17, chandrayaan3, im1, im2. |
 | `ephem/index.json` | Every chunk file with its first and last UTC time and row count. |
+| `daily.json` | Per-day stay summary for all sites (built by `node scripts/build_daily.mjs`). For every UTC date D whose 7-day stay (D 00:00Z, 168 hourly samples) is fully covered: `[litH, commsH, bothH, sunEdgeH, earthEdgeH, longestDarkH, verdict]`, grouped per site in contiguous segments `{ firstDate, rows }`. Flat horizon; edge = \|elevation\| ≤ EDGE_DEG (2°). Rule constants are in the file header and in `lib/verdict.js`. ~410 KB, 14,694 rows. |
 
 Each chunk file holds: `siteId, lat, lon, altKm, start, end, stepHours (1), count, decimals (3), timeScale ("UTC"), source, apiVersion, fetchedUtc, horizonsHeader` (lines copied from the Horizons output) and four arrays `sunAz, sunEl, earthAz, earthEl`. Row `i` is at `start + i hours`.
 

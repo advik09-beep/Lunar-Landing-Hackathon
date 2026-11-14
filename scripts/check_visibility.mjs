@@ -1,5 +1,6 @@
-// Calls every export of lib/visibility.js and checks the contract v1 shapes.
+// Calls every export of lib/visibility.js and checks the contract v1 shapes and values.
 // Usage: node scripts/check_visibility.mjs   -> prints PASS or exits 1 with the failure.
+import { readFileSync } from "node:fs";
 import * as V from "../lib/visibility.js";
 
 let fails = 0;
@@ -9,61 +10,105 @@ const throwsMsg = (fn, re, msg) => { try { fn(); ok(false, msg + " (did not thro
 const T = "2026-11-14T12:00:00Z";
 
 ok(typeof V.MOCK === "boolean", "MOCK boolean");
-ok(V.API_VERSION === "1.0.0", "API_VERSION 1.0.0");
-has(V.READY, ["listSites", "getState", "getSummary", "loadSite", "getCoverage", "getTimeline", "loadDaily", "getDaily", "getSceneState", "getHorizon"], "READY");
+ok(V.API_VERSION === "1.1.0", "API_VERSION 1.1.0");
+has(V.READY, ["listSites", "getState", "getSummary", "loadSite", "getCoverage", "getTimeline", "loadDaily", "getDaily", "setDataBase", "getSceneState", "getHorizon"], "READY");
 ok(V.VERDICT_RULE.STAY_DAYS === 7 && V.VERDICT_RULE.CLEAR_PCT === 90 && V.VERDICT_RULE.OUT_PCT === 10 && V.VERDICT_RULE.EDGE_DEG === 2, "verdict numbers 7/90/10/2");
+ok(typeof V.setDataBase === "function", "setDataBase exported");
 
 const sites = V.listSites();
 ok(sites.length === 10, "10 sites");
 has(sites[0], ["id", "name", "lat", "lon", "kind", "landingDate", "source", "coordsVerified", "note"], "listSites()[0]");
 
+// NOT_LOADED before loading
+throwsMsg(() => V.getCoverage(), /NOT_LOADED/, "getCoverage before any load");
+throwsMsg(() => V.getTimeline("apollo11", T, 1), /NOT_LOADED/, "getTimeline before loadSite");
+throwsMsg(() => V.getDaily("2026-11-14", 3), /NOT_LOADED/, "getDaily before loadDaily");
+if (!V.MOCK) {
+  throwsMsg(() => V.getState("apollo11", T), /NOT_LOADED/, "getState before loadSite");
+  throwsMsg(() => V.getSummary("apollo11", T, 7), /NOT_LOADED/, "getSummary before loadSite");
+}
+
+for (const s of sites) await V.loadSite(s.id);
+
 const verdicts = new Set();
 for (const s of sites) {
   const st = V.getState(s.id, T);
   has(st, ["sunEl", "sunAz", "earthEl", "earthAz", "lit", "comms", "hoursToSunChange", "hoursToEarthChange", "terrain",
-    "sunMarginDeg", "earthMarginDeg", "sunEdge", "earthEdge", "edgeDeg", "horizonModel"], `getState(${s.id})`);
+    "sunMarginDeg", "earthMarginDeg", "sunEdge", "earthEdge", "edgeDeg", "horizonModel", "sampleUtc"], `getState(${s.id})`);
   ok(st.horizonModel === "flat" && st.sunMarginDeg === st.sunEl && st.earthMarginDeg === st.earthEl, `${s.id} flat margin = elevation`);
   ok(st.sunAz >= 0 && st.sunAz < 360 && st.earthAz >= 0 && st.earthAz < 360, `${s.id} azimuth in [0,360)`);
   ok(st.hoursToEarthChange === null || st.hoursToEarthChange > 0, `${s.id} countdown null or > 0`);
-
   const sum = V.getSummary(s.id, T, 7);
   has(sum, ["pctLit", "pctComms", "pctBoth", "longestDarkHours", "pctSunEdge", "pctEarthEdge", "verdict", "verdictRule"], `getSummary(${s.id})`);
   ok(["clear", "partial", "out", "edge"].includes(sum.verdict), `${s.id} verdict value`);
   verdicts.add(sum.verdict);
 }
 
-// loadSite / getTimeline
-throwsMsg(() => V.getTimeline("apollo11", T, 1), /NOT_LOADED/, "getTimeline before loadSite");
-await V.loadSite("apollo11");
+// Values equal the files (step 5 test: on-screen values equal the files).
+const f = JSON.parse(readFileSync(new URL("../data/ephem/apollo11/2026.json", import.meta.url), "utf8"));
+const i = (Date.parse(T) - Date.parse(f.start)) / 3600e3;
+const st = V.getState("apollo11", "2026-11-14T12:59:00Z");
+ok(st.sampleUtc === T, "getState reads the start of the hour");
+ok(st.sunAz === f.sunAz[i] && st.sunEl === f.sunEl[i] && st.earthAz === f.earthAz[i] && st.earthEl === f.earthEl[i], "getState equals file values");
+ok(st.sunAz === 91.486 && st.sunEl === -7.067, "apollo11 hand-check row (Sun) 91.486 / -7.067");
+
+// Countdown is consistent with the timeline.
+const st2 = V.getState("apollo11", T);
+if (st2.hoursToSunChange !== null) {
+  ok(V.getState("apollo11", Date.parse(T) + st2.hoursToSunChange * 3600e3).lit !== st2.lit, "sun countdown lands on a change");
+  ok(V.getState("apollo11", Date.parse(T) + (st2.hoursToSunChange - 1) * 3600e3).lit === st2.lit, "no earlier change");
+}
+
+// Timeline
 const tl = V.getTimeline("apollo11", "2026-11-14T12:34:00Z", 7);
 has(tl, ["siteId", "stepHours", "mock", "terrain", "horizonModel", "source", "samples"], "getTimeline");
 ok(tl.samples.length === 168, "timeline 7 days = 168 samples");
-ok(tl.samples[0].utc === "2026-11-14T12:00:00Z", "timeline floors start to the hour");
+ok(tl.samples[0].utc === T, "timeline floors start to the hour");
 has(tl.samples[0], ["utc", "sunEl", "sunAz", "earthEl", "earthAz", "lit", "comms", "sunEdge", "earthEdge", "sunMarginDeg", "earthMarginDeg", "horizonModel"], "timeline sample");
-const st0 = V.getState("apollo11", tl.samples[0].utc);
-ok(st0.sunEl === tl.samples[0].sunEl, "timeline sample equals getState at same time");
+ok(V.getState("apollo11", tl.samples[50].utc).sunEl === tl.samples[50].sunEl, "timeline sample equals getState at same time");
 throwsMsg(() => V.getTimeline("apollo11", T, 1, 1.5), /stepHours/, "fractional stepHours rejected");
 
-// coverage
+// Coverage
 const cov = V.getCoverage();
 has(cov, ["mock", "stepHours", "timeScale", "sites"], "getCoverage");
 ok(cov.sites.length === 10, "coverage for 10 sites");
-throwsMsg(() => V.getState("apollo11", "2035-01-01T00:00:00Z"), /OUT_OF_COVERAGE/, "out of coverage throws");
-ok(V.getState("apollo11", "1969-07-20T20:00:00Z").sunEl !== undefined, "Apollo 11 landing window covered");
+const a11 = cov.sites.find((s) => s.siteId === "apollo11").ranges;
+ok(a11.length === 2 && a11[1][0] === "2026-01-01T00:00:00Z" && a11[1][1] === "2029-12-31T23:00:00Z", "apollo11 ranges: landing + 2026-2029");
+ok(cov.sites.find((s) => s.siteId === "sp_haworth").ranges.length === 1, "pole site: one range");
+throwsMsg(() => V.getState("apollo11", "2030-01-01T00:00:00Z"), /OUT_OF_COVERAGE/, "out of coverage throws");
+throwsMsg(() => V.getSummary("apollo11", "2029-12-30T00:00:00Z", 7), /OUT_OF_COVERAGE/, "summary past end throws");
+const land = V.getState("apollo11", "1969-07-20T20:17:40Z");
+ok(land.lit && land.sunAz > 45 && land.sunAz < 135 && land.sunEl < 20, "Apollo 11 landing: low Sun in the east");
 throwsMsg(() => V.getState("sp_haworth", "1969-07-20T20:00:00Z"), /OUT_OF_COVERAGE/, "non-landing site not covered in 1969");
 
-// loadDaily / getDaily
-throwsMsg(() => V.getDaily("2026-11-14", 3), /NOT_LOADED/, "getDaily before loadDaily");
+// Daily
 await V.loadDaily();
 const t0 = Date.now();
 const daily = V.getDaily("2026-11-14", 56);
 const ms = Date.now() - t0;
 has(daily, ["apiVersion", "mock", "STAY_DAYS", "CLEAR_PCT", "OUT_PCT", "EDGE_DEG", "verdictRule", "sites"], "getDaily");
 ok(Object.keys(daily.sites).length === 10 && daily.sites.apollo11.length === 56, "daily 10 sites x 56 days");
-const row = daily.sites.im1[3];
-const ref = V.getSummary("im1", row.date + "T00:00:00Z", 7);
-ok(row.verdict === ref.verdict && row.pctBoth === ref.pctBoth, "daily row equals getSummary of the 7-day stay");
 ok(V.getDaily("2029-12-30", 1).sites.apollo11[0] === null, "stay running past coverage end -> null row");
+ok(V.getDaily("1969-07-20", 1).sites.apollo11[0] !== null, "Apollo 11 landing-date row exists");
+ok(V.getDaily("1969-07-20", 1).sites.sp_haworth[0] === null, "uncovered site row is null");
+
+// Every daily row in the file equals getSummary of its 7-day stay.
+let checked = 0;
+for (const s of sites) {
+  for (const [a] of cov.sites.find((c) => c.siteId === s.id).ranges) {
+    const startDay = new Date(Math.ceil(Date.parse(a) / 864e5) * 864e5).toISOString().slice(0, 10);
+    const rows = V.getDaily(startDay, 1461).sites[s.id];
+    for (const row of rows) {
+      if (!row) continue;
+      const ref = V.getSummary(s.id, row.date + "T00:00:00Z", 7);
+      for (const k of ["pctLit", "pctComms", "pctBoth", "longestDarkHours", "pctSunEdge", "pctEarthEdge", "verdict"]) {
+        if (row[k] !== ref[k]) { ok(false, `daily ${s.id} ${row.date} ${k}: ${row[k]} vs ${ref[k]}`); break; }
+      }
+      checked++;
+    }
+  }
+}
+ok(checked > 14000, `daily rows checked: ${checked}`);
 
 if (fails) { console.error(`${fails} check(s) failed`); process.exit(1); }
-console.log(`PASS  (MOCK=${V.MOCK}, API ${V.API_VERSION}; verdicts seen today: ${[...verdicts].join(", ")}; getDaily 10x56 in ${ms} ms)`);
+console.log(`PASS  (MOCK=${V.MOCK}, API ${V.API_VERSION}; verdicts seen ${T}: ${[...verdicts].join(", ")}; ${checked} daily rows = getSummary; getDaily 10x56 in ${ms} ms)`);

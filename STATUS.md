@@ -1,16 +1,16 @@
 # STATUS — Lunar Landing Site Navigator
 
-PLAN.md v2 is the one plan and wins over this file. Right now:
+PLAN.md v2 is the one plan and wins over this file. This header is the live board; anyone may update their own row.
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | 1 | Build the web app and get a public live URL |
-| Sheldon (Lane A human) | — | Step 2 PASSED 2026-11-14; decide when Lane A starts step 5 |
-| Claude Code (Lane A) | 5 (not started) | Waiting for Sheldon's go on step 5 (real data in /lib) |
+| Advik + ChatGPT (Lane B) | 1 | Build the web app and get a public live URL (desktop browser) |
+| Sheldon (Lane A human) | — | Step 2 PASSED 2026-11-14; GO given for Lane A's half of step 5 |
+| Claude Code (Lane A) | 5 (Lane A half DONE) | Stopped. Lane A half of step 5 done 2026-11-14; waiting for Lane B postbuild copy. Step 7 not started. |
 
-Step 2 Real numbers: **PASSED 2026-11-14** (7/7 hand-checks, 2026-2029 + landing windows downloaded, /data/README.md written).
-Waiting on Sheldon: go-ahead for Lane A step 5; reply to Lane B's Step 1 Vercel prompt request (Lane B entry, commit 202aa43).
-Waiting on Advik: step 1 live URL showing the 10 sites on a phone.
+Step 2 Real numbers: **PASSED 2026-11-14**. Signed 2026-11-14: D7 desktop only; D8 data copied at build + fetched per site, setDataBase added.
+Waiting on Sheldon: go for step 7 (terrain) when you choose; Lane A will not start it before.
+Waiting on Advik: step 1 live URL showing the 10 sites in a desktop browser; then Lane B's postbuild copy for step 5 (spec in Lane A section).
 
 ## Continuous two-agent coordination protocol (agreed 2026-11-14)
 
@@ -502,3 +502,44 @@ Lane A will add `export const API_VERSION = "1.0.0"` and `export const READY = {
 3. `loadSite(id)` fetches only that site's chunks, not all 46 files. Before step 5 starts, Lane A will run `npm run build && npm run preview` and confirm a fetch of one chunk from `dist/data/` succeeds.
 
 Alternative: Lane A bundles the data into JS modules that Vite code-splits. This means no copy step, but it adds ~10 MB of JS chunks to the build. Lane A recommends the copy step. Decide before step 5; step 1 is unaffected.
+
+### 2026-11-14 — D7, D8 and the live board signed; Lane A half of step 5 DONE
+**Signed by both humans (2026-11-14), now in PLAN.md:**
+- **D7:** Desktop only. No phone layout work or phone testing. Step 1 pass test is now "public link shows the 10 sites in a desktop browser"; step 9 is "live link works in a desktop browser".
+- **D8:** Real data files are copied into the published folder at build time and fetched per site; `setDataBase(url)` is added to contract v1.
+- **Board change:** PLAN.md's "Right now" table is replaced by one line pointing to the STATUS.md header, which is now the live board. Anyone may update their own row there. The working rule was updated to match.
+
+**Step 5, Lane A half: DONE.** `/lib/visibility.js` now serves real Horizons data behind the same contract. `MOCK = false`, `API_VERSION = "1.1.0"`.
+- **What changed for callers:**
+  - Every sync call for a site (`getState`, `getSummary`, `getTimeline`) now throws `NOT_LOADED` until `await loadSite(id)` resolves. `getDaily` needs `await loadDaily()`. `getCoverage` works after either load.
+  - Times are read at the start of their hour (`12:59` → the `12:00` sample). `getState` has a new field `sampleUtc` that says which sample was used.
+  - Coverage ranges are now inclusive of the last sample (e.g. `2029-12-31T23:00:00Z`).
+  - All other names, fields and errors are unchanged from mock v1.
+- **New:**
+  - `setDataBase(url)` points the library at the data folder.
+  - `lib/verdict.js` holds the D5 rule (7 / 90 / 10 / 2). `visibility.js` and `scripts/build_daily.mjs` both use it.
+  - `data/daily.json` is the per-day summary (~410 KB, 14,694 rows), built by `node scripts/build_daily.mjs`.
+- **Where data is fetched from:**
+  - The default base is `../data/` relative to the library's own URL. In the built site the library is inside `dist/assets/<bundle>.js`, so this resolves to `dist/data/`.
+  - Under `vite dev` the library is served at `/@fs/<repo>/lib/visibility.js`, so it resolves to `/@fs/<repo>/data/`, which the existing `server.fs.allow` already permits. **No `setDataBase` call is needed in either case**; it's only an override.
+  - `loadSite(id)` fetches `ephem/index.json` once, then only that site's chunks (~1 MB per site uncompressed).
+- **Evidence (run 2026-11-14):**
+  - `node scripts/check_visibility.mjs` → PASS with `MOCK=false`: all exports and shapes; values equal the files (apollo11 2026-11-14 12:00 Sun 91.486 / -7.067); countdowns land on a real change; Apollo 11 landing shows a low eastern Sun; out-of-coverage and not-loaded errors. Every one of the 14,694 daily rows equals `getSummary` of its 7-day stay. All four verdicts occur on 2026-11-14.
+  - `node scripts/check_ephem.mjs` → PASS (7/7 hand-check rows, max diff 0.000431°).
+  - `cd web && npm run typecheck && npm run build` → OK (JS 7.30 kB; /web untouched).
+  - **HTTP test:** a scratch copy of `web/dist` with the data copied in exactly as specified below, served by `vite preview`; `loadSite("im1")` + `loadDaily()` over HTTP returned the same values as the files. The same test against `vite dev` at `/@fs/<repo>/data/` also passed.
+  - Not tested: a real browser running a page that calls `loadSite` (the current /web page only calls `listSites`), and Vercel.
+- **Visible effect on the current page:** `MOCK` is now `false`, so the existing mock-data banner in /web will no longer show after Lane B's next build. That's correct (real data), but the page should keep the "flat horizon" label wherever `horizonModel === "flat"`.
+
+**What Lane B's postbuild copy must do (exact spec, D8):**
+1. Run after `vite build`, from `/web`. Recommended: a `postbuild` script in `web/package.json`; npm runs it automatically after `npm run build`, so the Vercel build command stays `cd web && npm run build`.
+2. Copy the folder `../data/ephem/` (all of it: `index.json` plus one subfolder per site with `2026.json` … `2029.json` and, for six sites, `landing.json`) to `dist/data/ephem/`, keeping the same paths.
+3. Copy the file `../data/daily.json` to `dist/data/daily.json`.
+4. Do **not** copy `data/sites.js` or `data/README.md` (sites.js is already bundled through the import).
+5. Result: `web/dist/data/ephem/index.json`, `web/dist/data/ephem/<siteId>/<YYYY>.json`, `web/dist/data/daily.json`. About 10 MB, served as static JSON. Files are fetched only when a site is loaded.
+6. It must work on Vercel's Linux build. A cross-platform option is a small Node script: `node -e "const fs=require('fs');fs.rmSync('dist/data',{recursive:true,force:true});fs.cpSync('../data/ephem','dist/data/ephem',{recursive:true});fs.copyFileSync('../data/daily.json','dist/data/daily.json')"` (`fs.cpSync` needs Node ≥ 16.7). Fail the build if either source is missing.
+7. **Check after deploy:** `<live URL>/data/ephem/index.json` and `<live URL>/data/daily.json` return JSON (HTTP 200), and the page's `loadSite` / `loadDaily` calls resolve without `LOAD_FAILED`.
+- Lane A will re-run `node scripts/build_daily.mjs` whenever `data/ephem` changes and commit both; Lane B's copy step needs no change for that.
+
+**Lane A stops here.** Step 7 has not started; it waits for Sheldon's go.
+
