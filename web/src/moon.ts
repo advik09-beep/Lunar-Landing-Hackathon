@@ -66,8 +66,8 @@ function illustrativeTexture(): THREE.CanvasTexture {
         const dy = (y - c.y) * 1.45;
         const d = Math.sqrt(dx * dx + dy * dy) / c.r;
         if (d < 1.35) {
-          const wall = Math.exp(-((d - 0.92) / 0.14) ** 2);
-          const basin = Math.exp(-(d / 0.75) ** 4);
+          const wall = Math.exp(-Math.pow((d - 0.92) / 0.14, 2));
+          const basin = Math.exp(-Math.pow(d / 0.75, 4));
           brightness += wall * 25 - basin * 15;
         }
       }
