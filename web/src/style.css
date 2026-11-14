@@ -141,3 +141,33 @@ h2 { margin: 0; font-size: 1.75rem; line-height: 1.23; letter-spacing: -.035em; 
 @media (prefers-reduced-motion: reduce) {
   .starfield-canvas { transition: none; animation: none; }
 }
+
+/* D15: visible plain-language verdict guide, shared across all tabs. */
+.verdict-legend { background: #172940; border: 1px solid #58789d; border-radius: 15px; padding: 16px 20px; margin: 0 0 21px; }
+.verdict-guide-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 18px; color: #f1f7ff; margin-bottom: 12px; }
+.verdict-guide-heading strong { font-size: 1rem; }
+.verdict-guide-heading span { color: #bcd0e8; font-size: .78rem; }
+.verdict-guide-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; }
+.verdict-guide-item { display: flex; flex-direction: column; gap: 7px; padding: 12px 13px; border-radius: 10px; background: #0c1a2c; border: 1px solid #384b66; min-width: 0; }
+.verdict-guide-item strong { font-size: .84rem; }
+.verdict-guide-item span { font-size: .75rem; color: #d1e1f4; line-height: 1.5; }
+.verdict-guide-item.clear strong { color: #9accff; }
+.verdict-guide-item.partial strong { color: #73aef6; }
+.verdict-guide-item.out strong { color: #adbcd0; }
+.verdict-guide-item.edge { border-style: dashed; border-color: #c69a51; }
+.verdict-guide-item.edge strong { color: #f5be62; }
+.verdict-guide-note { color: #bdcee5; font-size: .73rem; line-height: 1.5; margin: 11px 0 0; }
+.pole-picker { background: #132238; border: 1px solid #4c6484; border-radius: 15px; padding: 18px 20px; }
+.pole-picker h3 { margin: 0 0 8px; font-size: 1rem; color: #f0f5ff; }
+.pole-picker p { margin: 0 0 12px; line-height: 1.5; font-size: .75rem; color: #bbcee8; }
+.pole-buttons { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+.pole-choice { display: flex; align-items: center; gap: 8px; min-width: 0; border: 1px solid #47617f; background: #20324a; color: #e9f2ff; border-radius: 10px; padding: 10px 9px; text-align: left; }
+.pole-choice:hover, .pole-choice.active { border-color: #a8d9ff; background: #294562; }
+.pole-letter { background: #111e2f; color: #fff; border: 2px solid #c8e2ff; border-radius: 50%; flex: none; display: grid; place-items: center; height: 28px; width: 28px; font-size: .8rem; }
+.pole-name { font-size: .73rem; flex: 1; min-width: 0; line-height: 1.3; }
+.pole-status { font-size: .66rem; white-space: nowrap; }
+.pole-status.clear { color: #a4d5ff; }
+.pole-status.partial { color: #88b4ed; }
+.pole-status.out { color: #b3bac6; }
+.pole-status.edge { color: #fac171; }
+.pole-status.unavailable { color: #a2aebb; }
