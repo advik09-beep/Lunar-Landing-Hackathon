@@ -6,11 +6,11 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 |-----|------|-----------|
 | Advik + ChatGPT (Lane B) | 4 — IN PROGRESS | D8 postbuild files deployed, both data JSON URLs returned 200; now building Three.js Moon and 10 markers. |
 | Sheldon (Lane A human) | — | D9 + D10 signed 2026-11-14; gates Lane A's D10, panel interface and side card one at a time |
-| Claude Code (Lane A) | D10 done; 3 (side card panel) | D10 committed; now panel interface, side card, web/panels.html |
+| Claude Code (Lane A) | 3 (side card panel) | Panel interface posted; side card + web/panels.html built and committed; stopped for Sheldon's review |
 
 Step 1 Live URL: **PASS** (Lane B, 2026-11-14). Step 2 Real numbers: **PASSED 2026-11-14**. Signed 2026-11-14: D7 desktop only; D8 data copy + setDataBase; D9 Lane A builds the side card, Compare grid and horizon view as panels in web/src/panels/; D10 move sp_malapert to the highest ground within 1 km.
-Waiting on Sheldon: go after each Lane A stage (D10 report, then panel interface, then side card).
-Waiting on Advik: postbuild data copy for step 5 (spec in Lane A section); 3D Moon (step 4); mounting Lane A panels once the interface is posted.
+Waiting on Sheldon: open web/panels.html (cd web && npm run dev, then http://localhost:5173/panels.html) and review the side card; go for the Compare grid next.
+Waiting on Advik: postbuild data copy (step 5 spec in Lane A section); 3D Moon (step 4); mount the side card using the panel interface (Lane A entry "Panel interface v1").
 
 ## Continuous two-agent coordination protocol (agreed 2026-11-14)
 
@@ -661,4 +661,58 @@ Alternative: Lane A bundles the data into JS modules that Vite code-splits. This
 - **Demo case updated:** 2026-09-19 06:00 UTC at sp_malapert, Sun +1.05° above the flat horizon but behind a ridge 1.84 km east (terrain horizon 6.03°). In the same hour Earth is −2.05° on flat but above the −3.16° terrain horizon (in view). `check_visibility` tests both.
 - **Checks:** `check_ephem` PASS (7/7), `check_horizon` PASS (Sun blocked-by-terrain 3,820 h; 49 robust far-ridge hours), `check_visibility` PASS (all 14,694 daily rows = getSummary). `/web` build OK.
 - **D9 follow-ups (Sheldon):** CLAUDE.md updated (Lane A may edit `web/src/panels/` and `web/panels.html`, nothing else under /web). The timeline strip lives inside the Compare dates grid panel.
+
+### 2026-11-14 — Panel interface v1 (for Lane B) + side card built (step 3, Lane A part)
+**Panel interface v1 (D9). Files:** `web/src/panels/` (Lane A only). Import from `web/src/panels/index.ts`.
+```ts
+// web/src/panels/types.ts
+export interface PanelProps {
+  siteId: string;                                  // id from listSites()
+  landingDate: string;                             // "YYYY-MM-DD", UTC day; stay = 00:00 UTC that day + VERDICT_RULE.STAY_DAYS (7)
+  onSiteSelected: (siteId: string) => void;        // panel ASKS the shell to select a site
+  onDateSelected: (landingDate: string) => void;   // panel ASKS the shell to select a date
+}
+export interface PanelHandle {
+  update(next: Partial<Pick<PanelProps, "siteId" | "landingDate">>): void; // shell pushes the new selection
+  destroy(): void;                                                          // removes the panel; container stays
+}
+export type MountPanel = (container: HTMLElement, props: PanelProps) => PanelHandle;
+
+// web/src/panels/index.ts
+export { mountSideCard } from "./sideCard";          // step 3 — READY
+// mountCompareGrid (step 6, includes the timeline strip) — NOT READY
+// mountHorizonView (step 7)                          — NOT READY
+```
+- **Selection flow (Lane B owns it):**
+  - Lane B calls `const h = mountSideCard(el, { siteId, landingDate, onSiteSelected, onDateSelected })` once.
+  - When the shared selection changes (marker click, date control, another panel's request), Lane B calls `h.update({ siteId, landingDate })`.
+  - Panels never change the selection themselves. They only call the callbacks, and Lane B decides, then calls `update()` on every mounted panel. So all panels stay on one selection.
+- **Data:** each panel loads what it needs through `/lib/visibility.js` (`loadSite` / `loadDaily`) and shows its own loading, error and "unavailable" (out-of-coverage) states. Lane B does not need to preload anything; preloading `loadSite(id)` is harmless.
+- **Style scoping:**
+  - Each panel appends ONE child element (`<div class="llp-panel llp-<kind>" data-lane-panel="<kind>">`) to the container it's given, and attaches an **open Shadow DOM** to that child.
+  - All panel CSS lives inside the shadow root, so it can't leak into the shell, and shell CSS can't reach panel internals.
+  - It inherits only `color`, `font-family` and other inherited properties, plus optional theme variables Lane B may set on the container or any ancestor: `--llp-text --llp-muted --llp-warn --llp-bg --llp-border --llp-accent --llp-link --llp-focus --llp-clear --llp-partial --llp-out --llp-edge`.
+  - Panels add no global `<style>`, no `document` listeners and no globals. Sizing: the panel is `display:block` and fills the container's width; the container controls width, height and scrolling.
+- **Not in the interface:** DESIGN.md's side-card exits ("Stand here", "Compare other dates") are not among D9's two callbacks, so the card does not show them. If both humans want them, a proposed optional third callback is `onOpenView?: (view: "horizon" | "compare") => void`. NOT approved.
+
+**Side card (`web/src/panels/sideCard.ts`), real data only:**
+- **Header:** site name, coordinates, stay window. For pole sites, the point description from `sites.js` (sp_malapert: "Highest ground within 1 km of the representative point; a slope, not a summit.").
+- **Plain / Numbers switch** (`aria-pressed` buttons).
+- **Verdict:** in words + symbol (✓ Clear, ◐ Partial, ✕ Out, ⚠ On the edge). Color is extra, never the only signal; the edge verdict also uses a dashed border.
+- **Horizon label:** FLAT ("terrain is not modelled at this site") or TERRAIN ("Terrain horizon from LOLA elevation data (one point; nearby spots differ, especially toward Earth)").
+- **Plain:** one "why" sentence plus Sun and Earth status at the start of the stay. It says when terrain flips the flat answer ("the Sun is +0.8° above level but hidden behind terrain"), and states that "Sunlight" isn't a promise of power and "Earth in view" isn't a guaranteed link.
+- **Numbers:**
+  - Sun/Earth elevation, azimuth, horizon there, margin, and next change (sunset/sunrise, Earthset/Earthrise, or "no change within the data").
+  - Stay percentages, longest dark stretch, and near-horizon percentages.
+  - The verdict rule text; sources (Horizons, LOLA with observer and "verified" meaning, site source link); coverage.
+  - **Download CSV:** 168 hourly rows in the layout agreed earlier; file `<siteId>_<date>_7day.csv`.
+- **"◀ Day before / Day after ▶"** call `onDateSelected` (date ±1 day).
+- **Test page:** `web/panels.html` + `web/src/panels/demo.ts` play the shell: site picker + landing-date input; selection kept in the URL (`?site=…&date=…`). Vite serves it in dev automatically. It is NOT part of the production build (no config changed), so it doesn't appear on the Vercel site.
+- **Not edited:** `main.ts`, `index.html`, `style.css`, any config.
+- **Evidence (2026-11-14):**
+  - `npm run typecheck` + `npm run build` OK (the panels are type-checked).
+  - Dev server serves `/panels.html` and `/src/panels/demo.ts` (HTTP 200).
+  - The panel was rendered in a DOM emulator (happy-dom, scratch only; there is no Chrome on this machine) with real data from `/data`: Plain, Numbers, CSV filename, day buttons → callback, site switch via `update()`, out-of-coverage message, no global styles, `destroy()` leaves the container empty.
+  - **Not yet seen in a real browser:** Sheldon to open it.
+  - `check_visibility`, `check_ephem`, `check_horizon` all PASS.
 
