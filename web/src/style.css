@@ -95,3 +95,10 @@ h2 { margin: 0; font-size: 1.75rem; line-height: 1.23; letter-spacing: -.035em; 
 .primary-nav button.nav-active { background: #283754; color: #eff5ff; font-weight: 650; }
 .panel-view { margin-top: 12px; min-width: 0; }
 .panel-view[hidden], .explorer[hidden] { display: none !important; }
+
+/* D11 credits: minimal source/license disclosure; layout polish deferred. */
+.credits-view { max-width: 980px; padding: 22px 26px; background: #121c2e; border: 1px solid #2b3a55; border-radius: 14px; line-height: 1.65; }
+.credits-view h2 { margin: 0 0 12px; }
+.credits-view h3 { font-size: 1rem; margin: 20px 0 4px; }
+.credits-view p { color: #c3d2e7; margin: 5px 0 14px; }
+.credits-view a { color: #9fc9ff; text-underline-offset: 3px; }
