@@ -1,86 +1,149 @@
 /**
- * D14: original modern starfield treatment behind the application only.
- * Inspired by etrepat/starfield (Estanislau Trepat, MIT License),
- * https://github.com/etrepat/starfield. No legacy 2011 Three.js APIs or
- * source code copied. The effect is a 2D decorative background, separate
- * from both scientific and illustrative 3D canvases.
+ * D14 visual refresh: independent, lightweight depth-parallax starfield.
+ * Visual reference: Hue Screen Starfield, https://www.huescreen.com/starfield/
+ * Original code, not copied or embedded from the referenced website.
+ *
+ * Previous stars moved only 0.7–4px/sec, which appeared motionless. These
+ * three layers travel ~4–42px/sec with a subtle pointer parallax. The sky
+ * lives behind the app, never inside either 3D scene or data visualization.
  */
-type Star = { x: number; y: number; size: number; speed: number; brightness: number };
+type Star = {
+  x: number;
+  y: number;
+  depth: number;
+  radius: number;
+  brightness: number;
+  phase: number;
+  tint: string;
+};
 
 export function mountStarfield(): () => void {
   const canvas = document.createElement('canvas');
   canvas.className = 'starfield-canvas';
   canvas.setAttribute('aria-hidden', 'true');
+  canvas.dataset.effect = 'depth-parallax';
   document.body.prepend(canvas);
-  const ctx = canvas.getContext('2d', { alpha: true });
+
+  const ctx = canvas.getContext('2d', { alpha: true, desynchronized: true });
   if (!ctx) { canvas.remove(); return () => {}; }
 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-  let frame = 0;
-  let last = 0;
   let width = 0;
   let height = 0;
+  let frame = 0;
+  let last = 0;
+  let elapsed = 0;
   let stars: Star[] = [];
-  // Fixed-seed LCG: predictable appearance even after a resize.
-  let seed = 3172026;
-  const random = () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296; };
+  let pointerX = 0;
+  let pointerY = 0;
+  let parallaxX = 0;
+  let parallaxY = 0;
+  let seed = 20261114;
+  const random = () => {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    return seed / 4294967296;
+  };
 
   function resize(): void {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     width = Math.max(1, window.innerWidth);
     height = Math.max(1, window.innerHeight);
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = Math.round(width * dpr);
     canvas.height = Math.round(height * dpr);
     canvas.style.width = width + 'px';
     canvas.style.height = height + 'px';
     ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
-    seed = 3172026;
-    stars = Array.from({ length: 180 }, () => ({
-      x: random() * width, y: random() * height,
-      size: .5 + random() * 1.3,
-      speed: .7 + random() * 4.0,
-      brightness: .28 + random() * .56,
-    }));
-    paint(0);
+
+    // Reinitialize consistently across screen sizes; not random per frame.
+    seed = 20261114;
+    stars = Array.from({ length: Math.min(460, Math.max(260, Math.round(width * height / 3600))) }, () => {
+      const r = random();
+      const depth = r < .50 ? .22 + random() * .19 : r < .86 ? .48 + random() * .22 : .77 + random() * .23;
+      const color = random();
+      return {
+        x: random() * width,
+        y: random() * height,
+        depth,
+        radius: depth < .45 ? .65 : depth < .75 ? .9 + random() * .6 : 1.5 + random() * 1.1,
+        brightness: .4 + random() * .45,
+        phase: random() * Math.PI * 2,
+        tint: color < .71 ? '220,235,255' : color < .89 ? '170,205,255' : '255,223,194',
+      };
+    });
+    render();
   }
 
-  function paint(dt: number): void {
+  function pointerMove(event: PointerEvent): void {
+    if (reduced.matches) return;
+    pointerX = (event.clientX / Math.max(1, width) - .5) * 2;
+    pointerY = (event.clientY / Math.max(1, height) - .5) * 2;
+  }
+
+  function render(): void {
     ctx!.clearRect(0, 0, width, height);
-    for (const star of stars) {
-      if (!reduced.matches) {
-        star.y -= dt * star.speed;
-        star.x += dt * star.speed * .09;
-        if (star.y < -4) { star.y += height + 8; star.x = (star.x + width * .3) % width; }
-        if (star.x > width) star.x -= width;
+    for (const s of stars) {
+      const travelX = elapsed * (5 + 21 * s.depth);
+      const travelY = elapsed * (4 + 39 * s.depth);
+      const parallax = s.depth * s.depth;
+      // Wrap both axes without a visible cut or texture seam.
+      const x = ((s.x + travelX + parallaxX * parallax * 23) % (width + 16) + width + 16) % (width + 16) - 8;
+      const y = ((s.y - travelY + parallaxY * parallax * 16) % (height + 16) + height + 16) % (height + 16) - 8;
+      const flicker = reduced.matches ? 1 : .9 + .1 * Math.sin(elapsed * (1.15 + s.depth * 1.2) + s.phase);
+      const alpha = Math.min(.9, s.brightness * flicker * (.42 + .75 * s.depth));
+      const color = 'rgba(' + s.tint + ',' + alpha.toFixed(3) + ')';
+
+      // Near stars get a short illuminated motion trail; the far sky stays calm.
+      if (s.depth > .76 && !reduced.matches) {
+        ctx!.strokeStyle = 'rgba(' + s.tint + ',' + (alpha * .32).toFixed(3) + ')';
+        ctx!.lineWidth = s.radius * .7;
+        ctx!.beginPath();
+        ctx!.moveTo(x - 3.5 * s.depth, y + 7 * s.depth);
+        ctx!.lineTo(x, y);
+        ctx!.stroke();
       }
-      ctx!.fillStyle = 'rgba(199,223,255,' + star.brightness.toFixed(3) + ')';
+      ctx!.fillStyle = color;
       ctx!.beginPath();
-      ctx!.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+      ctx!.arc(x, y, s.radius, 0, Math.PI * 2);
       ctx!.fill();
     }
   }
 
   function tick(time: number): void {
-    const dt = last ? Math.min((time - last) / 1000, .05) : 0;
+    frame = 0;
+    if (reduced.matches || document.hidden) return;
+    const dt = last ? Math.min(.05, (time - last) / 1000) : 0;
     last = time;
-    paint(dt);
-    if (!reduced.matches) frame = requestAnimationFrame(tick);
+    elapsed += dt;
+    const smoothing = 1 - Math.exp(-dt * 4.5);
+    parallaxX += (pointerX - parallaxX) * smoothing;
+    parallaxY += (pointerY - parallaxY) * smoothing;
+    render();
+    frame = window.requestAnimationFrame(tick);
   }
-  function motionChanged(): void {
-    cancelAnimationFrame(frame);
+
+  function resume(): void {
+    window.cancelAnimationFrame(frame);
+    frame = 0;
     last = 0;
-    paint(0);
-    if (!reduced.matches) frame = requestAnimationFrame(tick);
+    render();
+    if (!reduced.matches && !document.hidden) frame = window.requestAnimationFrame(tick);
   }
-  window.addEventListener('resize', resize);
-  reduced.addEventListener('change', motionChanged);
+  function visibilityChanged(): void { resume(); }
+  function resized(): void { resize(); resume(); }
+
+  window.addEventListener('resize', resized);
+  window.addEventListener('pointermove', pointerMove, { passive: true });
+  document.addEventListener('visibilitychange', visibilityChanged);
+  reduced.addEventListener('change', resume);
   resize();
-  motionChanged();
+  resume();
 
   return () => {
-    cancelAnimationFrame(frame);
-    window.removeEventListener('resize', resize);
-    reduced.removeEventListener('change', motionChanged);
+    window.cancelAnimationFrame(frame);
+    window.removeEventListener('resize', resized);
+    window.removeEventListener('pointermove', pointerMove);
+    document.removeEventListener('visibilitychange', visibilityChanged);
+    reduced.removeEventListener('change', resume);
     canvas.remove();
   };
 }
