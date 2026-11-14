@@ -189,3 +189,12 @@ h2 { margin: 0; font-size: 1.75rem; line-height: 1.23; letter-spacing: -.035em; 
 
 /* D23: explicit mission-purpose statement, visible before the solar-system iframe. */
 .overview-mission-message { margin: 14px 22px 10px; padding: 14px 18px; border-left: 3px solid #8cc7ff; border-radius: 8px; background: rgba(19,40,64,.93); color: #e8f3ff; font-size: .9rem; line-height: 1.65; }
+
+.overview-window { position: relative; }
+.overview-title-card { position: absolute; z-index: 8; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 22px; padding: 40px; background: rgba(6, 13, 27, .98); }
+.overview-title-card h2 { font-size: 2.4rem; margin: 0; }
+.overview-title-card p { max-width: 640px; line-height: 1.65; }
+.overview-title-card div { display: flex; gap: 16px; }
+.overview-title-card button { padding: 12px 20px; border-radius: 9px; color: #e8f0ff; background: #233c62; border: 1px solid #537cb2; }
+.clock-clarification { color: #c8d9f2; font-size: .85rem; line-height: 1.5; }
+.researcher-view { overflow-y: auto; max-height: min(80vh, 950px); }
