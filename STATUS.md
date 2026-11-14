@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | 11 D13 — IN PROGRESS | GO: shared date + hour controls above every tab, panel v1.2 and marker recolor repair; then D14, D15 in order. |
+| Advik + ChatGPT (Lane B) | 12 D14 — IN PROGRESS | D13 clock + v1.2 passes desktop/build checks (5 site verdict labels changed after date shift; hourly Horizons scene updated). Starting overview + starfield; D15 next. |
 | Sheldon (Lane A human) | — | Planning stop 2026-11-14: D12-D18 signed; acceptance run done |
 | Claude Code (Lane A) | 10 (D12 terrain) | Stage 2 DONE (IM-2, IM-1, Chandrayaan-3); stopped for Sheldon's go on stage 3 (Apollo sites) |
 
@@ -402,6 +402,10 @@ Second task, only after the copy passes and with Advik's authorization: Step 4 T
 - **Required two tests executed against actual Lane A data:** Apollo 11, **2026-11-14 12:00Z**, geometric Sun elevation from scene vectors **−7.0663°** vs site-file **−7.067°**, dot product −0.12301746 → **night side** PASS. Malapert, **2026-09-19 06:00Z**, scene geometry **+1.0486°** vs site-file **+1.048°**, dot +0.01830048 → **geometric day side** PASS; `getState().lit=false` because verified LOLA terrain ridge blocks the Sun (margin −4.984°), and the UI states globe does not model local terrain. Tests ran before removing the obsolete illustrative-lighting label.
 - **Verification:** `node scripts/check_scene.mjs` PASS (58,440 site-hours within 0.05°, seven key science checks); `npm run typecheck` PASS; `npm run build` PASS (only nonfatal Vite 500 kB chunk warning); Vercel production deployment for `a04275c` READY. Headless Chromium at 1440×900 verified 10 site controls, WebGL Moon, three panels, NASA image HTTP 200, **zero external NASA requests**, real `2026-11-14T00:00:00Z` Sun/Earth status and 405,616 km Earth range; date changed to `2026-09-19T00:00:00Z` (404,250 km) and outside-coverage `2032-01-01` correctly reported `Lighting unavailable`; Credits reflects verified Horizons lighting; no console/page exceptions or failed requests. Production: `https://lunar-landing-hackathon.vercel.app`.
 - **Honest limits / coordination:** D11 color map remains NASA imagery for looks, **not a DEM**. The tiny ambient visibility on Moon night is for legibility only; no false local ridge shadow is rendered. Earth display distance/radius not to scale; the physical range is displayed from Lane A. **Step 4 human physical-mouse signoff remains pending.** Latest Lane A entry says root `README.md` still calls lighting illustrative; Lane A owns that shared doc, please update it to mention real Sun/Earth directions and the missing terrain shadows when ready. Lane B stops here.
+
+### 2026-11-14 — Lane B D13 implemented, deployed; D14 started
+- D13 commits `def53c8` (remove white globe marker halo overlay; enlarge opaque verdict-colored marker), `b411801` (single date range slider, date input, step controls and 0–167 hour slider above all four tabs; push `{siteId, landingDate, hour}` to all panels via v1.2, handle horizon `onHourSelected` and use same hour in `getSceneState`), `31ae816` (minimal shared-clock styling). No files in Lane A `web/src/panels/` edited.
+- `npm ci`, `npm run typecheck`, `npm run build` PASS. Vercel deployment `31ae816` READY. Chromium 1440×900: global clock visible in Compare and Credits; date-slider moved to 2026-12-22 and **5 of 10** site-list verdicts changed; hour=6 produced lighting sample 2026-12-22T06:00Z; no browser exceptions. Panel internal Shadow DOM hour verification remains to be checked; no human Step 4 signoff claimed. D13 functional implementation complete, next D14 per user order.
 
 
 ## Lane A
