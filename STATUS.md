@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | 1 | Build the web app and get a public live URL (desktop browser) |
+| Advik + ChatGPT (Lane B) | 1 — IN PROGRESS | prototype_01: verifying current source/build and deploying the 10-site catalog to Vercel; desktop only |
 | Sheldon (Lane A human) | — | Step 2 PASSED 2026-11-14; GO given for Lane A's half of step 5 |
 | Claude Code (Lane A) | 5 (Lane A half DONE) | Stopped. Lane A half of step 5 done 2026-11-14; waiting for Lane B postbuild copy. Step 7 not started. |
 
