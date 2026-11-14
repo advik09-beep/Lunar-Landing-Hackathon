@@ -7,6 +7,8 @@ import { mountSideCard, mountCompareGrid, mountHorizonView, mountResearcher, mou
 
 interface Site extends MoonSite {
   kind?: string;
+  category: 'candidate' | 'historic';
+  shortName: string;
   landingDate?: string | null;
   source?: string;
   coordsVerified?: boolean;
@@ -105,6 +107,7 @@ app.innerHTML = [
   '  </section>',
   '  <section id="explore-view" class="explorer" aria-label="Interactive lunar landing site explorer" hidden>',
   '    <div class="scene-column">',
+  '      <div class="explore-controls"><div class="view-toggle" role="group" aria-label="Explore view"><button id="globe-mode" type="button" aria-pressed="true">Globe</button><button id="horizon-mode" type="button" aria-pressed="false">Horizon</button></div><label class="site-picker-wrap" for="site-picker">Site <select id="site-picker" aria-label="Landing site"></select></label></div>',
   '      <div class="moon-window">',
   '        <div class="scene-heading"><span>MOON-FIXED VIEW</span><span>3D · Drag to rotate · Scroll to zoom</span></div>',
   '        <p id="explore-south-pole-note" class="explore-south-pole-note"></p>',
@@ -117,15 +120,6 @@ app.innerHTML = [
   '    </div>',
   '    <aside class="info-column">',
   '      <div id="side-card-mount" class="side-card-mount" aria-label="Site conditions and Educator Researcher details"></div>',
-  '      <section class="pole-picker" aria-label="Four south pole candidate sites">',
-  '        <h3>Four south-pole candidates</h3>',
-  '        <p>Choose A, B, C or D. Matching offset labels appear in the polar 3D view, with leader lines pointing to their true coordinates.</p>',
-  '        <div id="pole-buttons" class="pole-buttons"></div>',
-  '      </section>',
-  '      <div class="site-browser">',
-  '        <div class="site-list-header"><h3>Landing sites</h3><span>10 locations</span></div>',
-  '        <div id="site-buttons" class="site-buttons" role="group" aria-label="Choose a lunar landing site"></div>',
-  '      </div>',
   '    </aside>',
   '  </section>',
   '  <section id="compare-view" class="panel-view" aria-label="Compare landing dates" hidden><div id="compare-mount"></div></section>',
@@ -160,7 +154,7 @@ const find = <T extends HTMLElement>(id: string): T => {
 
 find<HTMLElement>('mock-notice').hidden = !MOCK;
 find<HTMLElement>('api-version').textContent = API_VERSION;
-const siteButtons = find<HTMLDivElement>('site-buttons');
+const sitePicker = find<HTMLSelectElement>('site-picker');
 const status = find<HTMLParagraphElement>('data-status');
 const lightingStatus = find<HTMLParagraphElement>('lighting-status');
 const select = find<HTMLInputElement>('landing-date');
@@ -173,51 +167,18 @@ const DATE_MIN = Date.UTC(2026, 0, 1);
 const DATE_MAX = Date.UTC(2029, 11, 24);
 dateSlider.max = String(Math.round((DATE_MAX - DATE_MIN) / 86400000));
 
-const buttonById = new Map<string, HTMLButtonElement>();
-const statusById = new Map<string, HTMLSpanElement>();
-const poleButtonById = new Map<string, HTMLButtonElement>();
-const poleStatusById = new Map<string, HTMLSpanElement>();
-
-for (const site of sites) {
-  const button = document.createElement('button');
-  button.type = 'button';
-  button.className = 'site-choice';
-  button.setAttribute('aria-label', 'Focus ' + site.name);
-  const label = document.createElement('span');
-  label.className = 'site-choice-name';
-  label.textContent = site.name;
-  const verdict = document.createElement('span');
-  verdict.className = 'site-choice-status unavailable';
-  verdict.textContent = '…';
-  button.append(label, verdict);
-  button.addEventListener('click', () => chooseSite(site.id));
-  siteButtons.append(button);
-  buttonById.set(site.id, button);
-  statusById.set(site.id, verdict);
+for (const category of ['candidate','historic'] as const) {
+  const group = document.createElement('optgroup');
+  group.label = category === 'candidate' ? 'Candidate sites' : 'Historic landings';
+  for (const site of sites.filter(s => s.category === category)) {
+    const option = document.createElement('option');
+    option.value = site.id; option.textContent = site.shortName; option.title = site.name;
+    group.append(option);
+  }
+  sitePicker.append(group);
 }
-
-const poleContainer = find<HTMLDivElement>('pole-buttons');
-const poleSites = sites.filter(s => s.kind === 'south-pole');
-poleSites.forEach((site,index) => {
-  const button = document.createElement('button');
-  button.type='button';
-  button.className='pole-choice';
-  const letter = document.createElement('b');
-  letter.className='pole-letter';
-  letter.textContent=['A','B','C','D'][index];
-  const title=document.createElement('span');
-  title.className='pole-name';
-  title.textContent=site.name.split(' (')[0];
-  const statusEl=document.createElement('span');
-  statusEl.className='pole-status unavailable';
-  statusEl.textContent='…';
-  button.append(letter,title,statusEl);
-  button.addEventListener('click',()=>chooseSite(site.id));
-  button.setAttribute('aria-label', 'Select south pole site '+letter.textContent+': '+site.name);
-  poleContainer.append(button);
-  poleButtonById.set(site.id,button);
-  poleStatusById.set(site.id,statusEl);
-});
+sitePicker.value = selectedSite;
+sitePicker.addEventListener('change', () => chooseSite(sitePicker.value));
 
 const cleanVerdict = (value: string): Verdict => ['clear', 'partial', 'out', 'edge'].includes(value) ? value as Verdict : 'unavailable';
 
@@ -228,6 +189,18 @@ let researcherView: PanelHandle | null = null;
 let plannerView: PanelHandle | null = null;
 type View = 'overview' | 'explore' | 'compare' | 'horizon' | 'researcher' | 'planner' | 'credits';
 let activeView: View = 'overview';
+let exploreMode: 'globe' | 'horizon' = 'globe';
+function setExploreMode(mode: 'globe' | 'horizon'): void {
+  exploreMode = mode;
+  find<HTMLElement>('moon-stage').closest<HTMLElement>('.moon-window')!.hidden = mode !== 'globe';
+  find<HTMLElement>('horizon-view').hidden = activeView !== 'explore' || mode !== 'horizon';
+  find<HTMLElement>('globe-mode').setAttribute('aria-pressed', String(mode === 'globe'));
+  find<HTMLElement>('horizon-mode').setAttribute('aria-pressed', String(mode === 'horizon'));
+  moon?.setVisible(activeView === 'explore' && mode === 'globe');
+}
+find<HTMLElement>('explore-view').querySelector('.scene-column')!.append(find<HTMLElement>('horizon-view'));
+find<HTMLElement>('globe-mode').addEventListener('click', () => setExploreMode('globe'));
+find<HTMLElement>('horizon-mode').addEventListener('click', () => setExploreMode('horizon'));
 
 function showTourTitle(): void {
   find<HTMLElement>('tour-science-caption').hidden = true;
@@ -242,6 +215,7 @@ function startSolarTour(): void {
   frame?.contentWindow?.postMessage({ type: 'lunar-navigator:start-tour' }, new URL(frame.src).origin);
 }
 function openView(view: View): void {
+  if (view === 'horizon') { exploreMode = 'horizon'; view = 'explore'; }
   activeView = view;
   document.body.dataset.view = view;
   find<HTMLElement>('global-clock').hidden = view === 'overview';
@@ -252,6 +226,7 @@ function openView(view: View): void {
     button?.classList.toggle('nav-active', name === view);
     button?.setAttribute('aria-pressed', String(name === view));
   }
+  setExploreMode(exploreMode);
   overview?.setVisible(view === 'overview');
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
@@ -266,16 +241,7 @@ function updateAllPanels(): void {
 }
 
 
-function updateButtons(): void {
-  for (const [id, button] of buttonById) {
-    button.classList.toggle('active', id === selectedSite);
-    button.setAttribute('aria-pressed', String(id === selectedSite));
-  }
-  for(const [id,button] of poleButtonById){
-    button.classList.toggle('active',id === selectedSite);
-    button.setAttribute('aria-pressed',String(id === selectedSite));
-  }
-}
+function updateButtons(): void { sitePicker.value = selectedSite; }
 
 function chooseSite(id: string): void {
   if (!sites.some(site => site.id === id)) return;
@@ -295,16 +261,7 @@ function updateDaily(): void {
     const row = daily.sites[site.id]?.[0];
     const verdict = row ? cleanVerdict(row.verdict) : 'unavailable';
     colors.set(site.id, verdict);
-    const element = statusById.get(site.id);
-    if (element) {
-      element.className = 'site-choice-status ' + verdict;
-      element.textContent = verdictNames[verdict];
-    }
-    const poleStatus=poleStatusById.get(site.id);
-    if(poleStatus){
-      poleStatus.className='pole-status '+verdict;
-      poleStatus.textContent=verdictNames[verdict];
-    }
+
   }
   moon?.setVerdicts(colors);
   updateButtons();
@@ -496,6 +453,7 @@ find<HTMLButtonElement>('nav-overview').addEventListener('click', showTourTitle)
 try {
   moon = new LunarScene(find<HTMLDivElement>('moon-stage'), sites, chooseSite);
   moon.focusSite(selectedSite);
+  moon.setVisible(false);
 } catch (error) {
   const stage = find<HTMLDivElement>('moon-stage');
   stage.textContent = 'Interactive 3D view unavailable in this browser. Choose a site from the list to continue.';

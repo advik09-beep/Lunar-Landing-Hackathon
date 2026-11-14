@@ -251,3 +251,22 @@ body[data-view="overview"] .overview-clock-status { position:absolute; bottom:0;
 .reading-level button { border:0; border-radius:99px; padding:6px 10px; font-size:.75rem; background:transparent; color:#A8BBD3; }
 .reading-level button[aria-pressed="true"] { background:#2F5D9A; color:#ECF2FF; }
 .methods-link { padding:4px 0; border:0; background:none; color:#A8BBD3; font-size:.75rem; white-space:nowrap; text-decoration:underline; text-underline-offset:4px; }
+
+/* D30.3: keep the visual in view; scroll only the detailed side card. */
+.intro-block { display:none; }
+.explorer { display:grid; grid-template-columns:minmax(0,1.7fr) minmax(320px,1fr); gap:16px; height:calc(100dvh - 390px); min-height:400px; align-items:stretch; }
+.scene-column { min-width:0; min-height:0; display:flex; flex-direction:column; gap:8px; }
+.explore-controls { display:flex; justify-content:space-between; align-items:center; gap:16px; flex:none; }
+.view-toggle { display:flex; gap:4px; }
+.view-toggle button { padding:7px 16px; font-size:.84rem; }
+.view-toggle button[aria-pressed="true"] { background:#2F5D9A; color:#ECF2FF; }
+.site-picker-wrap { display:flex; align-items:center; gap:8px; font-size:.84rem; }
+.site-picker-wrap select { padding:6px; color-scheme:dark; max-width:220px; }
+.moon-window { flex:1; min-height:0; display:flex; flex-direction:column; }
+.moon-stage { height:auto; min-height:200px; flex:1; }
+.scene-heading { padding:8px 14px; font-size:.75rem; }
+.scene-controls { padding:8px 14px; font-size:.75rem; flex-wrap:wrap; }
+.lighting-status { margin:0 14px 8px; font-size:.75rem; }
+.info-column { overflow-y:auto; min-height:0; overscroll-behavior:contain; padding-right:4px; }
+.explore-south-pole-note { display:none; }
+#horizon-view { margin:0; flex:1; min-height:0; overflow:auto; }

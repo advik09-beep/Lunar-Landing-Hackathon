@@ -66,6 +66,13 @@ export class LunarScene {
   private targetCamera: THREE.Vector3 | null = null;
   private targetFocus: THREE.Vector3 | null = null;
   private animationFrame = 0;
+  private visible = true;
+  setVisible(visible: boolean): void {
+    if (this.visible === visible) return;
+    this.visible = visible;
+    cancelAnimationFrame(this.animationFrame);
+    if (visible) { this.resize(); this.animate(); }
+  }
   private resizeObserver: ResizeObserver;
   private downPosition: { x: number; y: number } | null = null;
   private readonly onPointerMove: (event: PointerEvent) => void;
@@ -306,6 +313,7 @@ export class LunarScene {
   }
 
   private animate = (): void => {
+    if (!this.visible || document.hidden) { this.animationFrame = requestAnimationFrame(this.animate); return; }
     this.animationFrame = requestAnimationFrame(this.animate);
     if (this.targetCamera && this.targetFocus) {
       this.camera.position.lerp(this.targetCamera, 0.07);
