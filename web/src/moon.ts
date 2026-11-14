@@ -171,16 +171,18 @@ export class LunarScene {
       if (!Number.isFinite(site.lat) || !Number.isFinite(site.lon)) continue;
       const normal = spherePoint(site.lat, site.lon);
       const marker = new THREE.Mesh(
-        new THREE.SphereGeometry(0.023, 16, 12),
+        new THREE.SphereGeometry(0.036, 16, 12),
         new THREE.MeshBasicMaterial({ color: palette.unavailable }),
       );
-      marker.position.copy(normal).multiplyScalar(1.037);
+      marker.position.copy(normal).multiplyScalar(1.058);
       marker.userData.siteId = site.id;
       const halo = new THREE.Mesh(
-        new THREE.SphereGeometry(0.032, 16, 12),
-        new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.12, depthWrite: false }),
+        new THREE.RingGeometry(0.047, 0.058, 32),
+        new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.7, depthWrite: false, side: THREE.DoubleSide }),
       );
-      halo.position.copy(normal).multiplyScalar(1.033);
+      halo.position.copy(normal).multiplyScalar(1.054);
+      halo.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal);
+      halo.visible = false;
       this.scene.add(halo, marker);
       this.markers.push({ site, object: marker, halo, normal });
     }
@@ -255,7 +257,8 @@ export class LunarScene {
     for (const m of this.markers) {
       const verdict = values.get(m.site.id) ?? 'unavailable';
       (m.object.material as THREE.MeshBasicMaterial).color.setHex(palette[verdict]);
-      m.halo.visible = verdict !== 'out';
+      // Never cover an opaque verdict-colored marker with a larger white halo.
+      m.halo.visible = m.site.id === this.selected;
     }
   }
 
@@ -267,7 +270,8 @@ export class LunarScene {
     this.targetCamera = position;
     this.targetFocus = marker.normal.clone().multiplyScalar(0.18);
     for (const m of this.markers) {
-      m.halo.scale.setScalar(m.site.id === id ? 1.8 : 1);
+      m.halo.scale.setScalar(m.site.id === id ? 1.3 : 1);
+      m.halo.visible = m.site.id === id;
       (m.halo.material as THREE.MeshBasicMaterial).opacity = m.site.id === id ? 0.5 : 0.12;
     }
   }
