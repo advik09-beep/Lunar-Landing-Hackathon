@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D29 1 Planner build READY; step 2 LunLux rename — BUILD PENDING | Planner view mounted with scrolling and shared selections. Updating LunLux in document title, shell/header, navigation, title card and Credits; exact mission subtitle beneath name. Steps 3–4 next. |
+| Advik + ChatGPT (Lane B) | D29 steps 1–2 Vercel READY; step 3 dimmed intro — BUILD PENDING | Planner scrolling tab and LunLux shell live; translucent title card exposes the paused solar-system scene behind it. Embedded sound toggle remains step 4. |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | D29 rename done | Lane A files renamed to LunLux; stopped |
 

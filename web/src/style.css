@@ -191,7 +191,7 @@ h2 { margin: 0; font-size: 1.75rem; line-height: 1.23; letter-spacing: -.035em; 
 .overview-mission-message { margin: 14px 22px 10px; padding: 14px 18px; border-left: 3px solid #8cc7ff; border-radius: 8px; background: rgba(19,40,64,.93); color: #e8f3ff; font-size: .9rem; line-height: 1.65; }
 
 .overview-window { position: relative; }
-.overview-title-card { position: absolute; z-index: 8; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 22px; padding: 40px; background: rgba(6, 13, 27, .98); }
+.overview-title-card { position: absolute; z-index: 8; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 22px; padding: 40px; background: rgba(5, 12, 25, .54); backdrop-filter: brightness(.7) saturate(.8); -webkit-backdrop-filter: brightness(.7) saturate(.8); text-shadow: 0 2px 22px rgba(0, 0, 0, .95); }
 .overview-title-card h2 { font-size: 2.4rem; margin: 0; }
 .overview-title-card p { max-width: 640px; line-height: 1.65; }
 .overview-title-card div { display: flex; gap: 16px; }
@@ -216,3 +216,7 @@ h2 { margin: 0; font-size: 1.75rem; line-height: 1.23; letter-spacing: -.035em; 
 .primary-nav { flex-wrap: wrap; justify-content: flex-end; }
 .primary-nav button { padding: 8px 10px; font-size: .76rem; }
 .overview-title-card .overview-title-subtitle { margin:0; font-size:1.03rem; font-weight:600; color:#d3e7fa; }
+
+/* D29: the paused solar system is deliberately visible through the opening card. */
+.overview-title-card button { background: rgba(18, 42, 73, .93); border-color: #9abfe8; box-shadow: 0 6px 22px rgba(0,0,0,.28); text-shadow: none; }
+.overview-title-card button:hover { background: rgba(35, 71, 115, .96); }
