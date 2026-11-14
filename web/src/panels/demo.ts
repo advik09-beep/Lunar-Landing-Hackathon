@@ -1,7 +1,7 @@
 // Script for web/panels.html (Lane A test page). Plays the shell's role from PLAN D9:
 // owns the selection, mounts the side card, and applies the panel's selection requests.
 import { V } from "./data";
-import { mountSideCard, mountCompareGrid, mountHorizonView, type PanelProps } from "./index";
+import { mountSideCard, mountCompareGrid, mountHorizonView, mountResearcher, type PanelProps } from "./index";
 
 const params = new URLSearchParams(location.search);
 const siteSel = document.querySelector<HTMLSelectElement>("#site")!;
@@ -44,6 +44,7 @@ const panels = [
   mountSideCard(document.querySelector<HTMLElement>("#side-card")!, props()),
   mountHorizonView(document.querySelector<HTMLElement>("#horizon-view")!, props()),
   mountCompareGrid(document.querySelector<HTMLElement>("#compare-grid")!, props()),
+  mountResearcher(document.querySelector<HTMLElement>("#researcher")!, props()),
 ];
 
 siteSel.addEventListener("change", () => select(siteSel.value, dateIn.value));

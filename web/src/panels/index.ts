@@ -4,3 +4,4 @@ export const PANEL_INTERFACE_VERSION = "1.2";
 export { mountSideCard } from "./sideCard";
 export { mountCompareGrid } from "./compareGrid"; // step 6, includes the timeline strip
 export { mountHorizonView } from "./horizonView"; // step 7, "Stand here"
+export { mountResearcher } from "./researcher"; // D18 Researcher tab

@@ -158,6 +158,16 @@ for (let k = 0; k < 360 * RAYS_PER_DEG; k++) {
 }
 
 const r3 = (x) => Number(x.toFixed(3));
+// Local slope at the observer (D18: NASA lists "terrain slope" among landing-region criteria). Plane through
+// heights 1 pixel and 100 m north/south/east/west of the point on the fine map (bilinear); downslope azimuth
+// clockwise from north.
+function slopeAt(baseM) {
+  const at = (n, e) => D20.at(obsLat + (n / R) * r2d, obsLon + (e / (R * Math.cos(obsLat * d2r))) * r2d);
+  const hn = at(baseM, 0), hs = at(-baseM, 0), he = at(0, baseM), hw = at(0, -baseM);
+  if ([hn, hs, he, hw].some((h) => h === null)) return null;
+  const gN = (hn - hs) / (2 * baseM), gE = (he - hw) / (2 * baseM);
+  return { baselineM: baseM, slopeDeg: r3(Math.atan(Math.hypot(gN, gE)) * r2d), downslopeAzimuthDeg: r3(((Math.atan2(-gE, -gN) * r2d) + 360) % 360) };
+}
 const edgeBins = edgeWorstDeg.map((w, i) => (w !== null && w > elevationDeg[i] ? i : null)).filter((i) => i !== null);
 const out = {
   siteId, model: "lola", resolutionDeg: 1, verified: true,
@@ -178,6 +188,7 @@ const out = {
   source: `LRO LOLA GDR ${POLAR ? "polar" : "global cylindrical"} DEMs (PDS Geosciences): ${[FINE, ...FAR_PRODUCTS].join(", ")} — https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/${POLAR ? "polar" : "cylindrical"}/img/`,
   maps: { fine: { product: FINE, metersPerPixel: D20.scale, withinKm: NEAR_KM }, far: FAR.map((g) => (POLAR ? { product: g.name, metersPerPixel: g.scale, toLatitude: g.maxLat } : { product: g.name, metersPerPixel: g.scale, rowsWithinDegLat: GLOBAL_HALF })) },
   searchBoundM: Math.round(H_MAX),
+  localSlope: { pixel: slopeAt(D20.scale), over100m: slopeAt(100), map: FINE, note: "plane fit through heights 1 pixel / 100 m north, south, east and west of the observer on the fine map; one point, not a landing-ellipse survey" },
   builtUtc: new Date().toISOString(),
 };
 if (ENV.HZ_DUMP) writeFileSync(ENV.HZ_DUMP, JSON.stringify(out)); // sensitivity only

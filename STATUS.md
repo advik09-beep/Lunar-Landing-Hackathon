@@ -6,11 +6,11 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 |-----|------|-----------|
 | Advik + ChatGPT (Lane B) | D23 tour 3/4 — IN PROGRESS | All-ten LOLA Credits and prominent Sun/Earth overview message deployed (Vercel READY); now simplifying fork tour to Sun, eight planets, Moon; no other clickable bodies or fact cards. |
 | Sheldon (Lane A human) | — | Planning stop 2026-11-14: weights confirmed; D19–D23 signed |
-| Claude Code (Lane A) | D19 done | D19 discs, Earth's shadow, Earth whole-disc rule, Sun distance DONE; stopped for report. Next: D21, then D18 (with D20, D22) |
+| Claude Code (Lane A) | D21 + D18 done | D21 filterable ranking and D18 Researcher panel (with D20, D22) DONE and pushed; stopped. Lane B: mount the Researcher panel (instructions below) |
 
 Acceptance (both humans, 2026-11-14): steps 1, 2, 3, 6, 8 **PASS**; step 4 and 7 pending earlier findings. Signed: D7–D18 (see PLAN), D17 amendment, D14 amendment, **D19–D23** (stricter Sun/Earth rules, lunar conditions, no south-pole assumption, other-planets note, tour purpose). Score weights confirmed 25/20/15/10/15/15.
-Waiting on Sheldon: review the D19 before/after report (Lane A entry); go for D21.
-Waiting on Advik: D23 overview wording; note Lane A API 1.6.0 (loadSite now also loads the scene data; getState gains D19 fields).
+Waiting on Sheldon: review D21 + D18 (Researcher tab on web/panels.html).
+Waiting on Advik: mount mountResearcher as a Researcher tab; use the D22 wording (Lane A entry); D23 overview wording; check shell for south-pole defaults (D21).
 
 ## Continuous two-agent coordination protocol (agreed 2026-11-14)
 
@@ -1295,4 +1295,60 @@ Panel = sun-tracking, 1 m², 30%, summed over 2026–2029.
   - No "south pole" wording or defaults in Lane A panels. The test page's default site is the first site in the list. The site-point note is keyed on the candidate category, not on the old `kind`.
 - **Lane B:** please check your shell for any south-pole default or wording (e.g. the default selected site or a "South pole view" button label) and decide with the humans.
 - **Checks:** `check_metrics` gains the D21 cases (categories from landing dates; filters partition the ranking; scores unchanged; unknown filter rejected). DOM test: Apollo 11 tagged historic; top candidate Nobile Rim 2 named; grid filters; 6 PAST tags. `check_visibility` (API 1.7.0) PASS; `/web` build OK.
+
+### 2026-11-14 — D18 Researcher tab (with D20 and D22) READY to mount
+**Contents chosen from NASA's own statements of what landing-region selection weighs** (quoted on screen with links):
+- 2024: "science potential, launch window availability, terrain suitability, communication capabilities with Earth, and lighting conditions".
+- 2022: "terrain slope, ease of communications with Earth, and lighting conditions", and "continuous access to sunlight throughout a 6.5-day period … it provides a power source and minimizes temperature variations".
+- **Added because we hold the data:**
+  - **Local slope** at each site (plane fit on the terrain map, over 1 pixel and over 100 m; stored in each `horizon.json`; horizons recomputed byte-identical).
+  - **Longest continuous sunlight in the stay vs NASA's 6.5-day (156 h) benchmark.**
+- A coverage table shows how each NASA criterion is answered. Launch windows, science value and temperatures are stated as not modelled.
+
+**On the tab** (`web/src/panels/researcher.ts`), headed "RESEARCHER VIEW — written for researchers and mission designers":
+- **Lighting and power:** sunlight share (disc), longest dark stretch, dark periods, longest continuous sunlight vs 156 h, partial-Sun hours, sunlight strength and Sun distance ranges, eclipses in the stay. Then the power calculator (ESTIMATE, every assumption listed).
+- **Communications (geometry only):** Earth in view (whole disc), marginal hours, longest gap, contact windows, Earth's elevation/azimuth wobble and sub-Earth libration, distance to Earth and **one-way signal delay** (distance ÷ 299,792.458 km/s, JPL Horizons), and the **Sun near the Earth–Moon line** caution (within 5° either way; the threshold is ours and labeled illustrative).
+- **Lunar season and time of day:**
+  - Sub-solar latitude, with NASA SVS 5229 quoted ("the tilt of the Moon is a mere 1.5°", "draconic year of about 346.6 Earth days").
+  - Lunar local solar time at the start and end of the stay, and the next sunrise/sunset.
+  - The **Sun's compass sweep** while lit.
+- **Best and worst months** (2026–2029 and by calendar month), from the default-weight score.
+- **Terrain profile:** a 360° chart; maps and resolution (e.g. `ldem_80s_20m`, 20 m/px within 20 km, then 80/120/240/400 m); observer height and assumed mast; local slope; source.
+- **Sun and Earth score:** formula, this site's six terms, the score, and "Why these weights?".
+- **Other planets (D22),** **What is NOT modelled** (11 items), **Sources** (8 plus the site's own).
+- **Downloads:** **full analysis (JSON)** (everything above + 168 hourly rows + calculator inputs) and **hourly CSV** (D19 columns: sunFraction, eclipseFraction, irradiance, Earth radius/marginal, distances).
+
+**/lib (API 1.7.0):**
+- `getConditions(siteId, startUtc, days=7)` (all D20 items) and `getMonthlyScores(siteId)`.
+- `getHorizon` now also returns `maps`, `localSlope`, `searchBoundM`, `mastDipDeg`.
+- Texts in `lib/research.js`: `NASA_SITE_CRITERIA`, `CRITERIA_COVERAGE`, `SEASON_NOTE`, `OTHER_PLANETS_NOTE`, `NOT_MODELED`, `SOURCES`, `LIGHT_SPEED_KM_S`, `COMMS_CAUTION_DEG`.
+
+**Mount instructions for Lane B:**
+1. `import { mountResearcher } from "./panels/index";` (from `web/src/`).
+2. Add a tab/view labeled e.g. **"Researcher"** (the panel heads itself "written for researchers and mission designers"). Then call `const rv = mountResearcher(el, { siteId, landingDate, onSiteSelected, onDateSelected });` once.
+3. On every shared selection change: `rv.update({ siteId, landingDate })`, as for the other panels. It ignores `hour` (it analyses the whole stay).
+4. It loads its own data (`loadSite`, `loadDaily`), takes about a second for a new site, and shows "Unavailable" outside coverage. Width follows the container; it's long, so give it a scrolling area.
+5. The side card's `onOpenView` has no "researcher" value. If you want a button there, the humans can approve adding it.
+
+**D22 wording for Lane B** (for the overview/tour or Credits; verified):
+> *Other planets: their gravity is already in our numbers. JPL's ephemerides (DE440/DE441), which give every Sun, Earth and Moon position here, are computed by "fitting numerically integrated orbits" of "the Sun, the barycenters of eight planetary systems, the Moon, the Pluto system barycenter", and even include "Perturbations from 30 individual Kuiper belt objects" (Park et al. 2021, JPL). Their light is negligible: seen from the Moon in 2026–2029, JPL Horizons gives the Sun an apparent magnitude no fainter than −26.70 and Venus, the brightest planet, no brighter than −4.93, so Venus delivers at most about 2 billionths of the Sun's light. Radio from the planets is not modelled; we found no JPL figure to quote, so we make no numeric claim about it.*
+
+**Verification notes for D22:**
+- The DE440 paper text was read from JPL's PDF (ssd.jpl.nasa.gov/doc/Park.2021.AJ.DE440.pdf).
+- The magnitudes come from a Horizons query (quantity 9 APmag, observer 500@301, Sun/Venus/Jupiter/Mars, 2026–2029 at 5-day steps): Sun −26.784 to −26.701, Venus −4.928 to −3.766, Jupiter −2.677 to −1.663, Mars −1.409 to +1.585.
+- **The radio half of the requested claim is NOT verified.** No JPL/NASA statement was found, so the wording says so.
+
+**Checks:**
+- `check_d20` PASS (new):
+  - Signal delay = distance ÷ c.
+  - Lunar local time 12.02 h at the Sun's highest point (Apollo 11).
+  - Season = JPL sub-solar latitude, NASA quotes present.
+  - The 2026-03-03 eclipse appears in Malapert's 2026-03-01 stay.
+  - Caution count = recount (20 h).
+  - Compass sweep 84.6° = sub-solar longitude change (Haworth, fully sunlit stay), which meets the 156 h benchmark.
+  - Month mean = average of getScore.
+  - All 10 slopes present (IM-1 11.7° over 100 m, others 0.7–3.1°).
+  - NASA criteria, D22 note and sources present.
+- DOM test: all 11 sections, the audience label, NASA quotes, eclipse, delay and caution, season/local time/sweep, profile chart + maps + slope, D22, calculator, JSON (full analysis + 168 hourly rows) and CSV (168 rows, D19 columns) downloads, switch to Apollo 11 (historic label, global map).
+- All earlier checks and panel tests PASS (two old panel tests updated for D12 all-terrain and D21 wording). `/web` build OK. README updated (Researcher tab, categories, seven check scripts).
 

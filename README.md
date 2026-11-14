@@ -14,9 +14,13 @@ It has two reading levels:
 - **Explore in 3D:** a Moon globe (NASA imagery) with 10 sites, each colored *and* labeled by verdict for the chosen landing date: ✓ Clear, ◐ Partial, ✕ Out, ⚠ On the edge (grazing the skyline, so small changes in position matter).
 - **Side card:** for one site and date: verdict, Sun and Earth status, the terrain horizon model and its map, sources and coverage, and a CSV of the 168 hourly values.
 - **Compare dates:** a grid of sites × landing dates, plus an hour-by-hour strip showing when the Sun and Earth are in view.
+- **Researcher tab:** a full analysis of one site and stay, written for researchers and mission designers:
+  - NASA's landing-region criteria and how we cover each, lighting and power with the calculator, communications geometry with signal delay, lunar season and time of day, eclipses, best and worst months, the terrain profile with its maps and local slope, and the score formula.
+  - A note on other planets, a list of what is NOT modelled, and all sources.
+  - Downloadable as JSON (full analysis) or CSV (hourly).
 - **Stand here:** a 360° horizon panorama with the Sun and Earth paths over the stay. Every site uses a real terrain horizon from NASA's LOLA laser altimeter, so you can see the Sun blocked by a ridge.
 
-The 10 sites: Apollo 11, 12 and 17; Chandrayaan-3; Intuitive Machines IM-1 and IM-2; and four south-pole points from NASA's Artemis III candidate regions (Peak near Cabeus B, Haworth, Malapert Massif, Nobile Rim 2).
+The 10 sites are either **candidate sites** (possible future landing points: four from NASA's Artemis III candidate regions, Peak near Cabeus B, Haworth, Malapert Massif, Nobile Rim 2) or **historic landings** (Apollo 11, 12 and 17, Chandrayaan-3, Intuitive Machines IM-1 and IM-2), shown as comparisons for educators. The ranking can be filtered to all sites, candidates, or historic landings.
 
 **Verdict rule** (signed by both team members, shown on screen):
 - *On the edge:* the Sun or Earth is within 2° of the terrain skyline more than half the stay. It is grazing the skyline, so small changes in position matter. (A site without terrain would instead say "terrain decides"; since D12, every site has terrain.)
@@ -71,7 +75,7 @@ The data are static JSON files in `data/`. There is no backend.
 - Malapert (original point), 2026-11-20 06:00 UTC: Sun and Earth
 - Malapert (original point), 2026-11-17 08:00 UTC: Sun
 
-**Six check scripts** (run from the repo root; each prints `PASS` or stops with the failure):
+**Seven check scripts** (run from the repo root; each prints `PASS` or stops with the failure):
 
 | Script | What it proves |
 |---|---|
@@ -81,6 +85,7 @@ The data are static JSON files in `data/`. There is no backend.
 | `node scripts/check_scene.mjs` | The Moon-fixed Sun and Earth directions for the 3D view agree with the site data: within 0.0034° of the hand-checked values, and within 0.0065° over 58,440 site-hours. At each of the 49 full moons in 2026–2029, the point with the Sun overhead and the point with Earth overhead are within 5° of each other. |
 | `node scripts/check_metrics.mjs` | The D16 metrics equal an hour-by-hour recount, and all 14,694 daily rows carry the same values. A worked power example a judge can follow: IM-2, 7 days from 2026-11-14, 1 m² sun-tracking panel at 30%, 100 W load. Sunlight that week averages 1,392 W/m² (1361 × (149.598 ÷ 147.78 million km)²). The full Sun disc is visible 128 h and partly visible 12 h (134.0 full-Sun hours), giving 55.9 kWh, an average of 333 W, and a battery of 100 W × 28 h = 2.8 kWh. The D17 score matches a hand calculation (IM-2: 76.6, all six terms worked out), the Educator and Researcher numbers agree at default weights, changing weights re-ranks, and fewer site-dates reach 95+ than under the old formula. |
 | `node scripts/check_d19.mjs` | D19 discs and shadow: the disc formulas give the textbook values. **Every lunar eclipse we find in 2026–2029 is on NASA's published list** (eclipse.gsfc.nasa.gov, Fred Espenak), within 1 h of NASA's time of greatest eclipse. All 10 NASA eclipses are found; one grazing penumbral (2027-07-18) misses our solid-Earth contact limit by 0.9% of Earth's radius, because Earth's atmosphere isn't modelled. NASA's four total eclipses show the Sun fully covered from the Moon's centre. No site ever sees the Sun covered outside an eclipse. Sunlight strength follows the Sun distance (−3.8% to +4.0% around 1361 W/m²). |
+| `node scripts/check_d20.mjs` | Researcher view (D18/D20/D22) facts, each against an independent fact:<br>- **Signal delay** = Earth distance ÷ speed of light (1.26–1.35 s).<br>- **Lunar local time** reads noon (12.02 h) at the hour the Sun is highest.<br>- **Season** = the sub-solar latitude from JPL, with NASA SVS 5229 quoted.<br>- The 2026-03-03 **eclipse** appears in the right stay.<br>- The Sun's **compass sweep** in a fully sunlit pole-region stay equals the sub-solar longitude change (84.6°).<br>- **Month averages** equal the averaged scores.<br>- Every site has a **local slope**.<br>- The **NASA criteria, D22 note and sources** are present. |
 
 **Terrain (all 10 sites, prototype):**
 - Built from NASA's LOLA elevation maps (PDS Geosciences).
