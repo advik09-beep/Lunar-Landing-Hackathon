@@ -42,6 +42,15 @@ let daily: DailyResult | null = null;
 let moon: LunarScene | null = null;
 let overview: OverviewScene | null = null;
 let disposeOverviewMessages: (() => void) | null = null;
+function syncOverviewClock(): void {
+  const frame = document.querySelector<HTMLIFrameElement>('#overview-stage iframe');
+  if (!frame?.contentWindow) return;
+  const utc = new Date(Date.parse(selectedDate + 'T00:00:00Z') + selectedHour * 3600000).toISOString();
+  frame.contentWindow.postMessage({ type: 'lunar-navigator:set-clock', utc }, new URL(frame.src).origin);
+  const status = document.getElementById('overview-clock-status');
+  if (status) status.textContent = 'Inspection moment: ' + utc.replace('T', ' ').slice(0, 16) +
+    ' UTC. Simulator date follows this clock, but precise planet positions are NOT available from the simulator for this date; do not treat its orbits as JPL ephemerides.';
+}
 const verdictNames: Record<Verdict, string> = {
   clear: 'Clear',
   partial: 'Partial',
@@ -87,6 +96,8 @@ app.innerHTML = [
   '      <div class="overview-caption"><strong id="overview-source">THE SUN · EARTH · MOON</strong><span id="overview-note">Illustrative sizes, positions and motion — not to scale; not ephemeris geometry</span></div>',
   '      <p id="overview-mission-message" class="overview-mission-message">Of everything in the solar system, the Sun determines the sunlight available for a lunar lander\'s potential power, while Earth determines when a direct radio link is geometrically possible. Other planets: their gravity is already in our numbers. JPL planetary ephemerides include their gravitational effects; their light is negligible compared with sunlight. Radio from other planets is not modeled.</p>',
   '      <div id="overview-stage" class="overview-stage" aria-label="Solar system overview visualization"></div>',
+  '      <p id="overview-clock-status" class="overview-clock-status" role="status">Simulator planetary ephemeris is not validated for the selected date.</p>',
+',
   '      <div id="overview-title-card" class="overview-title-card"><h2>Our Moon in the solar system</h2><p>Only the Sun and Earth determine the sunlight and direct Earth visibility we evaluate for a lunar lander. Other planets’ gravity is already included in NASA’s ephemerides.</p><div><button id="start-tour" type="button">Start tour</button><button id="skip-moon" type="button">Skip to the Moon</button></div></div>',
   '      <div class="overview-footer"><p id="overview-disclaimer">Choose the Moon to explore real landing sites and verified Sun/Earth visibility at your selected UTC date and hour.</p><button id="enter-explore" type="button">Explore the Moon and landing sites</button></div>',
   '    </div>',
@@ -128,7 +139,7 @@ app.innerHTML = [
   '    <h3>3D rendering library</h3>',
   '    <p><a href="https://threejs.org/" target="_blank" rel="noopener noreferrer">Three.js</a> and OrbitControls, copyright Three.js authors, <a href="https://github.com/mrdoob/three.js/blob/master/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>. The interactive globe and three-body overview were written for this project. Original drifting starfield visually informed by <a href="https://www.huescreen.com/starfield/" target="_blank" rel="noopener noreferrer">Hue Screen Starfield</a> (no code or assets copied), and previously by <a href="https://github.com/etrepat/starfield" target="_blank" rel="noopener noreferrer">etrepat/starfield</a>, copyright (c) 2010 Estanislau Trepat, <a href="https://github.com/etrepat/starfield/blob/develop/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>; legacy Three.js source was not copied.</p>',
   '    <h3>Solar-system overview — upstream simulator</h3>',
-  '    <p>Approved upstream: <a href="https://github.com/OzAILabs/SolarSystemSimulator" target="_blank" rel="noopener noreferrer">OzAILabs/SolarSystemSimulator</a>. The authors describe its source as MIT-licensed in the README. Its planetary textures are separately sourced from <a href="https://www.solarsystemscope.com/textures/" target="_blank" rel="noopener noreferrer">Solar System Scope</a> (CC BY 4.0), Planet Pixel Emporium, NASA/USGS Astrogeology and Steve Albers; attribution and individual reuse terms follow the upstream README. Our public <a href="https://github.com/advik09-beep/SolarSystemSimulator" target="_blank" rel="noopener noreferrer">GitHub fork</a> runs separately at <a href="https://solar-system-simulator-usmdo-club.vercel.app/" target="_blank" rel="noopener noreferrer">solar-system-simulator-usmdo-club.vercel.app</a>; the embedded full solar system is not synchronized to this app\'s landing-date control.</p>',
+  '    <p>Approved upstream: <a href="https://github.com/OzAILabs/SolarSystemSimulator" target="_blank" rel="noopener noreferrer">OzAILabs/SolarSystemSimulator</a>. The authors describe its source as MIT-licensed in the README. Its planetary textures are separately sourced from <a href="https://www.solarsystemscope.com/textures/" target="_blank" rel="noopener noreferrer">Solar System Scope</a> (CC BY 4.0), Planet Pixel Emporium, NASA/USGS Astrogeology and Steve Albers; attribution and individual reuse terms follow the upstream README. Our public <a href="https://github.com/advik09-beep/SolarSystemSimulator" target="_blank" rel="noopener noreferrer">GitHub fork</a> runs separately at <a href="https://solar-system-simulator-usmdo-club.vercel.app/" target="_blank" rel="noopener noreferrer">solar-system-simulator-usmdo-club.vercel.app</a>; the embedded simulator receives the shared UTC inspection clock, but its planetary positions are illustrative and not validated JPL ephemerides.</p>',
   '    <h3>Implementation and limitations</h3>',
   '    <p>Site coordinates, visibility analysis, data checks and horizon panels: Lane A. App shell, Three.js globe, panel integration and hosting: Lane B. Moon-fixed Sun lighting uses verified hourly JPL Horizons scene data. Earth position and terrain visibility remain available in the Stand here horizon view. The globe has no terrain shadows; The explorer nebula is original procedural decorative artwork, not an observed or simulated lunar sky. Any future borrowed assets must be added here with attribution and license before release.</p>',
   '  </section>',
@@ -315,6 +326,7 @@ function setLandingDate(date: string): void {
   dateOutput.textContent = selectedDate;
   dateSlider.value = String(Math.max(0, Math.min(Number(dateSlider.max), Math.round((timestamp - DATE_MIN) / 86400000))));
   renderClockHour();
+  syncOverviewClock();
   updateAllPanels();
   updateSceneLighting();
   if (dataReady) {
@@ -341,6 +353,7 @@ function setHour(value: number): void {
   if (!Number.isFinite(hour)) return;
   selectedHour = hour;
   renderClockHour();
+  syncOverviewClock();
   updateAllPanels();
   updateSceneLighting();
 }
@@ -385,6 +398,7 @@ if (embedUrl) {
   embedUrl.searchParams.set('lunarEmbed', '1');
   embedUrl.searchParams.set('parentOrigin', window.location.origin);
   frame.src = embedUrl.href;
+  frame.addEventListener('load', syncOverviewClock);
   frame.loading = 'eager';
   frame.referrerPolicy = 'strict-origin-when-cross-origin';
   frame.allow = 'fullscreen';
@@ -402,9 +416,9 @@ if (embedUrl) {
   window.addEventListener('message', onSimulatorMessage);
   disposeOverviewMessages = () => window.removeEventListener('message', onSimulatorMessage);
   find<HTMLElement>('overview-source').textContent = 'SOLAR SYSTEM · OzAILabs simulator';
-  find<HTMLElement>('overview-note').textContent = 'Full solar system · separate simulator time; our mission clock controls Explore, Compare and Stand here';
+  find<HTMLElement>('overview-note').textContent = 'Full solar system · inspection clock synchronized; planetary positions are illustrative, not validated ephemerides';
   find<HTMLElement>('overview-disclaimer').textContent =
-    'Interactive solar-system simulator. This is a visual overview with its own time; the landing-site timeline controls Explore, Compare and Stand here. Select Explore to study the Moon with verified site data.';
+    'The selected UTC inspection time is sent to the simulator. Its planetary orbits are illustrative, not validated historical ephemerides; Explore and Stand here use JPL Horizons data.';
 } else {
   try {
     overview = new OverviewScene(overviewStage, () => openView('explore'));
