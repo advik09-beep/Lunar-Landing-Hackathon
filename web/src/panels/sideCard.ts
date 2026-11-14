@@ -3,7 +3,7 @@
 // horizon model, source and coverage, an Educator / Researcher switch, and a CSV download.
 // v1.2: Sun and Earth status are shown at the shared hour of the stay (props.hour, default 0).
 // All values come from /lib/visibility.js; nothing is calculated here except formatting.
-import { V, type Site, type State, type Summary, type Horizon } from "./data";
+import { V, type Site, type State, type Summary, type Horizon, type Metrics } from "./data";
 import { createPanelRoot, esc, deg, az, pct, VERDICT_WORDS, verdictShort, addDays, fmtUtc, clampHour } from "./shared";
 import type { MountPanel, PanelProps } from "./types";
 
@@ -19,13 +19,25 @@ export const mountSideCard: MountPanel = (container, props) => {
   let current: PanelProps = { ...props };
   let mode: Mode = "plain";
   let token = 0;
-  let view: { site: Site; state: State; summary: Summary; horizon: Horizon; start: string } | null = null;
+  let view: { site: Site; state: State; summary: Summary; horizon: Horizon; start: string; metrics: Metrics } | null = null;
+  // D16 power calculator inputs (Researcher view); kept while the panel lives.
+  const calc = { areaM2: 1, effPct: 30, panel: "tracking" as "tracking" | "fixed-flat", loadW: 100 };
+
+  // Calculator inputs re-render only the result block, so typing keeps focus.
+  body.addEventListener("input", (e) => {
+    const t = e.target as HTMLInputElement | HTMLSelectElement;
+    const k = t.dataset.calc;
+    if (!k) return;
+    if (k === "panel") calc.panel = t.value as "tracking" | "fixed-flat";
+    else (calc as Record<string, number | string>)[k] = Number(t.value);
+    renderCalc();
+  });
 
   body.addEventListener("click", (e) => {
     const t = (e.target as HTMLElement).closest<HTMLElement>("[data-action]");
     if (!t) return;
     const a = t.dataset.action;
-    if (a === "mode-plain" || a === "mode-numbers") { mode = a === "mode-plain" ? "plain" : "numbers"; paint(); }
+    if (a === "mode-plain" || a === "mode-numbers") { mode = a === "mode-plain" ? "plain" : "numbers"; paint(); renderCalc(); }
     else if (a === "prev-day") current.onDateSelected(addDays(current.landingDate, -1));
     else if (a === "next-day") current.onDateSelected(addDays(current.landingDate, 1));
     else if (a === "csv") downloadCsv();
@@ -41,7 +53,7 @@ export const mountSideCard: MountPanel = (container, props) => {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(current.landingDate)) { body.innerHTML = `<p class="warn">Pick a landing date.</p>`; return; }
     body.innerHTML = `<h2>${esc(site.name)}</h2><p class="muted">Loading Sun and Earth data…</p>`;
     try {
-      await V.loadSite(site.id);
+      await Promise.all([V.loadSite(site.id), V.loadDaily()]); // daily summary: best-site ranking (D17)
     } catch (err) {
       if (my !== token) return;
       body.innerHTML = `<h2>${esc(site.name)}</h2><p class="warn">Could not load data for this site (${esc((err as Error).message)}).</p>`;
@@ -53,8 +65,10 @@ export const mountSideCard: MountPanel = (container, props) => {
       const state = V.getState(site.id, Date.parse(start) + hourNow() * 3.6e6);
       const summary = V.getSummary(site.id, start, V.VERDICT_RULE.STAY_DAYS);
       const horizon = V.getHorizon(site.id);
-      view = { site, state, summary, horizon, start };
+      const metrics = V.getMetrics(site.id, start, V.VERDICT_RULE.STAY_DAYS);
+      view = { site, state, summary, horizon, start, metrics };
       paint();
+      renderCalc();
     } catch (err) {
       const msg = (err as Error).message;
       if (!/OUT_OF_COVERAGE/.test(msg)) { body.innerHTML = `<h2>${esc(site.name)}</h2><p class="warn">${esc(msg)}</p>`; return; }
@@ -116,7 +130,23 @@ export const mountSideCard: MountPanel = (container, props) => {
           <li><strong>Sunlight:</strong> ${state.lit ? "yes" : "no"}${esc(sunNote(state))}</li>
           <li><strong>Earth in view:</strong> ${state.comms ? "yes" : "no"}${esc(earthNote(state))}</li>
         </ul>
-        <p class="muted small">“Sunlight” means the Sun is above the horizon, not a promise of power. “Earth in view” means a possible direct line of sight, not a guaranteed link.</p>`;
+        <p class="muted small">“Sunlight” means the Sun is above the horizon, not a promise of power. “Earth in view” means a possible direct line of sight, not a guaranteed link.</p>
+        ${scoreEducator()}`;
+    }
+
+    // D17 Educator: one score, default weights, top site named in plain words, no formula.
+    function scoreEducator(): string {
+      const r = V.getRanking(current.landingDate);
+      const me = r.ranking.find((x) => x.siteId === site.id);
+      const top = r.ranking[0];
+      if (!me?.available || !top?.available) return `<div class="score"><h3>Best-site score <span class="proto">PROTOTYPE</span></h3><p class="muted">Not available for this landing date.</p></div>`;
+      const topLine = top.siteId === site.id
+        ? `This is the top site for a landing on ${esc(current.landingDate)}.`
+        : `The top site for a landing on ${esc(current.landingDate)} is <strong>${esc(top.name)}</strong> (${Math.round(top.score!)} out of 100).`;
+      return `<div class="score"><h3>Best-site score <span class="proto">PROTOTYPE</span></h3>
+        <p class="big"><strong>${Math.round(me.score!)}</strong> out of 100 for this site.</p>
+        <p>${topLine}</p>
+        <p class="muted small">Uses the default weights. The Researcher view explains the calculation.</p></div>`;
     }
 
     function numbers(): string {
@@ -144,6 +174,9 @@ export const mountSideCard: MountPanel = (container, props) => {
           <tr><th>Sun within ${state.edgeDeg}° of horizon</th><td>${pct(summary.pctSunEdge)}</td><th>Earth within ${state.edgeDeg}° of horizon</th><td>${pct(summary.pctEarthEdge)}</td></tr>
         </table>
         <p class="muted small">Verdict rule: ${esc(summary.verdictRule)}</p>
+        ${metricsHtml()}
+        ${powerHtml()}
+        ${scoreResearcher()}
         <h3>Sources</h3>
         <ul class="sources small">
           <li>Sun and Earth angles: ${esc(src)}.</li>
@@ -152,6 +185,66 @@ export const mountSideCard: MountPanel = (container, props) => {
           <li>Coverage for this site: ${ranges.map(([a, b]) => `${esc(fmtUtc(a))} to ${esc(fmtUtc(b))}`).join("; ")}.</li>
         </ul>
         <button type="button" class="csv" data-action="csv">Download CSV (${days * 24} hourly rows)</button>`;
+    }
+
+    // D16 metrics (terrain-aware hourly data).
+    function metricsHtml(): string {
+      const m = view!.metrics;
+      return `<h3>Power and comms metrics (${m.hours} h, terrain-aware)</h3>
+        <table class="kv">
+          <tr><th>Sunlight share</th><td>${pct(m.pctLit)}</td><th>Earth-in-view share</th><td>${pct(m.pctComms)}</td></tr>
+          <tr><th>Longest dark stretch</th><td>${m.longestDarkHours} h</td><th>Longest contact gap</th><td>${m.longestContactGapHours} h</td></tr>
+          <tr><th>Dark periods</th><td>${m.darkPeriods}</td><th>Contact windows</th><td>${m.contactWindows}</td></tr>
+        </table>
+        <p class="muted small">${esc(m.note)} ${esc(m.commsNote)}</p>`;
+    }
+
+    // D16 power calculator: inputs here; results in #calc-out (re-rendered on input).
+    function powerHtml(): string {
+      return `<h3>Power calculator <span class="proto">ESTIMATE</span></h3>
+        <div class="calc">
+          <label>Panel area (m²) <input type="number" min="0.01" step="0.1" value="${calc.areaM2}" data-calc="areaM2"/></label>
+          <label>Efficiency (%) <input type="number" min="1" max="100" step="1" value="${calc.effPct}" data-calc="effPct"/></label>
+          <label>Panel type <select data-calc="panel">
+            <option value="tracking"${calc.panel === "tracking" ? " selected" : ""}>Sun-tracking</option>
+            <option value="fixed-flat"${calc.panel === "fixed-flat" ? " selected" : ""}>Fixed flat (horizontal)</option></select></label>
+          <label>Lander power draw (W) <input type="number" min="0" step="1" value="${calc.loadW}" data-calc="loadW"/></label>
+        </div>
+        <div class="calc-out" aria-live="polite"></div>`;
+    }
+
+    // D17 Researcher: formula + this site's components at default weights.
+    function scoreResearcher(): string {
+      const r = V.getRanking(current.landingDate);
+      const me = r.ranking.find((x) => x.siteId === site.id);
+      if (!me?.available) return `<h3>Best-site score <span class="proto">PROTOTYPE</span></h3><p class="muted">Not available for this landing date.</p>`;
+      const W = V.SCORE_DEFAULT_WEIGHTS, c = me.components!;
+      const row = (k: keyof typeof W, name: string) => `<tr><td>${esc(name)}</td><td>${esc(V.SCORE_TERMS[k])}</td><td>${c[k].toFixed(3)}</td><td>${W[k]}</td></tr>`;
+      return `<h3>Best-site score <span class="proto">PROTOTYPE</span></h3>
+        <p class="small">${esc(V.SCORE_FORMULA_TEXT)}</p>
+        <table><thead><tr><th>Term</th><th>Meaning</th><th>Value</th><th>Default weight</th></tr></thead><tbody>
+          ${row("sunlight", "wS")}${row("earth", "wE")}${row("shortDark", "wD")}${row("shortGap", "wG")}
+        </tbody></table>
+        <p class="small">Score for this site at default weights: <strong>${me.score!.toFixed(1)}</strong> / 100 (rank ${r.ranking.indexOf(me) + 1} of ${r.ranking.filter((x) => x.available).length}). Adjust the weights and see the ranking update in <em>Compare dates</em>.</p>`;
+    }
+  }
+
+  function renderCalc() {
+    const out = body.querySelector(".calc-out");
+    if (!out || !view) return;
+    try {
+      const p = V.computePower({ siteId: view.site.id, startUtc: view.start, days: V.VERDICT_RULE.STAY_DAYS,
+        areaM2: calc.areaM2, efficiency: calc.effPct / 100, panel: calc.panel, loadW: calc.loadW });
+      const kwh = (wh: number) => `${(wh / 1000).toFixed(1)} kWh`;
+      out.innerHTML = `<p class="small"><strong>Estimate</strong> for this ${p.hours}-hour stay:</p>
+        <table class="kv">
+          <tr><th>Average power</th><td>${p.averageW.toFixed(0)} W</td><th>Peak (panel facing the Sun)</th><td>${p.peakW.toFixed(0)} W</td></tr>
+          <tr><th>Energy over the stay</th><td>${kwh(p.energyWh)}</td><th>Lander needs</th><td>${kwh(p.loadEnergyWh)}</td></tr>
+          <tr><th>Balance</th><td>${p.balanceWh >= 0 ? "+" : "−"}${kwh(Math.abs(p.balanceWh))}${p.balanceWh < 0 ? " (deficit)" : ""}</td><th>Battery to survive the longest stretch with no panel power (${p.longestNoPowerHours} h)</th><td>${kwh(p.batteryWh)}</td></tr>
+        </table>
+        <p class="small">Assumptions:</p><ul class="small">${p.assumptions.map((a) => `<li>${esc(a)}</li>`).join("")}</ul>`;
+    } catch (err) {
+      out.innerHTML = `<p class="warn small">${esc((err as Error).message)}</p>`;
     }
   }
 
@@ -192,7 +285,7 @@ export const mountSideCard: MountPanel = (container, props) => {
       const hourChanged = next.hour !== undefined && next.hour !== current.hour;
       current = { ...current, ...next };
       if (changed) load();
-      else if (hourChanged && view) { view.state = V.getState(view.site.id, Date.parse(view.start) + hourNow() * 3.6e6); paint(); }
+      else if (hourChanged && view) { view.state = V.getState(view.site.id, Date.parse(view.start) + hourNow() * 3.6e6); paint(); renderCalc(); }
     },
     destroy() { token++; host.remove(); },
   };
@@ -259,5 +352,11 @@ thead th { color: var(--llp-muted, #a8bbd3); font-weight: 600; }
 .days button, .csv { padding: 6px 12px; border: 1px solid var(--llp-border, #344b69); border-radius: 8px; background: transparent; color: inherit; }
 .csv { margin-top: 10px; }
 .exits { display: flex; gap: 8px; margin-top: 10px; }
+.score { margin-top: 14px; padding: 10px 14px; border: 1px solid var(--llp-border, #344b69); border-radius: 10px; }
+.score .big { font-size: 1.05rem; }
+.proto { display: inline-block; padding: 0 6px; border-radius: 5px; font-size: .68rem; letter-spacing: .06em; border: 1px dashed var(--llp-warn, #ffd49d); color: var(--llp-warn, #ffd49d); vertical-align: middle; }
+.calc { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px 12px; margin: 6px 0; font-size: .85rem; }
+.calc label { display: grid; gap: 3px; color: var(--llp-muted, #a8bbd3); }
+.calc input, .calc select { font: inherit; padding: 4px 6px; border-radius: 6px; border: 1px solid var(--llp-border, #344b69); background: transparent; color: var(--llp-text, #ecf2ff); }
 .exits button { flex: 1; padding: 8px 12px; border: 1px solid var(--llp-accent, #2f5d9a); border-radius: 8px; background: var(--llp-accent, #2f5d9a); color: inherit; font-weight: 600; }
 `;

@@ -15,7 +15,7 @@ const EDGE = VERDICT_RULE.EDGE_DEG;
 const index = JSON.parse(readFileSync(join(DATA, "ephem", "index.json"), "utf8"));
 
 const out = { ...VERDICT_RULE, horizonModels: Object.fromEntries(Object.keys(index.sites).map((id) => [id, index.horizons?.[id] ? "lola" : "flat"])), hoursPerStay: N,
-  columns: ["litH", "commsH", "bothH", "sunEdgeH", "earthEdgeH", "longestDarkH", "verdict"],
+  columns: ["litH", "commsH", "bothH", "sunEdgeH", "earthEdgeH", "longestDarkH", "verdict", "darkPeriods", "contactWindows", "longestGapH"],
   builtUtc: new Date().toISOString(), sites: {} };
 
 for (const [siteId, chunks] of Object.entries(index.sites)) {
@@ -39,16 +39,19 @@ for (const [siteId, chunks] of Object.entries(index.sites)) {
     for (let day = firstDay; (day - r.start) / H + N <= r.sunM.length; day += D) {
       const i0 = (day - r.start) / H;
       let lit = 0, comms = 0, both = 0, se = 0, ee = 0, dark = 0, longest = 0;
+      let darkPeriods = 0, contactWindows = 0, gap = 0, longestGap = 0, prevL = null, prevC = null; // D16
       for (let i = i0; i < i0 + N; i++) {
         const s = r.sunM[i], e = r.earthM[i]; // margins above the horizon in use
         const L = s > 0, C = e > 0;
         if (L) lit++; if (C) comms++; if (L && C) both++;
         if (Math.abs(s) <= EDGE) se++; if (Math.abs(e) <= EDGE) ee++;
         dark = L ? 0 : dark + 1; longest = Math.max(longest, dark);
+        gap = C ? 0 : gap + 1; longestGap = Math.max(longestGap, gap);
+        if (!L && prevL !== false) darkPeriods++; if (C && prevC !== true) contactWindows++; prevL = L; prevC = C;
       }
       const pct = (k) => (100 * k) / N;
       rows.push([lit, comms, both, se, ee, longest,
-        verdictOf({ pctBoth: pct(both), pctSunEdge: pct(se), pctEarthEdge: pct(ee) })]);
+        verdictOf({ pctBoth: pct(both), pctSunEdge: pct(se), pctEarthEdge: pct(ee) }), darkPeriods, contactWindows, longestGap]);
     }
     if (rows.length) out.sites[siteId].push({ firstDate: new Date(firstDay).toISOString().slice(0, 10), rows });
   }

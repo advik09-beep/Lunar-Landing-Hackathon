@@ -2,7 +2,7 @@
 // Grid: sites as rows, landing dates as columns; each cell = verdict for a 7-day stay starting
 // that day, straight from getDaily() (the daily summary). Timeline strip: hourly sunlight /
 // Earth-in-view for the selected site over the same dates, from getTimeline().
-import { V, type Verdict } from "./data";
+import { V, type Verdict, type Weights } from "./data";
 import { createPanelRoot, esc, pct, VERDICT_WORDS, EDGE_WORDS, addDays } from "./shared";
 import type { MountPanel, PanelProps } from "./types";
 
@@ -22,6 +22,19 @@ export const mountCompareGrid: MountPanel = (container, props) => {
   let current: PanelProps = { ...props };
   let windowStart = addDays(current.landingDate, -BEFORE);
   let token = 0;
+  // D17 best-site score: reading level and Researcher weights (live ranking).
+  let scoreMode: "educator" | "researcher" = "educator";
+  let weights: Weights = { ...V.SCORE_DEFAULT_WEIGHTS };
+
+  body.addEventListener("input", (e) => {
+    const t = e.target as HTMLInputElement;
+    const k = t.dataset.weight as keyof Weights | undefined;
+    if (!k) return;
+    weights = { ...weights, [k]: Number(t.value) };
+    const lab = body.querySelector(`[data-weight-label="${k}"]`);
+    if (lab) lab.textContent = t.value;
+    renderRanking();
+  });
 
   body.addEventListener("click", (e) => {
     const t = (e.target as HTMLElement).closest<HTMLElement>("[data-action]");
@@ -30,6 +43,8 @@ export const mountCompareGrid: MountPanel = (container, props) => {
     if (action === "cell" && site && date) { current.onSiteSelected(site); current.onDateSelected(date); }
     else if (action === "site" && site) current.onSiteSelected(site);
     else if (action === "date" && date) current.onDateSelected(date);
+    else if (action === "score-educator" || action === "score-researcher") { scoreMode = action === "score-educator" ? "educator" : "researcher"; renderScoreBox(); }
+    else if (action === "reset-weights") { weights = { ...V.SCORE_DEFAULT_WEIGHTS }; renderScoreBox(); }
     else if (action === "earlier") { windowStart = addDays(windowStart, -SHIFT); render(); }
     else if (action === "later") { windowStart = addDays(windowStart, SHIFT); render(); }
   });
@@ -78,6 +93,7 @@ export const mountCompareGrid: MountPanel = (container, props) => {
     const strip = await stripHtml(current.siteId, dates, days);
     if (my !== token) return;
     const ms = Math.round(performance.now() - t0);
+    queueMicrotask(renderScoreBox);
 
     body.innerHTML = `
       <header>
@@ -99,7 +115,49 @@ export const mountCompareGrid: MountPanel = (container, props) => {
         <tbody>${rows}</tbody>
       </table></div>
       ${strip}
+      <section class="score-box" aria-label="Best-site score"></section>
       <p class="muted small">Verdicts and percentages come from the daily summary (getDaily); the strip comes from hourly data (getTimeline). ${[...terrain.values()].some((t) => t !== "lola") ? "FLAT rows use a flat horizon; TERRAIN rows use" : "Every row uses"} the LOLA terrain horizon for one point per site. Updated in ${ms} ms.</p>`;
+  }
+
+  // ---- D17: best-site score for the selected landing date (PROTOTYPE) ----
+  function renderScoreBox() {
+    const box = body.querySelector(".score-box");
+    if (!box) return;
+    const terms: [keyof Weights, string][] = [["sunlight", "wS"], ["earth", "wE"], ["shortDark", "wD"], ["shortGap", "wG"]];
+    box.innerHTML = `
+      <h3>Best-site score for a landing on ${esc(current.landingDate)} <span class="proto">PROTOTYPE</span></h3>
+      <div class="switch" role="group" aria-label="Reading level: Educator or Researcher">
+        <button type="button" data-action="score-educator" aria-pressed="${scoreMode === "educator"}">Educator</button>
+        <button type="button" data-action="score-researcher" aria-pressed="${scoreMode === "researcher"}">Researcher</button>
+      </div>
+      ${scoreMode === "researcher" ? `
+        <p class="small">${esc(V.SCORE_FORMULA_TEXT)}</p>
+        <div class="weights">${terms.map(([k, w]) => `<label><span>${w}: ${esc(V.SCORE_TERMS[k])}</span>
+          <input type="range" min="0" max="100" step="1" value="${weights[k]}" data-weight="${k}" aria-label="Weight ${w}"/> <b data-weight-label="${k}">${weights[k]}</b></label>`).join("")}</div>
+        <button type="button" class="reset" data-action="reset-weights">Reset to default weights (${terms.map(([k, w]) => `${w} ${V.SCORE_DEFAULT_WEIGHTS[k]}`).join(", ")})</button>` : ""}
+      <div class="rank-out" aria-live="polite"></div>`;
+    renderRanking();
+  }
+
+  function renderRanking() {
+    const out = body.querySelector(".rank-out");
+    if (!out) return;
+    let r;
+    try { r = V.getRanking(current.landingDate, scoreMode === "researcher" ? weights : V.SCORE_DEFAULT_WEIGHTS); } catch { out.innerHTML = `<p class="muted">Not available for this date.</p>`; return; }
+    const avail = r.ranking.filter((x) => x.available);
+    if (!avail.length) { out.innerHTML = `<p class="muted">Not available for this date (outside the data range).</p>`; return; }
+    const top = avail[0];
+    if (scoreMode === "educator") {
+      out.innerHTML = `<p class="big">For a landing on ${esc(current.landingDate)}, the best site by our prototype score is <strong>${esc(top.name)}</strong>, scoring <strong>${Math.round(top.score!)}</strong> out of 100.</p>
+        <ol class="rank">${avail.map((x) => `<li${x.siteId === current.siteId ? ' class="sel"' : ""}>${esc(x.name)}: ${Math.round(x.score!)}</li>`).join("")}</ol>
+        <p class="muted small">Uses the default weights. The Researcher view explains the calculation.</p>`;
+      return;
+    }
+    out.innerHTML = `<p class="small">${r.isDefault ? "Default weights." : "Custom weights: the ranking below is yours, not the Educator default."} Top site: <strong>${esc(top.name)}</strong> (${top.score === null ? "–" : top.score.toFixed(1)}).</p>
+      <table class="ranktable"><thead><tr><th>#</th><th>Site</th><th>Score</th><th>S</th><th>E</th><th>D</th><th>G</th></tr></thead><tbody>
+      ${avail.map((x, i) => `<tr${x.siteId === current.siteId ? ' class="sel"' : ""}><td>${i + 1}</td><td><button type="button" data-action="site" data-site="${x.siteId}">${esc(x.name)}</button></td><td>${x.score === null ? "–" : x.score.toFixed(1)}</td>${(["sunlight", "earth", "shortDark", "shortGap"] as const).map((k) => `<td>${x.components![k].toFixed(2)}</td>`).join("")}</tr>`).join("")}
+      </tbody></table>
+      ${r.ranking.length > avail.length ? `<p class="muted small">${r.ranking.length - avail.length} site(s) have no data for this date.</p>` : ""}`;
   }
 
   async function stripHtml(siteId: string, dates: string[], days: number): Promise<string> {
@@ -195,6 +253,20 @@ td.selcell .v, td.selcell span { outline: 3px solid var(--llp-text, #ecf2ff); ou
 .tag[data-model="flat"] { color: var(--llp-warn, #ffd49d); }
 .tag[data-model="lola"] { color: var(--llp-clear, #4fbf7a); }
 svg.strip { width: 100%; height: auto; display: block; }
+.score-box { margin-top: 16px; padding: 10px 14px; border: 1px solid var(--llp-border, #344b69); border-radius: 10px; }
+.score-box .big { font-size: 1.02rem; }
+.proto { display: inline-block; padding: 0 6px; border-radius: 5px; font-size: .68rem; letter-spacing: .06em; border: 1px dashed var(--llp-warn, #ffd49d); color: var(--llp-warn, #ffd49d); vertical-align: middle; }
+.switch { display: inline-flex; margin: 6px 0; border: 1px solid var(--llp-border, #344b69); border-radius: 999px; overflow: hidden; }
+.switch button { padding: 4px 14px; border: 0; background: transparent; color: inherit; font-size: .85rem; }
+.switch button[aria-pressed="true"] { background: var(--llp-accent, #2f5d9a); font-weight: 650; }
+.weights { display: grid; gap: 4px; margin: 6px 0; font-size: .82rem; }
+.weights label { display: grid; grid-template-columns: 1fr 160px 32px; gap: 8px; align-items: center; }
+.reset { padding: 4px 10px; border: 1px solid var(--llp-border, #344b69); border-radius: 8px; background: transparent; color: inherit; font-size: .8rem; }
+ol.rank { margin: 6px 0; padding-left: 22px; font-size: .88rem; }
+.rank li.sel, .ranktable tr.sel td { font-weight: 700; }
+.ranktable { border-collapse: collapse; font-size: .82rem; margin-top: 6px; font-variant-numeric: tabular-nums; }
+.ranktable th, .ranktable td { padding: 2px 8px; border-bottom: 1px solid var(--llp-border, #344b69); text-align: left; }
+.ranktable button { border: 0; background: transparent; color: inherit; padding: 0; font: inherit; cursor: pointer; text-decoration: underline; }
 .strip .bg { fill: rgba(255,255,255,.04); }
 .strip .sun { fill: var(--llp-sun, #f2c94c); }
 .strip .earth { fill: var(--llp-earth, #5aa9e6); }

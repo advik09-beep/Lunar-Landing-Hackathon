@@ -6,10 +6,10 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 |-----|------|-----------|
 | Advik + ChatGPT (Lane B) | D14 — REFINEMENT IN PROGRESS | Replace barely visible stars with clearly animated depth-parallax background; prepare OzAILabs iframe integration pending required GitHub fork and separate public deployment. |
 | Sheldon (Lane A human) | — | Planning stop 2026-11-14: D12-D18 signed; acceptance run done |
-| Claude Code (Lane A) | 10 (D12 terrain) | D12 DONE: all 10 sites have LOLA terrain; stopped. Next Lane A tasks per plan: (3) detailed Moon assets, (4) D16 + D17, (5) D18, on Sheldon's go |
+| Claude Code (Lane A) | 14 + 15 (D16, D17) | D16 metrics + power calculator and D17 best-site score DONE inside the existing panels; stopped. Next: D18 Researcher tab on Sheldon's go |
 
 Acceptance (both humans, 2026-11-14): steps 1, 2, 3, 6, 8 **PASS**. Step 4 not yet (markers don't recolor on date change; pole sites can't be told apart). Step 7 not yet (hour slider too hard to find). Signed 2026-11-14: D7–D11 (see PLAN); **D12–D18** (terrain all sites, date+hour slider, overview scene, legend, power/comms metrics, best-site score, Researcher tab). Side card switch renamed Educator / Researcher.
-Waiting on Sheldon: go for the next Lane A task (Moon assets / D16 + D17 / D18).
+Waiting on Sheldon: review D16/D17 (formula below); go for D18.
 Waiting on Advik: D13 (uses panel interface v1.2), D14, D15; step 4 fixes.
 
 ## Continuous two-agent coordination protocol (agreed 2026-11-14)
@@ -1079,4 +1079,50 @@ interface PanelHandle { update(next: Partial<Pick<PanelProps, "siteId" | "landin
 - **Lane B, please update one line in `web/src/main.ts` Credits:** "Malapert horizon elevation: NASA …" is now out of date. Suggested: *"Terrain horizons for all 10 sites: NASA LRO LOLA GDR elevation maps (PDS Geosciences), polar and global; maps and resolution per site in data/README.md."*
 - **PLAN.md + DESIGN.md:** "on the edge" now reads the same as the panels: "terrain decides" at flat-horizon sites, "grazing the skyline: small changes in position matter" at terrain sites (both humans). Since D12, every site is a terrain site.
 - **D14 amendment (both humans), recorded in PLAN.md:** the overview's first version is the **OzAILabs solar system simulator, forked and embedded as its own tab with full credit**. It shows all planets and is not yet tied to our date control, and the screen says both. Trimming to three bodies and syncing the date come later if time allows. Lane B owns it. Reminder from D11: the Credits panel must show its license; no code is copied from a repo whose license we can't show (earlier check: the README says MIT, no standalone LICENSE file seen).
+
+### 2026-11-14 — D16 power/comms metrics + power calculator and D17 best-site score (PROTOTYPE): DONE
+**Shown inside the existing panels, so Lane B needs no new mounting:** side card (Educator + Researcher) and Compare grid (new score box under the strip).
+
+**D16 in `/lib` (API 1.4.0), all from the terrain-aware hourly data:**
+- `getMetrics(siteId, startUtc, days=7)` → `{ pctLit, longestDarkHours, darkPeriods, pctComms, longestContactGapHours, contactWindows, hours, horizonModel, note, commsNote }`.
+  - Runs touching the stay's start or end are counted (stated).
+  - `commsNote`: "Earth in view is line-of-sight geometry only. A data rate needs antenna size, transmitter power, frequency and the receiving station network, which are not modelled."
+- `getDaily` rows gain `darkPeriods`, `contactWindows`, `longestContactGapHours` (new `daily.json` columns, rebuilt).
+- `computePower({ siteId, startUtc, days, areaM2, efficiency, panel: "tracking"|"fixed-flat", loadW })` → `{ peakW, averageW, energyWh, loadEnergyWh, balanceWh, poweredHours, longestNoPowerHours, batteryWh, hourlyW, assumptions[], estimate: true }`.
+  - Hourly power = 1361 W/m² × area × efficiency × f, where f = 1 (tracking) or sin(Sun elevation) (fixed flat, horizontal), and f = 0 when the Sun is hidden by terrain or, for a flat panel, at or below level.
+  - Battery = load × longest stretch with no panel power.
+  - **Solar irradiance source:** NASA NSSDCA Moon Fact Sheet, "Solar irradiance (W/m2) 1361.0" (last updated 11 January 2024). The Sun Fact Sheet has no solar-constant line. The value is used as a mean, with no Sun-distance correction (stated).
+  - Seven assumptions are returned and shown on screen; the result is labeled ESTIMATE.
+
+**D17 formula in plain words (PROTOTYPE, Lane A's proposal):**
+- Each site and landing date gets four sub-scores between 0 and 1, from the 7-day stay:
+  - **S**: how much of the stay has sunlight.
+  - **E**: how much of the stay has Earth in view.
+  - **D**: how short the longest dark stretch is (1 − longest dark ÷ 168 h).
+  - **G**: how short the longest gap without Earth is (1 − longest gap ÷ 168 h).
+- The score is their weighted average × 100. **Default weights: sunlight 35, Earth 25, short dark 25, short gap 15.**
+  - `score = 100 × (35·S + 25·E + 25·D + 15·G) ÷ 100`; with custom weights, divide by their sum.
+  - All weights zero → no score (not a fake number).
+- In `/lib`: `scoreOf(metrics, weights?)`, `getRanking(landingDate, weights?)` (from the daily summary, all 10 sites, best first), `SCORE_DEFAULT_WEIGHTS`, `SCORE_TERMS`, `SCORE_FORMULA_TEXT` (file `lib/score.js`).
+- Example, IM-2 from 2026-11-14: S 0.792, E 1.000, D 1 − 31/168 = 0.815, G 1.000 → **88.1**. Top site that date: Chandrayaan-3 (97.1).
+
+**On screen:**
+- **Side card, Educator:** "Best-site score PROTOTYPE: 88 out of 100 for this site. The top site for a landing on 2026-11-14 is Chandrayaan-3 (97 out of 100). Uses the default weights. The Researcher view explains the calculation." No formula or weights.
+- **Side card, Researcher:**
+  - The six D16 metrics with the hourly-run and comms notes.
+  - The power calculator (area, efficiency, panel type, load), with results and every assumption, labeled ESTIMATE.
+  - The score formula with this site's S/E/D/G at default weights and its rank.
+- **Compare grid, score box:** its own Educator / Researcher switch.
+  - Educator: "the best site by our prototype score is … scoring … out of 100", plus all sites in order, at default weights.
+  - Researcher: the formula, four weight sliders and the ranking table (S, E, D, G per site) updating live, a "custom weights" label and Reset.
+  - Same numbers at default weights.
+
+**Checks (`node scripts/check_metrics.mjs`, new) → PASS:**
+- getMetrics = an hour-by-hour recount (10 sites × 3 dates); all 14,694 daily rows carry the same D16 values.
+- **Worked power example:** IM-2, 2026-11-14, 1 m² tracking at 30%, 100 W: 1361 × 1 × 0.30 = 408.3 W; Sun up 133 of 168 h → 54,303.9 Wh; average 323.2 W; need 16,800 Wh; longest dark 31 h → battery 3,100 Wh.
+- Fixed flat at the same stay: 4,680 Wh (low Sun at 84.8°S); bad inputs rejected.
+- Score: equals scoreOf(getMetrics), stays within 0–100, sorted; the hand example (88.1) matches; Educator and Researcher identical at defaults; sunlight-only weights re-rank; all-zero gives no score.
+- **DOM test (happy-dom, real data):** the Educator texts above, the Researcher metrics, the calculator defaults reproducing 323 W / 54.3 kWh / 3.1 kWh, switching to fixed flat giving 4.7 kWh, grid sliders re-ranking live (sunlight-only puts Nobile Rim 2 first), and Reset restoring 97.1.
+- **All checks:** `check_visibility` (API 1.4.0), `check_ephem`, `check_scene`, `check_horizon`, `check_metrics` PASS. `cd web && npm run build` OK.
+- README updated: D16/D17 description, five check scripts, limits. PLAN already records that D17 replaces "no single best-site score".
 

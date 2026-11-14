@@ -39,6 +39,20 @@ export interface Coverage {
   sites: { siteId: string; ranges: [string, string][]; terrain: "lola" | "flat" }[];
 }
 export interface VerdictRule { STAY_DAYS: number; CLEAR_PCT: number; OUT_PCT: number; EDGE_DEG: number }
+// v1.4 (D16 / D17)
+export interface Metrics {
+  hours: number; pctLit: number; longestDarkHours: number; darkPeriods: number;
+  pctComms: number; longestContactGapHours: number; contactWindows: number; horizonModel: "lola" | "flat"; note: string; commsNote: string;
+}
+export interface Power {
+  hours: number; panel: "tracking" | "fixed-flat"; areaM2: number; efficiency: number; loadW: number;
+  irradianceWm2: number; peakW: number; averageW: number; energyWh: number; loadEnergyWh: number; balanceWh: number;
+  poweredHours: number; longestNoPowerHours: number; batteryWh: number; assumptions: string[]; estimate: true;
+}
+export type Weights = { sunlight: number; earth: number; shortDark: number; shortGap: number };
+export interface RankRow { siteId: string; name: string; score: number | null; available: boolean;
+  components?: { sunlight: number; earth: number; shortDark: number; shortGap: number }; }
+export interface Ranking { landingDate: string; weights: Weights; isDefault: boolean; formula: string; prototype: true; ranking: RankRow[] }
 
 interface Api {
   MOCK: boolean; API_VERSION: string; VERDICT_RULE: VerdictRule;
@@ -50,6 +64,12 @@ interface Api {
   getTimeline(siteId: string, startUtc: string | number, days: number, stepHours?: number): Timeline;
   getHorizon(siteId: string): Horizon;
   getCoverage(): Coverage;
+  getMetrics(siteId: string, startUtc: string | number, days?: number): Metrics;
+  computePower(o: { siteId: string; startUtc: string | number; days?: number; areaM2: number; efficiency: number; panel: "tracking" | "fixed-flat"; loadW: number }): Power;
+  getRanking(landingDate: string, weights?: Partial<Weights>): Ranking;
+  scoreOf(m: Metrics, weights?: Partial<Weights>): { score: number | null; components: Record<keyof Weights, number>; weights: Weights };
+  SCORE_DEFAULT_WEIGHTS: Weights; SCORE_TERMS: Record<keyof Weights, string>; SCORE_FORMULA_TEXT: string;
+  SOLAR_IRRADIANCE_W_M2: number; SOLAR_IRRADIANCE_SOURCE: string;
 }
 
 export const V = raw as unknown as Api;
