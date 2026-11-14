@@ -242,6 +242,9 @@ function startSolarTour(): void {
 }
 function openView(view: View): void {
   activeView = view;
+  document.body.dataset.view = view;
+  find<HTMLElement>('global-clock').hidden = view === 'overview';
+  find<HTMLElement>('verdict-legend').hidden = view === 'overview';
   for (const name of ['overview', 'explore', 'compare', 'horizon', 'researcher', 'planner', 'credits'] as View[]) {
     find<HTMLElement>(name + '-view').hidden = name !== view;
     const button = find<HTMLButtonElement>('nav-' + name);
@@ -516,6 +519,7 @@ for (const name of ['overview', 'explore', 'compare', 'horizon', 'researcher', '
   find<HTMLButtonElement>('nav-' + name).addEventListener('click', () => openView(name));
 }
 updateButtons();
+openView('overview');
 
 async function initializeData(): Promise<void> {
   try {

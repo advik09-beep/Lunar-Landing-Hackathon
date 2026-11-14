@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D29 steps 1–4 — PASS / STOPPED | LunLux shell and mission subtitle; mounted scrolling Planner; paused solar system visible behind dimmed title card; embedded sound OFF by default with accessible speaker toggle. Main + fork Vercel READY; Chromium PASS, no page errors. |
+| Advik + ChatGPT (Lane B) | D30 structure 1 — built; checking deployment | Merged Tour home; simulator backdrop and title card; no timeline or legend on home. |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | D30 Lane A part done | Panels follow the D30 theme, short names, Historic tag, interface v1.3 (shared reading level); stopped |
 
@@ -496,6 +496,11 @@ Second task, only after the copy passes and with Advik's authorization: Step 4 T
 - **Browser acceptance:** Live desktop Chromium (1640×1050), parent `https://lunar-landing-hackathon.vercel.app/`, embedded fork `https://solar-system-simulator-usmdo-club.vercel.app/`: initial speaker **Sound off / aria-pressed=false** despite simulated saved standalone unmuted preference; user click **Sound on / true**; second click **Sound off / false**; standalone saved preference remained unchanged. Planner rendered actual A/B panel, scrolled; title/card/name/subtitle/nav/Credits verified. **Zero page JavaScript errors**. Main intermediate commits and the final fork build were Vercel READY. The CSS+STATUS release commit only adds styling for on-card sound guidance.
 - **Stop:** D29 1–4 complete within the requested scope; no D28 Lane A edits or unrelated feature work.
 
+
+
+### 2026-11-14 — D30 presentation pass, structure 1
+- Merged Tour home; simulator backdrop and title card; no timeline or legend on home.
+- Files: web/src/main.ts, web/src/style.css. TypeScript and Vite/postbuild executed: PASS. Production deployment verification follows this commit. Scientific APIs and Lane A panels unchanged.
 
 ## Lane A
 
