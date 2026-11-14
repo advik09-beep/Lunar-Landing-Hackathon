@@ -2,7 +2,7 @@
 // panels never change the selection themselves — they ask through the two callbacks.
 
 export interface PanelProps {
-  /** Site id from listSites(), e.g. "sp_malapert". */
+  /** Site id from listSites(). */
   siteId: string;
   /** Landing date, "YYYY-MM-DD" (UTC day). The stay starts at 00:00 UTC that day and lasts VERDICT_RULE.STAY_DAYS. */
   landingDate: string;

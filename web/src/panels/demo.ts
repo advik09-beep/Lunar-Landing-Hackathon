@@ -9,7 +9,7 @@ const dateIn = document.querySelector<HTMLInputElement>("#date")!;
 const log = document.querySelector<HTMLParagraphElement>("#log")!;
 
 for (const s of V.listSites()) siteSel.add(new Option(s.name, s.id));
-siteSel.value = params.get("site") ?? "sp_malapert";
+siteSel.value = params.get("site") ?? V.listSites()[0].id; // D21: no default to any one region
 dateIn.value = params.get("date") ?? "2026-09-19";
 
 // The shell owns the selection: panels ask, the shell decides, then updates every panel.

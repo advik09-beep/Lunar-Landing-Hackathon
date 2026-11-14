@@ -2,7 +2,7 @@
 // Grid: sites as rows, landing dates as columns; each cell = verdict for a 7-day stay starting
 // that day, straight from getDaily() (the daily summary). Timeline strip: hourly sunlight /
 // Earth-in-view for the selected site over the same dates, from getTimeline().
-import { V, type Verdict, type Weights } from "./data";
+import { V, type Verdict, type Weights, type RankFilter } from "./data";
 import { createPanelRoot, esc, pct, VERDICT_WORDS, EDGE_WORDS, addDays, whyWeights, WHY_WEIGHTS_CSS, WEIGHT_KEYS } from "./shared";
 import type { MountPanel, PanelProps } from "./types";
 
@@ -25,9 +25,11 @@ export const mountCompareGrid: MountPanel = (container, props) => {
   // D17 best-site score: reading level and Researcher weights (live ranking).
   let scoreMode: "educator" | "researcher" = "educator";
   let weights: Weights = { ...V.SCORE_DEFAULT_WEIGHTS };
+  let rankFilter: RankFilter = "all"; // D21: all sites / candidate sites / historic landings
 
   body.addEventListener("input", (e) => {
     const t = e.target as HTMLInputElement;
+    if (t.dataset.action === "rank-filter") { rankFilter = t.value as RankFilter; renderRanking(); return; }
     const k = t.dataset.weight as keyof Weights | undefined;
     if (!k) return;
     weights = { ...weights, [k]: Number(t.value) };
@@ -87,7 +89,7 @@ export const mountCompareGrid: MountPanel = (container, props) => {
         const tip = `${s.name}, landing ${d}: ${w.label}${edgeWhy}. Over ${days} days: sunlight ${pct(r.pctLit)}, Earth in view ${pct(r.pctComms)}, both ${pct(r.pctBoth)}, longest dark ${r.longestDarkHours} h.`;
         return `<td class="${selCell ? "selcell" : ""}"><button type="button" class="v" data-verdict="${r.verdict}" data-action="cell" data-site="${s.id}" data-date="${d}" title="${esc(tip)}" aria-label="${esc(tip)}">${w.symbol}</button></td>`;
       }).join("");
-      return `<tr class="${selRow ? "selrow" : ""}"><th scope="row"><button type="button" data-action="site" data-site="${s.id}" ${selRow ? 'aria-current="true"' : ""}>${esc(s.name)}</button> <span class="tag" data-model="${model === "FLAT" ? "flat" : "lola"}">${model}</span></th>${cells}</tr>`;
+      return `<tr class="${selRow ? "selrow" : ""}"><th scope="row"><button type="button" data-action="site" data-site="${s.id}" ${selRow ? 'aria-current="true"' : ""}>${esc(s.name)}</button> <span class="tag" data-model="${model === "FLAT" ? "flat" : "lola"}">${model}</span>${s.category === "historic" ? ' <span class="tag hist" title="Historic landing, shown for comparison">PAST</span>' : ""}</th>${cells}</tr>`;
     }).join("");
 
     const strip = await stripHtml(current.siteId, dates, days);
@@ -137,6 +139,10 @@ export const mountCompareGrid: MountPanel = (container, props) => {
           <input type="range" min="0" max="100" step="1" value="${weights[k]}" data-weight="${k}" aria-label="Weight ${w}"/> <b data-weight-label="${k}">${weights[k]}</b></label>`).join("")}</div>
         <button type="button" class="reset" data-action="reset-weights">Reset to default weights (${terms.map(([k, w]) => `${w} ${V.SCORE_DEFAULT_WEIGHTS[k]}`).join(", ")})</button>
         ${whyWeights("researcher")}` : whyWeights("educator")}
+      <label class="filter">Show <select data-action="rank-filter">
+        <option value="all"${rankFilter === "all" ? " selected" : ""}>All sites</option>
+        <option value="candidate"${rankFilter === "candidate" ? " selected" : ""}>Candidate sites</option>
+        <option value="historic"${rankFilter === "historic" ? " selected" : ""}>Historic landings (comparisons)</option></select></label>
       <div class="rank-out" aria-live="polite"></div>`;
     renderRanking();
   }
@@ -145,19 +151,22 @@ export const mountCompareGrid: MountPanel = (container, props) => {
     const out = body.querySelector(".rank-out");
     if (!out) return;
     let r;
-    try { r = V.getRanking(current.landingDate, scoreMode === "researcher" ? weights : V.SCORE_DEFAULT_WEIGHTS); } catch { out.innerHTML = `<p class="muted">Not available for this date.</p>`; return; }
+    try { r = V.getRanking(current.landingDate, scoreMode === "researcher" ? weights : V.SCORE_DEFAULT_WEIGHTS, rankFilter); } catch { out.innerHTML = `<p class="muted">Not available for this date.</p>`; return; }
     const avail = r.ranking.filter((x) => x.available);
     if (!avail.length) { out.innerHTML = `<p class="muted">Not available for this date (outside the data range).</p>`; return; }
     const top = avail[0];
+    const group = rankFilter === "candidate" ? "candidate site" : rankFilter === "historic" ? "historic landing" : "site";
+    const histNote = (x: { category: string }) => (x.category === "historic" ? ` <span class="cmp">past landing, shown for comparison</span>` : "");
     if (scoreMode === "educator") {
-      out.innerHTML = `<p class="big">For a landing on ${esc(current.landingDate)}, the top site by our prototype ${esc(V.SCORE_LABEL)} is <strong>${esc(top.name)}</strong>, scoring <strong>${Math.round(top.score!)}</strong> out of 100.</p>
-        <ol class="rank">${avail.map((x) => `<li${x.siteId === current.siteId ? ' class="sel"' : ""}>${esc(x.name)}: ${Math.round(x.score!)}</li>`).join("")}</ol>
+      out.innerHTML = `<p class="big">For a landing on ${esc(current.landingDate)}, the top ${group} by our prototype ${esc(V.SCORE_LABEL)} is <strong>${esc(top.name)}</strong>, scoring <strong>${Math.round(top.score!)}</strong> out of 100${top.category === "historic" ? " (a past landing, shown for comparison)" : ""}.</p>
+        <ol class="rank">${avail.map((x) => `<li${x.siteId === current.siteId ? ' class="sel"' : ""}>${esc(x.name)}: ${Math.round(x.score!)}${histNote(x)}</li>`).join("")}</ol>
+        <p class="muted small">Historic landings are past missions, included so educators can compare them with candidate sites.</p>
         <p class="muted small">Uses the default weights. The Researcher view explains the calculation.</p>`;
       return;
     }
     out.innerHTML = `<p class="small">${r.isDefault ? "Default weights." : "Custom weights: the ranking below is yours, not the Educator default."} Top site: <strong>${esc(top.name)}</strong> (${top.score === null ? "–" : top.score.toFixed(1)}).</p>
       <table class="ranktable"><thead><tr><th>#</th><th>Site</th><th>Score</th><th>S</th><th>E</th><th>D</th><th>G</th><th>C</th><th>T</th></tr></thead><tbody>
-      ${avail.map((x, i) => `<tr${x.siteId === current.siteId ? ' class="sel"' : ""}><td>${i + 1}</td><td><button type="button" data-action="site" data-site="${x.siteId}">${esc(x.name)}</button></td><td>${x.score === null ? "–" : x.score.toFixed(1)}</td>${WEIGHT_KEYS.map(([k]) => `<td>${x.components![k].toFixed(2)}</td>`).join("")}</tr>`).join("")}
+      ${avail.map((x, i) => `<tr${x.siteId === current.siteId ? ' class="sel"' : ""}><td>${i + 1}</td><td><button type="button" data-action="site" data-site="${x.siteId}">${esc(x.name)}</button>${histNote(x)}</td><td>${x.score === null ? "–" : x.score.toFixed(1)}</td>${WEIGHT_KEYS.map(([k]) => `<td>${x.components![k].toFixed(2)}</td>`).join("")}</tr>`).join("")}
       </tbody></table>
       ${r.ranking.length > avail.length ? `<p class="muted small">${r.ranking.length - avail.length} site(s) have no data for this date.</p>` : ""}`;
   }
@@ -255,6 +264,10 @@ td.selcell .v, td.selcell span { outline: 3px solid var(--llp-text, #ecf2ff); ou
 .tag[data-model="flat"] { color: var(--llp-warn, #ffd49d); }
 .tag[data-model="lola"] { color: var(--llp-clear, #4fbf7a); }
 svg.strip { width: 100%; height: auto; display: block; }
+.filter { display: inline-flex; gap: 6px; align-items: center; margin: 6px 0 0 10px; font-size: .85rem; }
+.filter select { font: inherit; padding: 2px 6px; border-radius: 6px; border: 1px solid var(--llp-border, #344b69); background: transparent; color: inherit; }
+.cmp { font-size: .75rem; color: var(--llp-muted, #a8bbd3); font-style: italic; }
+.tag.hist { color: var(--llp-muted, #a8bbd3); }
 .score-box { margin-top: 16px; padding: 10px 14px; border: 1px solid var(--llp-border, #344b69); border-radius: 10px; }
 .score-box .big { font-size: 1.02rem; }
 .proto { display: inline-block; padding: 0 6px; border-radius: 5px; font-size: .68rem; letter-spacing: .06em; border: 1px dashed var(--llp-warn, #ffd49d); color: var(--llp-warn, #ffd49d); vertical-align: middle; }

@@ -92,7 +92,7 @@ export const mountSideCard: MountPanel = (container, props) => {
     const flat = state.horizonModel === "flat";
     const days = V.VERDICT_RULE.STAY_DAYS;
     const coords = `${Math.abs(site.lat).toFixed(5)}°${site.lat < 0 ? "S" : "N"}, ${Math.abs(site.lon).toFixed(5)}°${site.lon < 0 ? "W" : "E"}`;
-    const pointNote = site.kind === "south-pole" ? site.note.split(" (")[0] : "";
+    const pointNote = site.category === "candidate" ? site.note.split(" (")[0] : "";
     const horizonLabel = flat
       ? "Flat horizon: terrain is not modelled at this site."
       : "Terrain horizon from LOLA elevation data (one point; nearby spots differ, especially toward Earth).";
@@ -101,6 +101,7 @@ export const mountSideCard: MountPanel = (container, props) => {
       <header>
         <h2>${esc(site.name)}</h2>
         <p class="muted">${esc(coords)} · stay of ${days} days from ${esc(current.landingDate)} 00:00 UTC</p>
+        <p class="small"><span class="tag cat" data-cat="${site.category}">${site.category === "historic" ? "HISTORIC LANDING" : "CANDIDATE SITE"}</span> ${esc(V.SITE_CATEGORIES[site.category])}</p>
         ${pointNote ? `<p class="muted small">${esc(pointNote)}.</p>` : ""}
       </header>
       <div class="switch" role="group" aria-label="Reading level: Educator or Researcher">
@@ -139,10 +140,16 @@ export const mountSideCard: MountPanel = (container, props) => {
       const r = V.getRanking(current.landingDate);
       const me = r.ranking.find((x) => x.siteId === site.id);
       const top = r.ranking[0];
+      const topCand = V.getRanking(current.landingDate, undefined, "candidate").ranking.find((x) => x.available);
       if (!me?.available || !top?.available) return `<div class="score"><h3>${esc(V.SCORE_LABEL)} <span class="proto">PROTOTYPE</span></h3><p class="muted">Not available for this landing date.</p></div>`;
-      const topLine = top.siteId === site.id
-        ? `This is the top site for a landing on ${esc(current.landingDate)}.`
-        : `The top site for a landing on ${esc(current.landingDate)} is <strong>${esc(top.name)}</strong> (${Math.round(top.score!)} out of 100).`;
+      // D21: name the top candidate site; past landings are comparisons, never proposals.
+      const candLine = topCand
+        ? (topCand.siteId === site.id ? `This is the top candidate site for a landing on ${esc(current.landingDate)}.` : `The top candidate site for a landing on ${esc(current.landingDate)} is <strong>${esc(topCand.name)}</strong> (${Math.round(topCand.score!)} out of 100).`)
+        : "";
+      const allLine = top.category === "historic"
+        ? ` Counting past landings too, the highest score belongs to ${top.siteId === site.id ? "this site" : esc(top.name)} (${Math.round(top.score!)}), a past landing shown for comparison.`
+        : "";
+      const topLine = candLine + allLine;
       return `<div class="score"><h3>${esc(V.SCORE_LABEL)} <span class="proto">PROTOTYPE</span></h3>
         <p class="big"><strong>${Math.round(me.score!)}</strong> out of 100 for this site. ${whyWeights("educator")}</p>
         <p>${topLine}</p>
@@ -361,6 +368,8 @@ thead th { color: var(--llp-muted, #a8bbd3); font-weight: 600; }
 .exits { display: flex; gap: 8px; margin-top: 10px; }
 .score { margin-top: 14px; padding: 10px 14px; border: 1px solid var(--llp-border, #344b69); border-radius: 10px; }
 .score .big { font-size: 1.05rem; }
+.tag.cat[data-cat="historic"] { color: var(--llp-muted, #a8bbd3); }
+.tag.cat[data-cat="candidate"] { color: var(--llp-link, #9cc6ff); }
 .proto { display: inline-block; padding: 0 6px; border-radius: 5px; font-size: .68rem; letter-spacing: .06em; border: 1px dashed var(--llp-warn, #ffd49d); color: var(--llp-warn, #ffd49d); vertical-align: middle; }
 .calc { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px 12px; margin: 6px 0; font-size: .85rem; }
 .calc label { display: grid; gap: 3px; color: var(--llp-muted, #a8bbd3); }

@@ -1286,3 +1286,13 @@ Panel = sun-tracking, 1 m², 30%, summed over 2026–2029.
 - DOM tests: eclipse shown in the horizon view (40% then 100%) and the side card; Researcher metrics list eclipse and marginal-Earth hours; earlier panel tests pass with the updated numbers.
 - `/web` build OK. README updated (limits, six check scripts, examples).
 
+### 2026-11-14 — D21 DONE: filterable ranking, no south-pole assumption
+- `/lib`: `listSites()` adds `category`: **"historic"** when a site has a landing date (Apollo 11, 12, 17, Chandrayaan-3, IM-1, IM-2), otherwise **"candidate"** (the four Artemis candidate points). Derived from the data, not from latitude.
+  - `SITE_CATEGORIES` gives the labels. `getRanking(date, weights, filter)` takes filter `"all" | "candidate" | "historic"` and adds `category` to every row. Filtering never changes a score.
+- **Panels:**
+  - Compare grid score box: a "Show: All sites / Candidate sites / Historic landings (comparisons)" filter. Historic sites are tagged "past landing, shown for comparison", grid rows show a PAST tag, plus the note "Historic landings are past missions, included so educators can compare them with candidate sites."
+  - Side card: a HISTORIC LANDING / CANDIDATE SITE tag. The Educator line names the **top candidate site**, and adds the top overall only if it's a past landing ("a past landing shown for comparison").
+  - No "south pole" wording or defaults in Lane A panels. The test page's default site is the first site in the list. The site-point note is keyed on the candidate category, not on the old `kind`.
+- **Lane B:** please check your shell for any south-pole default or wording (e.g. the default selected site or a "South pole view" button label) and decide with the humans.
+- **Checks:** `check_metrics` gains the D21 cases (categories from landing dates; filters partition the ranking; scores unchanged; unknown filter rejected). DOM test: Apollo 11 tagged historic; top candidate Nobile Rim 2 named; grid filters; 6 PAST tags. `check_visibility` (API 1.7.0) PASS; `/web` build OK.
+

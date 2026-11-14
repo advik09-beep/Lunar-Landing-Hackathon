@@ -5,6 +5,7 @@ import * as raw from "../../../lib/visibility.js";
 export interface Site {
   id: string; name: string; lat: number; lon: number; kind: string;
   landingDate: string | null; source: string; coordsVerified: boolean; note: string;
+  category: "candidate" | "historic"; // D21
 }
 export interface State {
   sunEl: number; sunAz: number; earthEl: number; earthAz: number;
@@ -55,9 +56,10 @@ export interface Power {
   poweredHours: number; longestNoPowerHours: number; batteryWh: number; assumptions: string[]; estimate: true;
 }
 export type Weights = { sunlight: number; earth: number; shortDark: number; shortGap: number; clearance: number; slip: number };
-export interface RankRow { siteId: string; name: string; score: number | null; available: boolean;
+export type RankFilter = "all" | "candidate" | "historic";
+export interface RankRow { siteId: string; name: string; category: "candidate" | "historic"; score: number | null; available: boolean;
   components?: Record<keyof Weights, number>; }
-export interface Ranking { landingDate: string; weights: Weights; isDefault: boolean; formula: string; prototype: true; ranking: RankRow[] }
+export interface Ranking { landingDate: string; weights: Weights; isDefault: boolean; formula: string; prototype: true; filter: RankFilter; ranking: RankRow[] }
 
 interface Api {
   MOCK: boolean; API_VERSION: string; VERDICT_RULE: VerdictRule;
@@ -71,7 +73,8 @@ interface Api {
   getCoverage(): Coverage;
   getMetrics(siteId: string, startUtc: string | number, days?: number): Metrics;
   computePower(o: { siteId: string; startUtc: string | number; days?: number; areaM2: number; efficiency: number; panel: "tracking" | "fixed-flat"; loadW: number }): Power;
-  getRanking(landingDate: string, weights?: Partial<Weights>): Ranking;
+  getRanking(landingDate: string, weights?: Partial<Weights>, filter?: RankFilter): Ranking;
+  SITE_CATEGORIES: Record<"candidate" | "historic", string>;
   scoreOf(m: Metrics, weights?: Partial<Weights>): { score: number | null; components: Record<keyof Weights, number>; weights: Weights };
   SCORE_DEFAULT_WEIGHTS: Weights; SCORE_TERMS: Record<keyof Weights, string>; SCORE_FORMULA_TEXT: string;
   SOLAR_IRRADIANCE_W_M2: number; SOLAR_IRRADIANCE_SOURCE: string;

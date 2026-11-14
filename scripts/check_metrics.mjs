@@ -90,6 +90,14 @@ const sunOnly = V.getRanking(date, { sunlight: 100, earth: 0, shortDark: 0, shor
 ok(sunOnly.ranking.map((x) => x.siteId).join() !== r.ranking.map((x) => x.siteId).join() && !sunOnly.isDefault, "changing weights re-ranks (sunlight-only weights give a different order)");
 ok(V.getRanking(date, { sunlight: 0, earth: 0, shortDark: 0, shortGap: 0, clearance: 0, slip: 0 }).ranking.every((x) => x.score === null), "all-zero weights give no score (not a fake number)");
 
+// D21: filterable ranking, no south-pole assumption; historic landings are comparisons.
+const cats = V.listSites().map((x) => x.category);
+ok(V.listSites().every((x) => (x.landingDate ? x.category === "historic" : x.category === "candidate")), `every site is a candidate or a historic landing (${cats.filter((c) => c === "candidate").length} candidate, ${cats.filter((c) => c === "historic").length} historic), from its landing date`);
+const rc = V.getRanking(date, undefined, "candidate"), rh = V.getRanking(date, undefined, "historic");
+ok(rc.ranking.every((x) => x.category === "candidate") && rh.ranking.every((x) => x.category === "historic") && rc.ranking.length + rh.ranking.length === r.ranking.length, "filters return only candidate / only historic sites; together they make the full ranking");
+ok(rc.ranking.every((x) => x.score === r.ranking.find((y) => y.siteId === x.siteId).score), "filtering never changes a site's score");
+try { V.getRanking(date, undefined, "pole"); ok(false, "unknown filter rejected"); } catch (e) { ok(/filter/.test(e.message), "unknown filter rejected"); }
+
 // Worked score example (same stay as the power example), every term from first principles.
 const t0 = Date.parse(`${date}T00:00:00Z`);
 const tl2 = V.getTimeline("im2", t0, 7).samples;
