@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | 1 — PASS | Public desktop catalog verified: lunar-landing-hackathon.vercel.app; 10/10 sites, MOCK banner hidden. Stopped after Step 1. |
+| Advik + ChatGPT (Lane B) | D8 — IN PROGRESS | Advik GO: implement postbuild data copy; verify both public JSON URLs before Step 4 Three.js Moon. |
 | Sheldon (Lane A human) | — | D9 + D10 signed 2026-11-14; gates Lane A's D10, panel interface and side card one at a time |
 | Claude Code (Lane A) | 7 / D10 | Moving sp_malapert to the highest ground within 1 km, re-downloading and recomputing; will report before committing |
 
