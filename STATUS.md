@@ -5,12 +5,12 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 | Who | Step | Doing now |
 |-----|------|-----------|
 | Advik + ChatGPT (Lane B) | 1 — PASS | Public desktop catalog verified: lunar-landing-hackathon.vercel.app; 10/10 sites, MOCK banner hidden. Stopped after Step 1. |
-| Sheldon (Lane A human) | — | Step 2 PASSED 2026-11-14; GO given for Lane A's half of step 5 |
-| Claude Code (Lane A) | 7 (Lane A half, sp_malapert) | Stages 2-4 DONE 2026-11-14; stopped. Lane B can build the horizon view on getHorizon. |
+| Sheldon (Lane A human) | — | D9 + D10 signed 2026-11-14; gates Lane A's D10, panel interface and side card one at a time |
+| Claude Code (Lane A) | 7 / D10 | Moving sp_malapert to the highest ground within 1 km, re-downloading and recomputing; will report before committing |
 
-Step 2 Real numbers: **PASSED 2026-11-14**. Signed 2026-11-14: D7 desktop only; D8 data copied at build + fetched per site, setDataBase added.
-Waiting on Sheldon: decide whether the sp_malapert horizon is good enough as-is (north horizon is sensitive to the exact point; see Lane A entry) and whether to do pole sites 2-4.
-Waiting on Advik: step 1 live URL showing the 10 sites in a desktop browser; then Lane B's postbuild copy for step 5 (spec in Lane A section).
+Step 1 Live URL: **PASS** (Lane B, 2026-11-14). Step 2 Real numbers: **PASSED 2026-11-14**. Signed 2026-11-14: D7 desktop only; D8 data copy + setDataBase; D9 Lane A builds the side card, Compare grid and horizon view as panels in web/src/panels/; D10 move sp_malapert to the highest ground within 1 km.
+Waiting on Sheldon: go after each Lane A stage (D10 report, then panel interface, then side card).
+Waiting on Advik: postbuild data copy for step 5 (spec in Lane A section); 3D Moon (step 4); mounting Lane A panels once the interface is posted.
 
 ## Continuous two-agent coordination protocol (agreed 2026-11-14)
 
@@ -630,4 +630,15 @@ Alternative: Lane A bundles the data into JS modules that Vite code-splits. This
   - `check_ephem` PASS; `check_horizon` PASS.
   - `cd web && npm run build` (typecheck + build) OK.
 - **Not done:** pole sites 2–4 (sp_cabeus_b_peak, sp_haworth, sp_nobile_rim2) stay flat. The same scripts would work for them, but each needs its own 20 m window. **Lane A stops here.**
+
+### 2026-11-14 — D9 and D10 signed by both humans
+- **D9 Roles:**
+  - Lane B keeps the app shell (index.html, main.ts, base styles, Vite and Vercel config), the postbuild data copy and the 3D Moon (step 4).
+  - Lane A now also builds three self-contained panels under `web/src/panels/`, which only Lane A edits: the side card with Plain / Numbers (step 3), the Compare dates grid (step 6) and the horizon view (step 7).
+  - Each panel exports a mount function taking a container element, the selected site and landing date, and callbacks for "site selected" and "date selected". Lane B mounts them and owns the shared selection.
+  - Neither lane edits the other's files in /web. Lane A's panel test page is `web/panels.html` (Sheldon's instruction).
+  - PLAN.md steps table updated: step 3 "A panel, B mounts"; step 6 "A grid panel, B mounts"; step 7 "A data + horizon view panel, B mounts".
+  - **Open question for both humans:** D9 names the Compare *grid*; step 6 also lists a *timeline strip*, and D9 doesn't say who builds that. Lane A assumes it belongs inside the grid panel unless told otherwise.
+- **D10 Malapert point:** move sp_malapert to the highest ground within 1 km of the current representative point, re-download its Horizons data, recompute the horizon, rerun every check, and keep the old point's numbers in the README for comparison. If the Earth-facing horizon is still set by ground closer than 500 m, Lane A reports to Sheldon before committing. No other pole sites for now.
+- **Note:** CLAUDE.md (Lane A rules) still says "Never edit /web". It needs a one-line update to match D9 before Lane A writes panels. Sheldon to confirm.
 

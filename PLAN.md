@@ -51,6 +51,21 @@ and researchers get the numbers behind them.
 - D7 Desktop only. No phone layout work or phone testing.
 - D8 Real data files are copied into the published folder at build time
   and fetched per site; setDataBase(url) is added to contract v1.
+- D9 Roles. Lane B keeps the app shell (index.html, main.ts, base
+  styles, Vite and Vercel config), the postbuild data copy and the 3D
+  Moon (step 4). Lane A now also builds three screen pieces as
+  self-contained modules under web/src/panels/, which only Lane A
+  edits: the side card with Plain / Numbers (step 3), the Compare dates
+  grid (step 6) and the horizon view (step 7). Each exports a mount
+  function taking a container element, the selected site and landing
+  date, and callbacks for "site selected" and "date selected". Lane B
+  mounts them and owns the shared selection. Neither lane edits the
+  other's files in /web.
+- D10 Malapert point. Move sp_malapert to the highest ground within
+  1 km of the current representative point. Re-download its Horizons
+  data for the new coordinates, recompute the horizon, rerun every
+  check. Keep the old point's numbers in the README as the "200 m
+  changes the answer" comparison. No other pole sites for now.
 
 ## Settled earlier (do not reopen without both humans)
 - 10 fixed sites: 3 Apollo, Chandrayaan-3, IM-1, IM-2, 4 south pole
@@ -70,11 +85,11 @@ and researchers get the numbers behind them.
 |---|------|-------|-------------|
 | 1 | Live URL [M0, B0] | B | public link shows the 10 sites in a desktop browser. |
 | 2 | Real numbers [M1] | A | 3 human hand-checks match within 0.1 deg; data covers 2026-2029 plus each past landing; /data/README.md written |
-| 3 | Side card, Plain / Numbers [M2, B1] | B | a stranger answers "is Earth in view here on this date?" in 10 seconds |
+| 3 | Side card, Plain / Numbers [M2, B1] | A panel, B mounts (D9) | a stranger answers "is Earth in view here on this date?" in 10 seconds |
 | 4 | Explore in 3D [B5 moved up] | B | 3D Moon with the 10 markers at their real latitude and longitude, colored by verdict; clicking a marker zooms in and opens the side card; a date control recolors markers; south pole sites can be told apart |
 | 5 | Real data in the app [B2] | A then B | MOCK is false, banner gone, on-screen values equal the files |
-| 6 | Compare dates grid + timeline strip [M3, B3, B4] | B | updates in under 1 second, cells equal the daily summary |
-| 7 | Terrain, one pole site first [M4, B6] | A then B | one moment where flat says lit and terrain says dark, shown in the horizon view |
+| 6 | Compare dates grid + timeline strip [M3, B3, B4] | A grid panel, B mounts (D9) | updates in under 1 second, cells equal the daily summary |
+| 7 | Terrain, one pole site first [M4, B6] | A data + horizon view panel, B mounts (D9) | one moment where flat says lit and terrain says dark, shown in the horizon view |
 | 8 | True lighting in 3D | A data, B scene | the Moon is lit from the real Sun direction for the chosen date and Earth sits in its real direction, from Lane A's scene data |
 | 9 | Submit [M7, B7] | both | live link works in a desktop browser, demo recorded, project page and slides done |
 
@@ -88,8 +103,9 @@ your own lane has passed.
 ## Working rules for both AIs
 - Start every session by reading this file and the STATUS.md header,
   then say in 3 lines: your step, the failing test, your next task.
-- Lane A edits /scripts, /data, /lib. Lane B edits /web. Each writes
-  only in its own section of STATUS.md.
+- Lane A edits /scripts, /data, /lib and web/src/panels/ (plus its
+  panel test page web/panels.html). Lane B edits the rest of /web.
+  Each writes only in its own section of STATUS.md (D9).
 - The STATUS.md header is the live board: one row per person/AI plus
   "Waiting on Sheldon: ..." and "Waiting on Advik: ...". Anyone may
   update their own row there.
