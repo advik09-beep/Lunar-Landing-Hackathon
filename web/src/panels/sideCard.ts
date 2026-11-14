@@ -28,6 +28,8 @@ export const mountSideCard: MountPanel = (container, props) => {
     else if (a === "prev-day") current.onDateSelected(addDays(current.landingDate, -1));
     else if (a === "next-day") current.onDateSelected(addDays(current.landingDate, 1));
     else if (a === "csv") downloadCsv();
+    else if (a === "open-horizon") current.onOpenView?.("horizon");
+    else if (a === "open-compare") current.onOpenView?.("compare");
   });
 
   async function load() {
@@ -94,7 +96,11 @@ export const mountSideCard: MountPanel = (container, props) => {
       <nav class="days" aria-label="Change landing date">
         <button type="button" data-action="prev-day">◀ Day before</button>
         <button type="button" data-action="next-day">Day after ▶</button>
-      </nav>`;
+      </nav>
+      ${current.onOpenView ? `<nav class="exits" aria-label="Open another view">
+        <button type="button" data-action="open-horizon">Stand here</button>
+        <button type="button" data-action="open-compare">Compare other dates</button>
+      </nav>` : ""}`;
 
     function plain(): string {
       return `
@@ -242,4 +248,6 @@ thead th { color: var(--llp-muted, #a8bbd3); font-weight: 600; }
 .days { display: flex; justify-content: space-between; gap: 8px; margin-top: 16px; }
 .days button, .csv { padding: 6px 12px; border: 1px solid var(--llp-border, #344b69); border-radius: 8px; background: transparent; color: inherit; }
 .csv { margin-top: 10px; }
+.exits { display: flex; gap: 8px; margin-top: 10px; }
+.exits button { flex: 1; padding: 8px 12px; border: 1px solid var(--llp-accent, #2f5d9a); border-radius: 8px; background: var(--llp-accent, #2f5d9a); color: inherit; font-weight: 600; }
 `;

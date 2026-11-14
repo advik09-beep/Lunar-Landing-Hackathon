@@ -66,6 +66,18 @@ and researchers get the numbers behind them.
   data for the new coordinates, recompute the horizon, rerun every
   check. Keep the old point's numbers in the README as the "200 m
   changes the answer" comparison. No other pole sites for now.
+- D11 Visual scope, all owned by Lane B, in this order: (a) Real Moon
+  map: replace the illustrative texture with NASA's CGI Moon Kit color
+  map (svs.gsfc.nasa.gov/4720), aligned using Lane A's alignment check,
+  labeled as NASA imagery for looks, not science. (b) Overview scene:
+  an imported open-source Sun, Earth and Moon model, trimmed to those
+  three bodies, as a separate opening scene labeled not to scale.
+  Clicking the Moon enters the explorer with the same date. Markers and
+  verdicts exist only in the Moon-fixed explorer. (c) A seamless zoom
+  between the two scenes, only if time allows. A Credits panel lists
+  every borrowed piece and its license. No code is copied from a repo
+  whose license we cannot show. Cut order: (c) first, then (b). Step 8
+  is unchanged: Moon-fixed true lighting.
 
 ## Settled earlier (do not reopen without both humans)
 - 10 fixed sites: 3 Apollo, Chandrayaan-3, IM-1, IM-2, 4 south pole

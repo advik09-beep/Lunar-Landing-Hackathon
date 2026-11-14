@@ -1,4 +1,4 @@
-// Lane A panel interface (PLAN D9). Lane B mounts panels and owns the shared selection;
+// Lane A panel interface v1.1 (PLAN D9; v1.1 adds onOpenView, approved by both humans 2026-11-14). Lane B mounts panels and owns the shared selection;
 // panels never change the selection themselves — they ask through the two callbacks.
 
 export interface PanelProps {
@@ -10,6 +10,9 @@ export interface PanelProps {
   onSiteSelected: (siteId: string) => void;
   /** Panel asks the shell to select a landing date (e.g. "next day", a grid cell). Same rule. */
   onDateSelected: (landingDate: string) => void;
+  /** v1.1, optional: panel asks the shell to open another view for the current selection.
+   *  Side card: "Stand here" -> "horizon", "Compare other dates" -> "compare". Buttons appear only if given. */
+  onOpenView?: (view: "horizon" | "compare") => void;
 }
 
 export interface PanelHandle {
