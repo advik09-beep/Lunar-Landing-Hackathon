@@ -483,3 +483,22 @@ Lane A will add `export const API_VERSION = "1.0.0"` and `export const READY = {
 - **Still true:** `MOCK = true`; `/lib/visibility.js` does not read these files yet. That is step 5, which **has not started**; it waits for Sheldon's go. Site altitudes are UNVERIFIED (0 km).
 - **Note for both humans:** PLAN.md's "Right now" block still shows Lane A on step 2. PLAN changes need both humans, so I left it alone; the STATUS header above is current.
 
+
+### 2026-11-14 — Review of Lane B's prototype_01 (Step 1, Vercel) Codex prompt: APPROVED
+**APPROVED as written.** Evidence, run by Claude Code on Sheldon's machine against main at 13bbc30. Nothing under /web was changed or committed.
+- `cd web && npm install` OK; `npm run typecheck` OK (no errors); `npm run build` OK. Vite 5.4.21, 6 modules: `dist/index.html` 0.72 kB, CSS 1.70 kB, JS 7.25 kB (2.62 kB gzip).
+- The built JS bundle contains all 10 `listSites()` names (checked by matching each name from `data/sites.js` against `web/dist/assets/*.js`: 10/10) and the MOCK notice text.
+- Not tested by Lane A: `npm run preview` in a browser, Vercel settings, the public URL, phone layout. Those remain the Step 1 pass test.
+
+**Q1:** Yes. It matches PLAN v2 step 1 and contract v1. It only uses `listSites()` and `MOCK`, keeps the banner, and changes nothing outside /web.
+
+**Q2:** No issue seen with Root Directory `.` plus `cd web && npm install` / `cd web && npm run build` / output `web/dist`. The root `package.json` only sets `"type": "module"` and has no dependencies or build script, so it shouldn't interfere. **Please commit `web/package-lock.json`** (created by `npm install`; currently untracked) so Vercel installs the same versions we tested.
+
+**Q3:** Nothing to patch in `web/vite.config.ts` or `web/tsconfig.json`. Note for diagnosis: `npm run build` runs `tsc --noEmit` before `vite build`, so a type error fails the deploy. `tsconfig.json` includes `../lib/**/*.js` with `checkJs: false`, so a *syntax* error in a future /lib change, or a removed export that `main.ts` imports, would also fail the build. Lane A runs `npm run build` in /web before pushing any /lib change.
+
+**Heads-up for step 5 only (proposal, not needed for step 1):** the real data (`data/ephem/<siteId>/<YYYY>.json`, `landing.json`, `index.json`, ~9.7 MB total, ~260 KB per site-year; later `data/daily.json`) is outside `web/dist`. Vite will not copy it, because `/lib` will fetch these files at run time rather than import them. Proposal:
+1. **Lane B** adds a copy step inside /web: e.g. a `postbuild` script in `web/package.json` that copies `../data/ephem` and `../data/daily.json` into `web/dist/data/`. The Vercel build command stays `cd web && npm run build` (npm runs `postbuild` automatically).
+2. **Lane A** makes `/lib/visibility.js` fetch from a data base URL. By default that's `data/` next to the page (`dist/data/` in production). In `vite dev`, the same files come from the repo through the existing `server.fs.allow`. Lane A adds one additive export, `setDataBase(url)`, as an override. That's a small v1 addition and needs both humans' OK.
+3. `loadSite(id)` fetches only that site's chunks, not all 46 files. Before step 5 starts, Lane A will run `npm run build && npm run preview` and confirm a fetch of one chunk from `dist/data/` succeeds.
+
+Alternative: Lane A bundles the data into JS modules that Vite code-splits. This means no copy step, but it adds ~10 MB of JS chunks to the build. Lane A recommends the copy step. Decide before step 5; step 1 is unaffected.
