@@ -69,8 +69,9 @@ const H_MAX = Math.max(D20.hMax, ...FAR.map((d) => d.hMax));
 
 // Great-circle destination from the site.
 // Optional observer shift (metres north / east) for sensitivity tests.
-const obsLat = site.lat + (Number(ENV.HZ_NORTH_M ?? 0) / R) * r2d;
-const obsLon = site.lon + (Number(ENV.HZ_EAST_M ?? 0) / (R * Math.cos(site.lat * d2r))) * r2d;
+const baseLat = Number(ENV.HZ_LAT ?? site.lat), baseLon = Number(ENV.HZ_LON ?? site.lon); // HZ_LAT/HZ_LON: dry-run another point
+const obsLat = baseLat + (Number(ENV.HZ_NORTH_M ?? 0) / R) * r2d;
+const obsLon = baseLon + (Number(ENV.HZ_EAST_M ?? 0) / (R * Math.cos(baseLat * d2r))) * r2d;
 const phi1 = obsLat * d2r, lam1 = obsLon * d2r;
 function dest(azDeg, dM) {
   const th = azDeg * d2r, dl = dM / R;
@@ -92,7 +93,7 @@ for (let k = 0; k < 360 * RAYS_PER_DEG; k++) {
   const az = (k - (RAYS_PER_DEG - 1) / 2) / RAYS_PER_DEG;   // bin 0 rays: -0.45..+0.45
   const bin = Math.round(az + 360) % 360;
   const azN = (az + 360) % 360;
-  let best = -Infinity, bestD = null, bestDem = null, d = D20.scale;
+  let best = -Infinity, bestD = null, bestDem = null, d = Math.max(D20.scale, Number(ENV.HZ_MIN_M ?? 0)); // HZ_MIN_M: sensitivity only
   for (;;) {
     if (best > -90 && angle(H_MAX, d) < best) break;     // nothing further can be higher
     const [lat, lon] = dest(azN, d);
@@ -131,10 +132,12 @@ const out = {
   source: "LRO LOLA GDR polar DEMs (PDS Geosciences): ldem_80s_20m, ldem_80s_80m, ldem_75s_120m, ldem_60s_240m — https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/polar/img/",
   builtUtc: new Date().toISOString(),
 };
+if (ENV.HZ_DUMP) writeFileSync(ENV.HZ_DUMP, JSON.stringify(out)); // sensitivity only
 if (ENV.HZ_DRY) {
   const pick = (a) => a.map((i) => out.elevationDeg[i].toFixed(2)).join(" ");
   console.log(JSON.stringify({ mast: MAST_M, rays: RAYS_PER_DEG, north_m: ENV.HZ_NORTH_M ?? 0, east_m: ENV.HZ_EAST_M ?? 0,
-    ground: r3(ground), az_0_90_180_270: pick([0, 90, 180, 270]), az_350_355: pick([350, 352, 354, 356, 358]) }));
+    ground: r3(ground), az_0_90_180_270: pick([0, 90, 180, 270]), az_350_355: pick([350, 352, 354, 356, 358]),
+    earth_bins: [351, 352, 353, 354, 355, 356, 357, 358, 359, 0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => `${i}:${out.elevationDeg[i].toFixed(2)}@${out.blockDistKm[i]}km`).join(" ") }));
   process.exit(0);
 }
 writeFileSync(join(ROOT, "data", "ephem", siteId, "horizon.json"), JSON.stringify(out));

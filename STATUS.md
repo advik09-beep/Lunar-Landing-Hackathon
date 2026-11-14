@@ -6,7 +6,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 |-----|------|-----------|
 | Advik + ChatGPT (Lane B) | 4 — IN PROGRESS | D8 postbuild files deployed, both data JSON URLs returned 200; now building Three.js Moon and 10 markers. |
 | Sheldon (Lane A human) | — | D9 + D10 signed 2026-11-14; gates Lane A's D10, panel interface and side card one at a time |
-| Claude Code (Lane A) | 7 / D10 | Moving sp_malapert to the highest ground within 1 km, re-downloading and recomputing; will report before committing |
+| Claude Code (Lane A) | D10 done; 3 (side card panel) | D10 committed; now panel interface, side card, web/panels.html |
 
 Step 1 Live URL: **PASS** (Lane B, 2026-11-14). Step 2 Real numbers: **PASSED 2026-11-14**. Signed 2026-11-14: D7 desktop only; D8 data copy + setDataBase; D9 Lane A builds the side card, Compare grid and horizon view as panels in web/src/panels/; D10 move sp_malapert to the highest ground within 1 km.
 Waiting on Sheldon: go after each Lane A stage (D10 report, then panel interface, then side card).
@@ -650,4 +650,15 @@ Alternative: Lane A bundles the data into JS modules that Vite code-splits. This
   - **Open question for both humans:** D9 names the Compare *grid*; step 6 also lists a *timeline strip*, and D9 doesn't say who builds that. Lane A assumes it belongs inside the grid panel unless told otherwise.
 - **D10 Malapert point:** move sp_malapert to the highest ground within 1 km of the current representative point, re-download its Horizons data, recompute the horizon, rerun every check, and keep the old point's numbers in the README for comparison. If the Earth-facing horizon is still set by ground closer than 500 m, Lane A reports to Sheldon before committing. No other pole sites for now.
 - **Note:** CLAUDE.md (Lane A rules) still says "Never edit /web". It needs a one-line update to match D9 before Lane A writes panels. Sheldon to confirm.
+
+### 2026-11-14 — D10 DONE: sp_malapert moved; answers recorded
+- **New point:** 85.97972°S, 0.67183°E, the highest ground within 1 km of the representative point; a slope, not a summit (highest LOLA 20 m pixel within 1 km of 86.0°S, 0.3°E; 4885.5 m above the 1737.4 km sphere; it sits on the 1 km circle and the ground keeps rising beyond). `data/sites.js`: coordinates and note updated; name is now "Malapert Massif (high ground near representative point)"; id unchanged.
+- **Re-done for the new coordinates:** Horizons 2026–2029 (`data/ephem/sp_malapert/`), terrain horizon, `data/daily.json`. Sheldon's two old-point hand-checks are now compared with a full-precision Horizons fixture at the original point (`data/checks/handcheck_sp_malapert_original_point.json`, `scripts/fetch_handcheck_fixture.mjs`): exact match, diff 0.000000. Query code moved to `scripts/horizons_api.mjs` (shared, no behaviour change).
+- **Earth-facing horizon (the D10 reporting rule):** bins 351°–5° are set by terrain 120–160 km away. Bins 6°–8° are set by ground 40 m away that slopes downhill (−3.1° to −3.2°). Reported to Sheldon before committing; ignoring ground closer than 500 m changes no Earth answer in 2026–2029 (smallest margin 0.05°). Sheldon: GO.
+- **Comparison, each with its own distance** (full table in `/data/README.md`):
+  - Original point vs D10 point, **1.000 km apart:** Earth in view over terrain 41.2% → 100%; Sun 29.1% → 45.8% (flat: Sun 50.4%, Earth ~69%).
+  - The **200 m** figures are the earlier sensitivity runs. Old point: northern horizon 1.6° to 11.8°. D10 point: 200 m south puts it back on the slope (+5° to +5.8°).
+- **Demo case updated:** 2026-09-19 06:00 UTC at sp_malapert, Sun +1.05° above the flat horizon but behind a ridge 1.84 km east (terrain horizon 6.03°). In the same hour Earth is −2.05° on flat but above the −3.16° terrain horizon (in view). `check_visibility` tests both.
+- **Checks:** `check_ephem` PASS (7/7), `check_horizon` PASS (Sun blocked-by-terrain 3,820 h; 49 robust far-ridge hours), `check_visibility` PASS (all 14,694 daily rows = getSummary). `/web` build OK.
+- **D9 follow-ups (Sheldon):** CLAUDE.md updated (Lane A may edit `web/src/panels/` and `web/panels.html`, nothing else under /web). The timeline strip lives inside the Compare dates grid panel.
 

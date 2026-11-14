@@ -68,13 +68,30 @@ What it means for us (our own calculation, not a doc statement): after 2027-02-0
 - The Chandrayaan-3 landing time is a secondary source and approximate; the IM-2 time is minute-precision only.
 
 ## Terrain horizon (step 7, sp_malapert only)
-- **DEMs (PDS Geosciences, LOLA GDR polar):** `ldem_80s_20m` (20 m/px; only rows within ±22 km of the site, via HTTP range), `ldem_80s_80m` (80 m, to 80°S), `ldem_75s_120m` (120 m, to 75°S), `ldem_60s_240m` (240 m, to 60°S). https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/polar/img/
+- **Observer point (D10, 2026-11-14):** highest ground within 1 km of the representative point; a slope, not a summit. 85.97972°S, 0.67183°E, 4885.5 m above the 1737.4 km sphere (highest LOLA 20 m pixel within 1 km of the original representative point 86.0°S, 0.3°E; `scripts/find_highest_point.mjs`). It sits on the 1 km circle: the ground keeps rising beyond it (highest within 3 km: 5123.5 m, also at the circle's edge). Its Horizons data in `ephem/sp_malapert/` were re-downloaded for these coordinates.
+- **DEMs (PDS Geosciences, LOLA GDR polar):** `ldem_80s_20m` (20 m/px; only rows within ±22 km of the original point, via HTTP range), `ldem_80s_80m` (80 m, to 80°S), `ldem_75s_120m` (120 m, to 75°S), `ldem_60s_240m` (240 m, to 60°S). https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/polar/img/
 - **Label facts:** polar stereographic centred on −90°, sphere 1737.4 km, "MEAN EARTH/POLAR AXIS OF DE421", LSB 16-bit, `HEIGHT = DN × 0.5` m, "Map values are relative to a radius of 1737.4 km" (same sphere as our Horizons data). Orientation from `catalog/dsmap_polar.cat`: "In the south, Longitude 0 extends straight up from the center, and Longitude 90 East extends to the right." Preliminary LOLA data (products created 2017).
 - **Method:**
-  - Observer on the 20 m DEM surface at the site (4830.5 m above the sphere) + 2 m mast (ASSUMED).
+  - Observer on the 20 m DEM surface + 2 m mast (ASSUMED).
   - Rays every 0.1° of azimuth along great circles. Exact spherical geometry (curvature included). Bilinear heights from the finest DEM covering each point.
-  - A ray stops when even the DEM maximum height (7027 m, label DERIVED_MAXIMUM) could no longer rise above the best angle found, so beyond that point nothing can change the result. Every one of the 360 bins stopped this way before any data edge, so the search is complete in every direction, including north toward Earth.
+  - A ray stops when even the DEM maximum height (7027 m, label DERIVED_MAXIMUM) could no longer rise above the best angle found. Every bin stopped this way before any data edge, so the search is complete in every direction.
   - Bin value = maximum of its ten rays.
-- **Sanity numbers:** smooth-sphere horizon dip for this observer 4.268° at 129.6 km. Southern horizon −3.6° set by terrain ~123 km away, close to the smooth-sphere value as expected for a high observer. 24 bins dip below −4.268° (terrain below the sphere).
-- **Sensitivity (important):** the representative point sits on a slope rising ~6° to the north (+21 m over 200 m). The northern horizon (Earth's direction, az 352–358: ~5.6°) is set by ground 140–180 m away and changes with position: 1.6° if the observer is 200 m further north, 8.0–8.6° if 200 m south, 3.4° with a 10 m mast. Directions blocked by distant ridges (e.g. east, south) barely change. Ray density 10 → 20 per degree: no change.
+- **Sanity numbers (D10 point):** smooth-sphere horizon dip 4.293° at 130.3 km. In Earth's directions (az ~352°–8° over 2026–2029) the horizon is −3.1° to −3.5°. Bins 351°–5° are set by terrain 120–160 km away; bins 6°–8° are set by ground ~40 m away that slopes downhill. Ignoring ground closer than 500 m lowers those three bins slightly and changes no Earth answer in 2026–2029; the smallest Earth margin there is 0.05°.
+- **Robust demo case:** 2026-09-19 06:00 UTC, Sun az 85.3°, el +1.05° (flat: lit). Terrain horizon 6.03°, set by a ridge 1.84 km east (terrain: dark). Earth el −2.05° (flat: not in view) is above the −3.16° terrain horizon (terrain: in view).
 
+### "Where you stand changes the answer" — two comparisons, each with its own distance
+**1. Original point vs D10 point: 1.000 km apart** (both 2026–2029, hourly):
+
+| | Original representative point (86.0°S, 0.3°E) | D10 point (85.97972°S, 0.67183°E) |
+|---|---|---|
+| Ground height above sphere | 4830.5 m | 4885.5 m |
+| Smooth-sphere dip | 4.268° | 4.293° |
+| Horizon toward Earth (az 352°–358°) | ~+5.6°, set by ground 140–180 m away | −3.1° to −3.5°, set by terrain 120–160 km away |
+| Sun visible: flat → terrain | 50.4% → 29.1% | 50.4% → 45.8% |
+| Earth in view: flat → terrain | 69.1% → 41.2% | 69.2% → **100%** |
+| 2026-09-19 06:00 UTC | Sun blocked (ridge 3.24 km east, 5.54°) | Sun blocked (ridge 1.84 km east, 6.03°) |
+
+**2. Moving the observer 200 m (earlier sensitivity runs; northern horizon, Earth's direction):**
+- From the original point: 200 m north → 1.6°; 200 m south → 8.0–8.6°; 200 m east → ~4°; 200 m west → ~11.8°; 10 m mast instead of 2 m → 3.4° (unshifted: ~5.6°).
+- From the D10 point: 200 m north → −3.3° (unchanged); 200 m south → +5.0° to +5.8° (back on the rising slope, set by ground ~80 m away); 200 m east → −2.5°; 200 m west → −3.3° to −2.8°; 10 m mast → no change.
+- Directions blocked by distant ridges barely move: east (az 90°) stays 6.0°–6.7° in every shift. Ray density 10 → 20 per degree: no change.

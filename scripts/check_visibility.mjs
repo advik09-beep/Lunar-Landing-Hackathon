@@ -61,17 +61,18 @@ ok(st.sunAz === f.sunAz[i] && st.sunEl === f.sunEl[i] && st.earthAz === f.earthA
 ok(st.sunAz === 91.486 && st.sunEl === -7.067, "apollo11 hand-check row (Sun) 91.486 / -7.067");
 
 // Step 7 test: an hour where the flat horizon says "Sun up" and the terrain says "blocked".
-// 2026-09-19 06:00 UTC at sp_malapert: Sun az 85.638, el 1.020; terrain horizon in bin 86 is
-// 5.541 deg (a ridge 3.24 km east). Found by scripts/check_horizon.mjs.
+// sp_malapert (D10 point), 2026-09-19 06:00 UTC: Sun az 85.267, el 1.048; terrain horizon in bin 85
+// is 6.032 deg, set by a ridge 1.84 km east (stays 6.0-6.7 deg if the observer moves 200 m).
+// Found by scripts/check_horizon.mjs. Earth at that hour is below the flat horizon but above the terrain.
 {
   const b = V.getState("sp_malapert", "2026-09-19T06:00:00Z");
   const hz = V.getHorizon("sp_malapert");
   ok(hz.model === "lola" && hz.elevationDeg.length === 360 && hz.verified === true && hz.resolutionDeg === 1, "getHorizon(sp_malapert) shape");
-  ok(b.sunEl > 0 && b.sunEl === 1.02, `blocked case: Sun above the flat horizon (el ${b.sunEl})`);
-  ok(b.lit === false && b.sunMarginDeg < -4, `blocked case: terrain says dark (margin ${b.sunMarginDeg.toFixed(3)})`);
-  ok(hz.blockDistKm[86] > 2, `blocked case: blocker is a distant ridge (${hz.blockDistKm[86]} km), not the point's own slope`);
-  const flatWouldSay = b.sunEl > 0;
-  ok(flatWouldSay && !b.lit, "flat says lit, terrain says dark");
+  ok(b.sunEl === 1.048, `blocked case: Sun above the flat horizon (el ${b.sunEl})`);
+  ok(b.lit === false && b.sunMarginDeg < -4.9, `blocked case: terrain says dark (margin ${b.sunMarginDeg.toFixed(3)})`);
+  ok(hz.blockDistKm[85] > 1, `blocked case: blocker is a ridge ${hz.blockDistKm[85]} km away, not the point's own slope`);
+  ok(b.sunEl > 0 && !b.lit, "flat says lit, terrain says dark");
+  ok(b.earthEl < 0 && b.comms === true, `same hour: Earth below the flat horizon (${b.earthEl}) but in view over terrain`);
 }
 
 // Countdown is consistent with the timeline.

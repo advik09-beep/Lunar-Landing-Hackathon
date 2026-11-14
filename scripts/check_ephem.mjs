@@ -34,14 +34,19 @@ const HAND = [
   ["sp_malapert", "2026-11-20T06:00:00Z", "earth", 352.405849, 7.454124],
   ["sp_malapert", "2026-11-17T08:00:00Z", "sun", 85.839251, 1.847012],
 ];
-console.log("Hand-check regression (file vs Horizons web app):");
+// sp_malapert moved under D10 (2026-11-14), so its hand-checks (made at the original point
+// 86.0S, 0.3E) are compared with a full-precision Horizons fixture for that original point.
+const fx = JSON.parse(readFileSync(join(DIR, "..", "checks", "handcheck_sp_malapert_original_point.json"), "utf8"));
+const atFixture = (utc) => { const i = (Date.parse(utc) - Date.parse(fx.start)) / 3600e3; return { sunAz: fx.sunAz[i], sunEl: fx.sunEl[i], earthAz: fx.earthAz[i], earthEl: fx.earthEl[i] }; };
+console.log("Hand-check regression (our data vs Horizons web app):");
 for (const [id, utc, body, az, el] of HAND) {
-  const r = at(id, utc);
+  const fromFixture = id === "sp_malapert";
+  const r = fromFixture ? atFixture(utc) : at(id, utc);
   const fa = r[body + "Az"], fe = r[body + "El"];
   const d = Math.max(Math.abs(fa - az), Math.abs(fe - el));
   maxDiff = Math.max(maxDiff, d);
-  console.log(`  ${id.padEnd(12)} ${utc} ${body.padEnd(5)} web ${az.toFixed(6)} / ${el.toFixed(6)}  file ${fa} / ${fe}  diff ${d.toFixed(6)}`);
-  ok(d <= 0.0006, `${id} ${utc} ${body} differs by ${d} (> stored rounding 0.0005)`);
+  console.log(`  ${id.padEnd(12)} ${utc} ${body.padEnd(5)} web ${az.toFixed(6)} / ${el.toFixed(6)}  ${fromFixture ? "fixture(original point)" : "file"} ${fa} / ${fe}  diff ${d.toFixed(6)}`);
+  ok(d <= (fromFixture ? 0.0000011 : 0.0006), `${id} ${utc} ${body} differs by ${d}`);
 }
 
 // PLAN step 2 sanity checks.
@@ -69,5 +74,6 @@ for (const s of sites) {
   }
 }
 
+ok(fx.lat === -86.0 && fx.lon === 0.3, "fixture is at the original sp_malapert point");
 if (fails) { console.error(`${fails} check(s) failed`); process.exit(1); }
 console.log(`PASS (7/7 hand-check rows, max diff ${maxDiff.toFixed(6)} deg; tolerance 0.1 deg)`);
