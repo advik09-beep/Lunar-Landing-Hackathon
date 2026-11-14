@@ -5,10 +5,11 @@ PLAN.md v2 is the one plan and wins over this file. Right now:
 | Who | Step | Doing now |
 |-----|------|-----------|
 | Advik + ChatGPT (Lane B) | 1 | Build the web app and get a public live URL |
-| Sheldon (Lane A human) | 2 | Three hand-checks of our numbers against the JPL Horizons web app |
-| Claude Code (Lane A) | 2 | Waiting on Sheldon's hand-checks, then widening the data download |
+| Sheldon (Lane A human) | — | Step 2 PASSED 2026-11-14; decide when Lane A starts step 5 |
+| Claude Code (Lane A) | 5 (not started) | Waiting for Sheldon's go on step 5 (real data in /lib) |
 
-Waiting on Sheldon: remaining Horizons hand-checks (check 1 Sun PASSED; check 1 Earth, checks 2 and 3 pending; rows in the Lane A entry "M1 download script, 7-day test window").
+Step 2 Real numbers: **PASSED 2026-11-14** (7/7 hand-checks, 2026-2029 + landing windows downloaded, /data/README.md written).
+Waiting on Sheldon: go-ahead for Lane A step 5; reply to Lane B's Step 1 Vercel prompt request (Lane B entry, commit 202aa43).
 Waiting on Advik: step 1 live URL showing the 10 sites on a phone.
 
 ## Continuous two-agent coordination protocol (agreed 2026-11-14)
@@ -472,4 +473,13 @@ Lane A will add `export const API_VERSION = "1.0.0"` and `export const READY = {
 - Lighting stays illustrative until step 8 (`getSceneState`, `READY.getSceneState === false`).
 
 **Lane A next single task (unchanged):** finish step 2 after the remaining hand-checks: widen the download, then `/data/README.md`.
+
+### 2026-11-14 — Step 2 Real numbers PASSED
+- **Hand-checks: 7 of 7 match the Horizons web app to six decimals (Sheldon).** These are the six planned rows (apollo11 2026-11-14 12:00, im1 2026-11-17 08:00, sp_malapert 2026-11-20 06:00; Sun and Earth each) plus sp_malapert Sun 2026-11-17 08:00 (web app 85.839251 / 1.847012).
+- **EOP question resolved (manual):** EOP only sets UT1/polar motion/nutation for Earth's frame, and reaches a Moon site only through the UTC time labels. After the prediction end (2027-02-08), Horizons holds the last predicted values constant and uses the last known leap second. Our estimate: at most ~1 s of timing error (an unknown future leap second), i.e. ~0.0002° of Sun motion. Negligible. Full quotes in `/data/README.md`.
+- **Download widened:** `scripts/fetch_horizons.mjs` now writes `data/ephem/<siteId>/<YYYY>.json` for 2026-2029, plus `landing.json` (landing day ±15 days) for apollo11, apollo12, apollo17, chandrayaan3, im1, im2, and `data/ephem/index.json`. That's 46 chunks: one request per site × target × chunk (≤ 8784 rows), one at a time with a 1.5 s pause, retries on network errors, and the run can be resumed. Values are stored at 3 decimals: ~260 KB per site-year, 9.7 MB total. The old 7-day files were removed (the 2026 files cover the same hours). Every chunk header was checked for MEAN_ME (high precision), east-longitude positive, AIRLESS and UT; the script also checks for gaps and row counts.
+- **Regression:** `node scripts/check_ephem.mjs` → PASS. 7/7 rows within 0.0005° of the web app (max 0.000431°, the storage rounding). Apollo 11 landing hour 1969-07-20 20:00Z: Sun az 88.804° el 10.553° (low, east). Earth > 30° at the Apollo sites and within 10° of the horizon at the four pole sites (2027-06-01). Coverage complete for all 10 sites, with no gaps. `node scripts/check_visibility.mjs` still PASS (mock unchanged).
+- **`/data/README.md` written:** every query setting with its doc source; longitude sign, azimuth direction and UTC, each with the Horizons header line or doc quote that proves it; frame, sphere, corrections, sampling, EOP, checks and known limits.
+- **Still true:** `MOCK = true`; `/lib/visibility.js` does not read these files yet. That is step 5, which **has not started**; it waits for Sheldon's go. Site altitudes are UNVERIFIED (0 km).
+- **Note for both humans:** PLAN.md's "Right now" block still shows Lane A on step 2. PLAN changes need both humans, so I left it alone; the STATUS header above is current.
 
