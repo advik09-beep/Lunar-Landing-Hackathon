@@ -1,7 +1,7 @@
 // Script for web/panels.html (Lane A test page). Plays the shell's role from PLAN D9:
 // owns the selection, mounts the side card, and applies the panel's selection requests.
 import { V } from "./data";
-import { mountSideCard, mountCompareGrid, type PanelProps } from "./index";
+import { mountSideCard, mountCompareGrid, mountHorizonView, type PanelProps } from "./index";
 
 const params = new URLSearchParams(location.search);
 const siteSel = document.querySelector<HTMLSelectElement>("#site")!;
@@ -27,12 +27,14 @@ const props = (): PanelProps => ({
   onDateSelected: (d) => { log.textContent = `panel asked for date ${d}`; select(siteSel.value, d); },
   onOpenView: (view) => {
     log.textContent = `side card asked to open the ${view} view`;
-    if (view === "compare") document.querySelector("#compare-grid")?.scrollIntoView({ behavior: "smooth" });
+    const target = view === "horizon" ? "#horizon-view" : "#compare-grid";
+    document.querySelector(target)?.scrollIntoView({ behavior: "smooth" });
   },
 });
 
 const panels = [
   mountSideCard(document.querySelector<HTMLElement>("#side-card")!, props()),
+  mountHorizonView(document.querySelector<HTMLElement>("#horizon-view")!, props()),
   mountCompareGrid(document.querySelector<HTMLElement>("#compare-grid")!, props()),
 ];
 

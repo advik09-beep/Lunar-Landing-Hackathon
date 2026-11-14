@@ -22,13 +22,15 @@
   <body>
     <main>
       <h1>Lane A panels — test page</h1>
-      <p class="note">Standalone page for checking Lane A panels with real data. It plays the shell's role: it owns the selection and mounts the side card and the Compare dates grid (with its timeline strip).</p>
+      <p class="note">Standalone page for checking Lane A panels with real data. It plays the shell's role: it owns the selection and mounts the side card, the horizon view (“Stand here”) and the Compare dates grid (with its timeline strip). The side card’s two exit buttons scroll to those panels.</p>
       <form id="pick" onsubmit="return false">
         <label>Site <select id="site"></select></label>
         <label>Landing date (UTC) <input id="date" type="date" /></label>
       </form>
       <p id="log" role="status"></p>
       <div id="side-card"></div>
+      <h2 class="section">Stand here: horizon view (step 7)</h2>
+      <div id="horizon-view"></div>
       <h2 class="section">Compare dates (step 6)</h2>
       <div id="compare-grid"></div>
     </main>

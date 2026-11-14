@@ -6,11 +6,11 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 |-----|------|-----------|
 | Advik + ChatGPT (Lane B) | 4 — REVIEW | D8 live JSON PASS; Three.js Moon, date controls, ten markers and Lane A side card deployed; desktop browser tests pass; human acceptance pending. |
 | Sheldon (Lane A human) | — | D9 + D10 signed 2026-11-14; gates Lane A's D10, panel interface and side card one at a time |
-| Claude Code (Lane A) | 6 (Compare grid panel) | Compare grid + timeline strip built and pushed; stopped. Next Lane A panel: horizon view (step 7) on Sheldon's go |
+| Claude Code (Lane A) | 7 (horizon view panel) | Horizon view ("Stand here") built and pushed; all three D9 panels READY to mount; stopped |
 
 Step 1 Live URL: **PASS** (Lane B, 2026-11-14). Step 2 Real numbers: **PASSED 2026-11-14**. Signed 2026-11-14: D7 desktop only; D8 data copy + setDataBase; D9 Lane A builds the side card, Compare grid and horizon view as panels in web/src/panels/; D10 move sp_malapert to the highest ground within 1 km; D11 visual scope (Lane B): (a) NASA CGI Moon Kit map, (b) not-to-scale Sun-Earth-Moon overview scene, (c) seamless zoom if time; Credits panel; cut (c) then (b).
-Waiting on Sheldon: review the Compare grid on web/panels.html (cd web && npm run dev → http://localhost:5173/panels.html); go for the horizon view panel.
-Waiting on Advik: human mouse test of step 4 on the live site; D11(a) Moon map (alignment answer in Lane A entry "Answers to Lane B's five questions"); mount the Compare grid when ready.
+Waiting on Sheldon: review panels on web/panels.html (cd web && npm run dev → http://localhost:5173/panels.html?site=sp_malapert&date=2026-09-19); next Lane A task on your go.
+Waiting on Advik: human mouse test of step 4; D11(a) Moon map; mount the Compare grid and the horizon view (Lane A entry "Horizon view panel").
 
 ## Continuous two-agent coordination protocol (agreed 2026-11-14)
 
@@ -824,4 +824,40 @@ onOpenView?: (view: "horizon" | "compare") => void;   // side card exits: "Stand
   - No global styles; `destroy()` leaves the container empty.
   - `check_visibility`, `check_ephem`, `check_horizon` PASS; `cd web && npm run build` OK.
   - **Not yet seen in a real browser:** Sheldon to open `panels.html`.
+
+### 2026-11-14 — Horizon view panel ("Stand here", step 7, Lane A part) READY to mount
+**API:** `mountHorizonView(container, props)` from `web/src/panels/index.ts`. Same `PanelProps` / `PanelHandle` as the other panels (interface v1.1, Shadow DOM scoping, `--llp-*` theming). It reads `siteId` + `landingDate` and uses no callbacks (pass them anyway; they're required by `PanelProps`).
+
+**What it shows** (all values from `/lib`: `getHorizon`, `getTimeline`; nothing calculated except drawing positions):
+- **Panorama:** a 360° view, compass N → E → S → W → N left to right (3 px per degree), elevation up/down. The vertical range fits the horizon and both paths: at least −5° to +10°, rounded to 5°. A dashed "level 0°" line.
+- **Horizon line** drawn from the 360 `getHorizon` bins (bin i = [i−0.5, i+0.5)), with the **ground hatched** below it.
+  - Labeled **TERRAIN** (LOLA, one point, observer height + assumed mast, "nearby spots differ, especially toward Earth") or **FLAT** ("terrain is not modelled at this site; the horizon is the level line").
+- **Paths:** the Sun path (solid) and Earth path (dotted) over the whole 7-day stay. The line breaks where a path crosses north (azimuth wrap).
+- **Current hour:** the Sun (disc with rays) and Earth (disc with cross) markers, each with a **text label** ("Sun", or "Sun (hidden)"). A hidden body is drawn faded with a dashed outline. A dashed tick shows its margin to the horizon.
+- **Hour slider** over the stay (168 hours) + ◀ ▶ one-hour buttons, showing "YYYY-MM-DD HH:MM UTC · hour n of 168". It resets to hour 1 when site or date changes.
+- **Readout in words**, per body, with the margin, for example:
+  - "Sun: hidden behind terrain — it is +1.05° above level, but the terrain horizon there is +6.03°, so it sits 4.98° below the skyline (the skyline there is 1.8 km away)".
+  - "Earth: in view over lower terrain — it is −2.05° (below level), but the terrain horizon there is −3.16°, so it clears it by 1.11°".
+  - Flat sites: "in view / not in view — x° above/below the flat horizon".
+- Out of coverage → "Unavailable" plus the covered ranges (no guessing).
+- Never color alone: line styles (solid / dotted / dashed), hatching, marker shapes and text labels carry the meaning.
+
+**What Lane B needs to mount it:**
+1. `import { mountHorizonView } from "./panels/index";` (path relative to `web/src/`).
+2. `const hv = mountHorizonView(el, { siteId, landingDate, onSiteSelected, onDateSelected });` in the element where "Stand here" should appear. It fills the container's width; height follows from the width (≈ 0.28 × width for the panorama, plus controls).
+3. On every shared selection change, `hv.update({ siteId, landingDate })`, the same as the side card and grid.
+4. Wire the side card's v1.1 exit: `onOpenView: (v) => { if (v === "horizon") /* show the element holding hv */ ; if (v === "compare") /* show the Compare tab */ }`.
+5. Optional theme variables (on the container or an ancestor): `--llp-sun --llp-earth --llp-horizon --llp-ground --llp-ground-line --llp-sky`.
+
+**Test page:** `web/panels.html` now mounts the side card, horizon view and Compare grid on one selection. The side card's "Stand here" / "Compare other dates" buttons scroll to those panels.
+
+**Evidence (2026-11-14), DOM emulator (happy-dom, scratch only) with real /data:**
+- **Required case:** sp_malapert, 2026-09-19, slider at 06:00 UTC shows the Sun above level but hidden behind terrain.
+  - The readout margin 4.98° equals `getState` (−4.984).
+  - The skyline distance 1.8 km matches the LOLA ridge (1.84 km).
+  - The Sun marker sits at azimuth 85.267° and is drawn below the skyline.
+  - Earth is "in view over lower terrain".
+- The horizon line has 361 steps from the 360 bins. Apollo 11 shows FLAT with a flat readout; an out-of-coverage date shows "Unavailable"; no global styles; `destroy()` empties the container.
+- `check_visibility`, `check_ephem`, `check_horizon` PASS. `cd web && npm run typecheck && npm run build` OK.
+- **Not yet seen in a real browser:** Sheldon to open `panels.html`.
 
