@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D14 STARFIELD — PASS; OzAILabs EMBED — BLOCKED | Moving depth-parallax background verified live and reduced-motion safe; separate OzAILabs fork + Vercel URL needed to activate prepared iframe; no Lane A files edited. |
+| Advik + ChatGPT (Lane B) | D14 OzAILabs — IN PROGRESS | Fork advik09-beep/SolarSystemSimulator verified and visible to Vercel; creating separate public deployment, then wiring approved iframe and checking desktop. |
 | Sheldon (Lane A human) | — | Planning stop 2026-11-14: D12-D18 signed; acceptance run done |
 | Claude Code (Lane A) | 14 + 15 (D16, D17) | D16 metrics + power calculator and D17 best-site score DONE inside the existing panels; stopped. Next: D18 Researcher tab on Sheldon's go |
 
