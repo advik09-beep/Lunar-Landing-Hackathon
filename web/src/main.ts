@@ -227,6 +227,7 @@ type View = 'overview' | 'explore' | 'compare' | 'horizon' | 'researcher' | 'cre
 let activeView: View = 'overview';
 
 function showTourTitle(): void {
+  find<HTMLElement>('tour-science-caption').hidden = true;
   openView('overview');
   find<HTMLElement>('overview-title-card').hidden = false;
 }
