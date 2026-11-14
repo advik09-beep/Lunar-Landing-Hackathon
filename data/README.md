@@ -130,3 +130,18 @@ All are PDS LOLA GDR polar products, preliminary (2017). Mast 2 m (assumed). No 
 
 Hours with the Sun above the flat horizon but behind terrain (2026–2029): Cabeus B 0, Haworth 10,626, Malapert 3,820, Nobile Rim 2 1,134.
 
+## Terrain on more sites (D12, prototype): stage 2, the three recent landings
+Observer point = the **landed coordinates** (D12), on the DEM surface + 2 m mast (assumed). Map choice comes from `scripts/lola_maps.mjs`: the finest PDS LOLA GDR polar map that covers a ±22 km window around the site. All maps are polar stereographic, centred on −90°, "MEAN EARTH/POLAR AXIS OF DE421", heights relative to 1737.4 km (checked from each label). Beyond 20 km: 80 m (to 80°S), 120 m (to 75°S), 240 m (to 60°S), 400 m (`ldem_45s_400m`, to 45°S). No bin was limited by a map edge.
+
+| Site | Landed point (source) | Fine map within 20 km | Ground above sphere (LOLA) | Published elevation | Terrain horizon | Sun visible: flat → terrain | Earth in view: flat → terrain | Earth-facing skyline |
+|---|---|---|---|---|---|---|---|---|
+| im2 | 84.7906°S, 29.1957°E (LROC located resting point) | `ldem_80s_20m`, **20 m/px** | 5321.9 m | not stated | −1.46° to +4.07° | 50.2% → 45.1% | 72.7% → 81.3% | ridges 9.3–16.2 km away |
+| im1 | 80.13°S, 1.44°E (LROC landed point) | `ldem_75s_30m`, **30 m/px** (80°S is too close to the 20 m map's edge) | 2594.2 m | LROC: 2579 m | −0.21° to +10.93° | 50.3% → 39.5% | 100% → 100% | 2.6–3.1 km away |
+| chandrayaan3 | 69.3741°S, 32.32°E (LROC "Chandrayaan-3 Landing Site", lander imaged; **moved from ISRO's prime-site centre** 69.367621°S, 32.348126°E, ~0.35 km) | `ldem_60s_60m`, **60 m/px** | 529.1 m | LROC: 532 m | +0.56° to +2.48° | 50.1% → 47.8% | 100% → 100% | 15–41 km away |
+
+- **Elevation cross-check:** the LOLA ground height at IM-1 and Chandrayaan-3 matches LROC's published elevation within 15 m and 3 m.
+- **IM-2:** LROC says the lander rests on its side in a ~20 m crater. A 20 m/px map can't resolve that crater, so the horizon describes the surrounding terrain, not the view from inside the small crater.
+- **Chandrayaan-3:** 60 m/px is the finest polar product reaching 69°S, so small nearby features aren't resolved.
+- **Map agreement (`check_horizon.mjs`):** fine vs coarser map near each site, mean |diff| 2.7 m (IM-2), within limits at IM-1 (30 m vs 120 m), 4.2 m (Chandrayaan-3).
+- **Sun above the flat horizon but behind terrain, 2026–2029:** IM-2 2,046 h, IM-1 3,784 h, Chandrayaan-3 830 h.
+

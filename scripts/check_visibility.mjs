@@ -32,7 +32,7 @@ if (!V.MOCK) {
 for (const s of sites) await V.loadSite(s.id);
 
 // Sites with a LOLA terrain horizon so far (D12 stages). Every other site must stay flat.
-const TERRAIN_SITES = ["sp_cabeus_b_peak", "sp_haworth", "sp_malapert", "sp_nobile_rim2"];
+const TERRAIN_SITES = ["chandrayaan3", "im1", "im2", "sp_cabeus_b_peak", "sp_haworth", "sp_malapert", "sp_nobile_rim2"];
 const verdicts = new Set();
 for (const s of sites) {
   const st = V.getState(s.id, T);

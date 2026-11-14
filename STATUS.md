@@ -6,10 +6,10 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 |-----|------|-----------|
 | Advik + ChatGPT (Lane B) | 11 D13 — IN PROGRESS | GO: shared date + hour controls above every tab, panel v1.2 and marker recolor repair; then D14, D15 in order. |
 | Sheldon (Lane A human) | — | Planning stop 2026-11-14: D12-D18 signed; acceptance run done |
-| Claude Code (Lane A) | 10 (D12 terrain) | Stage 1 DONE (all four pole candidates on LOLA terrain); stopped for Sheldon's go on stage 2 (IM-2, IM-1, Chandrayaan-3) |
+| Claude Code (Lane A) | 10 (D12 terrain) | Stage 2 DONE (IM-2, IM-1, Chandrayaan-3); stopped for Sheldon's go on stage 3 (Apollo sites) |
 
 Acceptance (both humans, 2026-11-14): steps 1, 2, 3, 6, 8 **PASS**. Step 4 not yet (markers don't recolor on date change; pole sites can't be told apart). Step 7 not yet (hour slider too hard to find). Signed 2026-11-14: D7–D11 (see PLAN); **D12–D18** (terrain all sites, date+hour slider, overview scene, legend, power/comms metrics, best-site score, Researcher tab). Side card switch renamed Educator / Researcher.
-Waiting on Sheldon: go for D12 stage 2 (IM-2, IM-1, Chandrayaan-3).
+Waiting on Sheldon: go for D12 stage 3 (Apollo 11, 12, 17); OK on the Chandrayaan-3 coordinate change (LROC landed point).
 Waiting on Advik: D13 (uses panel interface v1.2), D14, D15; step 4 fixes.
 
 ## Continuous two-agent coordination protocol (agreed 2026-11-14)
@@ -995,4 +995,34 @@ interface PanelHandle { update(next: Partial<Pick<PanelProps, "siteId" | "landin
 - **Not edited, needs both humans:** PLAN.md ("on the edge (terrain decides)", Settled earlier) and DESIGN.md ("…so terrain decides"). Suggested wording: "on the edge (flat sites: terrain decides; terrain sites: grazing the skyline)".
 - **Lane B:** the globe legend and marker labels only say "On the edge" (fine). If you add a description, use the same two phrases.
 - **Cabeus B point kept** (Sheldon). The reason is recorded in the root README: the Earth-facing skyline is downhill ground around a high point, the same situation as Malapert's eastern bins.
+
+### 2026-11-14 — D12 terrain, stage 2 DONE: IM-2, IM-1, Chandrayaan-3 (landed coordinates)
+- **Maps confirmed from PDS labels:**
+  - `ldem_75s_30m` (30 m/px, to 75°S, 1.86 GB; only ±22 km of rows fetched) and `ldem_60s_60m` (60 m/px, to 60°S, 1.93 GB; rows only).
+  - `ldem_45s_400m` (400 m/px, to 45°S, 104 MB, whole) as the outermost far map.
+  - All polar stereographic centred on −90°, "MEAN EARTH/POLAR AXIS OF DE421", heights "relative to a radius of 1737.4 km". Also read: `ldem_75s_60m`, `ldem_60s_120m`, `ldem_45s_100m/200m` (not used).
+- **Per site** (full table in `/data/README.md`):
+
+  | Site | Fine map within 20 km | Sun visible, flat → terrain | Earth in view, flat → terrain |
+  |---|---|---|---|
+  | **IM-2** (LROC resting point) | 20 m/px | 50.2% → 45.1% | 72.7% → 81.3% |
+  | **IM-1** (LROC landed point) | **30 m/px** (80.13°S is too close to the 20 m map's 80°S edge) | 50.3% → 39.5% | 100% → 100% |
+  | **Chandrayaan-3** | **60 m/px** (finest polar map reaching 69°S) | 50.1% → 47.8% | 100% → 100% |
+
+  - Beyond 20 km every site uses 80 / 120 / 240 / 400 m maps. No direction is cut off by a map edge.
+- **Chandrayaan-3 coordinate change (D12 "landed coordinates"):**
+  - From ISRO's *prime landing-site centre* (69.367621°S, 32.348126°E; ISRO gives a 4 km × 2.4 km box and no touchdown coordinates) to **LROC's "Chandrayaan-3 Landing Site" 69.3741°S, 32.32°E, 532 m**, where LROC imaged the lander about four days after landing. About 0.35 km apart.
+  - `sites.js` source now points to LROC; the ISRO values are kept in the note. Its Horizons data (2026–2029 + landing window) were re-downloaded. **Sheldon: please confirm.**
+- **Independent cross-check:** LOLA ground height vs LROC's published elevation: IM-1 2594 m vs 2579 m; Chandrayaan-3 529 m vs 532 m.
+- **Limits stated in the data README:** IM-2 rests on its side in a ~20 m crater (LROC) that a 20 m map can't resolve. Chandrayaan-3 at 60 m/px misses small nearby features.
+- **Code:**
+  - New `scripts/lola_maps.mjs` (which map is finest per latitude). `fetch_lola.mjs` and `compute_horizon.mjs` use it; `horizon.json` now records `maps` (product + m/px).
+  - `check_horizon.mjs` compares each site's own fine map with a coarser map covering all test points.
+  - **Regression:** Malapert and Haworth recomputed through the new code: elevation and blocking distances identical to the committed files.
+  - Two check-script bugs fixed: the IM-1 comparison hit points off the 80 m map (NaN), and the Earth azimuth range was printed wrong when straddling north.
+- **Checks:**
+  - `check_horizon` PASS for all seven terrain sites; Malapert keeps step 7's blocked-Sun test.
+  - `check_visibility` PASS (expects exactly 7 terrain sites; Sun/Earth margins vs each horizon; all daily rows = getSummary).
+  - `check_ephem`, `check_scene` PASS. `/web` build OK.
+- **Next (stage 3, on go):** Apollo 11, 12, 17 at their LM coordinates. They're near the equator, outside every polar map, so they need a different (cylindrical/global) LOLA product. Lane A will confirm it from PDS documentation first.
 

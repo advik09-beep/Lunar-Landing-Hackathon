@@ -19,13 +19,14 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import sites from "../data/sites.js";
 import { buildIndex } from "./build_index.mjs";
+import { FAR as FAR_PRODUCTS, fineProduct } from "./lola_maps.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const RAW = join(ROOT, "data", "raw");
 const R = 1737400;          // m, reference sphere (LOLA label OFFSET; Horizons "Center radii")
 const ENV = process.env;     // overrides for sensitivity tests only (HZ_DRY=1 prints, does not write)
 const MAST_M = Number(ENV.HZ_MAST ?? 2);  // ASSUMED observer height above ground
-const NEAR_KM = 20;         // use the 20 m DEM inside this distance
+const NEAR_KM = 20;         // use the site's fine DEM window inside this distance
 const RAYS_PER_DEG = Number(ENV.HZ_RAYS ?? 10);
 const d2r = Math.PI / 180, r2d = 180 / Math.PI;
 
@@ -63,10 +64,11 @@ function dem(name, file, firstRow = 0) {
     } };
 }
 
-const winName = `ldem_80s_20m_${ENV.HZ_WINDOW ?? siteId}_rows`; // HZ_WINDOW: use another site's 20 m window (dry runs)
+const FINE = fineProduct(site.lat);  // finest polar map covering the site (scripts/lola_maps.mjs)
+const winName = `${FINE}_${ENV.HZ_WINDOW ?? siteId}_rows`; // HZ_WINDOW: use another site's window (dry runs)
 const win = JSON.parse(readFileSync(join(RAW, `${winName}.json`), "utf8"));
-const D20 = dem("ldem_80s_20m", `${winName}.img`, win.firstRow);
-const FAR = [dem("ldem_80s_80m", "ldem_80s_80m.img"), dem("ldem_75s_120m", "ldem_75s_120m.img"), dem("ldem_60s_240m", "ldem_60s_240m.img")];
+const D20 = dem(FINE, `${winName}.img`, win.firstRow); // (name kept from step 7; it is the fine map, 20-60 m)
+const FAR = FAR_PRODUCTS.map((p) => dem(p, `${p}.img`));
 const H_MAX = Math.max(D20.hMax, ...FAR.map((d) => d.hMax));
 
 // Great-circle destination from the site.
@@ -130,8 +132,9 @@ const out = {
     heightAboveSphereM: r3(hObs), sphereRadiusM: R },
   smoothSphereDipDeg: r3(dipDeg), smoothSphereHorizonKm: r3(smoothHorizonKm),
   demMaxHeightM: H_MAX,
-  method: "rays every 0.1 deg; exact spherical geometry; 20 m DEM to 20 km, then 80 m (to 80S), 120 m (to 75S), 240 m (to 60S); bilinear; ray stops when the DEM maximum height could no longer exceed the best angle; bin = max of 10 rays",
-  source: "LRO LOLA GDR polar DEMs (PDS Geosciences): ldem_80s_20m, ldem_80s_80m, ldem_75s_120m, ldem_60s_240m — https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/polar/img/",
+  method: `rays every 0.1 deg; exact spherical geometry; ${D20.scale} m DEM (${FINE}) to ${NEAR_KM} km, then ${FAR.map((g) => `${g.scale} m (to ${-g.maxLat}S)`).join(", ")}; bilinear; ray stops when the DEM maximum height could no longer exceed the best angle; bin = max of 10 rays`,
+  source: `LRO LOLA GDR polar DEMs (PDS Geosciences): ${[FINE, ...FAR_PRODUCTS].join(", ")} — https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/polar/img/`,
+  maps: { fine: { product: FINE, metersPerPixel: D20.scale, withinKm: NEAR_KM }, far: FAR.map((g) => ({ product: g.name, metersPerPixel: g.scale, toLatitude: g.maxLat })) },
   builtUtc: new Date().toISOString(),
 };
 if (ENV.HZ_DUMP) writeFileSync(ENV.HZ_DUMP, JSON.stringify(out)); // sensitivity only

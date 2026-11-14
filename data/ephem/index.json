@@ -301,6 +301,9 @@
   ]
  },
  "horizons": {
+  "chandrayaan3": "chandrayaan3/horizon.json",
+  "im1": "im1/horizon.json",
+  "im2": "im2/horizon.json",
   "sp_cabeus_b_peak": "sp_cabeus_b_peak/horizon.json",
   "sp_haworth": "sp_haworth/horizon.json",
   "sp_malapert": "sp_malapert/horizon.json",
