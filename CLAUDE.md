@@ -1,5 +1,7 @@
 For Claude Code (Lane A) only. Lane B, ignore this file.
 
+Project: **LunLux** — Sunlight and Earth contact for lunar landing sites (renamed from "Lunar Landing Site Navigator", D29; repo, folders and web addresses unchanged).
+
 @PLAN.md
 
 @STATUS.md

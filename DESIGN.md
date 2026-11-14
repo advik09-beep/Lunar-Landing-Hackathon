@@ -1,4 +1,6 @@
-# DESIGN.md: screen design (APPROVED by both humans 2026-11-14)
+# DESIGN.md: LunLux screen design (APPROVED by both humans 2026-11-14)
+
+**LunLux** — Sunlight and Earth contact for lunar landing sites
 
 PLAN.md wins if anything here disagrees with it. Step numbers below are
 PLAN.md's (1-9).

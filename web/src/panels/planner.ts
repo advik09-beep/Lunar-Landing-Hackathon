@@ -146,8 +146,8 @@ export const mountPlanner: MountPanel = (container, props) => {
   }
 
   function downloadSaved() {
-    const url = URL.createObjectURL(new Blob([JSON.stringify({ app: "Lunar Landing Site Navigator", savedPairs: saved }, null, 1)], { type: "application/json" }));
-    const a = document.createElement("a"); a.href = url; a.download = "saved-scenarios.json"; root.append(a); a.click(); a.remove();
+    const url = URL.createObjectURL(new Blob([JSON.stringify({ app: L.APP_NAME, description: L.APP_TAGLINE, savedPairs: saved }, null, 1)], { type: "application/json" }));
+    const a = document.createElement("a"); a.href = url; a.download = "lunlux_saved-scenarios.json"; root.append(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 

@@ -1,4 +1,4 @@
-# STATUS — Lunar Landing Site Navigator
+# STATUS — LunLux
 
 PLAN.md v2 is the one plan and wins over this file. This header is the live board; anyone may update their own row.
 
@@ -6,7 +6,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 |-----|------|-----------|
 | Advik + ChatGPT (Lane B) | D29 step 1/4 — Planner mount, BUILD PENDING | Mount Lane A's D28 Planner in a dedicated scrolling tab; shared site/date updates and cleanup wired. Then LunLux rename, dimmed opening scene, embedded audio control. |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
-| Claude Code (Lane A) | D28 done | Tour captions revised; D28 planner (A/B scenarios + mission requirements) built and pushed; stopped. Lane B: mount mountPlanner (notes below) |
+| Claude Code (Lane A) | D29 rename done | Lane A files renamed to LunLux; stopped |
 
 Acceptance (both humans): steps 1, 2, 3, 6, 8 PASS; step 4 and 7 pending earlier findings. Signed: D7–D23 (see PLAN), **D24–D28** (title card + tour nav, tour captions, why the south pole, one clock, A/B scenarios + requirements filter). Rule: no status-only pushes.
 Waiting on Sheldon: review the revised captions, the south-pole one-liner and the D28 planner on web/panels.html.
@@ -1458,4 +1458,17 @@ SOUTH_POLE.sources;          // [{ name, url }]
 - DOM test: table + differences; picking B updates them; save/swap/load; JSON download; PASS/FAIL with named limit; changing a limit and the filter re-run; clicking a site → callback.
 - `check_tour` updated for the revised captions (Mars 5.38–20.06 min; Jupiter wording and source; Earth title; Mercury and Neptune quotes; one-liner 24 words < 25).
 - All other checks and panel tests PASS. `/web` build OK (after pulling Lane B's own fix `a7899fb` for a D27 markup typo in main.ts). README: Planner, nine check scripts.
+
+### 2026-11-14 — D29: renamed to LunLux (Lane A files)
+- **Recorded in PLAN.md as D29 (both humans):**
+  - The project is **LunLux**, with the one-line description **"Sunlight and Earth contact for lunar landing sites"**. The repo, folders and web addresses are unchanged.
+  - The starting page shows the solar system dimmed behind the title card; the simulator's sound is off by default with a visible toggle (Lane B).
+- **Renamed in Lane A files:**
+  - Titles and tagline in PLAN.md, README.md, DESIGN.md, CLAUDE.md and the STATUS.md title.
+  - `web/panels.html` title and heading.
+  - `/lib`: `APP_NAME = "LunLux"` and `APP_TAGLINE` in `lib/research.js`, exported from `lib/visibility.js` (API unchanged otherwise).
+  - Downloads are prefixed **`lunlux_`**: `lunlux_<site>_<date>_7day.csv`, `lunlux_<site>_<date>_researcher.json`, `lunlux_<site>_<date>_hourly.csv`, `lunlux_saved-scenarios.json`. CSV headers start with `# app,LunLux — Sunlight and Earth contact for lunar landing sites`, and the JSON downloads carry `app` and `description`.
+  - "Lunar Landing Site Navigator" now appears only in the notes saying it was renamed.
+- **Lane B:** please rename your visible strings (page title, headings, Credits, footer). `APP_NAME` / `APP_TAGLINE` can be imported from `lib/visibility.js`.
+- **Checks:** all nine check scripts and every panel test PASS; `/web` build OK.
 

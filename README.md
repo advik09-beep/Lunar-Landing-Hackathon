@@ -1,4 +1,6 @@
-# Lunar Landing Site Navigator
+# LunLux
+
+**Sunlight and Earth contact for lunar landing sites**
 
 **NASA Space Apps Challenge 2026 · team of two (Sheldon and Advik)**
 

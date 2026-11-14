@@ -1,4 +1,6 @@
-# PLAN.md v2 — the one plan (Lunar Landing Site Navigator, NASA Space Apps 2026)
+# PLAN.md v2 — the one plan (LunLux, NASA Space Apps 2026)
+
+**LunLux** — Sunlight and Earth contact for lunar landing sites
 
 ## Right now
 The live board is the header of STATUS.md. Anyone may update their own row there.
@@ -175,6 +177,12 @@ and researchers get the numbers behind them.
   overview. Lane B.
 - D28 Saved A/B scenario comparison and a mission requirements filter.
   Lane A, after D25 and D26.
+- D29 (both humans, 2026-11-14): the project is renamed **LunLux**,
+  replacing "Lunar Landing Site Navigator" everywhere, with the one-line
+  description "Sunlight and Earth contact for lunar landing sites". The repository, folders and web addresses keep
+  their names. The starting page shows the solar system dimmed behind
+  the title card, and the simulator's sound is off by default with a
+  visible toggle (Lane B).
 
 ## Settled earlier (do not reopen without both humans)
 - 10 fixed sites: 3 Apollo, Chandrayaan-3, IM-1, IM-2, 4 south pole

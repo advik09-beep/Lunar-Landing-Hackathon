@@ -269,6 +269,7 @@ export const mountSideCard: MountPanel = (container, props) => {
     const tl = V.getTimeline(site.id, start, V.VERDICT_RULE.STAY_DAYS);
     const s = tl.samples;
     const lines = [
+      `# app,${V.APP_NAME} — ${V.APP_TAGLINE}`,
       `# site_id,${site.id}`,
       `# site_name,${csvCell(site.name)}`,
       `# lat_deg,${site.lat}`,
@@ -285,7 +286,7 @@ export const mountSideCard: MountPanel = (container, props) => {
     const url = URL.createObjectURL(new Blob([lines.join("\n") + "\n"], { type: "text/csv" }));
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${site.id}_${current.landingDate}_${V.VERDICT_RULE.STAY_DAYS}day.csv`;
+    a.download = `lunlux_${site.id}_${current.landingDate}_${V.VERDICT_RULE.STAY_DAYS}day.csv`;
     root.append(a);
     a.click();
     a.remove();

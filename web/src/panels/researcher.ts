@@ -178,16 +178,16 @@ export const mountResearcher: MountPanel = (container, props) => {
   function downloadJson() {
     if (!analysis) return;
     const hourly = V.getTimeline(analysis.site.id, analysis.stay.start, V.VERDICT_RULE.STAY_DAYS).samples;
-    save(`${analysis.site.id}_${current.landingDate}_researcher.json`, JSON.stringify({ ...analysis, hourly, calculatorInputs: { ...calc } }, null, 1), "application/json");
+    save(`lunlux_${analysis.site.id}_${current.landingDate}_researcher.json`, JSON.stringify({ app: V.APP_NAME, description: V.APP_TAGLINE, ...analysis, hourly, calculatorInputs: { ...calc } }, null, 1), "application/json");
   }
   function downloadCsv() {
     if (!analysis) return;
     const s = V.getTimeline(analysis.site.id, analysis.stay.start, V.VERDICT_RULE.STAY_DAYS).samples;
     const cols = ["utc", "sunEl", "sunAz", "sunMarginDeg", "sunFraction", "sunSkylineFraction", "eclipseFraction", "lit", "irradianceWm2", "sunDistKm",
       "earthEl", "earthAz", "earthMarginDeg", "earthRadiusDeg", "comms", "earthMarginal", "earthDistKm"] as const;
-    const head = [`# site_id,${analysis.site.id}`, `# stay,${s[0].utc}..${s[s.length - 1].utc}`, `# api_version,${V.API_VERSION}`, `# horizon_model,${s[0].horizonModel}`,
+    const head = [`# app,${V.APP_NAME} — ${V.APP_TAGLINE}`, `# site_id,${analysis.site.id}`, `# stay,${s[0].utc}..${s[s.length - 1].utc}`, `# api_version,${V.API_VERSION}`, `# horizon_model,${s[0].horizonModel}`,
       "# angles in degrees, azimuth clockwise from north, distances in km, irradiance in W/m2, UTC", cols.join(",")];
-    save(`${analysis.site.id}_${current.landingDate}_hourly.csv`, [...head, ...s.map((r) => cols.map((k) => (r as unknown as Record<string, unknown>)[k]).join(","))].join("\n") + "\n", "text/csv");
+    save(`lunlux_${analysis.site.id}_${current.landingDate}_hourly.csv`, [...head, ...s.map((r) => cols.map((k) => (r as unknown as Record<string, unknown>)[k]).join(","))].join("\n") + "\n", "text/csv");
   }
 
   load();
