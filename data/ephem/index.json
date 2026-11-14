@@ -301,6 +301,9 @@
   ]
  },
  "horizons": {
+  "apollo11": "apollo11/horizon.json",
+  "apollo12": "apollo12/horizon.json",
+  "apollo17": "apollo17/horizon.json",
   "chandrayaan3": "chandrayaan3/horizon.json",
   "im1": "im1/horizon.json",
   "im2": "im2/horizon.json",

@@ -22,8 +22,10 @@ A switch on the side card sets the reading level.
 
 ## Four verdicts, same everywhere, never color alone
 clear / partial / out / on the edge. "On the edge" means the Sun or
-Earth sits within EDGE_DEG of the horizon for most of the stay, so
-terrain decides. Numbers for now (PLAN D5): STAY_DAYS = 7,
+Earth sits within EDGE_DEG of the horizon for most of the stay. Wording
+(both humans, 2026-11-14): at flat-horizon sites "terrain decides"; at
+terrain sites (terrain already included) "grazing the skyline: small
+changes in position matter". Numbers for now (PLAN D5): STAY_DAYS = 7,
 CLEAR_PCT = 90, OUT_PCT = 10, EDGE_DEG = 2. The rule is shown on screen.
 
 ## How this maps onto PLAN.md's steps

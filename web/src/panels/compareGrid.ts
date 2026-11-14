@@ -88,7 +88,7 @@ export const mountCompareGrid: MountPanel = (container, props) => {
         ${(Object.keys(VERDICT_WORDS) as Verdict[]).map((v) => `<span><b class="v" data-verdict="${v}" aria-hidden="true">${VERDICT_WORDS[v].symbol}</b> ${esc(VERDICT_WORDS[v].label)}</span>`).join("")}
         <span><b class="v na" aria-hidden="true">–</b> No data</span>
       </div>
-      <p class="muted small">⚠ On the edge — FLAT rows: ${esc(EDGE_WORDS.flat)}. TERRAIN rows: ${esc(EDGE_WORDS.lola)}.</p>
+      <p class="muted small">⚠ On the edge — ${[...terrain.values()].some((t) => t !== "lola") ? `FLAT rows: ${esc(EDGE_WORDS.flat)}. TERRAIN rows: ${esc(EDGE_WORDS.lola)}.` : `${esc(EDGE_WORDS.lola)} (every site uses a terrain horizon).`}</p>
       <nav class="window" aria-label="Move the date window">
         <button type="button" data-action="earlier">◀ ${SHIFT} days earlier</button>
         <span class="muted">${esc(dates[0])} to ${esc(dates[COLS - 1])}</span>
@@ -99,7 +99,7 @@ export const mountCompareGrid: MountPanel = (container, props) => {
         <tbody>${rows}</tbody>
       </table></div>
       ${strip}
-      <p class="muted small">Verdicts and percentages come from the daily summary (getDaily); the strip comes from hourly data (getTimeline). FLAT rows use a flat horizon; TERRAIN uses the LOLA horizon for one point. Updated in ${ms} ms.</p>`;
+      <p class="muted small">Verdicts and percentages come from the daily summary (getDaily); the strip comes from hourly data (getTimeline). ${[...terrain.values()].some((t) => t !== "lola") ? "FLAT rows use a flat horizon; TERRAIN rows use" : "Every row uses"} the LOLA terrain horizon for one point per site. Updated in ${ms} ms.</p>`;
   }
 
   async function stripHtml(siteId: string, dates: string[], days: number): Promise<string> {

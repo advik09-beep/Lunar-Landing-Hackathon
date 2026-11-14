@@ -109,7 +109,7 @@ export const mountHorizonView: MountPanel = (container, props) => {
       `<line x1="${i * 45 * PX_PER_DEG}" x2="${i * 45 * PX_PER_DEG}" y1="${PAD_T}" y2="${H - PAD_B}" class="grid"/><text x="${Math.min(W - 12, Math.max(2, i * 45 * PX_PER_DEG - 6))}" y="${H - 8}" class="axis compass">${c} ${i * 45 === 360 ? "" : `${i * 45}°`}</text>`).join("");
     const desc = flat
       ? "Flat horizon: terrain is not modelled at this site, so the horizon is the level line (0°) in every direction."
-      : `Terrain horizon from LOLA elevation data for one point${d.horizon.observer ? ` (${d.horizon.observer.groundHeightM} m above the 1737.4 km sphere, ${d.horizon.observer.mastM} m assumed mast)` : ""}. Nearby spots differ, especially toward Earth.`;
+      : `Terrain horizon from LOLA elevation data for one point${d.horizon.observer ? ` (${heightWords(d.horizon.observer.groundHeightM)}, ${d.horizon.observer.mastM} m assumed mast)` : ""}. Nearby spots differ, especially toward Earth.`;
 
     body.innerHTML = `
       <header>
@@ -188,6 +188,11 @@ export const mountHorizonView: MountPanel = (container, props) => {
     destroy() { token++; host.remove(); },
   };
 };
+
+/** "4885.5 m above" / "1927.8 m below" the 1737.4 km reference sphere. */
+function heightWords(m: number): string {
+  return `${Math.abs(m).toFixed(1)} m ${m >= 0 ? "above" : "below"} the 1737.4 km reference sphere`;
+}
 
 // One sentence per body, in words, with the margin. Uses lit/comms and margins from /lib.
 function readout(name: string, el: number, azDeg: number, margin: number, visible: boolean, hz: Horizon): string {

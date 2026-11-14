@@ -88,6 +88,11 @@ and researchers get the numbers behind them.
 - D14 Overview scene with Sun, Earth and Moon only (per D11b), and a
   moving star background outside the 3D window only. A more detailed
   Moon. Lane B.
+  D14 amendment (both humans, 2026-11-14): the overview scene's first
+  version is the OzAILabs solar system simulator, forked and embedded as
+  its own tab with full credit. It shows all planets and is not yet tied
+  to our date control; the screen says both. Trimming it to three bodies
+  and syncing the date come later if time allows. Lane B.
 - D15 Marker color stays the verdict. A prominent plain-words legend.
   Pole sites must be distinguishable. Lane B.
 - D16 Power and comms metrics in /lib: sunlight share, longest dark
@@ -119,7 +124,9 @@ and researchers get the numbers behind them.
   power or a guaranteed link. Flat-horizon results are labeled flat.
   Mock data always carries a visible banner.
 - Four verdicts everywhere, never shown by color alone: clear,
-  partial, out, on the edge (terrain decides).
+  partial, out, on the edge ("terrain decides" at flat-horizon sites;
+  "grazing the skyline: small changes in position matter" at terrain
+  sites; both humans, 2026-11-14).
 - No chatbot. (The former "no single best-site score" is replaced by
   D17.)
 

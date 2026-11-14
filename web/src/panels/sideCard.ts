@@ -147,7 +147,7 @@ export const mountSideCard: MountPanel = (container, props) => {
         <h3>Sources</h3>
         <ul class="sources small">
           <li>Sun and Earth angles: ${esc(src)}.</li>
-          <li>Horizon: ${flat ? "flat (0° in every direction)" : `${esc(horizon.source)}${horizon.observer ? ` Observer ${horizon.observer.groundHeightM} m above the 1737.4 km sphere + ${horizon.observer.mastM} m assumed mast.` : ""} ${esc(horizon.verifiedMeaning ?? "")}`}</li>
+          <li>Horizon: ${flat ? "flat (0° in every direction)" : `${esc(horizon.source)}${horizon.observer ? ` Observer ${Math.abs(horizon.observer.groundHeightM).toFixed(1)} m ${horizon.observer.groundHeightM >= 0 ? "above" : "below"} the 1737.4 km reference sphere + ${horizon.observer.mastM} m assumed mast.` : ""} ${esc(horizon.verifiedMeaning ?? "")}`}</li>
           <li>Site coordinates: <a href="${esc(site.source)}" target="_blank" rel="noopener">${esc(site.source)}</a>${site.coordsVerified ? "" : " (unverified)"}</li>
           <li>Coverage for this site: ${ranges.map(([a, b]) => `${esc(fmtUtc(a))} to ${esc(fmtUtc(b))}`).join("; ")}.</li>
         </ul>

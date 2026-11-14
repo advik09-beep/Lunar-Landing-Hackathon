@@ -145,3 +145,24 @@ Observer point = the **landed coordinates** (D12), on the DEM surface + 2 m mast
 - **Map agreement (`check_horizon.mjs`):** fine vs coarser map near each site, mean |diff| 2.7 m (IM-2), within limits at IM-1 (30 m vs 120 m), 4.2 m (Chandrayaan-3).
 - **Sun above the flat horizon but behind terrain, 2026–2029:** IM-2 2,046 h, IM-1 3,784 h, Chandrayaan-3 830 h.
 
+## Terrain on more sites (D12, prototype): stage 3, the Apollo sites. All 10 sites now have terrain.
+Observer point = the **landed (LM) coordinates** from NSSDCA, on the DEM surface + 2 m mast (assumed). These sites lie outside every polar map, so they use the **global simple-cylindrical LOLA GDR maps** (PDS Geosciences, `lola_gdr/cylindrical/img/`):
+- **Within 20 km:** a ±22 km row window of the site's `ldem_1024_<lat band>_<lon band>` tile: 1024 px/deg, label MAP_SCALE 0.0296 km/px, so **~30 m/px**.
+- **Beyond 20 km:** a ±8° latitude row window of `ldem_128` (128 px/deg, label MAP_SCALE 236.901 m/px, **~237 m/px**).
+
+Label facts: SIMPLE CYLINDRICAL, CENTER_LONGITUDE 180, east-positive 0–360, "MEAN EARTH/POLAR AXIS OF DE421", heights "relative to a radius of 1737.4 km", LSB 16-bit × 0.5 m. Pixel formula from `catalog/dsmap.cat`: `SAMPLE = NINT(SPO + RES·(LON − CENTER_LONGITUDE)) + 1`, `LINE = NINT(LPO − RES·(LAT − CENTER_LATITUDE)) + 1`. Checked against each tile's edges.
+
+**Search stopping bound:** the polar maps' DERIVED_MAXIMUM (~7 km) only covers the poles. For these sites the bound is the highest point in the site's own fetched windows + 500 m (the 237 m map smooths peaks): 11,279 m (Apollo 11), 10,611 m (Apollo 12), 9,309 m (Apollo 17). No ray left its windows (0 edge-limited bins).
+
+| Site | Landed point (NSSDCA) | Fine map within 20 km | Ground relative to sphere | Terrain horizon | Sun visible: flat → terrain | Earth in view: flat → terrain | Earth-facing skyline |
+|---|---|---|---|---|---|---|---|
+| apollo11 | 0.67408°N, 23.47297°E | `ldem_1024_00n_15n_000_030`, ~30 m/px | **−1927.8 m** (below) | −0.61° to +1.33° | 50.1% → 49.9% | 100% → 100% | 1.3–6.8 km away |
+| apollo12 | 3.01239°S, 23.42157°W | `ldem_1024_15s_00s_330_360`, ~30 m/px | **−1421.9 m** (below) | −0.41° to +0.73° | 50.4% → 50.1% | 100% → 100% | 0.39–1.0 km away (68% of Earth hours < 500 m) |
+| apollo17 | 20.1908°N, 30.77168°E | `ldem_1024_15n_30n_030_060`, ~30 m/px | **−2628.6 m** (below) | +0.45° to +14.23° | 50.1% → 47.9% | 100% → 100% | 10.7–12.9 km away |
+
+- **Observers below the reference sphere:** all three sit 1.4–2.6 km *below* 1737.4 km (mare and valley floors). A "smooth-sphere dip" relative to that sphere is undefined there, so `horizon.json` records `smoothSphereDipDeg: null` with a note. It also records `mastDipDeg` (0.087°, the dip from a 2 m mast over a smooth sphere through the ground point).
+- **Apollo 11's tile window stops at the equator**, because its tile is 0°–15°N. In the ~1.5 km strip south of the equator within 20 km, heights come from the 237 m map.
+- **Apollo 12:** Earth's direction is set by ground 0.39–1.0 km away (low horizon, +0.2° to +0.7°). Earth is high (100% in view either way), so no answer changes.
+- **Apollo 17** sits in a deep valley: its horizon reaches 14.2°, and the Sun is blocked by terrain for 764 h in 2026–2029 while above the flat horizon (356 h by ridges ≥ 2 km away).
+- **Map agreement (`check_horizon.mjs`):** 30 m tile vs 237 m map within ~9 km of each site: mean |diff| 4.1 m, 2.1 m, 14.6 m.
+

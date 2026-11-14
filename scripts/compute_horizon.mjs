@@ -1,4 +1,4 @@
-// Step 7: terrain horizon profile for one site from LOLA GDR south polar DEMs (data/raw/,
+// Step 7 / D12: terrain horizon profile for one site from LOLA GDR DEMs, polar or global cylindrical (data/raw/,
 // fetched by scripts/fetch_lola.mjs). Writes data/ephem/<siteId>/horizon.json.
 // Usage: node scripts/compute_horizon.mjs [siteId=sp_malapert]
 //
@@ -6,8 +6,8 @@
 //   - Observer = DEM surface at the site + MAST_M (assumed), on a sphere R = 1737.4 km
 //     (LOLA heights are "relative to a radius of 1737.4 km", same sphere as our Horizons data).
 //   - For rays every 0.1 deg of azimuth (clockwise from north), walk outward along the great circle.
-//     Heights come from the finest DEM that covers the point: 20 m (<= 20 km, local window),
-//     then 80 m (to 80S), 120 m (to 75S), 240 m (to 60S). Bilinear interpolation.
+//     Heights come from the finest DEM that covers the point (scripts/lola_maps.mjs): the site's fine map
+//     (20/30/60 m polar, or ~30 m global tile) within 20 km, then coarser maps. Bilinear interpolation.
 //   - Elevation angle of each terrain point is exact 3D geometry on the sphere (curvature included):
 //     angle = atan2((R+h)cos(d/R) - (R+h_obs), (R+h)sin(d/R)).
 //   - Stop a ray when even the highest point in the DEMs (label DERIVED_MAXIMUM) could not rise above
@@ -19,7 +19,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import sites from "../data/sites.js";
 import { buildIndex } from "./build_index.mjs";
-import { FAR as FAR_PRODUCTS, fineProduct } from "./lola_maps.mjs";
+import { farProducts, fineProduct, isPolar, GLOBAL_FAR_HALF_DEG as GLOBAL_HALF } from "./lola_maps.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const RAW = join(ROOT, "data", "raw");
@@ -38,38 +38,73 @@ function label(name) {
   const t = readFileSync(join(RAW, `${name}.lbl`), "utf8");
   const num = (k) => Number(t.match(new RegExp(`^\\s*${k}\\s*=\\s*(-?[\\d.]+)`, "m"))[1]);
   if (!/relative to a radius of 1737\.4 km/.test(t.replace(/\s+/g, " "))) throw new Error(`${name}: height reference not 1737.4 km`);
-  if (!/MEAN EARTH\/POLAR AXIS OF DE421/.test(t) || num("CENTER_LATITUDE") !== -90) throw new Error(`${name}: unexpected projection`);
+  const opt = (k) => { const m = t.match(new RegExp(`^\\s*${k}\\s*=\\s*(-?[\\d.]+)`, "m")); return m ? Number(m[1]) : NaN; };
+  const proj = (t.match(/MAP_PROJECTION_TYPE\s*=\s*"([^"]+)"/) || [])[1];
+  if (!/MEAN EARTH\/POLAR AXIS OF DE421/.test(t)) throw new Error(`${name}: unexpected frame`);
   if (num("SCALING_FACTOR") !== 0.5 || num("SAMPLE_BITS") !== 16) throw new Error(`${name}: unexpected sample format`);
-  return { N: num("LINES"), scale: num("MAP_SCALE"), off: num("LINE_PROJECTION_OFFSET"),
-    maxLat: num("MAXIMUM_LATITUDE"), hMax: num("DERIVED_MAXIMUM") * 0.5 };
+  if (proj === "POLAR STEREOGRAPHIC") {
+    if (num("CENTER_LATITUDE") !== -90) throw new Error(`${name}: not south polar`);
+    return { proj: "polar", N: num("LINES"), samples: num("LINE_SAMPLES"), scale: num("MAP_SCALE"), off: num("LINE_PROJECTION_OFFSET"),
+      maxLat: num("MAXIMUM_LATITUDE"), hMax: opt("DERIVED_MAXIMUM") * 0.5 };
+  }
+  if (proj === "SIMPLE CYLINDRICAL") {
+    if (!/POSITIVE_LONGITUDE_DIRECTION\s*=\s*"EAST"/.test(t)) throw new Error(`${name}: longitude not east-positive`);
+    // PDS catalog/dsmap.cat: SAMPLE = NINT(SPO + RES*(LON - CENTER_LONGITUDE)) + 1, LINE = NINT(LPO - RES*(LAT - CENTER_LATITUDE)) + 1 (1-based)
+    const res = num("MAP_RESOLUTION");
+    return { proj: "cyl", N: num("LINES"), samples: num("LINE_SAMPLES"), res, scale: Math.round((2 * Math.PI * R) / (360 * res)),
+      lpo: num("LINE_PROJECTION_OFFSET"), spo: num("SAMPLE_PROJECTION_OFFSET"), clat: num("CENTER_LATITUDE"), clon: num("CENTER_LONGITUDE"),
+      minLat: num("MINIMUM_LATITUDE"), maxLat: num("MAXIMUM_LATITUDE"), west: num("WESTERNMOST_LONGITUDE"), east: num("EASTERNMOST_LONGITUDE"),
+      hMax: opt("DERIVED_MAXIMUM") * 0.5 };
+  }
+  throw new Error(`${name}: unknown projection ${proj}`);
 }
 
 function dem(name, file, firstRow = 0) {
   const L = label(name);
   const buf = readFileSync(join(RAW, file));
   const data = new Int16Array(buf.buffer, buf.byteOffset, buf.length / 2); // LSB 16-bit; macOS/x86/ARM are little-endian
-  const rows = data.length / L.N;
+  const W = L.samples;
+  const rows = data.length / W;
   return { name, ...L, data, firstRow, rows,
-    // Height (m above 1737.4 km sphere) at lat/lon, or null if outside this DEM.
+    // Height (m above 1737.4 km sphere) at lat/lon, or null if outside this DEM (or outside its fetched rows).
     at(lat, lon) {
-      if (lat > this.maxLat) return null;
-      const rr = 2 * R * Math.tan(((90 + lat) * d2r) / 2); // south: colatitude from the south pole = 90 + lat
-      const col = this.off + (rr * Math.sin(lon * d2r)) / this.scale;  // 90E to the right
-      const row = this.off - (rr * Math.cos(lon * d2r)) / this.scale;  // lon 0 up
+      let row, col;
+      if (this.proj === "polar") {
+        if (lat > this.maxLat) return null;
+        const rr = 2 * R * Math.tan(((90 + lat) * d2r) / 2); // south: colatitude from the south pole = 90 + lat
+        col = this.off + (rr * Math.sin(lon * d2r)) / this.scale;  // 90E to the right
+        row = this.off - (rr * Math.cos(lon * d2r)) / this.scale;  // lon 0 up
+      } else {
+        const lon360 = ((lon % 360) + 360) % 360;
+        if (lat < this.minLat || lat > this.maxLat || lon360 < this.west || lon360 > this.east) return null;
+        col = this.spo + this.res * (lon360 - this.clon); // 0-based, pixel centres on integers
+        row = this.lpo - this.res * (lat - this.clat);
+      }
       const r0 = Math.floor(row) - this.firstRow, c0 = Math.floor(col);
-      if (r0 < 0 || r0 + 1 >= this.rows || c0 < 0 || c0 + 1 >= this.N) return null;
-      const fr = row - Math.floor(row), fc = col - c0, N = this.N, D = this.data;
+      if (r0 < 0 || r0 + 1 >= this.rows || c0 < 0 || c0 + 1 >= W) return null;
+      const fr = row - Math.floor(row), fc = col - c0, N = W, D = this.data;
       const i = r0 * N + c0;
       return 0.5 * ((D[i] * (1 - fc) + D[i + 1] * fc) * (1 - fr) + (D[i + N] * (1 - fc) + D[i + N + 1] * fc) * fr);
     } };
 }
 
-const FINE = fineProduct(site.lat);  // finest polar map covering the site (scripts/lola_maps.mjs)
+const FINE = fineProduct(site.lat, site.lon);  // finest map covering the site (scripts/lola_maps.mjs)
+const POLAR = isPolar(site.lat);
 const winName = `${FINE}_${ENV.HZ_WINDOW ?? siteId}_rows`; // HZ_WINDOW: use another site's window (dry runs)
 const win = JSON.parse(readFileSync(join(RAW, `${winName}.json`), "utf8"));
 const D20 = dem(FINE, `${winName}.img`, win.firstRow); // (name kept from step 7; it is the fine map, 20-60 m)
-const FAR = FAR_PRODUCTS.map((p) => dem(p, `${p}.img`));
-const H_MAX = Math.max(D20.hMax, ...FAR.map((d) => d.hMax));
+const FAR_PRODUCTS = farProducts(site.lat);
+const FAR = FAR_PRODUCTS.map((p) => {
+  if (POLAR) return dem(p, `${p}.img`); // whole polar files
+  const w = JSON.parse(readFileSync(join(RAW, `${p}_${siteId}_rows.json`), "utf8")); // global: row window
+  return dem(p, `${p}_${siteId}_rows.img`, w.firstRow);
+});
+// Stopping bound: the highest terrain that could exist where a ray can go.
+//  polar: the label DERIVED_MAXIMUM of the polar maps (polar maps cover the whole search area);
+//  global: the highest point in the site's fetched windows + 500 m margin (the 237 m map smooths peaks);
+//  rays leaving the windows are flagged as edge-limited, as before.
+const winMax = (g) => { let m = -Infinity; for (let i = 0; i < g.data.length; i++) if (g.data[i] > m) m = g.data[i]; return m * 0.5; };
+const H_MAX = POLAR ? Math.max(D20.hMax, ...FAR.map((d) => d.hMax)) : Math.max(winMax(D20), ...FAR.map(winMax)) + 500;
 
 // Great-circle destination from the site.
 // Optional observer shift (metres north / east) for sensitivity tests.
@@ -87,8 +122,13 @@ function dest(azDeg, dM) {
 const ground = D20.at(obsLat, obsLon);
 const hObs = ground + MAST_M, Ro = R + hObs;
 const angle = (h, dM) => Math.atan2((R + h) * Math.cos(dM / R) - Ro, (R + h) * Math.sin(dM / R)) * r2d;
-const dipDeg = Math.acos(R / Ro) * r2d;                  // smooth-sphere horizon dip
-const smoothHorizonKm = Math.sqrt(2 * R * hObs) / 1000;  // distance to the smooth-sphere horizon
+// Smooth-sphere horizon dip relative to the 1737.4 km reference sphere. Defined only for an observer
+// ABOVE that sphere; the Apollo sites (maria) are 1.4-2.6 km BELOW it, so there it is null.
+const aboveSphere = hObs > 0;
+const dipDeg = aboveSphere ? Math.acos(R / Ro) * r2d : null;
+const smoothHorizonKm = aboveSphere ? Math.sqrt(2 * R * hObs) / 1000 : null;
+// Dip for the mast alone over a smooth sphere through the ground point (always defined).
+const mastDipDeg = Math.acos((R + ground) / Ro) * r2d;
 
 const elevationDeg = new Array(360).fill(-Infinity), blockDistKm = new Array(360).fill(null),
   blockDem = new Array(360).fill(null), edgeWorstDeg = new Array(360).fill(null);
@@ -130,11 +170,14 @@ const out = {
   edgeWorstCaseDeg: edgeBins.map((i) => r3(edgeWorstDeg[i])),
   observer: { lat: site.lat, lon: site.lon, groundHeightM: r3(ground), mastM: MAST_M, mastAssumed: true,
     heightAboveSphereM: r3(hObs), sphereRadiusM: R },
-  smoothSphereDipDeg: r3(dipDeg), smoothSphereHorizonKm: r3(smoothHorizonKm),
+  smoothSphereDipDeg: dipDeg === null ? null : r3(dipDeg), smoothSphereHorizonKm: smoothHorizonKm === null ? null : r3(smoothHorizonKm),
+  smoothSphereNote: aboveSphere ? "dip of a smooth 1737.4 km sphere seen from the observer" : "observer is below the 1737.4 km reference sphere, so a dip relative to it is undefined (null)",
+  mastDipDeg: Number(mastDipDeg.toFixed(4)), // smooth sphere through the ground point, seen from the mast top
   demMaxHeightM: H_MAX,
-  method: `rays every 0.1 deg; exact spherical geometry; ${D20.scale} m DEM (${FINE}) to ${NEAR_KM} km, then ${FAR.map((g) => `${g.scale} m (to ${-g.maxLat}S)`).join(", ")}; bilinear; ray stops when the DEM maximum height could no longer exceed the best angle; bin = max of 10 rays`,
-  source: `LRO LOLA GDR polar DEMs (PDS Geosciences): ${[FINE, ...FAR_PRODUCTS].join(", ")} — https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/polar/img/`,
-  maps: { fine: { product: FINE, metersPerPixel: D20.scale, withinKm: NEAR_KM }, far: FAR.map((g) => ({ product: g.name, metersPerPixel: g.scale, toLatitude: g.maxLat })) },
+  method: `rays every 0.1 deg; exact spherical geometry; ${D20.scale} m DEM (${FINE}) to ${NEAR_KM} km, then ${FAR.map((g) => POLAR ? `${g.scale} m (to ${-g.maxLat}S)` : `${g.scale} m (${g.name}, rows within ${GLOBAL_HALF} deg of latitude)`).join(", ")}; bilinear; ray stops when the highest possible terrain (${Math.round(H_MAX)} m) could no longer exceed the best angle; bin = max of 10 rays`,
+  source: `LRO LOLA GDR ${POLAR ? "polar" : "global cylindrical"} DEMs (PDS Geosciences): ${[FINE, ...FAR_PRODUCTS].join(", ")} — https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/${POLAR ? "polar" : "cylindrical"}/img/`,
+  maps: { fine: { product: FINE, metersPerPixel: D20.scale, withinKm: NEAR_KM }, far: FAR.map((g) => (POLAR ? { product: g.name, metersPerPixel: g.scale, toLatitude: g.maxLat } : { product: g.name, metersPerPixel: g.scale, rowsWithinDegLat: GLOBAL_HALF })) },
+  searchBoundM: Math.round(H_MAX),
   builtUtc: new Date().toISOString(),
 };
 if (ENV.HZ_DUMP) writeFileSync(ENV.HZ_DUMP, JSON.stringify(out)); // sensitivity only
@@ -147,6 +190,7 @@ if (ENV.HZ_DRY) {
 }
 writeFileSync(join(ROOT, "data", "ephem", siteId, "horizon.json"), JSON.stringify(out));
 buildIndex(); // so lib/visibility.js and build_daily.mjs see the new horizon (then run: node scripts/build_daily.mjs)
-console.log(`observer ground ${ground.toFixed(1)} m (+${MAST_M} m mast) above 1737.4 km sphere; smooth-sphere dip ${dipDeg.toFixed(3)} deg at ${smoothHorizonKm.toFixed(1)} km`);
+console.log(`observer ground ${ground.toFixed(1)} m (+${MAST_M} m mast) relative to the 1737.4 km sphere; ` +
+  (aboveSphere ? `smooth-sphere dip ${dipDeg.toFixed(3)} deg at ${smoothHorizonKm.toFixed(1)} km` : `below the sphere: smooth-sphere dip undefined; mast-only dip ${mastDipDeg.toFixed(4)} deg`));
 console.log(`horizon min ${Math.min(...elevationDeg).toFixed(3)} max ${Math.max(...elevationDeg).toFixed(3)} deg; blocking DEM per ray:`, demUse);
 console.log(`bins where the 60S edge could hide something higher: ${edgeBins.length}`);

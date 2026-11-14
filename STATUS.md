@@ -6,10 +6,10 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 |-----|------|-----------|
 | Advik + ChatGPT (Lane B) | D13–D15 — IMPLEMENTED / TESTED; STOPPED | Shared UTC date/hour controls, corrected marker verdict colors, overview + reduced-motion stars, NASA 4K map, global legend and four A–D pole selectors live; human visual signoff pending. |
 | Sheldon (Lane A human) | — | Planning stop 2026-11-14: D12-D18 signed; acceptance run done |
-| Claude Code (Lane A) | 10 (D12 terrain) | Stage 2 DONE (IM-2, IM-1, Chandrayaan-3); stopped for Sheldon's go on stage 3 (Apollo sites) |
+| Claude Code (Lane A) | 10 (D12 terrain) | D12 DONE: all 10 sites have LOLA terrain; stopped. Next Lane A tasks per plan: (3) detailed Moon assets, (4) D16 + D17, (5) D18, on Sheldon's go |
 
 Acceptance (both humans, 2026-11-14): steps 1, 2, 3, 6, 8 **PASS**. Step 4 not yet (markers don't recolor on date change; pole sites can't be told apart). Step 7 not yet (hour slider too hard to find). Signed 2026-11-14: D7–D11 (see PLAN); **D12–D18** (terrain all sites, date+hour slider, overview scene, legend, power/comms metrics, best-site score, Researcher tab). Side card switch renamed Educator / Researcher.
-Waiting on Sheldon: go for D12 stage 3 (Apollo 11, 12, 17); OK on the Chandrayaan-3 coordinate change (LROC landed point).
+Waiting on Sheldon: go for the next Lane A task (Moon assets / D16 + D17 / D18).
 Waiting on Advik: D13 (uses panel interface v1.2), D14, D15; step 4 fixes.
 
 ## Continuous two-agent coordination protocol (agreed 2026-11-14)
@@ -1042,4 +1042,41 @@ interface PanelHandle { update(next: Partial<Pick<PanelProps, "siteId" | "landin
   - `check_visibility` PASS (expects exactly 7 terrain sites; Sun/Earth margins vs each horizon; all daily rows = getSummary).
   - `check_ephem`, `check_scene` PASS. `/web` build OK.
 - **Next (stage 3, on go):** Apollo 11, 12, 17 at their LM coordinates. They're near the equator, outside every polar map, so they need a different (cylindrical/global) LOLA product. Lane A will confirm it from PDS documentation first.
+
+### 2026-11-14 — D12 terrain DONE: all 10 sites (stage 3, Apollo); D14 amendment; "on the edge" wording in PLAN/DESIGN
+- **Interrupted run (computer slept) checked before use:** nothing had been committed. The three Apollo `horizon.json` files were complete (360 finite values, correct maps, 0 edge-limited bins) and the index listed all 10. The only defect was the smooth-sphere dip, saved as `null` from a NaN. Fixed below; the Apollo horizons were recomputed with identical elevation values.
+- **Maps confirmed from PDS labels and `catalog/dsmap.cat`:** the global simple-cylindrical LOLA GDR maps (`lola_gdr/cylindrical/img/`).
+  - Within 20 km: a ±22 km row window of the site's **`ldem_1024` tile** (1024 px/deg, ~30 m/px).
+  - Beyond: a ±8° row window of **`ldem_128`** (~237 m/px).
+  - Labels: CENTER_LONGITUDE 180, east-positive 0–360, MEAN EARTH/POLAR AXIS OF DE421, heights relative to 1737.4 km.
+  - Formula: `SAMPLE = NINT(SPO + RES·(LON − CENTER_LONGITUDE)) + 1`, `LINE = NINT(LPO − RES·(LAT − CENTER_LATITUDE)) + 1`, checked against tile edges.
+  - Downloaded only the windows: ~838 MB in 39 s. `data/raw/` total 2.1 GB, gitignored.
+- **Per site (landed LM coordinates, NSSDCA):**
+
+  | Site | Fine map | Ground vs sphere | Terrain horizon | Sun, flat → terrain | Earth, flat → terrain |
+  |---|---|---|---|---|---|
+  | **Apollo 11** | `ldem_1024_00n_15n_000_030` | −1927.8 m | −0.61° to +1.33° | 50.1% → 49.9% | 100% → 100% |
+  | **Apollo 12** | `ldem_1024_15s_00s_330_360` | −1421.9 m | −0.41° to +0.73° | 50.4% → 50.1% | 100% → 100% |
+  | **Apollo 17** | `ldem_1024_15n_30n_030_060` | −2628.6 m | **+0.45° to +14.23°** (valley) | 50.1% → 47.9% | 100% → 100% |
+
+  - Apollo 17's Sun is blocked by terrain for 764 h (356 h by ridges ≥ 2 km away).
+  - **Apollo 12's Earth-facing skyline is set by ground 0.39–1.0 km away** (68% of Earth hours < 500 m; D10 reporting rule). Its horizon there is low and Earth is high, so no answer changes.
+  - Apollo 11's tile stops at the equator; the ~1.5 km strip south of it within 20 km comes from the 237 m map.
+- **Smooth-sphere dip fix:** the Apollo observers are 1.4–2.6 km *below* the 1737.4 km reference sphere, where `acos(R/(R+h))` is undefined (NaN).
+  - `horizon.json` now stores `smoothSphereDipDeg: null` with `smoothSphereNote`, plus `mastDipDeg` (0.087°, mast over a smooth sphere through the ground point).
+  - `check_horizon` checks the null case explicitly.
+  - Panels now say "x m **below** the 1737.4 km reference sphere" instead of a negative "above".
+- **Search bound for global sites:** the polar labels' ~7 km maximum covers only the poles. Global sites use the highest point in their own windows + 500 m (9.3–11.3 km). No ray left its windows.
+- **Regression:** Malapert, IM-1 and Chandrayaan-3 recomputed through the rewritten loader: identical to the committed files.
+- **Checks:**
+  - `check_horizon` PASS for **all 10** sites; the Apollo sites get a cylindrical map-agreement test, 30 m vs 237 m: mean |diff| 4.1 / 2.1 / 14.6 m.
+  - `check_visibility` PASS (all 10 sites lola; Sun and Earth margins vs each horizon; 17,190 daily-row comparisons).
+  - `check_ephem`, `check_scene` PASS. `cd web && npm run build` OK.
+  - DOM test: Apollo 11 side card and horizon view show TERRAIN and "1927.8 m below the reference sphere"; the Compare grid shows no FLAT rows and says every site uses a terrain horizon.
+- **On screen / docs updated for "all 10 terrain":**
+  - Compare grid: the FLAT/TERRAIN legend and footer appear only if any site is flat. Now: "every site uses a terrain horizon".
+  - Root README (what you can do, terrain method, sources, limits) and `/data/README.md` (stage 3 table).
+- **Lane B, please update one line in `web/src/main.ts` Credits:** "Malapert horizon elevation: NASA …" is now out of date. Suggested: *"Terrain horizons for all 10 sites: NASA LRO LOLA GDR elevation maps (PDS Geosciences), polar and global; maps and resolution per site in data/README.md."*
+- **PLAN.md + DESIGN.md:** "on the edge" now reads the same as the panels: "terrain decides" at flat-horizon sites, "grazing the skyline: small changes in position matter" at terrain sites (both humans). Since D12, every site is a terrain site.
+- **D14 amendment (both humans), recorded in PLAN.md:** the overview's first version is the **OzAILabs solar system simulator, forked and embedded as its own tab with full credit**. It shows all planets and is not yet tied to our date control, and the screen says both. Trimming to three bodies and syncing the date come later if time allows. Lane B owns it. Reminder from D11: the Credits panel must show its license; no code is copied from a repo whose license we can't show (earlier check: the README says MIT, no standalone LICENSE file seen).
 

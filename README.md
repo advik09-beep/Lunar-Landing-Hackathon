@@ -11,15 +11,15 @@ It has two reading levels:
 - **Numbers:** angles, margins, sources and a CSV download, for mission planners and researchers.
 
 ## What you can do
-- **Explore in 3D:** a Moon globe (NASA imagery) with 10 sites, each colored *and* labeled by verdict for the chosen landing date: ✓ Clear, ◐ Partial, ✕ Out, ⚠ On the edge (at flat-horizon sites: terrain decides; at terrain sites: grazing the skyline, so small changes in position matter).
-- **Side card:** for one site and date: verdict, Sun and Earth status, whether the horizon is flat or real terrain, sources and coverage, and a CSV of the 168 hourly values.
+- **Explore in 3D:** a Moon globe (NASA imagery) with 10 sites, each colored *and* labeled by verdict for the chosen landing date: ✓ Clear, ◐ Partial, ✕ Out, ⚠ On the edge (grazing the skyline, so small changes in position matter).
+- **Side card:** for one site and date: verdict, Sun and Earth status, the terrain horizon model and its map, sources and coverage, and a CSV of the 168 hourly values.
 - **Compare dates:** a grid of sites × landing dates, plus an hour-by-hour strip showing when the Sun and Earth are in view.
-- **Stand here:** a 360° horizon panorama with the Sun and Earth paths over the stay. For seven sites (the four south-pole candidates, IM-1, IM-2 and Chandrayaan-3) it shows real terrain from NASA's LOLA laser altimeter, so you can see the Sun blocked by a ridge. The three Apollo sites are being added (D12).
+- **Stand here:** a 360° horizon panorama with the Sun and Earth paths over the stay. Every site uses a real terrain horizon from NASA's LOLA laser altimeter, so you can see the Sun blocked by a ridge.
 
 The 10 sites: Apollo 11, 12 and 17; Chandrayaan-3; Intuitive Machines IM-1 and IM-2; and four south-pole points from NASA's Artemis III candidate regions (Peak near Cabeus B, Haworth, Malapert Massif, Nobile Rim 2).
 
 **Verdict rule** (signed by both team members, shown on screen):
-- *On the edge:* the Sun or Earth is within 2° of the horizon more than half the stay. At flat-horizon sites that means terrain decides; at terrain sites (terrain already included) it means the body is grazing the skyline, so small changes in position matter.
+- *On the edge:* the Sun or Earth is within 2° of the terrain skyline more than half the stay. It is grazing the skyline, so small changes in position matter. (A site without terrain would instead say "terrain decides"; since D12, every site has terrain.)
 - Otherwise *clear* if Sun and Earth are both up at least 90% of the stay, *out* if both are up 10% or less, and *partial* in between.
 
 There is no single "best site" score: sunlight and Earth contact trade off, and the right choice depends on the mission.
@@ -53,18 +53,19 @@ The data are static JSON files in `data/`. There is no backend.
 |---|---|
 | `node scripts/check_ephem.mjs` | The seven hand-check values are reproduced (within the 0.0005° storage rounding; the two Malapert rows are compared against a saved Horizons file at the original point). Apollo 11 at landing shows a low morning Sun in the east. Earth is high at the Apollo sites and near the horizon at the pole sites. Coverage has no gaps. |
 | `node scripts/check_visibility.mjs` | Every function in `lib/visibility.js` returns the agreed shapes, and screen values equal the files. All 14,694 rows of the daily summary equal a fresh calculation from the hourly data. Out-of-range dates give "unavailable", never a guess. Includes the terrain test: at Malapert on 2026-09-19 06:00 UTC the Sun is 1.05° above a flat horizon but hidden behind a ridge 1.84 km away. |
-| `node scripts/check_horizon.mjs [siteId]` | A terrain horizon (default Malapert) is sane: it reads the elevation maps consistently (20/80/120/240 m maps agree to within ~6–11 m), it never falls below what geometry allows, the search isn't cut off by any map edge, and it finds hours where flat says "Sun up" but terrain says "blocked". The elevation-map comparisons need the raw maps: run `node scripts/fetch_lola.mjs` first (~485 MB, not in git). |
+| `node scripts/check_horizon.mjs [siteId]` | A terrain horizon (default Malapert) is sane: it reads the elevation maps consistently (each site's fine map agrees with a coarser map near the site, mean differences ~2–15 m), it never falls below what geometry allows, the search isn't cut off by any map edge, and it finds hours where flat says "Sun up" but terrain says "blocked". The elevation-map comparisons need the raw maps: run `node scripts/fetch_lola.mjs <siteId ...>` first (~2.1 GB for all 10 sites, not in git). |
 | `node scripts/check_scene.mjs` | The Moon-fixed Sun and Earth directions for the 3D view agree with the site data: within 0.0034° of the hand-checked values, and within 0.0065° over 58,440 site-hours. At each of the 49 full moons in 2026–2029, the point with the Sun overhead and the point with Earth overhead are within 5° of each other. |
 
-**Terrain (seven sites so far, prototype; the three Apollo sites are being added):**
+**Terrain (all 10 sites, prototype):**
 - Built from NASA's LOLA elevation maps (PDS Geosciences).
 - Method: look along a line every 0.1° of compass direction, include the Moon's curvature exactly, and keep searching until even the highest terrain on the Moon could no longer show above the skyline.
-- Each south-pole candidate uses the highest ground within 1 km of its representative point; IM-1, IM-2 and Chandrayaan-3 use their landed coordinates (LROC). Map resolution near the site is 20 m, 30 m (IM-1) or 60 m (Chandrayaan-3). At Malapert that is "a slope, not a summit"; per-site details are in `data/README.md`.
+- Each south-pole candidate uses the highest ground within 1 km of its representative point. The six past landings use their landed coordinates (LROC for IM-1, IM-2, Chandrayaan-3; NSSDCA for Apollo).
+- Map resolution near the site: 20 m (pole sites, IM-2), 30 m (IM-1; the three Apollo sites, from global 1024 px/deg tiles) or 60 m (Chandrayaan-3). Each site's maps are listed in `data/README.md`. At Malapert that is "a slope, not a summit"; per-site details are in `data/README.md`.
 - Moving the observer about 1 km changed Earth-in-view from 41% to 100% of the time. We report that openly (see `data/README.md`).
 
 ## Data sources and credits
 - **Sun and Earth angles, Moon-fixed scene data:** NASA JPL Solar System Dynamics, Horizons System. https://ssd.jpl.nasa.gov/horizons/
-- **Terrain:** NASA LRO Lunar Orbiter Laser Altimeter (LOLA) GDR polar elevation maps, PDS Geosciences Node. https://pds-geosciences.wustl.edu/missions/lro/lola.htm
+- **Terrain:** NASA LRO Lunar Orbiter Laser Altimeter (LOLA) GDR elevation maps, polar and global (cylindrical), PDS Geosciences Node. https://pds-geosciences.wustl.edu/missions/lro/lola.htm
 - **Moon surface image (visual only):** NASA's Scientific Visualization Studio, CGI Moon Kit (2025), https://svs.gsfc.nasa.gov/4720. Credit: NASA's Scientific Visualization Studio. NASA says it is "optimized for aesthetics, not science". Its orientation was checked against LOLA elevation before use.
 - **Site coordinates and landing times:**
   - NASA NSSDCA (Apollo)
@@ -79,13 +80,13 @@ The data are static JSON files in `data/`. There is no backend.
 - **Sun and Earth are treated as points.** The Sun's disc is about 0.5° wide, so near the horizon real sunlight is partial while we show all-or-nothing.
 - **"Sunlight" is not power and "Earth in view" is not a guaranteed link.** They mean the body is above the horizon.
 - **Cabeus B's view toward Earth is set by ground 0.26–0.7 km away** (76% of Earth hours). That ground slopes downhill around a high point, so it decides how far *below* level Earth can be seen, not a ridge in the way. It's the same situation as Malapert's eastern bins (6°–8°). We kept the point on purpose.
-- **Terrain is modelled at seven sites so far** (prototype). The three Apollo sites still use a flat horizon and are labeled FLAT. Each terrain horizon is for one point; nearby spots differ. The observer height (2 m mast) is assumed.
+- **Terrain is modelled at all 10 sites, as a prototype.** Each horizon is for one point; nearby spots differ. The observer height (2 m mast) is assumed. Near-site maps are 20–60 m per pixel, so features smaller than that aren't resolved (e.g. the ~20 m crater IM-2 rests in).
 - **The four south-pole sites are representative points** of ~15 km candidate regions, not landing spots.
 - **Data are hourly.** Sunrise/sunset times are accurate to the hour.
 - **Fixed date range:** 2026–2029, plus 30 days around each past landing. Other dates show "unavailable".
 - **Site heights are not used** for the Sun/Earth angles: all sites sit on a 1,737.4 km sphere. The effect on the angles is very small, but it isn't measured.
 - **Coordinate frames:** most site sources don't state their coordinate frame. The Chandrayaan-3 landing time is from a secondary source and approximate; IM-2's is to the minute only.
-- **The LOLA maps are preliminary 2017 products.** Newer adjusted maps exist and were not used.
+- **The LOLA maps are preliminary products** (labels say "preliminary LOLA data"): polar maps and the global 1024 px/deg tiles created 2017; the global 128 px/deg map created 2011. Newer adjusted maps exist and were not used.
 - **The 3D globe shows no terrain,** and its lighting is illustrative until the Moon-fixed Sun direction (already available from `getSceneState`) is wired into the scene.
 - **Desktop browsers only** (a team decision). No phone layout.
 

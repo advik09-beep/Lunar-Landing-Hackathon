@@ -5,7 +5,7 @@
 import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { FAR, fineProduct } from "./lola_maps.mjs";
+import { FAR, fineProduct, isPolar, GLOBAL_FAR } from "./lola_maps.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const siteId = process.argv[2] ?? "sp_malapert";
@@ -25,15 +25,46 @@ ok(hz.edgeLimitedBins.length === 0, "no azimuth limited by the 60S data edge (se
 const hObs = hz.observer.heightAboveSphereM, Ro = R + hObs;
 const lowest = -Math.acos((R - 9126.5) / Ro) * r2d;
 ok(Math.min(...hz.elevationDeg) >= lowest, `horizon never below the tangent to the deepest terrain (${lowest.toFixed(2)} deg)`);
-ok(Math.abs(hz.smoothSphereDipDeg - Math.acos(R / Ro) * r2d) < 1e-3, `smooth-sphere dip ${hz.smoothSphereDipDeg} deg for an observer ${hObs} m above the sphere`);
-const below = hz.elevationDeg.filter((e) => e < -hz.smoothSphereDipDeg).length;
+if (hObs > 0) {
+  ok(Math.abs(hz.smoothSphereDipDeg - Math.acos(R / Ro) * r2d) < 1e-3, `smooth-sphere dip ${hz.smoothSphereDipDeg} deg for an observer ${hObs} m above the sphere`);
+} else {
+  ok(hz.smoothSphereDipDeg === null && hz.smoothSphereHorizonKm === null, `observer ${hObs} m BELOW the sphere: smooth-sphere dip recorded as undefined (null), not NaN`);
+  // An observer below the reference sphere on a mast sees, at most, the mast-only dip below level over flat
+  // local ground; real terrain around a basin floor should not drop much further below level.
+  ok(Number.isFinite(hz.mastDipDeg) && Math.min(...hz.elevationDeg) > -3, `lowest horizon ${Math.min(...hz.elevationDeg).toFixed(2)} deg (mast-only dip ${hz.mastDipDeg} deg)`);
+}
+const below = hObs > 0 ? hz.elevationDeg.filter((e) => e < -hz.smoothSphereDipDeg).length : 0;
 console.log(`     ${below} of 360 bins dip below the smooth-sphere horizon (terrain lower than the 1737.4 km sphere, e.g. toward the polar depressions)`);
 
 // 3. DEM read checks (raw files needed): the site's fine map agrees with the next coarser map that
 // covers the site, and the coarse polar maps agree with each other (same orientation, same heights).
 const RAW = join(ROOT, "data", "raw");
-const FINE = fineProduct(hz.observer.lat);
-if (FAR.every((p) => existsSync(join(RAW, `${p}.img`))) && existsSync(join(RAW, `${FINE}_${siteId}_rows.img`))) {
+const FINE = fineProduct(hz.observer.lat, hz.observer.lon);
+if (!isPolar(hz.observer.lat)) {
+  // Global (cylindrical) site: 1024 px/deg tile window vs the 128 px/deg window, near the site.
+  const files = [FINE, GLOBAL_FAR].map((p) => join(RAW, `${p}_${siteId}_rows.img`));
+  if (files.every((f) => existsSync(f))) {
+    const openC = (name) => {
+      const t = readFileSync(join(RAW, `${name}.lbl`), "utf8");
+      const num = (k) => Number(t.match(new RegExp(`^\\s*${k}\\s*=\\s*(-?[\\d.]+)`, "m"))[1]);
+      const W = JSON.parse(readFileSync(join(RAW, `${name}_${siteId}_rows.json`), "utf8"));
+      const b = readFileSync(join(RAW, `${name}_${siteId}_rows.img`));
+      const D = new Int16Array(b.buffer, b.byteOffset, b.length / 2);
+      const res = num("MAP_RESOLUTION"), lpo = num("LINE_PROJECTION_OFFSET"), spo = num("SAMPLE_PROJECTION_OFFSET"), clon = num("CENTER_LONGITUDE"), ns = num("LINE_SAMPLES");
+      // PDS catalog/dsmap.cat (0-based): sample = SPO + RES*(LON - CENTER_LONGITUDE), line = LPO - RES*LAT
+      return (lat, lon) => { const l = Math.round(lpo - res * lat) - W.firstRow, sm = Math.round(spo + res * ((((lon % 360) + 360) % 360) - clon)); return l >= 0 && sm >= 0 && sm < ns && l * ns < D.length ? 0.5 * D[l * ns + sm] : NaN; };
+    };
+    const fine = openC(FINE), coarse = openC(GLOBAL_FAR);
+    const pts = [];
+    const lonSpan = 0.3 / Math.cos(hz.observer.lat * d2r);
+    for (let i = 0; i < 200; i++) pts.push([hz.observer.lat + 0.3 * Math.sin(i * 1.7), hz.observer.lon + lonSpan * Math.cos(i * 2.3)]);
+    const both = pts.map(([la, lo]) => [fine(la, lo), coarse(la, lo)]).filter(([a, b]) => Number.isFinite(a) && Number.isFinite(b));
+    const m = both.reduce((s, [a, b]) => s + Math.abs(a - b), 0) / both.length;
+    const g = fine(hz.observer.lat, hz.observer.lon), gc = coarse(hz.observer.lat, hz.observer.lon);
+    ok(Math.abs(g - gc) < 60, `site height 30 m tile ${g} m vs 237 m map ${gc} m (same place, same orientation)`);
+    ok(both.length >= 150 && m < 60, `30 m tile (${FINE}) vs 237 m (${GLOBAL_FAR}), ${both.length} points within ~9 km: mean |diff| ${m.toFixed(1)} m`);
+  } else console.log("skip DEM read checks (data/raw not present; run scripts/fetch_lola.mjs <siteId>)");
+} else if (FAR.every((p) => existsSync(join(RAW, `${p}.img`))) && existsSync(join(RAW, `${FINE}_${siteId}_rows.img`))) {
   const lbl = (name) => { const t = readFileSync(join(RAW, `${name}.lbl`), "utf8"); const num = (k) => Number(t.match(new RegExp(`^\\s*${k}\\s*=\\s*(-?[\\d.]+)`, "m"))[1]); return { N: num("LINES"), off: num("LINE_PROJECTION_OFFSET"), scale: num("MAP_SCALE"), maxLat: num("MAXIMUM_LATITUDE") }; };
   const open = (name, file, firstRow = 0) => {
     const { N, off, scale, maxLat } = lbl(name);
