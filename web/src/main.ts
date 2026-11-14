@@ -83,6 +83,7 @@ app.innerHTML = [
   '  <section id="overview-view" class="overview-view" aria-label="Sun Earth Moon overview">',
   '    <div class="overview-window">',
   '      <div class="overview-caption"><strong id="overview-source">THE SUN · EARTH · MOON</strong><span id="overview-note">Illustrative sizes, positions and motion — not to scale; not ephemeris geometry</span></div>',
+  '      <p id="overview-mission-message" class="overview-mission-message">Of everything in the solar system, the Sun determines the sunlight available for a lunar lander\'s potential power, while Earth determines when a direct radio link is geometrically possible. The other planets\' gravitational pull is already included in NASA/JPL Horizons data; their light and radio contributions are negligible for this comparison.</p>',
   '      <div id="overview-stage" class="overview-stage" aria-label="Solar system overview visualization"></div>',
   '      <div class="overview-footer"><p id="overview-disclaimer">Choose the Moon to explore real landing sites and verified Sun/Earth visibility at your selected UTC date and hour.</p><button id="enter-explore" type="button">Explore the Moon and landing sites</button></div>',
   '    </div>',
@@ -373,7 +374,7 @@ if (embedUrl) {
   frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-pointer-lock allow-downloads allow-forms');
   overviewStage.replaceChildren(frame);
   find<HTMLElement>('overview-source').textContent = 'SOLAR SYSTEM · OzAILabs simulator';
-  find<HTMLElement>('overview-note').textContent = 'Forked from OzAILabs · MIT stated in upstream README · full solar system';
+  find<HTMLElement>('overview-note').textContent = 'Full solar system · separate simulator time; our mission clock controls Explore, Compare and Stand here';
   find<HTMLElement>('overview-disclaimer').textContent =
     'Interactive solar-system simulator. This is a visual overview with its own time; the landing-site timeline controls Explore, Compare and Stand here. Select Explore to study the Moon with verified site data.';
 } else {
