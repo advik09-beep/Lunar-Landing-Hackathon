@@ -159,6 +159,23 @@ and researchers get the numbers behind them.
   cleaned up (95f3d88, D14 amendment); a NASA challenge objectives audit
   added to Lane B's docs (34744ea, 395d77b).
 
+- Planning stop 2026-11-14 evening (both humans). From now on, status
+  notes are folded into real commits; no status-only pushes.
+- D24 Overview opens on a still title card: purpose message, "Start
+  tour", "Skip to the Moon". A "Solar system tour" button in the main
+  navigation on every tab returns to it. Lane B.
+- D25 Every tour stop answers "What does this body do to a lander on the
+  Moon?" Lane A writes the ten captions with a source each; Lane B
+  displays them.
+- D26 "Why the south pole?" appears at the tour's Moon stop, as a
+  clickable in the Educator view, and as one line in the Explore header.
+  It also says the tool works for any site and historic landings are
+  comparisons.
+- D27 One clock: the date and hour sliders also drive the solar system
+  overview. Lane B.
+- D28 Saved A/B scenario comparison and a mission requirements filter.
+  Lane A, after D25 and D26.
+
 ## Settled earlier (do not reopen without both humans)
 - 10 fixed sites: 3 Apollo, Chandrayaan-3, IM-1, IM-2, 4 south pole
   representative points.

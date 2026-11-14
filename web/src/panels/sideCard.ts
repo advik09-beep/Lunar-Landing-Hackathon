@@ -132,7 +132,11 @@ export const mountSideCard: MountPanel = (container, props) => {
           <li><strong>Earth in view:</strong> ${state.comms ? "yes" : "no"}${esc(earthNote(state))}</li>
         </ul>
         <p class="muted small">“Sunlight” means the Sun is above the horizon, not a promise of power. “Earth in view” means a possible direct line of sight, not a guaranteed link.</p>
-        ${scoreEducator()}`;
+        ${scoreEducator()}
+        <details class="why-weights south-pole"><summary>Why the south pole?</summary>
+          ${V.SOUTH_POLE.full.map((p) => `<p>${esc(p)}</p>`).join("")}
+          <p class="muted small">Sources: ${V.SOUTH_POLE.sources.map((x) => `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.name)}</a>`).join("; ")}</p>
+        </details>`;
     }
 
     // D17 Educator: one score, default weights, top site named in plain words, no formula.

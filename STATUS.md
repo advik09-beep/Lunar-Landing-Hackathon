@@ -4,13 +4,13 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D23 production PASS | USMDO Club Pro verified; fork then main deployed production READY. Live cross-origin tour Moon stop and physical rendered-Moon click both open Explore, preserving 2026-11-21 and all 10 site controls. No D23 deployment blocker. |
-| Sheldon (Lane A human) | — | Planning stop 2026-11-14: weights confirmed; D19–D23 signed |
-| Claude Code (Lane A) | D21 + D18 done | D21 filterable ranking and D18 Researcher panel (with D20, D22) DONE and pushed; stopped. Lane B: mount the Researcher panel (instructions below) |
+| Advik + ChatGPT (Lane B) | D24, D25 display, D26 display, D27 | Title card + "Solar system tour" nav (D24); show the ten tour captions (D25) and the south-pole text (D26) from /lib; one clock for the overview (D27); mount the Researcher tab (D18) |
+| Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
+| Claude Code (Lane A) | D25 + D26 text done | Tour captions and south-pole text in /lib with sources and checks; "Why the south pole?" in the side card. Next: D28 (A/B scenarios, mission requirements filter) on Sheldon's go |
 
-Acceptance (both humans, 2026-11-14): steps 1, 2, 3, 6, 8 **PASS**; step 4 and 7 pending earlier findings. Signed: D7–D18 (see PLAN), D17 amendment, D14 amendment, **D19–D23** (stricter Sun/Earth rules, lunar conditions, no south-pole assumption, other-planets note, tour purpose). Score weights confirmed 25/20/15/10/15/15.
-Waiting on Sheldon: review D21 + D18 (Researcher tab on web/panels.html).
-Waiting on Advik: mount mountResearcher as a Researcher tab; use the D22 wording (Lane A entry); D23 overview wording; check shell for south-pole defaults (D21).
+Acceptance (both humans): steps 1, 2, 3, 6, 8 PASS; step 4 and 7 pending earlier findings. Signed: D7–D23 (see PLAN), **D24–D28** (title card + tour nav, tour captions, why the south pole, one clock, A/B scenarios + requirements filter). Rule: no status-only pushes.
+Waiting on Sheldon: review the ten captions and the south-pole text; go for D28.
+Waiting on Advik: D24, D27; display D25 captions and D26 text (how to read them below); mount the Researcher tab (D18).
 
 ## Continuous two-agent coordination protocol (agreed 2026-11-14)
 
@@ -1370,4 +1370,47 @@ Panel = sun-tracking, 1 m², 30%, summed over 2026–2029.
   - NASA criteria, D22 note and sources present.
 - DOM test: all 11 sections, the audience label, NASA quotes, eclipse, delay and caution, season/local time/sweep, profile chart + maps + slope, D22, calculator, JSON (full analysis + 168 hourly rows) and CSV (168 rows, D19 columns) downloads, switch to Apollo 11 (historic label, global map).
 - All earlier checks and panel tests PASS (two old panel tests updated for D12 all-terrain and D21 wording). `/web` build OK. README updated (Researcher tab, categories, seven check scripts).
+
+### 2026-11-14 (evening) — D24–D28 recorded; D25 tour captions and D26 south-pole text DONE (Lane A part)
+**Recorded in PLAN.md:** D24–D28 and the rule that status notes are folded into real commits (no status-only pushes).
+
+**D25 tour captions:** `lib/tour.js`, exported from `lib/visibility.js` as `TOUR_STOPS` (API 1.8.0).
+- Ten stops in tour order: Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune, Moon. Each `{ id, body, title, text, ours[], sources[{name, url}] }`.
+- `text` is two plain sentences answering "What does this body do to a lander on the Moon?"
+- Every source is an official NASA or JPL page, checked 2026-11-14: the science.nasa.gov facts pages, the NSSDCA fact sheets, NASA SVS 5229, the Artemis III page, the DE440 paper, and JPL Horizons.
+- Figures we computed ourselves are labeled "ours" in the text and listed in `ours`.
+  - From the Moon (our JPL Horizons magnitudes, 2026–2029): **Venus is the brightest planet**, at most 1.95 × 10⁻⁹ of the Sun's light.
+  - Sunlight 1,310–1,415 W/m²; signal delay 1.19–1.36 s; one lunar day = 29.531 Earth days (the sub-solar point drifts 360° west in that time).
+  - Raw magnitudes are in `MAGNITUDES_FROM_MOON`; `lightVsSun(body)` gives the ratios.
+- **Corrections made by the checks:** the first draft said "about 1.3 seconds" and "Earth within a few degrees of the horizon at the candidate sites". The data gave 1.19–1.36 s and up to 10.63°, so the texts now say "between about 1.2 and 1.4 seconds" and "never more than about 11 degrees above level".
+
+**D26 "Why the south pole?":** `SOUTH_POLE = { oneLine, full[3 paragraphs], sources[] }`.
+- Quoted from NASA: the 2022 candidate-regions release ("permanently shadowed regions rich in resources", "water ice that was confirmed at the Moon's South Pole", sites with "continuous access to sunlight throughout a 6.5-day period"); NASA Moon facts (ice "within darkened craters at the poles"); the Artemis III page ("The Sun will hover just above the horizon"); NASA SVS 5229 (tilt 1.5°).
+- NASA's "why Artemis" page returned 404, so it isn't used.
+- Includes our Malapert 1 km example and the sentence that the tool works for any site, with historic landings as comparisons.
+- Lane A's side card Educator view now has a clickable **"Why the south pole?"** (full text + sources).
+
+**How Lane B reads them:**
+```js
+import { TOUR_STOPS, SOUTH_POLE } from "../../lib/visibility.js";   // path from web/src/
+// D25: one caption per tour stop (order = tour order)
+for (const stop of TOUR_STOPS) { /* stop.body, stop.title, stop.text, stop.sources[i].name / .url */ }
+const moon = TOUR_STOPS.find((s) => s.id === "moon");
+// D26: Explore header line, and the tour's Moon stop
+SOUTH_POLE.oneLine;          // one line (Explore header)
+SOUTH_POLE.full;             // array of 3 paragraphs (tour Moon stop, "Why the south pole?" clickable)
+SOUTH_POLE.sources;          // [{ name, url }]
+```
+- These are plain constants: no loading needed, synchronous, safe to import at start-up.
+- Please show each stop's sources (e.g. a small "Sources" link), and keep the "(our …)" wording when shortening.
+- Credits: add "NASA science.nasa.gov planet fact pages" and "JPL Horizons planet magnitudes (our queries)".
+
+**Checks:**
+- `check_tour` PASS (new):
+  - Order, two sentences each, nasa.gov sources, every "ours" figure listed.
+  - Venus brightest and 1.95e-9 ("about two billionths"); Mercury, Mars and Saturn under a billionth; Jupiter 2.46e-10 ("about a four-billionth"); Neptune 5.6e13 times fainter ("tens of trillions"), 30 × 30 = 900.
+  - Sunlight 1310.0–1415.2; lunar day 29.531 d; delay 1.190–1.356 s.
+  - South-pole one-line and full text present with quotes; candidate-site Earth max 10.63° ("about 11").
+- DOM test: the side card Educator view shows the clickable "Why the south pole?" (4 paragraphs incl. sources), not repeated in Researcher.
+- All other checks and panel tests PASS. `/web` build OK. README: eight check scripts.
 

@@ -75,7 +75,7 @@ The data are static JSON files in `data/`. There is no backend.
 - Malapert (original point), 2026-11-20 06:00 UTC: Sun and Earth
 - Malapert (original point), 2026-11-17 08:00 UTC: Sun
 
-**Seven check scripts** (run from the repo root; each prints `PASS` or stops with the failure):
+**Eight check scripts** (run from the repo root; each prints `PASS` or stops with the failure):
 
 | Script | What it proves |
 |---|---|
@@ -86,6 +86,7 @@ The data are static JSON files in `data/`. There is no backend.
 | `node scripts/check_metrics.mjs` | The D16 metrics equal an hour-by-hour recount, and all 14,694 daily rows carry the same values. A worked power example a judge can follow: IM-2, 7 days from 2026-11-14, 1 m² sun-tracking panel at 30%, 100 W load. Sunlight that week averages 1,392 W/m² (1361 × (149.598 ÷ 147.78 million km)²). The full Sun disc is visible 128 h and partly visible 12 h (134.0 full-Sun hours), giving 55.9 kWh, an average of 333 W, and a battery of 100 W × 28 h = 2.8 kWh. The D17 score matches a hand calculation (IM-2: 76.6, all six terms worked out), the Educator and Researcher numbers agree at default weights, changing weights re-ranks, and fewer site-dates reach 95+ than under the old formula. |
 | `node scripts/check_d19.mjs` | D19 discs and shadow: the disc formulas give the textbook values. **Every lunar eclipse we find in 2026–2029 is on NASA's published list** (eclipse.gsfc.nasa.gov, Fred Espenak), within 1 h of NASA's time of greatest eclipse. All 10 NASA eclipses are found; one grazing penumbral (2027-07-18) misses our solid-Earth contact limit by 0.9% of Earth's radius, because Earth's atmosphere isn't modelled. NASA's four total eclipses show the Sun fully covered from the Moon's centre. No site ever sees the Sun covered outside an eclipse. Sunlight strength follows the Sun distance (−3.8% to +4.0% around 1361 W/m²). |
 | `node scripts/check_d20.mjs` | Researcher view (D18/D20/D22) facts, each against an independent fact:<br>- **Signal delay** = Earth distance ÷ speed of light (1.26–1.35 s).<br>- **Lunar local time** reads noon (12.02 h) at the hour the Sun is highest.<br>- **Season** = the sub-solar latitude from JPL, with NASA SVS 5229 quoted.<br>- The 2026-03-03 **eclipse** appears in the right stay.<br>- The Sun's **compass sweep** in a fully sunlit pole-region stay equals the sub-solar longitude change (84.6°).<br>- **Month averages** equal the averaged scores.<br>- Every site has a **local slope**.<br>- The **NASA criteria, D22 note and sources** are present. |
+| `node scripts/check_tour.mjs` | The ten solar-system tour captions (D25) and the "Why the south pole?" text (D26): ten stops in order, two sentences each, NASA/JPL sources. Every figure we call ours is recomputed: Venus is the brightest planet from the Moon at about 2 billionths of the Sun's light (JPL Horizons magnitudes), sunlight 1,310–1,415 W/m², signal delay 1.2–1.4 s, one lunar day 29.53 Earth days, and Earth never more than about 11° above level at the candidate sites. |
 
 **Terrain (all 10 sites, prototype):**
 - Built from NASA's LOLA elevation maps (PDS Geosciences).
