@@ -1,5 +1,5 @@
 import './style.css';
-import { listSites, loadDaily, getDaily, loadScene, getSceneState, MOCK, API_VERSION, VERDICT_RULE, TOUR_STOPS, SOUTH_POLE } from '../../lib/visibility.js';
+import { listSites, loadDaily, getDaily, loadScene, getSceneState, MOCK, VERDICT_RULE, TOUR_STOPS, SOUTH_POLE } from '../../lib/visibility.js';
 import { LunarScene, type MoonSite, type Verdict, type SceneState } from './moon';
 import { OverviewScene } from './overview';
 import { mountStarfield } from './starfield';
@@ -44,6 +44,7 @@ let selectedHour = 0; // 0–167, hourly samples within the seven-day landing st
 let daily: DailyResult | null = null;
 let moon: LunarScene | null = null;
 let overview: OverviewScene | null = null;
+let simulatorFrame: HTMLIFrameElement | null = null;
 let disposeOverviewMessages: (() => void) | null = null;
 function syncOverviewClock(): void {
   const frame = document.querySelector<HTMLIFrameElement>('#overview-stage iframe');
@@ -52,7 +53,7 @@ function syncOverviewClock(): void {
   frame.contentWindow.postMessage({ type: 'lunar-navigator:set-clock', utc }, new URL(frame.src).origin);
   const status = document.getElementById('overview-clock-status');
   if (status) status.textContent = 'Inspection moment: ' + utc.replace('T', ' ').slice(0, 16) +
-    ' UTC. Simulator date follows this clock, but precise planet positions are NOT available from the simulator for this date; do not treat its orbits as JPL ephemerides.';
+    ' UTC · Illustrative planetary positions; use Explore for site conditions.';
 }
 const verdictNames: Record<Verdict, string> = {
   clear: 'Clear',
@@ -95,7 +96,7 @@ app.innerHTML = [
   '      <div id="overview-stage" class="overview-stage" aria-label="Solar system overview visualization"></div>',
   '      <div id="tour-science-caption" class="tour-science-caption" hidden aria-live="polite"></div>',
   '      <p id="overview-clock-status" class="overview-clock-status" role="status">Simulator planetary ephemeris is not validated for the selected date.</p>',
-  '      <div id="overview-title-card" class="overview-title-card" role="region" aria-label="Solar system tour introduction"><h2>LunLux</h2><p class="overview-title-subtitle">Sunlight and Earth contact for lunar landing sites</p><p>Only the Sun and Earth determine the sunlight and direct Earth visibility we evaluate for a lunar lander. Other planets’ gravity is already included in NASA’s ephemerides.</p><div><button id="start-tour" type="button">Start tour</button><button id="skip-moon" type="button">Skip to the Moon</button></div><p class="overview-audio-note">Tour sound starts off. Use the speaker button in the simulator to turn it on or off.</p></div>',
+  '      <div id="overview-title-card" class="overview-title-card" role="region" aria-label="Solar system tour introduction"><h2>LunLux</h2><p class="overview-title-subtitle">Sunlight and Earth contact for lunar landing sites</p><p>Only the Sun and Earth determine the sunlight and direct Earth visibility we evaluate for a lunar lander. Other planets’ gravity is already included in NASA’s ephemerides.</p><div><button id="start-tour" type="button">Start tour</button><button id="skip-moon" type="button">Skip to the Moon</button></div><p class="overview-audio-note">Tour sound starts off. Use the speaker button for sound.</p></div>',
   '      <div class="overview-footer"><p id="overview-disclaimer">Choose the Moon to explore real landing sites and verified Sun/Earth visibility at your selected UTC date and hour.</p><button id="enter-explore" type="button">Explore the Moon and landing sites</button></div>',
   '    </div>',
   '  </section>',
@@ -126,17 +127,17 @@ app.innerHTML = [
   '    <h3>NASA Scientific Visualization Studio — CGI Moon Kit</h3>',
   '    <p>Moon surface color map: <a href="https://svs.gsfc.nasa.gov/4720" target="_blank" rel="noopener noreferrer">NASA SVS CGI Moon Kit (2025), official 2K JPEG and 4K color JPEG derived once from the 2025 4096×2048 sRGB TIFF</a>. Credit: NASA\'s Scientific Visualization Studio. Derived from LROC color data with polar albedo fill. NASA media usage is governed by <a href="https://www.nasa.gov/nasa-brand-center/images-and-media/" target="_blank" rel="noopener noreferrer">NASA media usage guidelines</a>; no separate software license is asserted for the imagery.</p>',
   '    <h3>Scientific ephemerides and terrain</h3>',
-  '    <p>Sun and Earth directions, visibility and stay summaries: <a href="https://ssd.jpl.nasa.gov/horizons/" target="_blank" rel="noopener noreferrer">NASA/JPL Horizons</a>. Terrain horizons at all ten landing sites use NASA Lunar Reconnaissance Orbiter Laser Altimeter (LOLA) GDR elevation maps via PDS Geosciences, including polar and global coverage; observer coordinates, map sources and resolution for each site are documented in data/README.md. NASA/JPL Horizons supplies Sun/Earth ephemerides. The decorative Moon texture is not terrain elevation data.</p>',
+  '    <p>Sun and Earth directions, visibility and stay summaries: <a href="https://ssd.jpl.nasa.gov/horizons/" target="_blank" rel="noopener noreferrer">NASA/JPL Horizons</a>. Terrain horizons at all ten landing sites use NASA Lunar Reconnaissance Orbiter Laser Altimeter (LOLA) GDR elevation maps via PDS Geosciences, including polar and global coverage; observer coordinates, map sources and resolution for each site are listed in each site’s report. NASA/JPL Horizons supplies Sun/Earth ephemerides. The decorative Moon texture is not terrain elevation data.</p>',
   '    <h3>NASA planet facts and tour captions</h3>',
-  '    <p>Tour captions are authored in Lane A’s /lib/tour.js, using NASA science.nasa.gov planet fact pages, NASA SVS and JPL Horizons. Planet brightness figures are from our own JPL Horizons magnitude queries, labeled as team calculations.</p>',
+  '    <p>Tour captions use NASA science.nasa.gov planet fact pages, NASA SVS and JPL Horizons. Planet brightness figures are from our own JPL Horizons magnitude queries, labeled as team calculations.</p>',
   '    <h3>3D rendering library</h3>',
   '    <p><a href="https://threejs.org/" target="_blank" rel="noopener noreferrer">Three.js</a> and OrbitControls, copyright Three.js authors, <a href="https://github.com/mrdoob/three.js/blob/master/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>. The interactive globe and three-body overview were written for this project. Original drifting starfield visually informed by <a href="https://www.huescreen.com/starfield/" target="_blank" rel="noopener noreferrer">Hue Screen Starfield</a> (no code or assets copied), and previously by <a href="https://github.com/etrepat/starfield" target="_blank" rel="noopener noreferrer">etrepat/starfield</a>, copyright (c) 2010 Estanislau Trepat, <a href="https://github.com/etrepat/starfield/blob/develop/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>; legacy Three.js source was not copied.</p>',
   '    <h3>Solar-system overview — upstream simulator</h3>',
   '    <p>Approved upstream: <a href="https://github.com/OzAILabs/SolarSystemSimulator" target="_blank" rel="noopener noreferrer">OzAILabs/SolarSystemSimulator</a>. The authors describe its source as MIT-licensed in the README. Its planetary textures are separately sourced from <a href="https://www.solarsystemscope.com/textures/" target="_blank" rel="noopener noreferrer">Solar System Scope</a> (CC BY 4.0), Planet Pixel Emporium, NASA/USGS Astrogeology and Steve Albers; attribution and individual reuse terms follow the upstream README. Our public <a href="https://github.com/advik09-beep/SolarSystemSimulator" target="_blank" rel="noopener noreferrer">GitHub fork</a> runs separately at <a href="https://solar-system-simulator-usmdo-club.vercel.app/" target="_blank" rel="noopener noreferrer">solar-system-simulator-usmdo-club.vercel.app</a>; the embedded simulator receives the shared UTC inspection clock, but its planetary positions are illustrative and not validated JPL ephemerides.</p>',
   '    <h3>Implementation and limitations</h3>',
-  '    <p>Site coordinates, visibility analysis, data checks and horizon panels: Lane A. App shell, Three.js globe, panel integration and hosting: Lane B. Moon-fixed Sun lighting uses verified hourly JPL Horizons scene data. Earth position and terrain visibility remain available in the Stand here horizon view. The globe has no terrain shadows; The explorer nebula is original procedural decorative artwork, not an observed or simulated lunar sky. Any future borrowed assets must be added here with attribution and license before release.</p>',
+  '    <p>Moon-fixed Sun lighting uses verified hourly JPL Horizons scene data. Earth position and terrain visibility remain available in the Stand here horizon view. The globe has no terrain shadows; The explorer nebula is original procedural decorative artwork, not an observed or simulated lunar sky. Any future borrowed assets must be added here with attribution and license before release.</p>',
   '  </section>',
-  '  <footer class="site-footer">Site coordinates and visibility: shared scientific data API <code>/lib/visibility.js</code> · API <span id="api-version"></span> · Moon image: NASA Scientific Visualization Studio, CGI Moon Kit (aesthetic color map; not scientific terrain).</footer>',
+  '  <footer class="site-footer">NASA/JPL Horizons · NASA LRO LOLA · Hourly data</footer>',
   '</main>',
 ].join('\n');
 
@@ -147,7 +148,6 @@ const find = <T extends HTMLElement>(id: string): T => {
 };
 
 find<HTMLElement>('mock-notice').hidden = !MOCK;
-find<HTMLElement>('api-version').textContent = API_VERSION;
 const sitePicker = find<HTMLSelectElement>('site-picker');
 const status = find<HTMLParagraphElement>('data-status');
 const lightingStatus = find<HTMLParagraphElement>('lighting-status');
@@ -223,6 +223,11 @@ function openView(view: View): void {
   if (view === 'compare') find<HTMLElement>('planner-view').hidden = false;
   updateAllPanels();
   setExploreMode(exploreMode);
+  // Detach the independent WebGL iframe outside Tour so it cannot consume GPU time.
+  if (simulatorFrame) {
+    if (view === 'overview' && !simulatorFrame.isConnected) find<HTMLElement>('overview-stage').append(simulatorFrame);
+    else if (view !== 'overview' && simulatorFrame.isConnected) simulatorFrame.remove();
+  }
   overview?.setVisible(view === 'overview');
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
@@ -288,13 +293,13 @@ function updateSceneLighting(): void {
     lightingStatus.textContent =
       'JPL Horizons Sun lighting · ' + sceneState.sampleUtc +
       ' · Earth ' + Math.round(sceneState.earth.distKm).toLocaleString() +
-      ' km away (Earth shown in Stand here). Decorative nebula, not an observed sky. The globe does not model local terrain blocking.';
+      ' km away · Earth shown in Horizon. Decorative sky; no terrain shadows.';
     lightingStatus.dataset.state = 'ready';
   } catch (error) {
     moon?.clearSceneState();
     lightingStatus.textContent = String(error).includes('OUT_OF_COVERAGE')
       ? 'Lighting unavailable for this date: outside validated Horizons scene coverage.'
-      : 'Lighting unavailable: ' + String(error);
+      : 'Sun lighting is unavailable for this date.';
     lightingStatus.dataset.state = 'unavailable';
   }
 }
@@ -311,10 +316,10 @@ function setLandingDate(date: string): void {
   if (dataReady) {
     try {
       daily = getDaily(selectedDate, 1) as DailyResult;
-      status.textContent = '7-day stay starting ' + selectedDate + ' · real hourly Horizons data summarized by Lane A';
+      status.textContent = '7-day stay starting ' + selectedDate + ' · hourly NASA/JPL Horizons data';
     } catch (error) {
       daily = null;
-      status.textContent = 'Date unavailable: ' + String(error);
+      status.textContent = 'Conditions unavailable for the selected date.';
     }
     updateDaily();
   }
@@ -328,13 +333,15 @@ function renderClockHour(): void {
   hourOutput.title = utc + ' UTC';
 }
 
+let panelUpdateTimer = 0;
 function setHour(value: number): void {
   const hour = Math.max(0, Math.min(167, Math.round(value)));
   if (!Number.isFinite(hour)) return;
   selectedHour = hour;
   renderClockHour();
   syncOverviewClock();
-  updateAllPanels();
+  clearTimeout(panelUpdateTimer);
+  panelUpdateTimer = window.setTimeout(updateAllPanels, 90);
   updateSceneLighting();
 }
 
@@ -372,6 +379,7 @@ if (configuredOverviewUrl) {
 const overviewStage = find<HTMLDivElement>('overview-stage');
 if (embedUrl) {
   const frame = document.createElement('iframe');
+  simulatorFrame = frame;
   frame.className = 'overview-iframe';
   frame.title = 'OzAILabs Solar System Simulator — embedded interactive overview';
   embedUrl.searchParams.set('lunarEmbed', '1');
@@ -442,7 +450,7 @@ if (embedUrl) {
   window.addEventListener('message', onSimulatorMessage);
   disposeOverviewMessages = () => window.removeEventListener('message', onSimulatorMessage);
   find<HTMLElement>('overview-source').textContent = 'SOLAR SYSTEM · OzAILabs simulator';
-  find<HTMLElement>('overview-note').textContent = 'Full solar system · inspection clock synchronized; planetary positions are illustrative, not validated ephemerides';
+  find<HTMLElement>('overview-note').textContent = 'Illustrative solar system · not to scale';
   find<HTMLElement>('overview-disclaimer').textContent =
     'The selected UTC inspection time is sent to the simulator. Its planetary orbits are illustrative, not validated historical ephemerides; Explore and Stand here use JPL Horizons data.';
 } else {
@@ -451,7 +459,7 @@ if (embedUrl) {
     overview.setVisible(true);
   } catch (error) {
     console.warn('Overview scene unavailable:', error);
-    overviewStage.textContent = '3D overview unavailable. Use the Explore button to open the Moon.';
+    overviewStage.textContent = '3D overview unavailable. Choose Explore to open the Moon.';
   }
 }
 find<HTMLButtonElement>('enter-explore').addEventListener('click', () => openView('explore'));
@@ -495,7 +503,7 @@ async function initializeData(): Promise<void> {
     dataReady = true;
     setLandingDate(selectedDate);
   } catch (error) {
-    status.textContent = 'Scientific daily summaries could not be loaded. ' + String(error);
+    status.textContent = 'Conditions could not be loaded. Please refresh to try again.';
     status.dataset.state = 'error';
   }
 }
@@ -509,7 +517,7 @@ async function initializeSceneLighting(): Promise<void> {
   } catch (error) {
     sceneReady = false;
     moon?.clearSceneState();
-    lightingStatus.textContent = 'Lighting unavailable: scene data could not be loaded (' + String(error) + ').';
+    lightingStatus.textContent = 'Sun lighting could not be loaded. Please refresh to try again.';
     lightingStatus.dataset.state = 'unavailable';
   }
 }
