@@ -4,13 +4,13 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | 8 — LANE B PASS | NASA Moon JPEG committed in web/public (offline builds PASS); verified Moon-fixed Sun/Earth directions live, two scientific cases PASS; Step 4 human mouse review pending. STOPPED. |
-| Sheldon (Lane A human) | — | D9 + D10 signed 2026-11-14; gates Lane A's D10, panel interface and side card one at a time |
-| Claude Code (Lane A) | 9 (submission docs) | Root README.md written and pushed; waiting for Sheldon's go |
+| Advik + ChatGPT (Lane B) | 11, 12, 13 (D13, D14, D15) | Next: date + hour slider above every tab (D13), overview scene + stars + detailed Moon (D14), legend + pole sites (D15), then mounts. Fix step 4 (markers recolor on date change; pole sites distinguishable). |
+| Sheldon (Lane A human) | — | Planning stop 2026-11-14: D12-D18 signed; acceptance run done |
+| Claude Code (Lane A) | 10 (D12 terrain, stage 1) | Interface v1.2 pushed (Lane B can start D13); now terrain for the other three pole candidates |
 
-Step 1 Live URL: **PASS** (Lane B, 2026-11-14). Step 2 Real numbers: **PASSED 2026-11-14**. Signed 2026-11-14: D7 desktop only; D8 data copy + setDataBase; D9 Lane A builds the side card, Compare grid and horizon view as panels in web/src/panels/; D10 move sp_malapert to the highest ground within 1 km; D11 visual scope (Lane B): (a) NASA CGI Moon Kit map, (b) not-to-scale Sun-Earth-Moon overview scene, (c) seamless zoom if time; Credits panel; cut (c) then (b).
-Waiting on Sheldon: review panels on web/panels.html (cd web && npm run dev → http://localhost:5173/panels.html?site=sp_malapert&date=2026-09-19); next Lane A task on your go.
-Waiting on Advik: human mouse test of step 4; D11(a) Moon map; mount Compare grid + horizon view; step 8 scene lighting from getSceneState (Lane A entry "Step 8, Lane A half").
+Acceptance (both humans, 2026-11-14): steps 1, 2, 3, 6, 8 **PASS**. Step 4 not yet (markers don't recolor on date change; pole sites can't be told apart). Step 7 not yet (hour slider too hard to find). Signed 2026-11-14: D7–D11 (see PLAN); **D12–D18** (terrain all sites, date+hour slider, overview scene, legend, power/comms metrics, best-site score, Researcher tab). Side card switch renamed Educator / Researcher.
+Waiting on Sheldon: go after terrain stage 1 report.
+Waiting on Advik: D13 (uses panel interface v1.2), D14, D15; step 4 fixes.
 
 ## Continuous two-agent coordination protocol (agreed 2026-11-14)
 
@@ -921,4 +921,39 @@ Frame: Moon-fixed, east-positive; +X = 0°N 0°E, +Y = 0°N 90°E, +Z = north po
 - `README.md` at the repo root covers: what the project is, the live link, how to run it, how the numbers were verified (the seven hand-checks and the four check scripts: `check_ephem`, `check_visibility`, `check_horizon`, `check_scene`), data sources and credits, known limits, and how AI tools were used.
 - Shared file at the repo root (Sheldon's request). Lane B: please flag anything in the "Lane B" or "Credits" lines that's inaccurate, and Lane A will fix it.
 - It describes 3D lighting as illustrative (true as of `a0f5eb5`). Update that line once Lane B wires in `getSceneState`.
+
+### 2026-11-14 — Planning stop: D12–D18 signed; acceptance results
+- **Acceptance (both humans):** steps 3, 6 and 8 PASS. Step 4 not yet: markers don't recolor when the date changes, and the pole sites can't be told apart. Step 7 not yet: the hour slider is too hard to find. D13's shared hour control should fix step 7's finding.
+- **D12–D18 recorded in PLAN.md.** New steps 10–16 added to the table (step 9 Submit stays last). Pass tests for 10–16 were written by Lane A from the decision text; both humans may amend them.
+- "No single best-site score" (Settled earlier) is replaced by D17. The side card switch is renamed Educator / Researcher.
+- **Lane A order:** (1) panel interface v1.2 (shared hour); (2) D12 terrain in stages (other three pole candidates → IM-2, IM-1, Chandrayaan-3 → Apollo sites), pushing after each; (3) detailed Moon assets from the NASA CGI Moon Kit for Lane B; (4) D16 + D17; (5) D18.
+- **Lane B order:** D13, D14, D15, then mounts.
+
+### 2026-11-14 — Panel interface v1.2 (shared hour, for D13) READY
+Additive and optional. v1.1 callers keep working unchanged. `PANEL_INTERFACE_VERSION = "1.2"`.
+```ts
+interface PanelProps {
+  // ... v1.1 fields unchanged (siteId, landingDate, onSiteSelected, onDateSelected, onOpenView?)
+  hour?: number;                          // hour within the 7-day stay, 0..167 (0 = landing date 00:00 UTC); default 0; clamped
+  onHourSelected?: (hour: number) => void; // panel ASKS the shell to change the shared hour
+}
+interface PanelHandle { update(next: Partial<Pick<PanelProps, "siteId" | "landingDate" | "hour">>): void; destroy(): void; }
+```
+**How Lane B wires D13:**
+- Your date slider sets `landingDate`, and your hour sub-slider sets `hour`. On any change, call `update({ siteId, landingDate, hour })` on every mounted panel, and use the same instant for lighting: `getSceneState(Date.parse(landingDate + "T00:00:00Z") + hour * 3_600_000)`.
+- Pass `onHourSelected` so the horizon view's own slider and ◀ ▶ buttons *ask* you. You then set the shared hour and call `update({ hour })` everywhere, so all panels and the lighting stay on one hour.
+- If you don't pass `onHourSelected`, the horizon view keeps a local hour (v1.1 behaviour).
+
+**What each panel does with the hour:**
+- **Side card:** Sun/Earth status, margins and next change are shown "At hour N of the stay (YYYY-MM-DD HH:MM UTC)". The verdict and stay percentages are for the whole stay and don't change with the hour.
+- **Horizon view:** markers and readout are at that hour, and its slider follows it.
+- **Compare grid:** the strip draws a dashed cursor at that hour inside the outlined stay.
+
+**Also:** the side card switch now reads **Educator / Researcher** (PLAN, D12–D18 block). `web/panels.html` has a shared hour slider standing in for your D13 control.
+
+**Evidence (DOM emulator, real /data):**
+- Side card at hour 7 shows "2026-09-19 06:00 UTC" with the Sun hidden behind terrain, and its status equals `getState` at that hour.
+- With `onHourSelected`, the slider asks (and doesn't move by itself); ▶ asks for hour+1. `update({hour: 30})` moves the side card, horizon view and strip cursor together; hour 999 is clamped to 167.
+- A v1.1 caller's local slider still works.
+- Earlier panel tests rerun: PASS. `check_visibility` PASS; `cd web && npm run build` OK.
 

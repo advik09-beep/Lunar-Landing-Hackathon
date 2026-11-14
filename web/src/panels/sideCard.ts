@@ -1,12 +1,13 @@
 // Side card panel (step 3, PLAN D3 / D9). Lane A owns this file.
 // Shows, for the selected site and landing date: verdict in words, Sun and Earth status,
-// horizon model, source and coverage, a Plain / Numbers switch, and a CSV download.
+// horizon model, source and coverage, an Educator / Researcher switch, and a CSV download.
+// v1.2: Sun and Earth status are shown at the shared hour of the stay (props.hour, default 0).
 // All values come from /lib/visibility.js; nothing is calculated here except formatting.
 import { V, type Site, type State, type Summary, type Horizon } from "./data";
-import { createPanelRoot, esc, deg, az, pct, VERDICT_WORDS, addDays, fmtUtc } from "./shared";
+import { createPanelRoot, esc, deg, az, pct, VERDICT_WORDS, addDays, fmtUtc, clampHour } from "./shared";
 import type { MountPanel, PanelProps } from "./types";
 
-type Mode = "plain" | "numbers";
+type Mode = "plain" | "numbers"; // shown as Educator / Researcher
 
 export const mountSideCard: MountPanel = (container, props) => {
   const { host, root } = createPanelRoot(container, "sidecard", CSS);
@@ -49,7 +50,7 @@ export const mountSideCard: MountPanel = (container, props) => {
     if (my !== token) return;
     const start = `${current.landingDate}T00:00:00Z`;
     try {
-      const state = V.getState(site.id, start);
+      const state = V.getState(site.id, Date.parse(start) + hourNow() * 3.6e6);
       const summary = V.getSummary(site.id, start, V.VERDICT_RULE.STAY_DAYS);
       const horizon = V.getHorizon(site.id);
       view = { site, state, summary, horizon, start };
@@ -64,6 +65,11 @@ export const mountSideCard: MountPanel = (container, props) => {
         <p class="muted">Data covers: ${ranges.map(([a, b]) => `${esc(a.slice(0, 10))} to ${esc(b.slice(0, 10))}`).join("; ")}. We never guess outside these dates.</p>`;
     }
   }
+
+  const hourNow = () => clampHour(current.hour, V.VERDICT_RULE.STAY_DAYS * 24);
+  const atHour = (st: State) => hourNow() === 0
+    ? `At the start of the stay (${fmtUtc(st.sampleUtc)})`
+    : `At hour ${hourNow() + 1} of the stay (${fmtUtc(st.sampleUtc)})`;
 
   function paint() {
     if (!view) return;
@@ -83,9 +89,9 @@ export const mountSideCard: MountPanel = (container, props) => {
         <p class="muted">${esc(coords)} · stay of ${days} days from ${esc(current.landingDate)} 00:00 UTC</p>
         ${pointNote ? `<p class="muted small">${esc(pointNote)}.</p>` : ""}
       </header>
-      <div class="switch" role="group" aria-label="Reading level">
-        <button type="button" data-action="mode-plain" aria-pressed="${mode === "plain"}">Plain</button>
-        <button type="button" data-action="mode-numbers" aria-pressed="${mode === "numbers"}">Numbers</button>
+      <div class="switch" role="group" aria-label="Reading level: Educator or Researcher">
+        <button type="button" data-action="mode-plain" aria-pressed="${mode === "plain"}">Educator</button>
+        <button type="button" data-action="mode-numbers" aria-pressed="${mode === "numbers"}">Researcher</button>
       </div>
       <div class="verdict" data-verdict="${summary.verdict}">
         <span class="symbol" aria-hidden="true">${w.symbol}</span>
@@ -105,7 +111,7 @@ export const mountSideCard: MountPanel = (container, props) => {
     function plain(): string {
       return `
         <p class="why">${esc(whySentence(summary, flat))}</p>
-        <h3>At the start of the stay (${esc(fmtUtc(state.sampleUtc))})</h3>
+        <h3>${esc(atHour(state))}</h3>
         <ul class="status">
           <li><strong>Sunlight:</strong> ${state.lit ? "yes" : "no"}${esc(sunNote(state))}</li>
           <li><strong>Earth in view:</strong> ${state.comms ? "yes" : "no"}${esc(earthNote(state))}</li>
@@ -120,7 +126,7 @@ export const mountSideCard: MountPanel = (container, props) => {
       const ranges = V.getCoverage().sites.find((c) => c.siteId === site.id)?.ranges ?? [];
       const src = V.getTimeline(site.id, view!.start, 1).source;
       return `
-        <h3>At the start of the stay (hourly sample ${esc(fmtUtc(state.sampleUtc))})</h3>
+        <h3>${esc(atHour(state))}, hourly sample</h3>
         <table>
           <thead><tr><th></th><th>Elevation</th><th>Azimuth</th><th>Horizon there</th><th>Margin</th><th>Next change</th></tr></thead>
           <tbody>
@@ -183,8 +189,10 @@ export const mountSideCard: MountPanel = (container, props) => {
     update(next) {
       const changed = (next.siteId !== undefined && next.siteId !== current.siteId) ||
         (next.landingDate !== undefined && next.landingDate !== current.landingDate);
+      const hourChanged = next.hour !== undefined && next.hour !== current.hour;
       current = { ...current, ...next };
       if (changed) load();
+      else if (hourChanged && view) { view.state = V.getState(view.site.id, Date.parse(view.start) + hourNow() * 3.6e6); paint(); }
     },
     destroy() { token++; host.remove(); },
   };

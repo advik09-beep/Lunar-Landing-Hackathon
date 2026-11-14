@@ -4,7 +4,7 @@
 // chosen hour plus their paths over the 7-day stay from getTimeline. Nothing is calculated here
 // except drawing positions; visibility (lit/comms, margins) comes straight from /lib.
 import { V, type Horizon, type Timeline, type Sample } from "./data";
-import { createPanelRoot, esc, deg, az, fmtUtc } from "./shared";
+import { createPanelRoot, esc, deg, az, fmtUtc, clampHour } from "./shared";
 import type { MountPanel, PanelProps } from "./types";
 
 const W = 1080, PX_PER_DEG = W / 360;   // 3 px per degree of azimuth
@@ -17,25 +17,33 @@ export const mountHorizonView: MountPanel = (container, props) => {
   root.append(body);
 
   let current: PanelProps = { ...props };
-  let hour = 0;
+  let hour = clampHour(props.hour, V.VERDICT_RULE.STAY_DAYS * 24); // v1.2: shared hour (local if the shell gives no onHourSelected)
   let token = 0;
   let data: { horizon: Horizon; tl: Timeline; name: string; yMin: number; yMax: number } | null = null;
 
   body.addEventListener("input", (e) => {
     const t = e.target as HTMLInputElement;
-    if (t.dataset.action === "hour") { hour = Number(t.value); drawDynamic(); }
+    if (t.dataset.action === "hour") setHour(Number(t.value));
   });
   body.addEventListener("click", (e) => {
     const t = (e.target as HTMLElement).closest<HTMLElement>("[data-action]");
     if (!t || !data) return;
     const n = data.tl.samples.length;
-    if (t.dataset.action === "prev-hour") hour = Math.max(0, hour - 1);
-    else if (t.dataset.action === "next-hour") hour = Math.min(n - 1, hour + 1);
-    else return;
+    if (t.dataset.action === "prev-hour") setHour(Math.max(0, hour - 1));
+    else if (t.dataset.action === "next-hour") setHour(Math.min(n - 1, hour + 1));
+  });
+
+  // v1.2: with onHourSelected the shell owns the hour (we ask, it calls update({hour})); without it, the hour is local.
+  function setHour(h: number) {
+    if (current.onHourSelected) { current.onHourSelected(h); return; }
+    showHour(h);
+  }
+  function showHour(h: number) {
+    hour = h;
     const slider = body.querySelector<HTMLInputElement>("input[data-action=hour]");
     if (slider) slider.value = String(hour);
     drawDynamic();
-  });
+  }
 
   async function load() {
     const my = ++token;
@@ -172,7 +180,10 @@ export const mountHorizonView: MountPanel = (container, props) => {
       const changed = (next.siteId !== undefined && next.siteId !== current.siteId) ||
         (next.landingDate !== undefined && next.landingDate !== current.landingDate);
       current = { ...current, ...next };
-      if (changed) { hour = 0; load(); }
+      if (next.hour !== undefined) hour = clampHour(next.hour, V.VERDICT_RULE.STAY_DAYS * 24);
+      else if (changed && !current.onHourSelected) hour = 0; // v1.1 behaviour: new site/date starts at hour 1
+      if (changed) load();
+      else if (next.hour !== undefined && data) showHour(hour);
     },
     destroy() { token++; host.remove(); },
   };

@@ -43,6 +43,12 @@ export const VERDICT_WORDS: Record<Verdict, { label: string; symbol: string; sho
   edge: { label: "On the edge", symbol: "⚠", short: "the Sun or Earth hugs the horizon, so terrain decides" },
 };
 
+/** Clamp a shared hour to the stay: 0 .. hours-1 (whole hours). */
+export function clampHour(h: number | undefined, hours: number): number {
+  const n = Math.round(Number(h ?? 0));
+  return Number.isFinite(n) ? Math.min(hours - 1, Math.max(0, n)) : 0;
+}
+
 export function addDays(date: string, n: number): string {
   return new Date(Date.parse(date + "T00:00:00Z") + n * 864e5).toISOString().slice(0, 10);
 }

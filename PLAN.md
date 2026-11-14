@@ -78,6 +78,36 @@ and researchers get the numbers behind them.
   every borrowed piece and its license. No code is copied from a repo
   whose license we cannot show. Cut order: (c) first, then (b). Step 8
   is unchanged: Moon-fixed true lighting.
+- D12 Terrain on all 10 sites, prototype. Observer point: candidate
+  sites use the highest ground within 1 km; real landings use the
+  landed coordinates. State each site's map and resolution honestly.
+- D13 One date slider above every tab, with an hour sub-slider choosing
+  the hour within the 7-day stay. It drives lighting, side card and
+  horizon view together. Lane B owns the control; panels accept the
+  hour through the interface.
+- D14 Overview scene with Sun, Earth and Moon only (per D11b), and a
+  moving star background outside the 3D window only. A more detailed
+  Moon. Lane B.
+- D15 Marker color stays the verdict. A prominent plain-words legend.
+  Pole sites must be distinguishable. Lane B.
+- D16 Power and comms metrics in /lib: sunlight share, longest dark
+  stretch, Earth-in-view share, longest contact gap, plus a power
+  calculator from user-entered panel area and efficiency with every
+  assumption shown. Lane A.
+- D17 A best-site score per date. This REPLACES "no single best-site
+  score". Educator view: one score per date with the top site named in
+  plain words, no weights or formula, and a line saying the Researcher
+  view explains the calculation. Researcher view: the same score with
+  its full formula and every weight visible and adjustable, updating
+  the ranking live. The Educator score always uses the default weights
+  and says so. Both views give the same number at default weights.
+  Lane A proposes the formula; label it prototype.
+- D18 Researcher tab: comprehensive per-site analysis on screen with a
+  download, clearly labeled as for researchers. Research what mission
+  designers actually need from official NASA sources and cite them.
+  Lane A builds the panel; Lane B mounts it.
+- The side card switch is renamed Educator / Researcher (was Plain /
+  Numbers in D3).
 
 ## Settled earlier (do not reopen without both humans)
 - 10 fixed sites: 3 Apollo, Chandrayaan-3, IM-1, IM-2, 4 south pole
@@ -90,7 +120,8 @@ and researchers get the numbers behind them.
   Mock data always carries a visible banner.
 - Four verdicts everywhere, never shown by color alone: clear,
   partial, out, on the edge (terrain decides).
-- No single "best site" score. No chatbot.
+- No chatbot. (The former "no single best-site score" is replaced by
+  D17.)
 
 ## The steps (one numbering; old names in brackets)
 | # | Step | Owner | Passes when |
@@ -103,7 +134,19 @@ and researchers get the numbers behind them.
 | 6 | Compare dates grid + timeline strip [M3, B3, B4] | A grid panel, B mounts (D9) | updates in under 1 second, cells equal the daily summary |
 | 7 | Terrain, one pole site first [M4, B6] | A data + horizon view panel, B mounts (D9) | one moment where flat says lit and terrain says dark, shown in the horizon view |
 | 8 | True lighting in 3D | A data, B scene | the Moon is lit from the real Sun direction for the chosen date and Earth sits in its real direction, from Lane A's scene data |
-| 9 | Submit [M7, B7] | both | live link works in a desktop browser, demo recorded, project page and slides done |
+| 10 | Terrain on all 10 sites (D12) | A data, B nothing new (panels already show it) | every site's horizon is from LOLA, with its observer point, map and resolution stated; all checks pass |
+| 11 | Date + hour slider (D13) | B control; A panels accept the hour (interface v1.2) | one control above every tab; moving the hour updates lighting, side card and horizon view together |
+| 12 | Overview scene, stars, detailed Moon (D14) | B; A prepares Moon assets | separate not-to-scale Sun-Earth-Moon scene; stars outside the 3D window only; more detailed Moon from NASA CGI Moon Kit |
+| 13 | Legend + pole sites distinguishable (D15) | B | plain-words legend always visible; a stranger can pick each of the four pole sites |
+| 14 | Power and comms metrics + power calculator (D16) | A | /lib returns the four metrics; calculator shows every assumption; values equal a hand calculation from the hourly data |
+| 15 | Best-site score (D17, prototype) | A | Educator and Researcher views give the same score at default weights; changing a weight re-ranks live |
+| 16 | Researcher tab (D18) | A panel, B mounts | per-site analysis with download, labeled for researchers, each requested item cited to an official NASA source |
+| 9 | Submit [M7, B7] | both | live link works in a desktop browser, demo recorded, project page and slides done (stays last; 10-16 come before it) |
+
+Acceptance run by both humans (2026-11-14): steps 3, 6 and 8 PASS.
+Step 4 not yet (globe markers do not recolor when the date changes;
+pole sites cannot be told apart). Step 7 not yet (hour slider too hard
+to find).
 
 Lane B works 1, 3, 4, 6 on mock data (banner showing) and switches to
 real data at step 5. Lane A works 2, then its half of 5, then 7, then

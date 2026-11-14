@@ -120,6 +120,9 @@ export const mountCompareGrid: MountPanel = (container, props) => {
       });
     });
     const selIdx = dates.indexOf(current.landingDate);
+    const hr = Math.min(days * 24 - 1, Math.max(0, Math.round(current.hour ?? 0))); // v1.2: shared hour cursor
+    const cursor = selIdx >= 0 && selIdx * 24 + hr < n
+      ? `<line x1="${((selIdx * 24 + hr + 0.5) * bw).toFixed(2)}" x2="${((selIdx * 24 + hr + 0.5) * bw).toFixed(2)}" y1="0" y2="${Hh}" class="cursor"/>` : "";
     const stay = selIdx >= 0
       ? `<rect x="${(selIdx * 24 * bw).toFixed(2)}" y="1" width="${(Math.min(days, dates.length - selIdx) * 24 * bw).toFixed(2)}" height="${Hh - 2}" class="stay"/>` : "";
     const ticks = dates.map((d, k) => (k % 7 === 0 ? `<text x="${(k * 24 * bw + 2).toFixed(1)}" y="${Hh + 14}">${d.slice(5)}</text>` : "")).join("");
@@ -130,13 +133,14 @@ export const mountCompareGrid: MountPanel = (container, props) => {
     } catch { summary = `No data for a ${days}-day stay from ${esc(current.landingDate)}.`; }
     return `
       <h3>Hour by hour: ${esc(site.name)}</h3>
-      <p class="muted small">Top half filled = sunlight; bottom half filled = Earth in view; both = full bar; neither = empty. Hatched = no data. The outlined block is the selected stay.</p>
+      <p class="muted small">Top half filled = sunlight; bottom half filled = Earth in view; both = full bar; neither = empty. Hatched = no data. The outlined block is the selected stay; the dashed line is the selected hour.</p>
       <svg class="strip" viewBox="0 0 ${W} ${Hh + 18}" role="img" aria-label="${esc(`Hourly sunlight and Earth in view for ${site.name}, ${dates[0]} to ${dates[dates.length - 1]}. ${summary}`)}">
         <defs><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" class="nodata-bg"/><line x1="0" y1="0" x2="0" y2="6" class="hatch"/></pattern></defs>
         <rect x="0" y="0" width="${W}" height="${Hh}" class="bg"/>
         ${rects.join("")}
         <line x1="0" y1="${Hh / 2}" x2="${W}" y2="${Hh / 2}" class="mid"/>
         ${stay}
+        ${cursor}
         ${ticks}
       </svg>
       <p class="small">${summary}${covered < dates.length ? ` <span class="warn">${dates.length - covered} day(s) in this window have no data.</span>` : ""}</p>`;
@@ -145,6 +149,7 @@ export const mountCompareGrid: MountPanel = (container, props) => {
   render();
   return {
     update(next) {
+      const hourChanged = next.hour !== undefined && next.hour !== current.hour;
       const siteChanged = next.siteId !== undefined && next.siteId !== current.siteId;
       const dateChanged = next.landingDate !== undefined && next.landingDate !== current.landingDate;
       current = { ...current, ...next };
@@ -152,7 +157,7 @@ export const mountCompareGrid: MountPanel = (container, props) => {
         const i = Math.round((Date.parse(current.landingDate) - Date.parse(windowStart)) / 864e5);
         if (i < 0 || i >= COLS) windowStart = addDays(current.landingDate, -BEFORE); // recentre only if outside
       }
-      if (siteChanged || dateChanged) render();
+      if (siteChanged || dateChanged || hourChanged) render();
     },
     destroy() { token++; host.remove(); },
   };
@@ -193,6 +198,7 @@ svg.strip { width: 100%; height: auto; display: block; }
 .strip .earth { fill: var(--llp-earth, #5aa9e6); }
 .strip .mid { stroke: var(--llp-border, #344b69); stroke-width: 1; }
 .strip .stay { fill: none; stroke: var(--llp-text, #ecf2ff); stroke-width: 3; }
+.strip .cursor { stroke: var(--llp-text, #ecf2ff); stroke-width: 2; stroke-dasharray: 4 2; }
 .strip .nodata { fill: url(#hatch); }
 .strip .nodata-bg { fill: transparent; }
 .strip .hatch { stroke: var(--llp-border, #344b69); stroke-width: 2; }
