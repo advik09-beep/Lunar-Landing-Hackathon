@@ -63,7 +63,7 @@ app.innerHTML = [
   '      <div class="moon-window">',
   '        <div class="scene-heading"><span>MOON-FIXED VIEW</span><span>3D · Drag to rotate · Scroll to zoom</span></div>',
   '        <div id="moon-stage" class="moon-stage" aria-label="Interactive 3D Moon with landing markers"></div>',
-  '        <div class="scene-controls"><button type="button" id="reset-view">Full Moon</button><button type="button" id="polar-view">South pole view</button><span>Surface shading is illustrative, not terrain data</span></div>',
+  '        <div class="scene-controls"><button type="button" id="reset-view">Full Moon</button><button type="button" id="polar-view">South pole view</button><span>NASA SVS Moon imagery · lighting illustrative · no terrain mesh</span></div>',
   '      </div>',
   '      <div class="date-controls">',
   '        <div class="date-heading"><span>LANDING DATE</span><span>All times in UTC · 7-day stay</span></div>',
@@ -84,7 +84,7 @@ app.innerHTML = [
   '  </section>',
   '  <section id="compare-view" class="panel-view" aria-label="Compare landing dates" hidden><div id="compare-mount"></div></section>',
   '  <section id="horizon-view" class="panel-view" aria-label="Stand here horizon panorama" hidden><div id="horizon-mount"></div></section>',
-  '  <footer class="site-footer">Site coordinates and visibility: shared scientific data API <code>/lib/visibility.js</code> · API <span id="api-version"></span> · Lunar surface illustration is not a registered topographic map.</footer>',
+  '  <footer class="site-footer">Site coordinates and visibility: shared scientific data API <code>/lib/visibility.js</code> · API <span id="api-version"></span> · Moon image: NASA Scientific Visualization Studio, CGI Moon Kit (aesthetic color map; not scientific terrain).</footer>',
   '</main>',
 ].join('\n');
 
