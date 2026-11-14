@@ -11,6 +11,17 @@ export type MoonSite = {
 };
 export type Verdict = 'clear' | 'partial' | 'out' | 'edge' | 'unavailable';
 
+// Moon-fixed MOON_ME, east-positive (Lane A API v1.3). The 3D mapping is
+// exactly the same as spherePoint(): (X, Y, Z) -> (X, Z, -Y).
+export type SceneState = {
+  sampleUtc: string;
+  sun: { dir: [number, number, number]; distKm: number };
+  earth: { dir: [number, number, number]; distKm: number };
+};
+const toThree = ([x, y, z]: readonly [number, number, number]): THREE.Vector3 =>
+  new THREE.Vector3(x, z, -y);
+
+
 type Marker = {
   site: MoonSite;
   object: THREE.Mesh;
@@ -39,6 +50,10 @@ function spherePoint(lat: number, lon: number, radius = 1): THREE.Vector3 {
 
 export class LunarScene {
   private renderer: THREE.WebGLRenderer;
+  private readonly ambientLight: THREE.AmbientLight;
+  private readonly sunLight: THREE.DirectionalLight;
+  private readonly earthBody: THREE.Mesh;
+  private readonly earthLabel: THREE.Sprite;
   private scene = new THREE.Scene();
   private camera: THREE.PerspectiveCamera;
   private controls: OrbitControls;
@@ -77,13 +92,14 @@ export class LunarScene {
     this.controls.maxDistance = 7.2;
     this.controls.enablePan = false;
 
-    this.scene.add(new THREE.AmbientLight(0xe0ebff, 1.08));
-    const key = new THREE.DirectionalLight(0xf8f3ea, 2.6);
-    key.position.set(4, 3, 6);
-    this.scene.add(key);
-    const rim = new THREE.DirectionalLight(0x8bb9ff, 0.85);
-    rim.position.set(-3, -1, -3);
-    this.scene.add(rim);
+    // One authoritative Sun source from Lane A scene data; no second key/rim
+    // that would incorrectly illuminate the Moon's true night side.
+    this.ambientLight = new THREE.AmbientLight(0xffffff, 0.32);
+    this.scene.add(this.ambientLight);
+    this.sunLight = new THREE.DirectionalLight(0xfff9ed, 0);
+    this.sunLight.position.set(10, 0, 0);
+    this.sunLight.target.position.set(0, 0, 0);
+    this.scene.add(this.sunLight, this.sunLight.target);
 
     const moonMaterial = new THREE.MeshStandardMaterial({
       color: 0xffffff, roughness: 1, metalness: 0,
@@ -110,6 +126,36 @@ export class LunarScene {
       new THREE.MeshBasicMaterial({ color: 0x9ab4db, transparent: true, opacity: 0.035, side: THREE.BackSide, depthWrite: false }),
     );
     this.scene.add(atmosphere);
+
+    // A small Earth drawn along the actual sub-Earth direction. Distance and
+    // apparent radius are intentionally exaggerated for education, not scale.
+    this.earthBody = new THREE.Mesh(
+      new THREE.SphereGeometry(0.20, 48, 32),
+      new THREE.MeshStandardMaterial({
+        color: 0x4699cc, roughness: 1, metalness: 0, emissive: 0x071523, emissiveIntensity: 0.08,
+      }),
+    );
+    this.earthBody.visible = false;
+    this.scene.add(this.earthBody);
+
+    const earthLabelCanvas = document.createElement('canvas');
+    earthLabelCanvas.width = 512;
+    earthLabelCanvas.height = 96;
+    const labelCtx = earthLabelCanvas.getContext('2d');
+    if (labelCtx) {
+      labelCtx.fillStyle = '#e2f1ff';
+      labelCtx.font = 'bold 27px sans-serif';
+      labelCtx.textAlign = 'center';
+      labelCtx.fillText('EARTH · NOT TO SCALE', 256, 58);
+    }
+    const labelTexture = new THREE.CanvasTexture(earthLabelCanvas);
+    labelTexture.colorSpace = THREE.SRGBColorSpace;
+    this.earthLabel = new THREE.Sprite(
+      new THREE.SpriteMaterial({ map: labelTexture, transparent: true, depthWrite: false }),
+    );
+    this.earthLabel.scale.set(0.87, 0.17, 1);
+    this.earthLabel.visible = false;
+    this.scene.add(this.earthLabel);
 
     const gridMaterial = new THREE.LineBasicMaterial({ color: 0x7692bb, transparent: true, opacity: 0.19 });
     for (const lat of [-60, -30, 0, 30, 60]) {
@@ -178,6 +224,28 @@ export class LunarScene {
       }
     }
     return null;
+  }
+
+  setSceneState(state: SceneState): void {
+    const sun = toThree(state.sun.dir).normalize();
+    const earth = toThree(state.earth.dir).normalize();
+    // The Moon is fixed; the actual Sun direction changes with UTC.
+    this.sunLight.position.copy(sun).multiplyScalar(10);
+    this.sunLight.intensity = 3.2;
+    this.ambientLight.intensity = 0.065;
+
+    this.earthBody.position.copy(earth).multiplyScalar(2.6);
+    this.earthLabel.position.copy(this.earthBody.position).add(new THREE.Vector3(0, 0.28, 0));
+    this.earthBody.visible = true;
+    this.earthLabel.visible = true;
+  }
+
+  clearSceneState(): void {
+    // Never retain a previous date's lighting when data are unavailable.
+    this.sunLight.intensity = 0;
+    this.ambientLight.intensity = 0.32; // neutral inspection light, not ephemeris
+    this.earthBody.visible = false;
+    this.earthLabel.visible = false;
   }
 
   setVerdicts(values: Map<string, Verdict>): void {
@@ -251,6 +319,11 @@ export class LunarScene {
         }
       } else if (object instanceof THREE.Line) {
         object.geometry.dispose();
+        (object.material as THREE.Material).dispose();
+      } else if (object instanceof THREE.Sprite) {
+        const material = object.material as THREE.SpriteMaterial;
+        material.map?.dispose();
+        material.dispose();
       }
     });
     this.renderer.dispose();
