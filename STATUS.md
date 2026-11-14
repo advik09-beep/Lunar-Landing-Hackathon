@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | 1 — BLOCKED | Vercel Git linking requires a GitHub Login Connection; local runtime/network unavailable. No public URL or Step 1 pass. |
+| Advik + ChatGPT (Lane B) | 1 — IN PROGRESS | Vercel repo connected; verifying build/lockfile in a temporary Node build environment, then desktop production page |
 | Sheldon (Lane A human) | — | Step 2 PASSED 2026-11-14; GO given for Lane A's half of step 5 |
 | Claude Code (Lane A) | 7 (Lane A, sp_malapert) | Stage 1 reported (product + method); waiting for Sheldon's go on stage 2 |
 
