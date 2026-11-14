@@ -328,3 +328,38 @@ D. **getCoverage()/getMetadata()** (or fields on existing exports)
   - im1 1.44E -80.13, 2026-11-17 08:00 UTC: Sun az 84.9258 el 2.4573; Earth az 352.8771 el 9.2952
   - sp_malapert 0.3E -86.0, 2026-11-20 06:00 UTC: Sun az 50.4114 el 4.0976; Earth az 352.4058 el 7.4541
 
+
+### 2026-11-14 — Plan approval, DESIGN.md proposal, and API contract v1 (reply to Lane B)
+- **Sheldon approves Lane B's execution plan B0-B7 as written** (Lane B entry "next-step execution plan", commit c45ea78). B0 stays first.
+- **DESIGN.md (repo root) is a PROPOSAL by Sheldon, awaiting Advik's OK.** It adds B1b (Explore view on a flat Moon image) and asks Lane A for edge fields, a verdict and a per-day summary file. Lane B: do not build from it until Advik agrees.
+- **No new data work in this entry.** M1 is still blocked on Sheldon's three hand-checks. Nothing below is built unless marked READY.
+
+**Visibility API contract v1 — PROPOSAL (Lane A will finalize signatures; changes need both humans).**
+Lane A will add `export const API_VERSION = "1.0.0"` and `export const READY = { ... }`, one boolean per item below. Lane B should check `READY` instead of assuming. Breaking changes bump the major version and get announced here first.
+
+| Item | Shape (summary) | Readiness |
+|---|---|---|
+| `listSites()` sync | as today, incl. `coordsVerified`, `note` | READY (mock-free catalog) |
+| `getState(siteId, utc)` sync | existing fields | READY on MOCK data only; real data NOT READY (needs M1) |
+| `getSummary(siteId, startUtc, days)` sync | existing fields | READY on MOCK data only; real data NOT READY |
+| `MOCK` | `true` until M1 passes | READY |
+| `API_VERSION`, `READY` | as above | NOT READY |
+| `await loadSite(siteId)` | fetches one hourly file; afterwards sync calls work for that site; sync call before load throws `Error("NOT_LOADED")` | NOT READY. Sheldon: yes. **Advik: not yet approved.** |
+| `getCoverage()` sync | `{ mock, stepHours: 1, timeScale: "UTC", sites: [{ siteId, ranges: [[startUtc, endUtc]], terrain }] }` | NOT READY |
+| `getTimeline(siteId, startUtc, days, stepHours=1)` sync after loadSite | `{ siteId, stepHours, mock, terrain, source, samples: [{ utc, sunEl, sunAz, earthEl, earthAz, lit, comms, sunEdge, earthEdge }] }` | NOT READY |
+| Edge fields on `getState` | adds `sunEdge`, `earthEdge`: true when that body's elevation is within `EDGE_DEG` of the horizon in use (flat: 0°; real: terrain angle at that azimuth); adds `edgeDeg` (the value used) | NOT READY |
+| Edge fields + verdict on `getSummary` | adds `pctSunEdge`, `pctEarthEdge`, `verdict: "clear"|"partial"|"out"|"edge"`, `verdictRule` (text of the rule, for display) | NOT READY |
+| `await loadDaily()` + `getDaily(startDate, days)` sync | per-day summary for ALL sites from one small file `data/daily.json`: `{ apiVersion, mock, edgeDeg, sites: { <siteId>: [{ date, pctLit, pctComms, pctBoth, pctSunEdge, pctEarthEdge, longestDarkHours, verdict }] } }`. Markers and the grid use only this; no hourly files. | NOT READY |
+| `getSceneState(utc)` | Moon-centred `MOON_ME` sub-solar / sub-Earth directions (see earlier Lane A entry). Not a heliocentric view. Work starts only after M1 passes. | NOT READY |
+| `getHorizon(siteId)` | as proposed earlier; `model: "flat"` returns 360 zeros | NOT READY (M4) |
+
+**Rules for all functions:** times in are ISO 8601 UTC with `Z` (or epoch ms); dates for `getDaily` are `"YYYY-MM-DD"` (UTC days). Angles are degrees, azimuth clockwise from north. Queries outside coverage throw `RangeError("OUT_OF_COVERAGE ...")`; there is no extrapolation. A missing next change (none inside coverage) is `null`, never 0.
+
+**Verdict rule — proposal; thresholds are named constants that BOTH humans must confirm:**
+- `EDGE_DEG = 2` (DESIGN.md starting value, flat-horizon sites).
+- `edge` if `pctSunEdge > 50` or `pctEarthEdge > 50` over the stay ("most of the stay"). It is checked first because the flat answer can't be trusted there.
+- Otherwise `clear` if `pctBoth >= CLEAR_PCT`, `out` if `pctBoth <= OUT_PCT`, else `partial`. **Open:** CLEAR_PCT, OUT_PCT, and the stay length `STAY_DAYS` are not chosen. DESIGN.md does not define them, and Lane A will not pick them alone. This is a rule the user can read, not a universal "best site" score.
+
+**Coverage:** DESIGN.md asks for at least 8 weeks ahead of today (so to at least 2027-01-09). The approved M1 range (2026-2029) includes this. Today there are only 7 days (2026-11-14..21), and widening waits for the hand-check. Open point carried over: Horizons' EOP (Earth-rotation) file predicts only to 2027-02-08, and I still have to check its effect on UTC timestamps past that date.
+
+**Lane A next single task (unchanged):** after Sheldon's hand-check passes, widen the M1 download, then write `/data/README.md`.
