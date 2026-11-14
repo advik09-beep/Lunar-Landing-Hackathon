@@ -31,15 +31,18 @@ if (!V.MOCK) {
 
 for (const s of sites) await V.loadSite(s.id);
 
+// Sites with a LOLA terrain horizon so far (D12 stages). Every other site must stay flat.
+const TERRAIN_SITES = ["sp_cabeus_b_peak", "sp_haworth", "sp_malapert", "sp_nobile_rim2"];
 const verdicts = new Set();
 for (const s of sites) {
   const st = V.getState(s.id, T);
   has(st, ["sunEl", "sunAz", "earthEl", "earthAz", "lit", "comms", "hoursToSunChange", "hoursToEarthChange", "terrain",
     "sunMarginDeg", "earthMarginDeg", "sunEdge", "earthEdge", "edgeDeg", "horizonModel", "sampleUtc"], `getState(${s.id})`);
-  if (s.id === "sp_malapert") {
+  if (TERRAIN_SITES.includes(s.id)) {
     const hz = V.getHorizon(s.id);
-    ok(st.horizonModel === "lola" && st.terrain === "real", "sp_malapert uses the LOLA terrain horizon");
-    ok(st.sunMarginDeg === st.sunEl - hz.elevationDeg[Math.round(st.sunAz) % 360] && st.lit === st.sunMarginDeg > 0, "sp_malapert margin = elevation - terrain horizon at that azimuth");
+    ok(st.horizonModel === "lola" && st.terrain === "real" && hz.model === "lola", `${s.id} uses the LOLA terrain horizon`);
+    ok(st.sunMarginDeg === st.sunEl - hz.elevationDeg[Math.round(st.sunAz) % 360] && st.lit === st.sunMarginDeg > 0, `${s.id} Sun margin = elevation - terrain horizon at that azimuth`);
+    ok(st.earthMarginDeg === st.earthEl - hz.elevationDeg[Math.round(st.earthAz) % 360] && st.comms === st.earthMarginDeg > 0, `${s.id} Earth margin = elevation - terrain horizon at that azimuth`);
   } else {
     ok(st.horizonModel === "flat" && st.terrain === "flat" && st.sunMarginDeg === st.sunEl && st.earthMarginDeg === st.earthEl, `${s.id} flat margin = elevation`);
     const fh = V.getHorizon(s.id);
@@ -99,7 +102,7 @@ ok(cov.sites.length === 10, "coverage for 10 sites");
 const a11 = cov.sites.find((s) => s.siteId === "apollo11").ranges;
 ok(a11.length === 2 && a11[1][0] === "2026-01-01T00:00:00Z" && a11[1][1] === "2029-12-31T23:00:00Z", "apollo11 ranges: landing + 2026-2029");
 ok(cov.sites.find((s) => s.siteId === "sp_haworth").ranges.length === 1, "pole site: one range");
-ok(cov.sites.find((s) => s.siteId === "sp_malapert").terrain === "lola" && cov.sites.filter((s) => s.terrain === "lola").length === 1, "coverage: only sp_malapert is lola");
+ok(JSON.stringify(cov.sites.filter((s) => s.terrain === "lola").map((s) => s.siteId).sort()) === JSON.stringify(TERRAIN_SITES), `coverage: terrain (lola) exactly for ${TERRAIN_SITES.join(", ")}`);
 throwsMsg(() => V.getState("apollo11", "2030-01-01T00:00:00Z"), /OUT_OF_COVERAGE/, "out of coverage throws");
 throwsMsg(() => V.getSummary("apollo11", "2029-12-30T00:00:00Z", 7), /OUT_OF_COVERAGE/, "summary past end throws");
 const land = V.getState("apollo11", "1969-07-20T20:17:40Z");

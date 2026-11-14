@@ -1,15 +1,17 @@
 // D10: find the highest ground within RADIUS_M of a point, on the LOLA 20 m south polar DEM
 // window in data/raw/ (scripts/fetch_lola.mjs). Prints lat/lon/height of the highest pixel centre.
-// Usage: node scripts/find_highest_point.mjs [lat=-86.0] [lon=0.3] [radius_m=1000]
+// Usage: node scripts/find_highest_point.mjs [lat=-86.0] [lon=0.3] [radius_m=1000] [windowSiteId=sp_malapert]
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const RAW = join(dirname(fileURLToPath(import.meta.url)), "..", "data", "raw");
-const [lat0 = -86.0, lon0 = 0.3, RADIUS_M = 1000] = process.argv.slice(2).map(Number);
+const args = process.argv.slice(2);
+const [lat0 = -86.0, lon0 = 0.3, RADIUS_M = 1000] = args.slice(0, 3).map(Number);
+const WIN = args[3] ?? "sp_malapert";
 const R = 1737400, N = 30400, OFF = 15199.5, SCALE = 20, d2r = Math.PI / 180, r2d = 180 / Math.PI;
-const W = JSON.parse(readFileSync(join(RAW, "ldem_80s_20m_malapert_rows.json"), "utf8"));
-const b = readFileSync(join(RAW, "ldem_80s_20m_malapert_rows.img"));
+const W = JSON.parse(readFileSync(join(RAW, `ldem_80s_20m_${WIN}_rows.json`), "utf8"));
+const b = readFileSync(join(RAW, `ldem_80s_20m_${WIN}_rows.img`));
 const D = new Int16Array(b.buffer, b.byteOffset, b.length / 2);
 
 // PDS polar stereographic (catalog/dsmap_polar.cat), south: lon 0 up, 90E right, r = 2R tan(colat/2).

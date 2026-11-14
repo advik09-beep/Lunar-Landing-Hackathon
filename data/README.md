@@ -114,3 +114,19 @@ What it means for us (our own calculation, not a doc statement): after 2027-02-0
   - At all 49 full moons in 2026–2029 the sub-solar and sub-Earth points are within 5.0° of each other.
   - Tolerance 0.05°: see STATUS.md.
 
+## Terrain on more sites (D12, prototype): stage 1, the four south-pole candidates
+Same method, scripts and checks as Malapert (above). Observer point = highest ground within 1 km of each candidate's representative point (D12). Every site uses the same maps:
+- **20 m/px** `ldem_80s_20m` within 20 km of the site (its own ±22 km row window)
+- **80 m/px** `ldem_80s_80m` to 80°S, **120 m/px** `ldem_75s_120m` to 75°S, **240 m/px** `ldem_60s_240m` to 60°S
+
+All are PDS LOLA GDR polar products, preliminary (2017). Mast 2 m (assumed). No bin was limited by a map edge.
+
+| Site | Observer point (D12) | What kind of point | Ground above sphere | Terrain horizon range | Sun visible: flat → terrain | Earth in view: flat → terrain | Earth-facing skyline |
+|---|---|---|---|---|---|---|---|
+| sp_cabeus_b_peak | 83.61274°S, 68.61071°W (747 m from rep. point) | a local high point (within 3 km at most 5 m higher) | 4596 m | −4.89° to +0.15° | 50.6% → 68.5% | 60.0% → 72.5% | set by downhill ground 0.26–0.7 km away (horizon −2.1° to −2.6°); 76% of Earth hours |
+| sp_haworth | 86.70752°S, 23.14284°W (998 m) | a slope, not a summit (on the 1 km circle) | 1624.5 m | −3.42° to +7.20° | 50.5% → 30.9% | 63.7% → 31.5% | ridges 4.4–7.7 km away |
+| sp_malapert | 85.97972°S, 0.67183°E (1000 m; D10) | a slope, not a summit (on the 1 km circle) | 4885.5 m | −4.86° to +6.13° | 50.4% → 45.8% | 69.2% → 100% | terrain 120–160 km away (bins 6°–8°: ground 40 m away, downhill) |
+| sp_nobile_rim2 | 83.91491°S, 58.92558°E (855 m) | inside the 1 km circle, not a summit (higher ground within 3 km) | 1044.5 m | −0.64° to +6.18° | 50.0% → 47.2% | 64.9% → 65.1% | ridges 10.8–16.1 km away |
+
+Hours with the Sun above the flat horizon but behind terrain (2026–2029): Cabeus B 0, Haworth 10,626, Malapert 3,820, Nobile Rim 2 1,134.
+

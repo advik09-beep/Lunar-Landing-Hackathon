@@ -18,6 +18,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import sites from "../data/sites.js";
+import { buildIndex } from "./build_index.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const RAW = join(ROOT, "data", "raw");
@@ -62,8 +63,9 @@ function dem(name, file, firstRow = 0) {
     } };
 }
 
-const win = JSON.parse(readFileSync(join(RAW, "ldem_80s_20m_malapert_rows.json"), "utf8"));
-const D20 = dem("ldem_80s_20m", "ldem_80s_20m_malapert_rows.img", win.firstRow);
+const winName = `ldem_80s_20m_${ENV.HZ_WINDOW ?? siteId}_rows`; // HZ_WINDOW: use another site's 20 m window (dry runs)
+const win = JSON.parse(readFileSync(join(RAW, `${winName}.json`), "utf8"));
+const D20 = dem("ldem_80s_20m", `${winName}.img`, win.firstRow);
 const FAR = [dem("ldem_80s_80m", "ldem_80s_80m.img"), dem("ldem_75s_120m", "ldem_75s_120m.img"), dem("ldem_60s_240m", "ldem_60s_240m.img")];
 const H_MAX = Math.max(D20.hMax, ...FAR.map((d) => d.hMax));
 
@@ -141,6 +143,7 @@ if (ENV.HZ_DRY) {
   process.exit(0);
 }
 writeFileSync(join(ROOT, "data", "ephem", siteId, "horizon.json"), JSON.stringify(out));
+buildIndex(); // so lib/visibility.js and build_daily.mjs see the new horizon (then run: node scripts/build_daily.mjs)
 console.log(`observer ground ${ground.toFixed(1)} m (+${MAST_M} m mast) above 1737.4 km sphere; smooth-sphere dip ${dipDeg.toFixed(3)} deg at ${smoothHorizonKm.toFixed(1)} km`);
 console.log(`horizon min ${Math.min(...elevationDeg).toFixed(3)} max ${Math.max(...elevationDeg).toFixed(3)} deg; blocking DEM per ray:`, demUse);
 console.log(`bins where the 60S edge could hide something higher: ${edgeBins.length}`);

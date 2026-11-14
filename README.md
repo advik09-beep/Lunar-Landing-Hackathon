@@ -14,7 +14,7 @@ It has two reading levels:
 - **Explore in 3D:** a Moon globe (NASA imagery) with 10 sites, each colored *and* labeled by verdict for the chosen landing date: ✓ Clear, ◐ Partial, ✕ Out, ⚠ On the edge (terrain decides).
 - **Side card:** for one site and date: verdict, Sun and Earth status, whether the horizon is flat or real terrain, sources and coverage, and a CSV of the 168 hourly values.
 - **Compare dates:** a grid of sites × landing dates, plus an hour-by-hour strip showing when the Sun and Earth are in view.
-- **Stand here:** a 360° horizon panorama with the Sun and Earth paths over the stay. For Malapert Massif it shows real terrain from NASA's LOLA laser altimeter, so you can see the Sun blocked by a ridge.
+- **Stand here:** a 360° horizon panorama with the Sun and Earth paths over the stay. For the four south-pole sites it shows real terrain from NASA's LOLA laser altimeter, so you can see the Sun blocked by a ridge (other sites are being added, D12).
 
 The 10 sites: Apollo 11, 12 and 17; Chandrayaan-3; Intuitive Machines IM-1 and IM-2; and four south-pole points from NASA's Artemis III candidate regions (Peak near Cabeus B, Haworth, Malapert Massif, Nobile Rim 2).
 
@@ -53,13 +53,13 @@ The data are static JSON files in `data/`. There is no backend.
 |---|---|
 | `node scripts/check_ephem.mjs` | The seven hand-check values are reproduced (within the 0.0005° storage rounding; the two Malapert rows are compared against a saved Horizons file at the original point). Apollo 11 at landing shows a low morning Sun in the east. Earth is high at the Apollo sites and near the horizon at the pole sites. Coverage has no gaps. |
 | `node scripts/check_visibility.mjs` | Every function in `lib/visibility.js` returns the agreed shapes, and screen values equal the files. All 14,694 rows of the daily summary equal a fresh calculation from the hourly data. Out-of-range dates give "unavailable", never a guess. Includes the terrain test: at Malapert on 2026-09-19 06:00 UTC the Sun is 1.05° above a flat horizon but hidden behind a ridge 1.84 km away. |
-| `node scripts/check_horizon.mjs` | The Malapert terrain horizon is sane: it reads the elevation maps consistently (20/80/120/240 m maps agree to within ~6–11 m), it never falls below what geometry allows, the search isn't cut off by any map edge, and it finds hours where flat says "Sun up" but terrain says "blocked". The elevation-map comparisons need the raw maps: run `node scripts/fetch_lola.mjs` first (~485 MB, not in git). |
+| `node scripts/check_horizon.mjs [siteId]` | A terrain horizon (default Malapert) is sane: it reads the elevation maps consistently (20/80/120/240 m maps agree to within ~6–11 m), it never falls below what geometry allows, the search isn't cut off by any map edge, and it finds hours where flat says "Sun up" but terrain says "blocked". The elevation-map comparisons need the raw maps: run `node scripts/fetch_lola.mjs` first (~485 MB, not in git). |
 | `node scripts/check_scene.mjs` | The Moon-fixed Sun and Earth directions for the 3D view agree with the site data: within 0.0034° of the hand-checked values, and within 0.0065° over 58,440 site-hours. At each of the 49 full moons in 2026–2029, the point with the Sun overhead and the point with Earth overhead are within 5° of each other. |
 
-**Terrain (Malapert Massif only):**
+**Terrain (the four south-pole sites so far; the other six are being added, prototype):**
 - Built from NASA's LOLA elevation maps (PDS Geosciences).
 - Method: look along a line every 0.1° of compass direction, include the Moon's curvature exactly, and keep searching until even the highest terrain on the Moon could no longer show above the skyline.
-- The point used is "the highest ground within 1 km of the representative point; a slope, not a summit".
+- Each candidate site uses the highest ground within 1 km of its representative point. At Malapert that is "a slope, not a summit"; per-site details are in `data/README.md`.
 - Moving the observer about 1 km changed Earth-in-view from 41% to 100% of the time. We report that openly (see `data/README.md`).
 
 ## Data sources and credits
@@ -78,7 +78,7 @@ The data are static JSON files in `data/`. There is no backend.
 ## Known limits
 - **Sun and Earth are treated as points.** The Sun's disc is about 0.5° wide, so near the horizon real sunlight is partial while we show all-or-nothing.
 - **"Sunlight" is not power and "Earth in view" is not a guaranteed link.** They mean the body is above the horizon.
-- **Terrain is modelled at one site only (Malapert Massif).** The other nine use a flat horizon and are labeled FLAT. For Malapert the terrain is for one point; nearby spots differ, especially toward Earth. The observer height (2 m mast) is assumed.
+- **Terrain is modelled at the four south-pole sites so far** (prototype). The other six still use a flat horizon and are labeled FLAT. Each terrain horizon is for one point; nearby spots differ. The observer height (2 m mast) is assumed.
 - **The four south-pole sites are representative points** of ~15 km candidate regions, not landing spots.
 - **Data are hourly.** Sunrise/sunset times are accurate to the hour.
 - **Fixed date range:** 2026–2029, plus 30 days around each past landing. Other dates show "unavailable".

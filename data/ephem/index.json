@@ -301,7 +301,10 @@
   ]
  },
  "horizons": {
-  "sp_malapert": "sp_malapert/horizon.json"
+  "sp_cabeus_b_peak": "sp_cabeus_b_peak/horizon.json",
+  "sp_haworth": "sp_haworth/horizon.json",
+  "sp_malapert": "sp_malapert/horizon.json",
+  "sp_nobile_rim2": "sp_nobile_rim2/horizon.json"
  },
  "scene": [
   {

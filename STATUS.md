@@ -6,10 +6,10 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 |-----|------|-----------|
 | Advik + ChatGPT (Lane B) | 11, 12, 13 (D13, D14, D15) | Next: date + hour slider above every tab (D13), overview scene + stars + detailed Moon (D14), legend + pole sites (D15), then mounts. Fix step 4 (markers recolor on date change; pole sites distinguishable). |
 | Sheldon (Lane A human) | — | Planning stop 2026-11-14: D12-D18 signed; acceptance run done |
-| Claude Code (Lane A) | 10 (D12 terrain, stage 1) | Interface v1.2 pushed (Lane B can start D13); now terrain for the other three pole candidates |
+| Claude Code (Lane A) | 10 (D12 terrain) | Stage 1 DONE (all four pole candidates on LOLA terrain); stopped for Sheldon's go on stage 2 (IM-2, IM-1, Chandrayaan-3) |
 
 Acceptance (both humans, 2026-11-14): steps 1, 2, 3, 6, 8 **PASS**. Step 4 not yet (markers don't recolor on date change; pole sites can't be told apart). Step 7 not yet (hour slider too hard to find). Signed 2026-11-14: D7–D11 (see PLAN); **D12–D18** (terrain all sites, date+hour slider, overview scene, legend, power/comms metrics, best-site score, Researcher tab). Side card switch renamed Educator / Researcher.
-Waiting on Sheldon: go after terrain stage 1 report.
+Waiting on Sheldon: go for D12 stage 2 (IM-2, IM-1, Chandrayaan-3).
 Waiting on Advik: D13 (uses panel interface v1.2), D14, D15; step 4 fixes.
 
 ## Continuous two-agent coordination protocol (agreed 2026-11-14)
@@ -956,4 +956,34 @@ interface PanelHandle { update(next: Partial<Pick<PanelProps, "siteId" | "landin
 - With `onHourSelected`, the slider asks (and doesn't move by itself); ▶ asks for hour+1. `update({hour: 30})` moves the side card, horizon view and strip cursor together; hour 999 is clamped to 167.
 - A v1.1 caller's local slider still works.
 - Earlier panel tests rerun: PASS. `check_visibility` PASS; `cd web && npm run build` OK.
+
+### 2026-11-14 — D12 terrain, stage 1 DONE: the other three pole candidates
+- **Moved (D12: highest ground within 1 km of the representative point), described honestly in `data/sites.js`:**
+  - sp_cabeus_b_peak → 83.61274°S, 68.61071°W (747 m away; *a local high point*, within 3 km at most 5 m higher).
+  - sp_haworth → 86.70752°S, 23.14284°W (998 m; *a slope, not a summit*).
+  - sp_nobile_rim2 → 83.91491°S, 58.92558°E (855 m; *inside the circle, not a summit*).
+  - Names now end "(high ground near representative point)"; ids unchanged.
+- **Re-done for the new coordinates:** Horizons 2026–2029, terrain horizon (`data/ephem/<id>/horizon.json`), `ephem/index.json`, `daily.json`.
+- **Maps and resolution (all four pole sites):** 20 m/px within 20 km, then 80 / 120 / 240 m/px (PDS LOLA GDR polar, preliminary 2017). Mast 2 m assumed. No map edge limits any direction. Per-site table: `/data/README.md`.
+- **Results (2026–2029):**
+
+  | Site | Sun visible, flat → terrain | Earth in view, flat → terrain |
+  |---|---|---|
+  | Cabeus B | 50.6% → 68.5% | 60.0% → 72.5% |
+  | Haworth | 50.5% → 30.9% | 63.7% → 31.5% |
+  | Nobile Rim 2 | 50.0% → 47.2% | 64.9% → 65.1% |
+
+  - **Cabeus B** is a high point (4,596 m), so its terrain horizon never rises above +0.15° and the Sun is never blocked. You see *below* level instead.
+  - **Haworth** sits low (1,624 m) with ridges 4–8 km away, so the Sun is blocked for 10,626 h and Earth for 11,271 h.
+- **Earth-facing skyline (D10 reporting rule):**
+  - Haworth: ridges 4.4–7.7 km away. Nobile Rim 2: 10.8–16.1 km away.
+  - **Cabeus B: set by ground 0.26–0.7 km away** (76% of Earth hours). It's downhill ground (horizon −2.1° to −2.6°) around a high point, so it marks how far below level Earth can be and still be seen. Flagged for Sheldon.
+- **Two bugs caught and fixed before committing anything:**
+  1. `fetch_lola.mjs` rewrote an existing window's row record using a site's *current* coordinates. That would have misaligned Malapert's DEM rows, since Malapert moved after its window was fetched. Now the record is written only with a download; Malapert's record was restored, and its horizon is byte-identical to the committed one apart from the build time.
+  2. The index was rebuilt before the new horizon files existed, so `daily.json` briefly treated these sites as flat. `compute_horizon.mjs` now rebuilds the index; daily rebuilt and verified (`horizonModels` shows `lola` for all four pole sites).
+- **Checks:**
+  - `check_horizon` PASS for each of the three. Step 7's blocked-Sun requirement still applies to Malapert only; other sites report their counts.
+  - `check_visibility` PASS: it now expects exactly these four terrain sites and checks Sun and Earth margins against each horizon.
+  - `check_ephem`, `check_scene` PASS. `cd web && npm run build` OK.
+- **Next (stage 2, on Sheldon's go):** IM-2, IM-1, Chandrayaan-3 at their landed coordinates. IM-1 (80.13°S) is at the edge of the 20 m polar map and Chandrayaan-3 (69.4°S) is outside it, so they need other maps (e.g. `ldem_75s_30m`, `ldem_60s_60m`). Lane A will check those products in the PDS folder before using them.
 

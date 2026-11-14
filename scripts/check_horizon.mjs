@@ -30,7 +30,7 @@ console.log(`     ${below} of 360 bins dip below the smooth-sphere horizon (terr
 
 // 3. DEM read checks (raw files needed).
 const RAW = join(ROOT, "data", "raw");
-if (existsSync(join(RAW, "ldem_80s_80m.img"))) {
+if (existsSync(join(RAW, "ldem_80s_80m.img")) && existsSync(join(RAW, `ldem_80s_20m_${siteId}_rows.img`))) {
   const open = (file, N, off, scale, firstRow = 0) => {
     const b = readFileSync(join(RAW, file));
     const D = new Int16Array(b.buffer, b.byteOffset, b.length / 2);
@@ -40,8 +40,8 @@ if (existsSync(join(RAW, "ldem_80s_80m.img"))) {
       return 0.5 * D[row * N + col];
     };
   };
-  const W = JSON.parse(readFileSync(join(RAW, "ldem_80s_20m_malapert_rows.json"), "utf8"));
-  const d20 = open("ldem_80s_20m_malapert_rows.img", 30400, 15199.5, 20, W.firstRow);
+  const W = JSON.parse(readFileSync(join(RAW, `ldem_80s_20m_${siteId}_rows.json`), "utf8"));
+  const d20 = open(`ldem_80s_20m_${siteId}_rows.img`, 30400, 15199.5, 20, W.firstRow);
   const d80 = open("ldem_80s_80m.img", 7600, 3799.5, 80);
   const d120 = open("ldem_75s_120m.img", 7624, 3811.5, 120);
   const d240 = open("ldem_60s_240m.img", 7760, 3879.5, 240);
@@ -89,8 +89,22 @@ for (const e of examples) console.log("     first cases:", JSON.stringify(e));
 if (best) console.log("     clearest case (any distance):", JSON.stringify(best));
 console.log(`     robust cases (blocker >= 2 km away, Sun >= 1 deg up, >= 1 deg below terrain): ${farCount} h`);
 if (farBest) console.log("     clearest robust case:", JSON.stringify(farBest));
-ok(sunBlocked > 0, "at least one hour: flat says Sun up, terrain says blocked");
-ok(farCount > 0, "at least one such hour where the blocking ridge is >= 2 km away");
+// Earth-facing horizon: what sets it (D10 rule: report ground closer than 500 m).
+const earthBins = new Map();
+for (const f of readdirSync(dir).filter((f) => /^\d{4}\.json$/.test(f))) {
+  const d = JSON.parse(readFileSync(join(dir, f), "utf8"));
+  for (const a of d.earthAz) { const b = Math.round(a) % 360; earthBins.set(b, (earthBins.get(b) ?? 0) + 1); }
+}
+const total = [...earthBins.values()].reduce((a, b) => a + b, 0);
+const nearHours = [...earthBins].filter(([b]) => hz.blockDistKm[b] < 0.5).reduce((a, [, n]) => a + n, 0);
+const dists = [...earthBins.keys()].map((b) => hz.blockDistKm[b]);
+console.log(`     Earth directions used (bins ${Math.min(...earthBins.keys())}..${Math.max(...earthBins.keys())}): skyline ${Math.min(...dists).toFixed(2)}-${Math.max(...dists).toFixed(1)} km away; ${(100 * nearHours / total).toFixed(1)}% of hours have Earth in a direction set by ground < 500 m`);
+
+// Step 7's pass test (PLAN) is for sp_malapert; other sites report these counts without requiring them.
+if (siteId === "sp_malapert") {
+  ok(sunBlocked > 0, "at least one hour: flat says Sun up, terrain says blocked");
+  ok(farCount > 0, "at least one such hour where the blocking ridge is >= 2 km away");
+}
 
 if (fails) { console.error(`${fails} check(s) failed`); process.exit(1); }
 console.log("PASS");
