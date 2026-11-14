@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | 4 — IN PROGRESS | D8 postbuild files deployed, both data JSON URLs returned 200; now building Three.js Moon and 10 markers. |
+| Advik + ChatGPT (Lane B) | 4 — REVIEW | D8 live JSON PASS; Three.js Moon, date controls, ten markers and Lane A side card deployed; desktop browser tests pass; human acceptance pending. |
 | Sheldon (Lane A human) | — | D9 + D10 signed 2026-11-14; gates Lane A's D10, panel interface and side card one at a time |
 | Claude Code (Lane A) | 3 (side card panel) | Panel interface posted; side card + web/panels.html built and committed; stopped for Sheldon's review |
 
@@ -379,6 +379,14 @@ Second task, only after the copy passes and with Advik's authorization: Step 4 T
 - **Milestones:** What concrete Step 4 test evidence and current side-card review outcome are still needed before declaring Step 4 PASS? Please do not change PLAN or start an unapproved feature based on this proposal.
 
 **Proposed shared position, pending Claude/Sheldon and Advik agreement:** First verify existing 3D Moon + panels and live JSON parity; then optionally swap to a registered NASA lunar surface mosaic; prioritize Step 6 Compare, Step 7 verified horizon, and Step 8 Moon-fixed true Sun/Earth directions. Do not build a separate orbital solar-system scene unless both humans amend the scope. This is a request for consensus, not a claim of approval.
+
+### 2026-11-14 — Lane B Step 4 deployed; desktop browser verification (review requested)
+- **D8 source and deployment:** `web/scripts/copy-data.mjs` (commit `1e7c323`) and `web/package.json` `postbuild` (commit `3ebabb1`) publish all ephemeris JSON chunks, `ephem/index.json`, Malapert `horizon.json`, and `daily.json` under `dist/data/`. Live production HTTPS checks returned **HTTP 200 application/json** for both `/data/ephem/index.json` (6,615 bytes) and `/data/daily.json` (406,910 bytes). D8 data publishing PASS.
+- **Step 4 implementation:** `web/src/moon.ts` (commit `92d2aae`, fix `fdfb1d0`) supplies a Three.js lunar sphere, real `listSites()` latitude/longitude markers in Lane A's Moon-fixed east-positive frame, camera orbit/zoom/focus and south-pole view. `web/src/main.ts` (commits `8156263`, `4ea711d`) owns shared site/UTC date selection, `getDaily()` real-data verdict coloring, date navigation and **mounts Lane A's `mountSideCard` via public panel interface**. CSS commit `ada643d`. Three.js deps + lockfile commits `93fa704`, `0cbc7ee`. No files in `web/src/panels/`, `web/panels.html`, `/lib`, `/data`, `/scripts`, PLAN or DESIGN edited by Lane B.
+- **Executed build checks:** sandbox `npm ci`, `npm run typecheck`, `npm run build` PASS; Vite 5.4.21, 15 modules, compiled JS 552.87 kB (146.52 kB gzip). `postbuild` PASS and copied 48 ephemeris JSON files; Vite warns JS main chunk >500 kB (non-fatal). Production Vercel deployment of `4ea711d` READY; later documentation-only HEAD `b3e52ed` also READY. Live URL: `https://lunar-landing-hackathon.vercel.app`.
+- **Executed desktop Chromium (1440×900) production tests:** visible WebGL2 canvas YES, ten site-selection buttons, mounted Lane A side card, `loadDaily` completed with real-data UTC/7-day status; choosing Haworth changed panel title; +7 days changed the UTC date 2026-11-14 → 2026-11-21 and **7 of 10** verdict labels; south-pole camera command and Nobile Rim 2 panel selection responded. Raycast hit testing found visible markers; synthesized pointer down/up on marker coordinates changed selection among Apollo 17/11/12. No browser exceptions during normal interactions; one desktop screenshot captured and inspected. Synthetic pointer events are not a substitute for a human physical-mouse test.
+- **Scientific/presentation limits:** sphere surface texture and lighting are intentionally **illustrative**, not georeferenced NASA imagery or true ephemeris illumination; true Moon-fixed lighting remains Step 8. Site coordinates/verdicts are real scientific data from Lane A. South-pole points are geographically clustered; polar view + site selector distinguish them.
+- **Acceptance request to Sheldon/Claude and Advik:** Step 4 is **implemented, deployed and functionally tested**, but final **human sign-off remains pending**; confirm real mouse/camera user experience, south-pole distinguishability, and whether approved PLAN Step 4 criteria are sufficiently met. No new NASA texture, orbital simulator, or terrain mesh was started; see the separate Lane B design-consensus proposal immediately above.
 
 ## Lane A
 
