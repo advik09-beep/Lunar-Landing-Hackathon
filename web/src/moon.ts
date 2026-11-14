@@ -58,6 +58,7 @@ export class LunarScene {
   private camera: THREE.PerspectiveCamera;
   private controls: OrbitControls;
   private markers: Marker[] = [];
+  private readonly poleCallouts: Array<{id:string;sprite:THREE.Sprite;leader:THREE.Line}> = [];
   private raycaster = new THREE.Raycaster();
   private pointer = new THREE.Vector2();
   private selected: string | null = null;
@@ -167,6 +168,8 @@ export class LunarScene {
       this.scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(points), gridMaterial));
     }
 
+    const poleSiteIds = sites.filter(s => s.kind === 'south-pole').map(s => s.id);
+    const poleLetters = ['A', 'B', 'C', 'D'];
     for (const site of sites) {
       if (!Number.isFinite(site.lat) || !Number.isFinite(site.lon)) continue;
       const normal = spherePoint(site.lat, site.lon);
@@ -185,6 +188,35 @@ export class LunarScene {
       halo.visible = false;
       this.scene.add(halo, marker);
       this.markers.push({ site, object: marker, halo, normal });
+      const poleIndex = poleSiteIds.indexOf(site.id);
+      if (poleIndex !== -1 && poleIndex < poleLetters.length) {
+        const letter = poleLetters[poleIndex];
+        const badgeCanvas = document.createElement('canvas');
+        badgeCanvas.width = badgeCanvas.height = 128;
+        const bc = badgeCanvas.getContext('2d');
+        if (bc) {
+          bc.fillStyle='#14273d'; bc.beginPath(); bc.arc(64,64,49,0,Math.PI*2); bc.fill();
+          bc.strokeStyle='#d4efff'; bc.lineWidth=8; bc.stroke();
+          bc.fillStyle='#fff'; bc.textAlign='center'; bc.textBaseline='middle';
+          bc.font='bold 72px sans-serif'; bc.fillText(letter,64,68);
+        }
+        const tex = new THREE.CanvasTexture(badgeCanvas);
+        tex.colorSpace=THREE.SRGBColorSpace;
+        const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:tex, transparent:true,depthTest:true,depthWrite:false}));
+        const angle=(45+90*poleIndex)*Math.PI/180;
+        const offset=new THREE.Vector3(Math.cos(angle)*.22,-.06,Math.sin(angle)*.22);
+        const target=normal.clone().multiplyScalar(1.16).add(offset);
+        sprite.position.copy(target);
+        sprite.scale.set(.19,.19,1);
+        sprite.visible=false;
+        const leader=new THREE.Line(
+          new THREE.BufferGeometry().setFromPoints([normal.clone().multiplyScalar(1.065),target]),
+          new THREE.LineBasicMaterial({color:0xd2e6ff,transparent:true,opacity:.76,depthTest:true}),
+        );
+        leader.visible=false;
+        this.scene.add(sprite,leader);
+        this.poleCallouts.push({id:site.id,sprite,leader});
+      }
     }
 
     this.onPointerDown = (e) => { this.downPosition = { x: e.clientX, y: e.clientY }; this.targetCamera = null; };
@@ -262,10 +294,15 @@ export class LunarScene {
     }
   }
 
+  private setPoleCallouts(visible:boolean): void {
+    for(const item of this.poleCallouts){item.sprite.visible=visible;item.leader.visible=visible;}
+  }
+
   focusSite(id: string): void {
     const marker = this.markers.find(m => m.site.id === id);
     if (!marker) return;
     this.selected = id;
+    this.setPoleCallouts(marker.site.kind === 'south-pole');
     const position = marker.normal.clone().multiplyScalar(2.0);
     this.targetCamera = position;
     this.targetFocus = marker.normal.clone().multiplyScalar(0.18);
@@ -277,11 +314,13 @@ export class LunarScene {
   }
 
   focusSouthPole(): void {
+    this.setPoleCallouts(true);
     this.targetCamera = new THREE.Vector3(0.0, -2.1, 0.45);
     this.targetFocus = new THREE.Vector3(0, -0.15, 0);
   }
 
   resetView(): void {
+    this.setPoleCallouts(false);
     this.selected = null;
     this.targetCamera = new THREE.Vector3(2.6, 1.4, 3.4);
     this.targetFocus = new THREE.Vector3(0, 0, 0);
