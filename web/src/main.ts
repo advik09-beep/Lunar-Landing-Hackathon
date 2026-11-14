@@ -82,15 +82,11 @@ app.innerHTML = [
   '    <details class="clock-tip"><summary aria-label="About the date and inspection time">ⓘ</summary><p>The 7-day stay starts at 00:00 UTC on the landing date. The slider chooses the moment you inspect within that stay; it does not move the landing time. Hourly data.</p></details>',
   '    <p id="data-status" class="sr-only" role="status" aria-live="polite">Loading conditions…</p>',
   '  </section>',
-  '  <section id="verdict-legend" class="verdict-legend" aria-label="What landing condition colors mean">',
-  '    <div class="verdict-guide-heading"><strong>What do the marker colors mean?</strong><span>Each verdict covers the full 7-day stay, not only the selected hour.</span></div>',
-  '    <div class="verdict-guide-grid">',
-  `      <div class="verdict-guide-item clear"><strong>● Clear</strong><span>Sunlight and Earth both visible together for at least ${VERDICT_RULE.CLEAR_PCT}% of the stay.</span></div>`,
-  '      <div class="verdict-guide-item partial"><strong>◐ Partial</strong><span>Both are visible together for part of the stay, but not enough to be clear.</span></div>',
-  `      <div class="verdict-guide-item out"><strong>✕ Out</strong><span>Sunlight and Earth are visible together for ${VERDICT_RULE.OUT_PCT}% or less of the stay.</span></div>`,
-  `      <div class="verdict-guide-item edge"><strong>⚠ On the edge</strong><span>Sun or Earth stays near the local horizon (within ${VERDICT_RULE.EDGE_DEG}°); terrain and position matter.</span></div>`,
-  '    </div>',
-  '    <p class="verdict-guide-note">These indicate potential sunlight and direct Earth line of sight, not guaranteed power or communications. Gray means data unavailable. Detailed terrain estimates differ by location.</p>',
+  '  <section id="verdict-legend" class="verdict-legend" aria-label="Seven-day verdict legend" hidden>',
+  `    <span class="verdict-chip clear" title="Sunlight and Earth both visible for at least ${VERDICT_RULE.CLEAR_PCT}% of the stay"><b>✓</b> Clear</span>`,
+  '    <span class="verdict-chip partial" title="Sunlight and Earth visible together for part of the stay"><b>◐</b> Partial</span>',
+  `    <span class="verdict-chip out" title="Sunlight and Earth visible together for ${VERDICT_RULE.OUT_PCT}% or less of the stay"><b>✕</b> Out</span>`,
+  `    <span class="verdict-chip edge" title="Sun or Earth grazes the skyline within ${VERDICT_RULE.EDGE_DEG}° for most of the stay; small position changes matter"><b>⚠</b> On the edge</span>`,
   '  </section>',
   '  <section id="overview-view" class="overview-view" aria-label="Sun Earth Moon overview">',
   '    <div class="overview-window">',
@@ -217,7 +213,7 @@ function openView(view: View): void {
   activeView = view;
   document.body.dataset.view = view;
   find<HTMLElement>('global-clock').hidden = view === 'overview' || view === 'credits';
-  find<HTMLElement>('verdict-legend').hidden = view === 'overview';
+  find<HTMLElement>('verdict-legend').hidden = view !== 'explore' && view !== 'compare';
   for (const name of ['overview', 'explore', 'compare', 'horizon', 'researcher', 'planner', 'credits'] as View[]) {
     find<HTMLElement>(name + '-view').hidden = name !== view;
     const button = document.getElementById('nav-' + name);

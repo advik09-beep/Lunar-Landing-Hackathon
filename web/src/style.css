@@ -290,3 +290,15 @@ body[data-view="overview"] .overview-clock-status { position:absolute; bottom:0;
 .clock-tip { position:relative; flex:none; }
 .clock-tip summary { cursor:pointer; list-style:none; font-size:1.1rem; color:#A8BBD3; }
 .clock-tip p { position:absolute; top:24px; right:0; z-index:20; width:290px; margin:0; padding:12px 14px; background:#132138; border:1px solid #344B69; border-radius:8px; font-size:.84rem; line-height:1.5; box-shadow:0 8px 30px #0008; white-space:normal; }
+
+/* D30.6: four compact symbols, never colour alone. */
+.verdict-legend { display:flex; align-items:center; gap:8px; padding:4px 0 12px; margin:0; background:none; border:0; border-radius:0; }
+.verdict-chip { display:inline-flex; align-items:center; gap:6px; padding:5px 12px; border:1px solid #344B69; border-radius:99px; font-size:.75rem; }
+.verdict-chip b { font-size:.84rem; }
+.verdict-chip.clear { background:#4FBF7A; color:#0B1322; border-color:#4FBF7A; }
+.verdict-chip.partial { background:linear-gradient(90deg,#4FBF7A22 50%,transparent 50%); color:#4FBF7A; border-color:#4FBF7A; }
+.verdict-chip.out { color:#94A3B8; border-color:#94A3B8; }
+.verdict-chip.edge { color:#B48CF0; border:1px dashed #B48CF0; }
+.explorer { height:calc(100dvh - 240px); min-height:360px; }
+#compare-view { height:calc(100dvh - 240px); min-height:300px; }
+#researcher-view,#credits-view { height:calc(100dvh - 194px); min-height:300px; }
