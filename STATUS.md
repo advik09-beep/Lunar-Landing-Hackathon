@@ -6,10 +6,10 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 |-----|------|-----------|
 | Advik + ChatGPT (Lane B) | 1 — BLOCKED | Vercel Git linking requires a GitHub Login Connection; local runtime/network unavailable. No public URL or Step 1 pass. |
 | Sheldon (Lane A human) | — | Step 2 PASSED 2026-11-14; GO given for Lane A's half of step 5 |
-| Claude Code (Lane A) | 5 (Lane A half DONE) | Stopped. Lane A half of step 5 done 2026-11-14; waiting for Lane B postbuild copy. Step 7 not started. |
+| Claude Code (Lane A) | 7 (Lane A, sp_malapert) | Stage 1 reported (product + method); waiting for Sheldon's go on stage 2 |
 
 Step 2 Real numbers: **PASSED 2026-11-14**. Signed 2026-11-14: D7 desktop only; D8 data copied at build + fetched per site, setDataBase added.
-Waiting on Sheldon: go for step 7 (terrain) when you choose; Lane A will not start it before.
+Waiting on Sheldon: go on step 7 stage 2 (download + compute the sp_malapert horizon).
 Waiting on Advik: step 1 live URL showing the 10 sites in a desktop browser; then Lane B's postbuild copy for step 5 (spec in Lane A section).
 
 ## Continuous two-agent coordination protocol (agreed 2026-11-14)
@@ -554,4 +554,22 @@ Alternative: Lane A bundles the data into JS modules that Vite code-splits. This
 - Lane A will re-run `node scripts/build_daily.mjs` whenever `data/ephem` changes and commit both; Lane B's copy step needs no change for that.
 
 **Lane A stops here.** Step 7 has not started; it waits for Sheldon's go.
+
+### 2026-11-14 — Step 7 (terrain), Lane A, stage 1: product and method for sp_malapert (PROPOSAL, awaiting Sheldon's go)
+- **Site:** sp_malapert only (Sheldon's choice). It sits at 86.0°S, 0.3°E (representative point = LROC mosaic centre, not a landing point), about 121 km from the pole. Other sites stay `flat`.
+- **Product (official PDS):** LOLA GDR polar DEMs, https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/polar/img/
+  - `ldem_80s_80m.img` (115,520,000 bytes): 80 m/px, 7600 × 7600, 80°S–90°S. Used for the far field.
+  - `ldem_80s_20m.img` (1,848,320,000 bytes): 20 m/px, 30400 × 30400, 80°S–90°S. Only the rows within ±20 km of the site are fetched (HTTP range request; the server sends `accept-ranges: bytes`): ~2,000 rows × 60,800 bytes ≈ 122 MB.
+  - Label facts (`.lbl`): polar stereographic, centre −90°/0°, spherical R = 1737.4 km, "MEAN EARTH/POLAR AXIS OF DE421", east-positive; LSB 16-bit integers, `HEIGHT = DN × 0.5` m; "Map values are relative to a radius of 1737.4 km" (so radius = 1737400 + height). Same sphere as our Horizons data. Preliminary LOLA data; product created 2017-06-15 from data 2009-07-13..2017-02-02.
+  - Orientation (`catalog/dsmap_polar.cat`): "In the south, Longitude 0 extends straight up from the center, and Longitude 90 East extends to the right"; `X = (I − N/2 − 0.5)·MAP_SCALE`, `Y = (J − N/2 − 0.5)·MAP_SCALE·NS` with NS = −1 in the south, `LON = ATAN2(X,Y)`, `LAT = −90 + 2·ATAN(0.5·R/1737400)` (degrees).
+  - Rejected: the 5 m products (87.5°S / 87°S limits don't reach 86°S); the 85°S products (don't cover the far side of the search disk); PGDA's newer 2023 adjusted 20 m GeoTIFF (2.6 GB, needs a GeoTIFF reader; possible later upgrade).
+- **Method in plain words:**
+  1. Put the observer on the DEM surface at the site, plus an assumed **2 m** mast height (ASSUMPTION; the elevation used is interpolated from the 20 m DEM).
+  2. For each azimuth ray (every 0.1°, clockwise from north, the same convention as our Horizons data), step outward across the terrain: 20 m steps on the 20 m DEM out to 20 km, then 80 m steps on the 80 m DEM, out to **300 km** or the DEM edge if closer (the edge is ~183 km away straight away from the pole).
+  3. At each step, turn the terrain point into a 3D Moon-fixed position (radius = 1737.4 km + height) and compute its true elevation angle as seen from the observer. Using full 3D positions handles the **Moon's curvature** exactly; the surface falls away by ~6.5 km at 150 km, so far terrain must stand very high to show.
+  4. The horizon angle for each 1° bin is the highest angle found on any of its ten 0.1° rays, so narrow peaks aren't missed between whole degrees. Result: 360 values, degrees, can be negative (an elevated observer sees below the flat 0° line).
+  5. Record, per bin, the distance of the blocking point and whether the ray hit the DEM edge before 300 km, so we can show where the search distance was limiting.
+- **Then:** margin = elevation − horizon(azimuth); lit / comms use the margin (Sun and Earth still treated as points).
+- **Cost:** ~237 MB download (115.5 MB + ~122 MB). Measured 3.7 MB/s from PDS on Sheldon's connection, so about 1–2 minutes; computing takes seconds. Raw DEM files stay out of git (scratch/gitignored); only the 360-value profile and its provenance get committed.
+- **Known limits to state on screen:** representative point, not a landing spot (the horizon changes over a few hundred metres); preliminary 2017 LOLA DEM; 2 m observer height assumed; Sun and Earth as points (the Sun's disc is ~0.5° wide, so partial sunlight near the edge is shown as all-or-nothing); 1° azimuth bins.
 
