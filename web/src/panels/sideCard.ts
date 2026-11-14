@@ -196,6 +196,8 @@ export const mountSideCard: MountPanel = (container, props) => {
           <tr><th>Sunlight share</th><td>${pct(m.pctLit)}</td><th>Earth-in-view share</th><td>${pct(m.pctComms)}</td></tr>
           <tr><th>Longest dark stretch</th><td>${m.longestDarkHours} h</td><th>Longest contact gap</th><td>${m.longestContactGapHours} h</td></tr>
           <tr><th>Dark periods</th><td>${m.darkPeriods}</td><th>Contact windows</th><td>${m.contactWindows}</td></tr>
+          <tr><th>Hours with part of the Sun's disc hidden</th><td>${m.partialSunHours}</td><th>Hours with Earth partly hidden (marginal)</th><td>${m.earthMarginalHours}</td></tr>
+          <tr><th>Lunar-eclipse hours (Earth's shadow)</th><td>${m.eclipseHours}</td><th></th><td></td></tr>
         </table>
         <p class="muted small">${esc(m.note)} ${esc(m.commsNote)}</p>`;
     }
@@ -310,12 +312,15 @@ function whySentence(s: Summary, flat: boolean): string {
   }
 }
 function sunNote(st: State): string {
+  if (st.eclipseFraction > 0 && st.sunSkylineFraction > 0) return ` — lunar eclipse: Earth covers ${Math.round(st.eclipseFraction * 100)}% of the Sun's disc`;
+  if (st.sunFraction > 0 && st.sunFraction < 1) return ` — ${Math.round(st.sunFraction * 100)}% of the Sun's disc is above the skyline`;
   if (st.horizonModel === "flat") return st.lit ? ` — the Sun is ${deg(st.sunEl, 1)} above the horizon` : ` — the Sun is below the horizon`;
   if (st.sunEl > 0 && !st.lit) return ` — the Sun is ${deg(st.sunEl, 1)} above level but hidden behind terrain`;
   if (st.sunEl <= 0 && st.lit) return ` — the Sun is below level but visible over lower terrain from this high point`;
   return st.lit ? ` — the Sun clears the terrain by ${deg(st.sunMarginDeg, 1)}` : ` — the Sun is below the terrain horizon`;
 }
 function earthNote(st: State): string {
+  if (st.earthMarginal) return ` — marginal: Earth's disc is partly hidden by the skyline (centre ${deg(st.earthMarginDeg, 2)} from it; Earth counts as in view only when its whole disc clears)`;
   if (st.horizonModel === "flat") return st.comms ? ` — Earth is ${deg(st.earthEl, 1)} above the horizon` : ` — Earth is below the horizon`;
   if (st.earthEl > 0 && !st.comms) return ` — Earth is ${deg(st.earthEl, 1)} above level but hidden behind terrain`;
   if (st.earthEl <= 0 && st.comms) return ` — Earth is below level but visible over lower terrain from this high point`;

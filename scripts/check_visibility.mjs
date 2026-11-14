@@ -10,7 +10,7 @@ const throwsMsg = (fn, re, msg) => { try { fn(); ok(false, msg + " (did not thro
 const T = "2026-11-14T12:00:00Z";
 
 ok(typeof V.MOCK === "boolean", "MOCK boolean");
-ok(V.API_VERSION === "1.5.0", "API_VERSION 1.5.0");
+ok(V.API_VERSION === "1.6.0", "API_VERSION 1.6.0");
 has(V.READY, ["listSites", "getState", "getSummary", "loadSite", "getCoverage", "getTimeline", "loadDaily", "getDaily", "setDataBase", "loadScene", "getSceneState", "getHorizon"], "READY");
 ok(V.READY.getSceneState === true && V.READY.getHorizon === true, "READY.getSceneState and getHorizon true");
 ok(V.VERDICT_RULE.STAY_DAYS === 7 && V.VERDICT_RULE.CLEAR_PCT === 90 && V.VERDICT_RULE.OUT_PCT === 10 && V.VERDICT_RULE.EDGE_DEG === 2, "verdict numbers 7/90/10/2");
@@ -41,8 +41,11 @@ for (const s of sites) {
   if (TERRAIN_SITES.includes(s.id)) {
     const hz = V.getHorizon(s.id);
     ok(st.horizonModel === "lola" && st.terrain === "real" && hz.model === "lola", `${s.id} uses the LOLA terrain horizon`);
-    ok(st.sunMarginDeg === st.sunEl - hz.elevationDeg[Math.round(st.sunAz) % 360] && st.lit === st.sunMarginDeg > 0, `${s.id} Sun margin = elevation - terrain horizon at that azimuth`);
-    ok(st.earthMarginDeg === st.earthEl - hz.elevationDeg[Math.round(st.earthAz) % 360] && st.comms === st.earthMarginDeg > 0, `${s.id} Earth margin = elevation - terrain horizon at that azimuth`);
+    ok(st.sunMarginDeg === st.sunEl - hz.elevationDeg[Math.round(st.sunAz) % 360], `${s.id} Sun margin = elevation - terrain horizon at that azimuth`);
+    ok(st.earthMarginDeg === st.earthEl - hz.elevationDeg[Math.round(st.earthAz) % 360], `${s.id} Earth margin = elevation - terrain horizon at that azimuth`);
+    // D19: lit = at least half the Sun's disc visible (skyline x eclipse); comms = Earth's whole disc clears the skyline
+    ok(st.lit === st.sunFraction >= 0.5 && Math.abs(st.sunFraction - st.sunSkylineFraction * (1 - st.eclipseFraction)) < 1e-12, `${s.id} lit = sunFraction >= 0.5 (disc rule)`);
+    ok(st.comms === st.earthMarginDeg >= st.earthRadiusDeg && st.earthMarginal === Math.abs(st.earthMarginDeg) < st.earthRadiusDeg, `${s.id} Earth in view only when its whole disc clears the skyline`);
   } else {
     ok(st.horizonModel === "flat" && st.terrain === "flat" && st.sunMarginDeg === st.sunEl && st.earthMarginDeg === st.earthEl, `${s.id} flat margin = elevation`);
     const fh = V.getHorizon(s.id);

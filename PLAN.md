@@ -126,6 +126,39 @@ and researchers get the numbers behind them.
 - The side card switch is renamed Educator / Researcher (was Plain /
   Numbers in D3).
 
+- Planning stop 2026-11-14 (both humans): the six default score weights
+  (sunlight 25, Earth 20, short dark 15, short gap 10, clearance 15,
+  slip tolerance 15) are confirmed.
+- D19 Stricter rules. (a) The Sun is a disc: each hour has a sunlight
+  fraction, the share of the disc above the terrain skyline. (b) Earth's
+  shadow: lunar eclipses reduce that fraction; the eclipse dates found in
+  2026-2029 are cross-checked against NASA's published list as a check.
+  (c) Earth counts as in view only when its whole disc clears the skyline;
+  partly hidden is reported as marginal. (d) The power calculator uses the
+  actual Sun distance each hour. Lane A proposes how fractions feed
+  windows, verdicts and the score.
+- D20 Lunar conditions per site and stay, from data we hold: lunar season
+  (sub-solar latitude; confirm NASA's explanation from the source Lane B
+  listed), time of lunar day, eclipses, partial Sun, Earth's position and
+  wobble, distance to Earth with one-way signal delay, distance to the
+  Sun with sunlight strength, a caution when the Sun is near the
+  Earth-Moon line, the Sun's compass sweep, best and worst months. State
+  what is NOT modeled.
+- D21 No south-pole assumption. The ranking is filterable: all sites,
+  candidate sites, historic landings. Historic landings are labeled as
+  comparisons for educators.
+- D22 Other planets: a short note that their gravity is already included
+  in NASA's JPL ephemeris and their light and radio are negligible.
+  Verify from JPL documentation before writing it.
+- D23 Tour purpose (Lane B): the overview says explicitly that only the
+  Sun and Earth decide a lunar lander's power and radio link.
+- Order: D19, then D21, then the D18 Researcher tab carrying D20 and D22.
+- Noted (Lane B changes made without a planning decision, recorded
+  2026-11-14): Earth removed from the Explore scene and replaced by a
+  procedural nebula background (95f3d88); the OzAILabs simulator embed
+  cleaned up (95f3d88, D14 amendment); a NASA challenge objectives audit
+  added to Lane B's docs (34744ea, 395d77b).
+
 ## Settled earlier (do not reopen without both humans)
 - 10 fixed sites: 3 Apollo, Chandrayaan-3, IM-1, IM-2, 4 south pole
   representative points.

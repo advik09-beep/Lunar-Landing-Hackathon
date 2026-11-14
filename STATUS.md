@@ -4,13 +4,13 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | Visual cleanup — DONE; NASA audit documented | Existing cleanup verified; detailed local conditions, lunar-day/seasonal limits, landing vs inspection time and prioritized comparison improvements documented. No new features authorized. |
-| Sheldon (Lane A human) | — | Planning stop 2026-11-14: D12-D18 signed; acceptance run done |
-| Claude Code (Lane A) | 15 (D17 amendment) | Clearance + slip tolerance, 'Sun and Earth score', 'Why these weights?' DONE; stopped. Next: D18 on Sheldon's go |
+| Advik + ChatGPT (Lane B) | D14 amendment, D23 | OzAILabs fork embedded; Earth removed from Explore (nebula). Next: D23 overview text (only the Sun and Earth decide power and radio), D15/step 4 sign-off items. |
+| Sheldon (Lane A human) | — | Planning stop 2026-11-14: weights confirmed; D19–D23 signed |
+| Claude Code (Lane A) | D19 done | D19 discs, Earth's shadow, Earth whole-disc rule, Sun distance DONE; stopped for report. Next: D21, then D18 (with D20, D22) |
 
-Acceptance (both humans, 2026-11-14): steps 1, 2, 3, 6, 8 **PASS**. Step 4 not yet (markers don't recolor on date change; pole sites can't be told apart). Step 7 not yet (hour slider too hard to find). Signed 2026-11-14: D7–D11 (see PLAN); **D12–D18** (terrain all sites, date+hour slider, overview scene, legend, power/comms metrics, best-site score, Researcher tab). Side card switch renamed Educator / Researcher.
-Waiting on Sheldon: review the amended score (formula and spread in the Lane A entry); go for D18.
-Waiting on Advik: D13 (uses panel interface v1.2), D14, D15; step 4 fixes.
+Acceptance (both humans, 2026-11-14): steps 1, 2, 3, 6, 8 **PASS**; step 4 and 7 pending earlier findings. Signed: D7–D18 (see PLAN), D17 amendment, D14 amendment, **D19–D23** (stricter Sun/Earth rules, lunar conditions, no south-pole assumption, other-planets note, tour purpose). Score weights confirmed 25/20/15/10/15/15.
+Waiting on Sheldon: review the D19 before/after report (Lane A entry); go for D21.
+Waiting on Advik: D23 overview wording; note Lane A API 1.6.0 (loadSite now also loads the scene data; getState gains D19 fields).
 
 ## Continuous two-agent coordination protocol (agreed 2026-11-14)
 
@@ -1217,4 +1217,72 @@ interface PanelHandle { update(next: Partial<Pick<PanelProps, "siteId" | "landin
 - `check_metrics` PASS: daily clearance = getMetrics on all 14,694 rows; ranking = getScore for every site; hand example; Educator = Researcher at defaults; re-ranking; all-zero → no score; spread printed, with new 95+ count < old.
 - DOM test: new label and meaning line; both "Why these weights?" texts (6 reason lines in Researcher); Educator 77 = Researcher 77.2; grid has 6 sliders plus C/T columns, re-ranks live, and Reset restores 91.8.
 - `check_visibility` (API 1.5.0), `check_ephem`, `check_scene`, `check_horizon` PASS. `/web` build OK. README updated.
+
+### 2026-11-14 — Planning stop recorded (D19–D23, weights confirmed); D19 DONE
+**Recorded in PLAN.md:**
+- The six default weights are confirmed.
+- D19–D23 and the order (D19 → D21 → D18 with D20 + D22).
+- A note on Lane B's unplanned changes: Earth removed from Explore and replaced by a procedural nebula (`95f3d88`); the simulator embed cleaned up; a NASA objectives audit in Lane B docs.
+
+**D19 sources (NASA NSSDCA fact sheets, read 2026-11-14):**
+- Sun "Volumetric mean radius (km) 695,700."
+- Earth "Equatorial radius (km) 6378.137".
+- Earth "Solar irradiance (W/m2) 1361.0" with "Semimajor axis (10^6 km) 149.598". Read as 1361 W/m² at that mean distance; the Moon sheet gives the same 1361.0.
+- Lunar eclipses: NASA GSFC LEdecade2021, "Eclipse Predictions by Fred Espenak, NASA's GSFC", times in TD.
+
+**How the fractions feed everything (Lane A proposal, implemented, API 1.6.0, `lib/disc.js`):**
+- **Each hour, `sunFraction`** = (share of the Sun's disc above the terrain skyline) × (1 − share covered by Earth's disc).
+  - Disc sizes come from the actual Sun and Earth distances that hour (scene data). The skyline is treated as straight across the disc; Earth's disc is seen from the site, so its parallax is included.
+- **Windows, dark periods, longest dark stretch, verdict ("both"), sunrise/sunset countdowns** use the flag `lit = sunFraction ≥ 0.5` (at least half the disc). Outside eclipses this equals the old "centre above the skyline" rule.
+- **Sunlight share (score term S, side card "Sunlight %")** = the mean `sunFraction`: partial hours count partly.
+- **Earth:** `comms` (Earth in view) only when the margin ≥ Earth's angular radius (whole disc clear). `earthMarginal` = partly hidden, counted and shown separately.
+  - Earth-in-view share, contact windows, gaps, the verdict and score term E all use the strict flag.
+- **Power:** each hour uses irradiance = 1361 × (149.598 million km ÷ actual Sun distance)², times `sunFraction` (× sin elevation for a flat panel). The battery uses the longest stretch with no sunlight at all.
+- **New fields:**
+  - `getState` / timeline samples: `sunFraction`, `sunSkylineFraction`, `eclipseFraction`, `earthMarginal`, `sunRadiusDeg`, `earthRadiusDeg`, `sunDistKm`, `earthDistKm`, `irradianceWm2`.
+  - `getSummary` / `getMetrics` / `getDaily`: `partialSunHours`, `eclipseHours`, `earthMarginalHours`, `litHours`.
+  - `computePower`: `meanIrradianceWm2`.
+- **Lane B:** `loadSite()` now also loads the scene data (it's needed for disc sizes). There's no other change to your calls.
+- **One implementation:** `getSummary`, `getMetrics` and `daily.json` share one counter (`stayCounts`); `scripts/build_daily.mjs` now calls the library, so they can't drift apart.
+
+**Eclipse cross-check (`node scripts/check_d19.mjs`, new):**
+- From our data, Earth's disc reaches the Sun's disc (somewhere on the Moon) in **9 events**, all on NASA's list and each within 1 h of NASA's time of greatest eclipse.
+  - 2026-03-03 total, 2026-08-28 partial, 2027-02-20 penumbral, 2027-08-17 penumbral, 2028-01-12 partial, 2028-07-06 partial, 2028-12-31 total, 2029-06-26 total, 2029-12-20 total.
+- NASA's 10th, the **2027-07-18 penumbral** (umbral magnitude −1.068), is a graze: our closest approach is at 16:00 UTC (NASA 16:04 TD) but misses the solid-Earth contact limit by 0.008°, 0.9% of Earth's radius. NASA's shadow includes Earth's atmosphere; ours doesn't. The check allows < 1% for this reason and says so.
+- **NASA's four total eclipses** show the Sun fully covered from the Moon's centre. At every site the Sun is never covered outside an eclipse.
+- **Example:** Malapert 2026-03-03, Sun 40% covered at 10:00, 100% at 11:00 and 12:00, 39% at 13:00 UTC (NASA greatest eclipse 11:34:52 TD).
+
+**Before / after, every hour 2026–2029, per site** (`node scripts/report_d19.mjs <snapshot>`; verdicts and scores over 1,449 landing dates per site):
+
+| Site | (a) Sun as disc: sunlight share | (b) eclipses: hours at site, share after | (c) Earth whole disc: in view | (d) Sun distance: panel energy, fixed → actual | all rules: energy | verdict changed | score (default weights) |
+|---|---|---|---|---|---|---|---|
+| apollo11 | 49.94% → 49.94% | 30 h, share → 49.88% | 100.00% → **100.00%** (0 marginal h) | 7150 → 7130 kWh (-0.28%) | 7121 kWh | 0/1449 | 75.2 → 75.2 (mean change 0.04) |
+| apollo12 | 50.14% → 50.14% | 32 h, share → 50.08% | 100.00% → **100.00%** (0 marginal h) | 7179 → 7160 kWh (-0.26%) | 7152 kWh | 0/1449 | 75.2 → 75.2 (mean change 0.03) |
+| apollo17 | 47.94% → 47.95% | 31 h, share → 47.89% | 100.00% → **100.00%** (0 marginal h) | 6864 → 6845 kWh (-0.28%) | 6837 kWh | 0/1449 | 74.3 → 74.2 (mean change 0.03) |
+| chandrayaan3 | 47.75% → 47.76% | 31 h, share → 47.70% | 100.00% → **100.00%** (0 marginal h) | 6837 → 6820 kWh (-0.24%) | 6813 kWh | 2/1449 | 72.1 → 72.1 (mean change 0.03) |
+| im1 | 39.54% → 39.52% | 31 h, share → 39.46% | 100.00% → **100.00%** (0 marginal h) | 5661 → 5645 kWh (-0.29%) | 5633 kWh | 3/1449 | 65.4 → 65.4 (mean change 0.04) |
+| im2 | 45.14% → 45.18% | 31 h, share → 45.13% | 81.31% → **74.16%** (6867 marginal h) | 6462 → 6449 kWh (-0.20%) | 6447 kWh | 30/1449 | 59.6 → 57.4 (mean change 2.15) |
+| sp_cabeus_b_peak | 68.53% → 68.60% | 31 h, share → 68.54% | 72.54% → **67.16%** (4152 marginal h) | 9811 → 9818 kWh (+0.06%) | 9819 kWh | 53/1449 | 66.9 → 65.4 (mean change 1.52) |
+| sp_haworth | 30.94% → 30.93% | 0 h, share → 30.93% | 31.55% → **25.80%** (3813 marginal h) | 4429 → 4436 kWh (+0.16%) | 4436 kWh | 31/1449 | 36.0 → 34.4 (mean change 1.61) |
+| sp_malapert | 45.78% → 45.88% | 30 h, share → 45.83% | 100.00% → **85.98%** (4917 marginal h) | 6554 → 6549 kWh (-0.08%) | 6556 kWh | 45/1449 | 66.6 → 62.4 (mean change 4.22) |
+| sp_nobile_rim2 | 47.19% → 47.17% | 31 h, share → 47.11% | 65.06% → **60.00%** (3712 marginal h) | 6757 → 6751 kWh (-0.08%) | 6740 kWh | 58/1449 | 54.7 → 53.2 (mean change 1.45) |
+
+Panel = sun-tracking, 1 m², 30%, summed over 2026–2029.
+
+**What changed, in short:**
+- **(a) Disc:** sunlight share moves by < 0.1 point anywhere. Partial-disc hours roughly balance: the disc is half visible exactly where the old centre rule switched.
+- **(b) Eclipses:** about 30 h per site over four years (0 at Haworth, where the Sun was already behind terrain during every eclipse), so the share falls by about 0.06 point.
+- **(c) Earth's whole disc** is the big one for the pole sites:
+  - Malapert Earth 100% → 86.0%; IM-2 81.3% → 74.2%; Cabeus B 72.5% → 67.2%; Haworth 31.6% → 25.8%; Nobile Rim 2 65.1% → 60.0%.
+  - Near-side sites: no change; Earth is high.
+- **(d) Sun distance:** panel energy changes by −0.3% at the near-side sites and stays within ±0.2% at the pole sites over four years. Any single week can be up to ±4%.
+- **Overall:** verdicts change on 0–3 landing dates at the near-side and mid-latitude sites and 30–58 at the pole sites. The mean score drops up to 4.2 points (Malapert), driven by (c).
+
+**Checks:**
+- `check_d19` PASS (new).
+- `check_visibility` (API 1.6.0; `lit` = disc rule, `comms` = whole-disc rule) PASS.
+- `check_metrics` PASS, with the power example updated: 1,392 W/m² average that week; 128 full-disc + 12 partial hours = 134.0 full-Sun hours → 55.9 kWh, 333 W, battery 2.8 kWh. Score example IM-2 76.6.
+- `check_ephem`, `check_scene`, `check_horizon` PASS.
+- DOM tests: eclipse shown in the horizon view (40% then 100%) and the side card; Researcher metrics list eclipse and marginal-Earth hours; earlier panel tests pass with the updated numbers.
+- `/web` build OK. README updated (limits, six check scripts, examples).
 

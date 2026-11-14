@@ -14,6 +14,8 @@ export interface State {
   sunMarginDeg: number; earthMarginDeg: number;
   sunEdge: boolean; earthEdge: boolean; edgeDeg: number;
   horizonModel: "lola" | "flat"; sampleUtc: string;
+  // v1.6 (D19)
+  sunFraction: number; sunSkylineFraction: number; eclipseFraction: number; earthMarginal: boolean; sunRadiusDeg: number; earthRadiusDeg: number; sunDistKm: number; earthDistKm: number; irradianceWm2: number;
 }
 export type Verdict = "clear" | "partial" | "out" | "edge";
 export interface Summary {
@@ -24,6 +26,8 @@ export interface Sample {
   utc: string; sunEl: number; sunAz: number; earthEl: number; earthAz: number;
   lit: boolean; comms: boolean; sunEdge: boolean; earthEdge: boolean;
   sunMarginDeg: number; earthMarginDeg: number; horizonModel: "lola" | "flat";
+  // v1.6 (D19)
+  sunFraction: number; sunSkylineFraction: number; eclipseFraction: number; earthMarginal: boolean; sunRadiusDeg: number; earthRadiusDeg: number; sunDistKm: number; earthDistKm: number; irradianceWm2: number;
 }
 export interface Timeline {
   siteId: string; stepHours: number; mock: boolean; terrain: string;
@@ -43,6 +47,7 @@ export interface VerdictRule { STAY_DAYS: number; CLEAR_PCT: number; OUT_PCT: nu
 export interface Metrics {
   hours: number; pctLit: number; longestDarkHours: number; darkPeriods: number;
   pctComms: number; longestContactGapHours: number; contactWindows: number; horizonModel: "lola" | "flat"; note: string; commsNote: string;
+  partialSunHours: number; eclipseHours: number; earthMarginalHours: number; litHours: number;
 }
 export interface Power {
   hours: number; panel: "tracking" | "fixed-flat"; areaM2: number; efficiency: number; loadW: number;

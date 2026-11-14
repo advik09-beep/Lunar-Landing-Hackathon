@@ -171,7 +171,10 @@ export const mountHorizonView: MountPanel = (container, props) => {
         </g>`;
     }
     const ro = body.querySelector("ul.readout");
-    if (ro) ro.innerHTML = `<li>${readout("Sun", s.sunEl, s.sunAz, s.sunMarginDeg, s.lit, d.horizon)}</li><li>${readout("Earth", s.earthEl, s.earthAz, s.earthMarginDeg, s.comms, d.horizon)}</li>`;
+    const sunExtra = s.eclipseFraction > 0 && s.sunSkylineFraction > 0 ? ` <em>Lunar eclipse: Earth's shadow covers ${Math.round(s.eclipseFraction * 100)}% of the Sun's disc.</em>`
+      : s.sunFraction > 0 && s.sunFraction < 1 ? ` <em>${Math.round(s.sunFraction * 100)}% of the Sun's disc is above the skyline.</em>` : "";
+    const earthExtra = s.earthMarginal ? ` <em>Marginal: Earth's disc is partly hidden by the skyline; it counts as in view only when the whole disc clears.</em>` : "";
+    if (ro) ro.innerHTML = `<li>${readout("Sun", s.sunEl, s.sunAz, s.sunMarginDeg, s.lit, d.horizon)}${sunExtra}</li><li>${readout("Earth", s.earthEl, s.earthAz, s.earthMarginDeg, s.comms, d.horizon)}${earthExtra}</li>`;
   }
 
   load();
@@ -198,6 +201,8 @@ function heightWords(m: number): string {
 function readout(name: string, el: number, azDeg: number, margin: number, visible: boolean, hz: Horizon): string {
   const where = `azimuth ${az(azDeg)}`;
   const hzEl = el - margin;
+  // D19: centre above the skyline but not counted (Earth: disc partly hidden; Sun: under half the disc visible, e.g. eclipse)
+  if (!visible && margin > 0) return `<strong>${name}: not counted as in view</strong> — its centre is ${deg(margin)} above the ${hz.model === "flat" ? "flat horizon" : "skyline"}, but ${name === "Earth" ? "part of its disc is still hidden" : "less than half of its disc is visible"}; ${where}.`;
   if (hz.model === "flat") {
     return visible
       ? `<strong>${name}: in view</strong> — ${deg(margin)} above the flat horizon (${where}).`

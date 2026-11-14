@@ -1,65 +1,35 @@
-// Builds data/daily.json from data/ephem/: for every site and every UTC date D whose
-// STAY_DAYS-day stay (D 00:00Z, hourly, STAY_DAYS*24 samples) is fully covered, the
-// stay's hour counts and verdict. lib/visibility.js turns counts into percentages, so
-// getDaily rows equal getSummary(site, D, STAY_DAYS) exactly.
+// Builds data/daily.json: for every site and every UTC date D whose STAY_DAYS-day stay (D 00:00Z, hourly)
+// is fully covered, the stay's integer counts. Since D19 the counts come straight from lib/visibility.js
+// (_stayCountsFor), so the daily summary and getSummary/getMetrics share one implementation.
 // Usage: node scripts/build_daily.mjs
-import { readFileSync, writeFileSync } from "node:fs";
+import { writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { VERDICT_RULE, verdictOf } from "../lib/verdict.js";
-import { CLEARANCE_FULL_DEG } from "../lib/score.js";
+import * as V from "../lib/visibility.js";
 
 const DATA = join(dirname(fileURLToPath(import.meta.url)), "..", "data");
 const H = 3600e3, D = 864e5;
-const N = VERDICT_RULE.STAY_DAYS * 24;
-const EDGE = VERDICT_RULE.EDGE_DEG;
-const index = JSON.parse(readFileSync(join(DATA, "ephem", "index.json"), "utf8"));
-
-const out = { ...VERDICT_RULE, horizonModels: Object.fromEntries(Object.keys(index.sites).map((id) => [id, index.horizons?.[id] ? "lola" : "flat"])), hoursPerStay: N,
-  columns: ["litH", "commsH", "bothH", "sunEdgeH", "earthEdgeH", "longestDarkH", "verdict", "darkPeriods", "contactWindows", "longestGapH", "sunClearPermille", "earthClearPermille"],
-  builtUtc: new Date().toISOString(), sites: {} };
-
-for (const [siteId, chunks] of Object.entries(index.sites)) {
-  // Terrain horizon if this site has one (step 7); otherwise flat (0 deg everywhere).
-  const hz = index.horizons?.[siteId] ? JSON.parse(readFileSync(join(DATA, "ephem", index.horizons[siteId]), "utf8")).elevationDeg : null;
-  const horizonAt = (az) => (hz ? hz[Math.round(az) % 360] : 0);
-  // Merge chunks into contiguous runs of samples.
-  const runs = [];
-  for (const c of chunks.slice().sort((a, b) => Date.parse(a.start) - Date.parse(b.start))) {
-    const d = JSON.parse(readFileSync(join(DATA, "ephem", c.file), "utf8"));
-    const start = Date.parse(d.start);
-    const last = runs.at(-1);
-    if (last && start === last.start + last.sunM.length * H) {
-      for (let i = 0; i < d.count; i++) { last.sunM.push(d.sunEl[i] - horizonAt(d.sunAz[i])); last.earthM.push(d.earthEl[i] - horizonAt(d.earthAz[i])); }
-    } else runs.push({ start, sunM: d.sunEl.map((e, i) => e - horizonAt(d.sunAz[i])), earthM: d.earthEl.map((e, i) => e - horizonAt(d.earthAz[i])) });
-  }
-  out.sites[siteId] = [];
-  for (const r of runs) {
-    const firstDay = Math.ceil(r.start / D) * D;
+const N = V.VERDICT_RULE.STAY_DAYS * 24;
+const COLS = ["litMilliH", "litH", "commsH", "bothH", "sunEdgeH", "earthEdgeH", "longestDarkH", "darkPeriods", "contactWindows", "longestGapH",
+  "sunClrPm", "earthClrPm", "partialSunH", "eclipseH", "earthMarginalH"];
+const sites = V.listSites();
+for (const s of sites) await V.loadSite(s.id);
+const cov = V.getCoverage();
+const out = { ...V.VERDICT_RULE, apiVersion: V.API_VERSION, hoursPerStay: N, columns: COLS,
+  horizonModels: Object.fromEntries(cov.sites.map((c) => [c.siteId, c.terrain])), builtUtc: new Date().toISOString(), sites: {} };
+let total = 0;
+for (const s of sites) {
+  out.sites[s.id] = [];
+  for (const [a, b] of cov.sites.find((c) => c.siteId === s.id).ranges) {
+    const first = Math.ceil(Date.parse(a) / D) * D, last = Date.parse(b);
     const rows = [];
-    for (let day = firstDay; (day - r.start) / H + N <= r.sunM.length; day += D) {
-      const i0 = (day - r.start) / H;
-      let lit = 0, comms = 0, both = 0, se = 0, ee = 0, dark = 0, longest = 0;
-      let darkPeriods = 0, contactWindows = 0, gap = 0, longestGap = 0, prevL = null, prevC = null; // D16
-      let sunClr = 0, earthClr = 0; // D17 amendment: clearance while visible
-      for (let i = i0; i < i0 + N; i++) {
-        const s = r.sunM[i], e = r.earthM[i]; // margins above the horizon in use
-        const L = s > 0, C = e > 0;
-        if (L) lit++; if (C) comms++; if (L && C) both++;
-        if (Math.abs(s) <= EDGE) se++; if (Math.abs(e) <= EDGE) ee++;
-        dark = L ? 0 : dark + 1; longest = Math.max(longest, dark);
-        gap = C ? 0 : gap + 1; longestGap = Math.max(longestGap, gap);
-        if (L) sunClr += Math.min(s, CLEARANCE_FULL_DEG) / CLEARANCE_FULL_DEG; if (C) earthClr += Math.min(e, CLEARANCE_FULL_DEG) / CLEARANCE_FULL_DEG;
-        if (!L && prevL !== false) darkPeriods++; if (C && prevC !== true) contactWindows++; prevL = L; prevC = C;
-      }
-      const pct = (k) => (100 * k) / N;
-      rows.push([lit, comms, both, se, ee, longest,
-        verdictOf({ pctBoth: pct(both), pctSunEdge: pct(se), pctEarthEdge: pct(ee) }), darkPeriods, contactWindows, longestGap,
-        lit ? Math.round((1000 * sunClr) / lit) : 0, comms ? Math.round((1000 * earthClr) / comms) : 0]);
+    for (let day = first; day + (N - 1) * H <= last; day += D) {
+      const c = V._stayCountsFor(s.id, day);
+      rows.push(COLS.map((k) => c[k]));
     }
-    if (rows.length) out.sites[siteId].push({ firstDate: new Date(firstDay).toISOString().slice(0, 10), rows });
+    if (rows.length) out.sites[s.id].push({ firstDate: new Date(first).toISOString().slice(0, 10), rows });
+    total += rows.length;
   }
 }
 writeFileSync(join(DATA, "daily.json"), JSON.stringify(out));
-const total = Object.values(out.sites).flat().reduce((n, s) => n + s.rows.length, 0);
-console.log(`daily.json: ${total} rows for ${Object.keys(out.sites).length} sites`);
+console.log(`daily.json: ${total} rows for ${sites.length} sites`);

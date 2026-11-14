@@ -14,7 +14,8 @@ function recount(siteId, start, days = 7) {
   const s = V.getTimeline(siteId, start, days).samples;
   const runs = (flag) => { let n = 0, longest = 0, cur = 0, prev = null; for (const x of s) { const v = flag(x); if (v && prev !== true) n++; cur = v ? cur + 1 : 0; longest = Math.max(longest, cur); prev = v; } return { n, longest }; };
   const dark = runs((x) => !x.lit), contact = runs((x) => x.comms), gap = runs((x) => !x.comms);
-  return { hours: s.length, pctLit: (100 * s.filter((x) => x.lit).length) / s.length, pctComms: (100 * s.filter((x) => x.comms).length) / s.length,
+  // D19: sunlight share = mean visible fraction of the Sun's disc (rounded to milli-hours like lib/daily)
+  return { hours: s.length, pctLit: (100 * Math.round(1000 * s.reduce((a, x) => a + x.sunFraction, 0))) / 1000 / s.length, pctComms: (100 * s.filter((x) => x.comms).length) / s.length,
     longestDarkHours: dark.longest, darkPeriods: dark.n, longestContactGapHours: gap.longest, contactWindows: contact.n };
 }
 
@@ -45,27 +46,30 @@ ok(m2 === 0 && rows === 14694, `all ${rows} daily rows: D16 fields and clearance
 console.log("\nWorked power example: IM-2, 7-day stay from 2026-11-14 00:00 UTC, sun-tracking panel 1 m², 30% efficient, lander draws 100 W");
 const ex = { siteId: "im2", startUtc: "2026-11-14T00:00:00Z", areaM2: 1, efficiency: 0.30, panel: "tracking", loadW: 100 };
 const p = V.computePower(ex);
+await V.loadScene();
 const tl = V.getTimeline("im2", ex.startUtc, 7).samples;
-const litHours = tl.filter((x) => x.lit).length;
-const longestDark = recount("im2", ex.startUtc).longestDarkHours;
-const peak = 1361.0 * 1 * 0.30;            // W with the panel facing the Sun
-const energy = litHours * peak;              // Wh: one hour per visible-Sun hour
-const avg = energy / 168, need = 100 * 168, battery = 100 * longestDark;
-console.log(`  1. Panel facing the Sun: 1361 W/m² × 1 m² × 0.30 = ${peak.toFixed(1)} W`);
-console.log(`  2. The Sun is above the terrain horizon for ${litHours} of the 168 hours`);
-console.log(`  3. Energy = ${litHours} h × ${peak.toFixed(1)} W = ${energy.toFixed(1)} Wh (${(energy / 1000).toFixed(1)} kWh)`);
-console.log(`  4. Average power = ${energy.toFixed(1)} Wh ÷ 168 h = ${avg.toFixed(1)} W`);
-console.log(`  5. The lander needs 100 W × 168 h = ${need} Wh; balance = ${(energy - need).toFixed(1)} Wh`);
-console.log(`  6. Longest dark stretch = ${longestDark} h, so the battery must hold 100 W × ${longestDark} h = ${battery} Wh`);
-ok(near(p.peakW, peak) && p.irradianceWm2 === 1361.0, `peak power ${p.peakW.toFixed(1)} W = 1361 × 1 × 0.30`);
-ok(p.poweredHours === litHours && near(p.energyWh, energy) && near(p.averageW, avg), `energy ${p.energyWh.toFixed(1)} Wh and average ${p.averageW.toFixed(1)} W match the hand calculation`);
-ok(p.loadEnergyWh === need && near(p.balanceWh, energy - need) && p.batteryWh === battery && p.longestNoPowerHours === longestDark, `battery ${p.batteryWh} Wh = 100 W × ${longestDark} h`);
-ok(p.estimate === true && p.assumptions.length >= 6 && p.assumptions.some((a) => /moonfact/.test(a)), "labeled an estimate; every assumption listed, solar irradiance source cited");
+// Independent irradiance from the Horizons Sun distance (scene data) and NASA's 1361 W/m² at 149.598 million km.
+const irr = tl.map((x) => 1361.0 * (149.598e6 / V.getSceneState(x.utc).sun.distKm) ** 2);
+const meanIrr = irr.reduce((a, b) => a + b, 0) / tl.length;
+const fullH = tl.filter((x) => x.sunFraction === 1).length, partial = tl.filter((x) => x.sunFraction > 0 && x.sunFraction < 1);
+const sunHours = tl.reduce((a, x) => a + x.sunFraction, 0);
+const energy = tl.reduce((a, x, i) => a + irr[i] * 1 * 0.30 * x.sunFraction, 0);
+let run = 0, noPow = 0; for (const x of tl) { run = x.sunFraction > 0 ? 0 : run + 1; noPow = Math.max(noPow, run); }
+const avg = energy / 168, need = 100 * 168, battery = 100 * noPow;
+console.log(`  1. Sunlight strength this week: 1361 W/m² × (149.598 million km ÷ Sun distance)² ≈ ${meanIrr.toFixed(1)} W/m² on average (Sun ${(V.getSceneState(tl[0].utc).sun.distKm / 1e6).toFixed(2)} million km away)`);
+console.log(`  2. Visible Sun: full disc for ${fullH} hours, part of the disc for ${partial.length} hours → ${sunHours.toFixed(2)} "full-Sun hours" out of 168`);
+console.log(`  3. Energy = Σ (sunlight strength × 1 m² × 0.30 × visible share of the disc) = ${energy.toFixed(1)} Wh (${(energy / 1000).toFixed(1)} kWh); roughly ${meanIrr.toFixed(0)} × 0.30 × ${sunHours.toFixed(1)} h`);
+console.log(`  4. Average power = ${energy.toFixed(1)} Wh ÷ 168 h = ${avg.toFixed(1)} W; the lander needs 100 W × 168 h = ${need} Wh`);
+console.log(`  5. Longest stretch with no sunlight at all = ${noPow} h, so the battery must hold 100 W × ${noPow} h = ${battery} Wh`);
+ok(p.irradianceWm2 === 1361.0 && near(p.meanIrradianceWm2, meanIrr, 1e-9), `mean sunlight strength ${p.meanIrradianceWm2.toFixed(2)} W/m² from the actual Sun distance`);
+ok(near(p.energyWh, energy, 1e-9) && near(p.averageW, avg, 1e-9), `energy ${p.energyWh.toFixed(1)} Wh and average ${p.averageW.toFixed(1)} W match the hand calculation`);
+ok(p.loadEnergyWh === need && p.batteryWh === battery && p.longestNoPowerHours === noPow, `battery ${p.batteryWh} Wh = 100 W × ${noPow} h`);
+ok(p.estimate === true && p.assumptions.length >= 6 && p.assumptions.some((a) => /149\.598/.test(a)) && p.assumptions.some((a) => /disc/.test(a)), "labeled an estimate; assumptions list the Sun-distance scaling and the disc rule");
 
-// Fixed flat panel: output scales with sin(Sun elevation) during visible-Sun hours.
+// Fixed flat panel: output also scales with sin(Sun elevation).
 const pf = V.computePower({ ...ex, panel: "fixed-flat" });
-const flatEnergy = tl.reduce((s, x) => s + (x.lit ? peak * Math.max(0, Math.sin((x.sunEl * Math.PI) / 180)) : 0), 0);
-ok(near(pf.energyWh, flatEnergy) && pf.energyWh < p.energyWh, `fixed flat panel: ${pf.energyWh.toFixed(1)} Wh = Σ peak × sin(elevation) (less than tracking)`);
+const flatEnergy = tl.reduce((a, x, i) => a + irr[i] * 0.30 * x.sunFraction * Math.max(0, Math.sin((x.sunEl * Math.PI) / 180)), 0);
+ok(near(pf.energyWh, flatEnergy, 1e-9) && pf.energyWh < p.energyWh, `fixed flat panel: ${pf.energyWh.toFixed(1)} Wh = Σ irradiance × 0.30 × visible share × sin(elevation) (less than tracking)`);
 const bad = (o, re, m) => { try { V.computePower({ ...ex, ...o }); ok(false, m); } catch (e) { ok(re.test(e.message), m); } };
 bad({ areaM2: 0 }, /areaM2/, "rejects zero area"); bad({ efficiency: 1.5 }, /efficiency/, "rejects efficiency > 100%");
 bad({ panel: "tilted" }, /panel/, "rejects unknown panel type"); bad({ loadW: -1 }, /loadW/, "rejects negative load");
