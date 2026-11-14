@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | 12 D14 — IN PROGRESS | D13 clock + v1.2 passes desktop/build checks (5 site verdict labels changed after date shift; hourly Horizons scene updated). Starting overview + starfield; D15 next. |
+| Advik + ChatGPT (Lane B) | 13 D15 — IN PROGRESS | D14 overview, motion-aware outside-only starfield, 4K NASA map deployed and tested. Now plain-language verdict legend and distinguishable pole sites; stop afterward. |
 | Sheldon (Lane A human) | — | Planning stop 2026-11-14: D12-D18 signed; acceptance run done |
 | Claude Code (Lane A) | 10 (D12 terrain) | Stage 2 DONE (IM-2, IM-1, Chandrayaan-3); stopped for Sheldon's go on stage 3 (Apollo sites) |
 
@@ -406,6 +406,12 @@ Second task, only after the copy passes and with Advik's authorization: Step 4 T
 ### 2026-11-14 — Lane B D13 implemented, deployed; D14 started
 - D13 commits `def53c8` (remove white globe marker halo overlay; enlarge opaque verdict-colored marker), `b411801` (single date range slider, date input, step controls and 0–167 hour slider above all four tabs; push `{siteId, landingDate, hour}` to all panels via v1.2, handle horizon `onHourSelected` and use same hour in `getSceneState`), `31ae816` (minimal shared-clock styling). No files in Lane A `web/src/panels/` edited.
 - `npm ci`, `npm run typecheck`, `npm run build` PASS. Vercel deployment `31ae816` READY. Chromium 1440×900: global clock visible in Compare and Credits; date-slider moved to 2026-12-22 and **5 of 10** site-list verdicts changed; hour=6 produced lighting sample 2026-12-22T06:00Z; no browser exceptions. Panel internal Shadow DOM hour verification remains to be checked; no human Step 4 signoff claimed. D13 functional implementation complete, next D14 per user order.
+
+### 2026-11-14 — Lane B D14 implementation complete, begins D15
+- **D14 overview**: `web/src/overview.ts` (`0bdf553`) implements a separate illustrative Three.js Sun/Earth/Moon scene without markers or verdicts; Moon click or accessible Explore button opens the Moon-fixed explorer without changing shared date/hour. `web/src/main.ts` and `web/src/style.css` mounts this as the default overview tab (`342ff09`, `a834dad`). Visual sizes/distances/motions are explicitly *not to scale*.
+- **Outside-only starfield**: `web/src/starfield.ts` (`42b065f`) is an original current-code implementation inspired by `etrepat/starfield` (Estanislau Trepat, MIT license), with exact repository link and license credited in the Credits tab; no legacy Three.js API or source code copied. Star canvas is a separate body background, not inside either 3D window; reduced motion freezes movement. Production Chromium confirmed starfield pixel data changes normally but remains byte-identical in reduced-motion mode, overview displayed, Explore navigation worked, no page errors.
+- **Detailed NASA Moon**: temporary GitHub Action converted NASA's 2025 CGI Moon Kit official 4096×2048 sRGB TIFF once to a 4096×2048 JPEG tracked at `web/public/moon/lroc_color_4k.jpg` (1,909,434 bytes, SHA-256 `9d183969aa29267a41a6ec3ffddfd53a17b0a90c0dfc2d28b6b9e0a2de0e6d11`; image commit `fd1c486`), then removed the one-time workflow (`a660e70`). Main explorer uses the 4K color texture (`7785282`), overview retains the 2K to save memory, NASA attribution updated (`d4db537`). No NASA fetch at deploy. `npm ci`, typecheck and build PASS. Production Chromium confirmed 2K and 4K image URLs HTTP 200, Explore view works, no page errors. D14 implemented; human visual acceptance pending.
+- **Next:** D15 prominent always-visible verdict descriptions and four polar-site callouts + explicit site picker. No other features started.
 
 
 ## Lane A
