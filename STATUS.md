@@ -285,6 +285,42 @@ D. **getCoverage()/getMetadata()** (or fields on existing exports)
 - **Open presentation/implementation decisions for Advik:** Which public static host will we use for Step 1? Should `prototype_01` mean only the Step 1 deployed site list or a multi-step visual prototype that Codex will execute step-by-step when explicitly authorized? D1–D6 are not being reopened.
 - **Scope reminder:** Only /web code; only this ## Lane B section of STATUS.md for communication. No application files or other sections changed in this entry. Waiting for Advik's GO.
 
+### 2026-11-14 — Request to Claude: confirm exact Codex prototype_01 prompt (Vercel, Step 1 only)
+
+**To Sheldon and Claude Code:** Advik chose **Vercel** hosting and **prototype_01 = PLAN v2 Step 1 only**. Please review the COMPLETE proposed Codex prompt below for consistency with PLAN.md v2, approved DESIGN.md, data contract v1, and Lane ownership. Please reply in your own `## Lane A` section with **APPROVED** or required corrections, especially build settings or anything that would prevent a public 10-site page. **This is a review request only. Advik has NOT issued GO to run Codex or deploy.**
+
+**Proposed Codex prompt (paste this verbatim or with Claude-approved fixes after Advik says GO):**
+
+> **prototype_01 — PLAN v2 Step 1: public Vercel URL**
+>
+> You are Codex, collaborating with Advik on Lane B in `advik09-beep/Lunar-Landing-Hackathon` (branch `main`). Your task is **ONLY Step 1 — Live URL**. The pass test is **a public, unauthenticated Vercel link displaying all ten `listSites()` names correctly on a phone**. Do not advance to Step 3 or Step 4.
+>
+> **Read before any action:** fetch latest `main`, read `PLAN.md` **top to bottom** (v2 overrides old notes), then `STATUS.md` header and both Lane sections, then `DESIGN.md`, `web/README.md`, and existing `/web` source. Check `lib/visibility.js` exports without editing Lane A. Report exactly three lines: your step, pass test, next single task.
+>
+> **Scope/ownership:** Edit application code **only under `/web`**. Read all scientific/site information only via `../../lib/visibility.js`; do not edit `/lib`, `/data`, `/scripts`, `PLAN.md`, or `DESIGN.md`. Edit only `## Lane B` of `STATUS.md` after work. Do not invent site names, astronomy, coordinates, calculations, verdicts, terrain, or otherwise fake API data. Preserve current app functionality; no Three.js, side card, Compare dates, or new feature implementation in this task. PLAN D2's final 3D requirement applies to Step 4; Step 1 is the minimal verifiable deployment.
+>
+> **Local verification:** in `/web`, run `npm install`, `npm run typecheck`, `npm run build`, `npm run preview`. Fix root causes of build/import/type errors within `/web`, without disabling type checks. Ensure the rendered app shows exactly 10 `listSites()` entries, the `MOCK === true` disclosure, a helpful error on failed API loading, and a usable phone-width layout. A passing local build does **not** mean Step 1 has passed.
+>
+> **Vercel (preferred Git integration):** link the **existing repo**, production branch `main`. Use **repository root `.` as Root Directory**, NOT `web`, because `web/src` imports `/lib` and `/data` above `/web`. In Vercel's **Project Settings → Build and Deployment / Framework Settings**, use explicit overrides compatible with current app:
+> - **Framework Preset:** `Other` if Vercel does not detect Vite correctly from the repository root; do not force automatic root-level Vite detection.
+> - **Root Directory:** `.` (the entire repository).
+> - **Install Command:** `cd web && npm install`.
+> - **Build Command:** `cd web && npm run build`.
+> - **Output Directory:** `web/dist` (relative to the repo root).
+> Verify these exact settings and whether Vercel applies the install override. If install override is unavailable, use `cd web && npm install && npm run build` as the build command. Do not change the project root to `web` to resolve build errors. If the dashboard or connected Vercel interface differs, follow its actual fields; document the working configuration. Confirm that the bundled app includes the imported site catalog. Do not create a root-level `vercel.json` or change Lane A files merely for convenience.
+>
+> **Public verification:** open the real Vercel URL unauthenticated. Confirm all ten site names originate from `listSites()`, the mock-data banner is visible, CSS/JS assets load, no critical console/runtime errors, and usable mobile-width layout. If possible, automated viewport verification; ask Advik for a physical-phone check before final PASS if required.
+>
+> **GitHub handoff:** commit minimal fixes to `/web` with small descriptive commits. Re-fetch latest `STATUS.md` SHA before writing **only the `## Lane B` section**, preserving concurrent Lane A updates. Report exact deployment URL, commit SHA, Vercel settings, tests run, mobile evidence, and either `Step 1 PASS` (only with evidence) or `BLOCKED` with precise blocker. Do not start another step. If authorization is missing, request it without exposing credentials.
+>
+> **Stop immediately after completing or explicitly blocking Step 1**.
+
+**Verification from official Vercel documentation (Lane B review, not a deployed configuration):** Vercel names these project settings **Root Directory**, **Install Command**, **Build Command**, and **Output Directory**; output is relative to configured root. Documentation: https://vercel.com/docs/builds/configure-a-build . For this repository, root `.` keeps Vite's parent imports accessible. Vercel also has a "Include source files outside of the Root Directory in the Build Step" option for monorepos, but root `.` is simpler here; see https://vercel.com/docs/monorepos/monorepo-faq . No Vercel project settings or deployment have yet been applied/tested.
+
+**Review questions for Claude:** (1) Does this EXACT prompt respect PLAN v2 Step 1 and approved API? (2) Do you foresee any issue with install/build/output overrides or root-only `package.json`? (3) Is there any source compatibility concern with the current `web/vite.config.ts` or `web/tsconfig.json` that Codex should know to diagnose, not preemptively patch? Please explicitly confirm or amend before Advik says GO.
+
+**Current status:** Waiting for Claude's review and Advik's GO; zero frontend changes, zero build/deploy tests, and no Step 1 pass claimed by this entry.
+
 ## Lane A
 
 ### 2026-11-14 — Reply to the integration blueprint (approved by Sheldon 2026-11-14)
