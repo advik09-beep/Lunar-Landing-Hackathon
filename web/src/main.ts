@@ -54,7 +54,7 @@ app.innerHTML = [
   '<main class="app-shell">',
   '  <header class="topbar">',
   '    <div class="brand"><span class="brand-kicker">NASA SPACE APPS 2026</span><strong>Lunar Landing Site Navigator</strong></div>',
-  '    <nav class="primary-nav" aria-label="Application views"><button id="nav-overview" type="button" class="nav-active" aria-pressed="true">Overview</button><button id="nav-explore" type="button" aria-pressed="false">Explore in 3D</button><button id="nav-compare" type="button" aria-pressed="false">Compare dates</button><button id="nav-horizon" type="button" aria-pressed="false">Stand here</button><button id="nav-researcher" type="button" aria-pressed="false">Researcher</button><button id="nav-credits" type="button" aria-pressed="false">Credits</button></nav>',
+  '    <nav class="primary-nav" aria-label="Application views"><button id="nav-overview" type="button" class="nav-active" aria-pressed="true">Overview</button><button id="nav-tour" type="button">Solar system tour</button><button id="nav-explore" type="button" aria-pressed="false">Explore in 3D</button><button id="nav-compare" type="button" aria-pressed="false">Compare dates</button><button id="nav-horizon" type="button" aria-pressed="false">Stand here</button><button id="nav-researcher" type="button" aria-pressed="false">Researcher</button><button id="nav-credits" type="button" aria-pressed="false">Credits</button></nav>',
   '    <span class="real-data-chip">JPL Horizons · real data</span>',
   '  </header>',
   '  <section class="intro-block">',
@@ -86,7 +86,8 @@ app.innerHTML = [
   '    <div class="overview-window">',
   '      <div class="overview-caption"><strong id="overview-source">THE SUN · EARTH · MOON</strong><span id="overview-note">Illustrative sizes, positions and motion — not to scale; not ephemeris geometry</span></div>',
   '      <p id="overview-mission-message" class="overview-mission-message">Of everything in the solar system, the Sun determines the sunlight available for a lunar lander\'s potential power, while Earth determines when a direct radio link is geometrically possible. Other planets: their gravity is already in our numbers. JPL planetary ephemerides include their gravitational effects; their light is negligible compared with sunlight. Radio from other planets is not modeled.</p>',
-  '      <div id="overview-stage" class="overview-stage" aria-label="Solar system overview visualization"></div>',
+  '      <div id="overview-stage" class="overview-stage" aria-label="Solar system overview visualization"></div>
+  '      <div id="overview-title-card" class="overview-title-card"><h2>Our Moon in the solar system</h2><p>Only the Sun and Earth determine the sunlight and direct Earth visibility we evaluate for a lunar lander. Other planets’ gravity is already included in NASA’s ephemerides.</p><div><button id="start-tour" type="button">Start tour</button><button id="skip-moon" type="button">Skip to the Moon</button></div></div>',',
   '      <div class="overview-footer"><p id="overview-disclaimer">Choose the Moon to explore real landing sites and verified Sun/Earth visibility at your selected UTC date and hour.</p><button id="enter-explore" type="button">Explore the Moon and landing sites</button></div>',
   '    </div>',
   '  </section>',
@@ -210,6 +211,16 @@ let researcherView: PanelHandle | null = null;
 type View = 'overview' | 'explore' | 'compare' | 'horizon' | 'researcher' | 'credits';
 let activeView: View = 'overview';
 
+function showTourTitle(): void {
+  openView('overview');
+  find<HTMLElement>('overview-title-card').hidden = false;
+}
+function startSolarTour(): void {
+  find<HTMLElement>('overview-title-card').hidden = true;
+  openView('overview');
+  const frame = find<HTMLIFrameElement>('overview-stage').querySelector('iframe');
+  frame?.contentWindow?.postMessage({ type: 'lunar-navigator:start-tour' }, new URL(frame.src).origin);
+}
 function openView(view: View): void {
   activeView = view;
   for (const name of ['overview', 'explore', 'compare', 'horizon', 'researcher', 'credits'] as View[]) {
@@ -404,6 +415,9 @@ if (embedUrl) {
   }
 }
 find<HTMLButtonElement>('enter-explore').addEventListener('click', () => openView('explore'));
+find<HTMLButtonElement>('start-tour').addEventListener('click', startSolarTour);
+find<HTMLButtonElement>('skip-moon').addEventListener('click', () => openView('explore'));
+find<HTMLButtonElement>('nav-tour').addEventListener('click', showTourTitle);
 
 try {
   moon = new LunarScene(find<HTMLDivElement>('moon-stage'), sites, chooseSite);
