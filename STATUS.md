@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | 11, 12, 13 (D13, D14, D15) | Next: date + hour slider above every tab (D13), overview scene + stars + detailed Moon (D14), legend + pole sites (D15), then mounts. Fix step 4 (markers recolor on date change; pole sites distinguishable). |
+| Advik + ChatGPT (Lane B) | 11 D13 — IN PROGRESS | GO: shared date + hour controls above every tab, panel v1.2 and marker recolor repair; then D14, D15 in order. |
 | Sheldon (Lane A human) | — | Planning stop 2026-11-14: D12-D18 signed; acceptance run done |
 | Claude Code (Lane A) | 10 (D12 terrain) | Stage 1 DONE (all four pole candidates on LOLA terrain); stopped for Sheldon's go on stage 2 (IM-2, IM-1, Chandrayaan-3) |
 
