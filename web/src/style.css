@@ -239,3 +239,15 @@ body[data-view="overview"] .overview-stage, body[data-view="overview"] .overview
 .overview-title-card .overview-audio-note { font-size:.75rem; background:none; padding:0; }
 body[data-view="overview"] .tour-science-caption { position:absolute; bottom:42px; left:24px; width:min(360px,32%); max-height:42%; font-size:.84rem; }
 body[data-view="overview"] .overview-clock-status { position:absolute; bottom:0; left:0; right:0; margin:0; font-size:.75rem; background:rgba(9,19,34,.8); }
+
+/* D30.2: four destinations; the reading level is shared by every panel. */
+.topbar { display:flex; align-items:center; justify-content:space-between; gap:24px; min-height:72px; padding:12px 0; }
+.brand { min-width:90px; }
+.brand-kicker,.brand-subtitle { display:none; }
+.brand strong { font-size:1.1rem; font-weight:500; letter-spacing:-.04em; }
+.primary-nav { flex-wrap:nowrap; gap:8px; background:none; border:0; padding:0; }
+.header-tools { display:flex; align-items:center; gap:16px; }
+.reading-level { display:flex; border:1px solid #344B69; border-radius:99px; padding:3px; }
+.reading-level button { border:0; border-radius:99px; padding:6px 10px; font-size:.75rem; background:transparent; color:#A8BBD3; }
+.reading-level button[aria-pressed="true"] { background:#2F5D9A; color:#ECF2FF; }
+.methods-link { padding:4px 0; border:0; background:none; color:#A8BBD3; font-size:.75rem; white-space:nowrap; text-decoration:underline; text-underline-offset:4px; }

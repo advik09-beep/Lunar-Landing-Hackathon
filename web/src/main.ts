@@ -37,6 +37,7 @@ if (!Array.isArray(sites) || sites.length !== 10 || sites.some(s => !s || typeof
 const dateOrigin = '2026-11-14';
 let selectedDate = dateOrigin;
 let selectedSite = sites[0].id;
+let readingLevel: 'educator' | 'researcher' = 'educator';
 let selectedHour = 0; // 0–167, hourly samples within the seven-day landing stay
 let daily: DailyResult | null = null;
 let moon: LunarScene | null = null;
@@ -63,8 +64,8 @@ app.innerHTML = [
   '<main class="app-shell">',
   '  <header class="topbar">',
   '    <div class="brand"><span class="brand-kicker">NASA SPACE APPS 2026</span><strong>LunLux</strong><span class="brand-subtitle">Sunlight and Earth contact for lunar landing sites</span></div>',
-  '    <nav class="primary-nav" aria-label="LunLux application navigation"><button id="nav-overview" type="button" class="nav-active" aria-pressed="true">LunLux overview</button><button id="nav-tour" type="button">Solar system tour</button><button id="nav-explore" type="button" aria-pressed="false">Explore in 3D</button><button id="nav-compare" type="button" aria-pressed="false">Compare dates</button><button id="nav-horizon" type="button" aria-pressed="false">Stand here</button><button id="nav-researcher" type="button" aria-pressed="false">Researcher</button><button id="nav-planner" type="button" aria-pressed="false">Planner</button><button id="nav-credits" type="button" aria-pressed="false">Credits</button></nav>',
-  '    <span class="real-data-chip">JPL Horizons · real data</span>',
+  '    <nav class="primary-nav" aria-label="Main navigation"><button id="nav-overview" type="button" class="nav-active" aria-pressed="true">Tour</button><button id="nav-explore" type="button" aria-pressed="false">Explore</button><button id="nav-compare" type="button" aria-pressed="false">Compare</button><button id="nav-researcher" type="button" aria-pressed="false">Report</button></nav>',
+  '    <div class="header-tools"><div class="reading-level" role="group" aria-label="Reading level"><button id="level-educator" aria-pressed="true" type="button">Educator</button><button id="level-researcher" aria-pressed="false" type="button">Researcher</button></div><button id="nav-credits" class="methods-link" type="button" aria-pressed="false">Data and methods</button></div>',
   '  </header>',
   '  <section class="intro-block">',
   '    <p class="eyebrow">THE MOON, FROM A NEW PERSPECTIVE</p>',
@@ -247,21 +248,21 @@ function openView(view: View): void {
   find<HTMLElement>('verdict-legend').hidden = view === 'overview';
   for (const name of ['overview', 'explore', 'compare', 'horizon', 'researcher', 'planner', 'credits'] as View[]) {
     find<HTMLElement>(name + '-view').hidden = name !== view;
-    const button = find<HTMLButtonElement>('nav-' + name);
-    button.classList.toggle('nav-active', name === view);
-    button.setAttribute('aria-pressed', String(name === view));
+    const button = document.getElementById('nav-' + name);
+    button?.classList.toggle('nav-active', name === view);
+    button?.setAttribute('aria-pressed', String(name === view));
   }
   overview?.setVisible(view === 'overview');
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
 function updateAllPanels(): void {
-  const next = { siteId: selectedSite, landingDate: selectedDate, hour: selectedHour };
+  const next = { siteId: selectedSite, landingDate: selectedDate, hour: selectedHour, level: readingLevel };
   sideCard?.update(next);
   compareGrid?.update(next);
   horizonView?.update(next);
   researcherView?.update(next);
-  plannerView?.update({siteId: selectedSite, landingDate: selectedDate});
+  plannerView?.update({siteId: selectedSite, landingDate: selectedDate, level: readingLevel});
 }
 
 
@@ -490,7 +491,7 @@ if (embedUrl) {
 find<HTMLButtonElement>('enter-explore').addEventListener('click', () => openView('explore'));
 find<HTMLButtonElement>('start-tour').addEventListener('click', startSolarTour);
 find<HTMLButtonElement>('skip-moon').addEventListener('click', () => openView('explore'));
-find<HTMLButtonElement>('nav-tour').addEventListener('click', showTourTitle);
+find<HTMLButtonElement>('nav-overview').addEventListener('click', showTourTitle);
 
 try {
   moon = new LunarScene(find<HTMLDivElement>('moon-stage'), sites, chooseSite);
@@ -505,6 +506,7 @@ const panelProps = {
   siteId: selectedSite,
   landingDate: selectedDate,
   hour: selectedHour,
+  level: readingLevel,
   onHourSelected: setHour,
   onSiteSelected: chooseSite,
   onDateSelected: setLandingDate,
@@ -516,7 +518,14 @@ horizonView = mountHorizonView(find<HTMLDivElement>('horizon-mount'), panelProps
 researcherView = mountResearcher(find<HTMLDivElement>('researcher-mount'), panelProps);
 plannerView = mountPlanner(find<HTMLDivElement>('planner-mount'), panelProps);
 for (const name of ['overview', 'explore', 'compare', 'horizon', 'researcher', 'planner', 'credits'] as View[]) {
-  find<HTMLButtonElement>('nav-' + name).addEventListener('click', () => openView(name));
+  if (name !== 'overview') document.getElementById('nav-' + name)?.addEventListener('click', () => openView(name));
+}
+for (const level of ['educator','researcher'] as const) {
+  find<HTMLButtonElement>('level-' + level).addEventListener('click', () => {
+    readingLevel = level;
+    for (const name of ['educator','researcher']) find<HTMLElement>('level-' + name).setAttribute('aria-pressed', String(name === level));
+    updateAllPanels();
+  });
 }
 updateButtons();
 openView('overview');

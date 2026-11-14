@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D30 structure 1 — built; checking deployment | Merged Tour home; simulator backdrop and title card; no timeline or legend on home. |
+| Advik + ChatGPT (Lane B) | D30 structure 2 — built; checking deployment | Four main tabs and Data and methods link; shared Educator/Researcher switch via panel v1.3. Structure 1 Vercel READY. |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | D30 Lane A part done | Panels follow the D30 theme, short names, Historic tag, interface v1.3 (shared reading level); stopped |
 
@@ -500,6 +500,11 @@ Second task, only after the copy passes and with Advik's authorization: Step 4 T
 
 ### 2026-11-14 — D30 presentation pass, structure 1
 - Merged Tour home; simulator backdrop and title card; no timeline or legend on home.
+- Files: web/src/main.ts, web/src/style.css. TypeScript and Vite/postbuild executed: PASS. Production deployment verification follows this commit. Scientific APIs and Lane A panels unchanged.
+
+
+### 2026-11-14 — D30 presentation pass, structure 2
+- Four main tabs and Data and methods link; shared Educator/Researcher switch via panel v1.3. Structure 1 Vercel READY.
 - Files: web/src/main.ts, web/src/style.css. TypeScript and Vite/postbuild executed: PASS. Production deployment verification follows this commit. Scientific APIs and Lane A panels unchanged.
 
 ## Lane A
