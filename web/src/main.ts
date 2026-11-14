@@ -1,7 +1,7 @@
 import './style.css';
 import { listSites, loadDaily, getDaily, MOCK, API_VERSION, VERDICT_RULE } from '../../lib/visibility.js';
 import { LunarScene, type MoonSite, type Verdict } from './moon';
-import { mountSideCard, type PanelHandle } from './panels';
+import { mountSideCard, mountCompareGrid, mountHorizonView, type PanelHandle } from './panels';
 
 interface Site extends MoonSite {
   kind?: string;
@@ -49,7 +49,7 @@ app.innerHTML = [
   '<main class="app-shell">',
   '  <header class="topbar">',
   '    <div class="brand"><span class="brand-kicker">NASA SPACE APPS 2026</span><strong>Lunar Landing Site Navigator</strong></div>',
-  '    <nav class="primary-nav" aria-label="Application views"><span class="nav-active">Explore in 3D</span><span class="nav-future" title="Lane A is developing the comparison module">Compare dates · coming soon</span></nav>',
+  '    <nav class="primary-nav" aria-label="Application views"><button id="nav-explore" type="button" class="nav-active" aria-pressed="true">Explore in 3D</button><button id="nav-compare" type="button" aria-pressed="false">Compare dates</button><button id="nav-horizon" type="button" aria-pressed="false">Stand here</button></nav>',
   '    <span class="real-data-chip">JPL Horizons · real data</span>',
   '  </header>',
   '  <section class="intro-block">',
@@ -58,7 +58,7 @@ app.innerHTML = [
   '    <p>Explore ten lunar landing locations. Change the landing date to discover how sunlight and direct Earth visibility affect a seven-day mission.</p>',
   '  </section>',
   '  <aside id="mock-notice" class="mock-notice" hidden>DEMO / SIMULATED VALUES — NOT FOR MISSION USE</aside>',
-  '  <section class="explorer" aria-label="Interactive lunar landing site explorer">',
+  '  <section id="explore-view" class="explorer" aria-label="Interactive lunar landing site explorer">',
   '    <div class="scene-column">',
   '      <div class="moon-window">',
   '        <div class="scene-heading"><span>MOON-FIXED VIEW</span><span>3D · Drag to rotate · Scroll to zoom</span></div>',
@@ -82,6 +82,8 @@ app.innerHTML = [
   '      </div>',
   '    </aside>',
   '  </section>',
+  '  <section id="compare-view" class="panel-view" aria-label="Compare landing dates" hidden><div id="compare-mount"></div></section>',
+  '  <section id="horizon-view" class="panel-view" aria-label="Stand here horizon panorama" hidden><div id="horizon-mount"></div></section>',
   '  <footer class="site-footer">Site coordinates and visibility: shared scientific data API <code>/lib/visibility.js</code> · API <span id="api-version"></span> · Lunar surface illustration is not a registered topographic map.</footer>',
   '</main>',
 ].join('\n');
@@ -122,6 +124,29 @@ for (const site of sites) {
 const cleanVerdict = (value: string): Verdict => ['clear', 'partial', 'out', 'edge'].includes(value) ? value as Verdict : 'unavailable';
 
 let sideCard: PanelHandle | null = null;
+let compareGrid: PanelHandle | null = null;
+let horizonView: PanelHandle | null = null;
+type View = 'explore' | 'compare' | 'horizon';
+let activeView: View = 'explore';
+
+function openView(view: View): void {
+  activeView = view;
+  for (const name of ['explore', 'compare', 'horizon'] as View[]) {
+    find<HTMLElement>(name + '-view').hidden = name !== view;
+    const button = find<HTMLButtonElement>('nav-' + name);
+    button.classList.toggle('nav-active', name === view);
+    button.setAttribute('aria-pressed', String(name === view));
+  }
+  window.scrollTo({ top: 0, behavior: 'instant' });
+}
+
+function updateAllPanels(): void {
+  const next = { siteId: selectedSite, landingDate: selectedDate };
+  sideCard?.update(next);
+  compareGrid?.update(next);
+  horizonView?.update(next);
+}
+
 
 function updateButtons(): void {
   for (const [id, button] of buttonById) {
@@ -135,7 +160,7 @@ function chooseSite(id: string): void {
   selectedSite = id;
   moon?.focusSite(id);
   updateButtons();
-  sideCard?.update({ siteId: id });
+  updateAllPanels();
 }
 
 function updateDaily(): void {
@@ -163,7 +188,7 @@ function setLandingDate(date: string): void {
   if (!Number.isFinite(timestamp)) return;
   selectedDate = new Date(timestamp).toISOString().slice(0, 10);
   select.value = selectedDate;
-  sideCard?.update({ landingDate: selectedDate });
+  updateAllPanels();
   if (dataReady) {
     try {
       daily = getDaily(selectedDate, 1) as DailyResult;
@@ -196,12 +221,19 @@ try {
   stage.classList.add('scene-unavailable');
   console.warn('WebGL lunar scene unavailable:', error);
 }
-sideCard = mountSideCard(find<HTMLDivElement>('side-card-mount'), {
+const panelProps = {
   siteId: selectedSite,
   landingDate: selectedDate,
   onSiteSelected: chooseSite,
   onDateSelected: setLandingDate,
-});
+  onOpenView: (view: 'compare' | 'horizon') => openView(view),
+};
+sideCard = mountSideCard(find<HTMLDivElement>('side-card-mount'), panelProps);
+compareGrid = mountCompareGrid(find<HTMLDivElement>('compare-mount'), panelProps);
+horizonView = mountHorizonView(find<HTMLDivElement>('horizon-mount'), panelProps);
+for (const name of ['explore', 'compare', 'horizon'] as View[]) {
+  find<HTMLButtonElement>('nav-' + name).addEventListener('click', () => openView(name));
+}
 updateButtons();
 
 async function initializeData(): Promise<void> {
@@ -216,4 +248,9 @@ async function initializeData(): Promise<void> {
 }
 void initializeData();
 
-window.addEventListener('pagehide', () => { moon?.destroy(); sideCard?.destroy(); }, { once: true });
+window.addEventListener('pagehide', () => {
+  moon?.destroy();
+  sideCard?.destroy();
+  compareGrid?.destroy();
+  horizonView?.destroy();
+}, { once: true });
