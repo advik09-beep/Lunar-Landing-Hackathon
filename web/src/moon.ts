@@ -15,10 +15,10 @@ export type Verdict = 'clear' | 'partial' | 'out' | 'edge' | 'unavailable';
 // exactly the same as spherePoint(): (X, Y, Z) -> (X, Z, -Y).
 export type SceneState = {
   sampleUtc: string;
-  sun: { dir: [number, number, number]; distKm: number };
-  earth: { dir: [number, number, number]; distKm: number };
+  sun: { dir: number[]; distKm: number };
+  earth: { dir: number[]; distKm: number };
 };
-const toThree = ([x, y, z]: readonly [number, number, number]): THREE.Vector3 =>
+const toThree = ([x, y, z]: readonly number[]): THREE.Vector3 =>
   new THREE.Vector3(x, z, -y);
 
 
@@ -227,6 +227,9 @@ export class LunarScene {
   }
 
   setSceneState(state: SceneState): void {
+    if ([state.sun.dir, state.earth.dir].some(v => v.length !== 3 || !v.every(Number.isFinite))) {
+      throw new Error('Invalid Moon-fixed direction vectors from scene data');
+    }
     const sun = toThree(state.sun.dir).normalize();
     const earth = toThree(state.earth.dir).normalize();
     // The Moon is fixed; the actual Sun direction changes with UTC.
