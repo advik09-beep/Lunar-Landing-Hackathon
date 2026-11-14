@@ -185,7 +185,7 @@ export class LunarScene {
       );
       halo.position.copy(normal).multiplyScalar(1.054);
       halo.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal);
-      halo.visible = false;
+      halo.visible = true; // neutral outline keeps dark 'Out' markers identifiable
       this.scene.add(halo, marker);
       this.markers.push({ site, object: marker, halo, normal });
       const poleIndex = poleSiteIds.indexOf(site.id);
@@ -286,12 +286,17 @@ export class LunarScene {
   }
 
   setVerdicts(values: Map<string, Verdict>): void {
+    const descriptions: string[] = [];
     for (const m of this.markers) {
       const verdict = values.get(m.site.id) ?? 'unavailable';
+      descriptions.push(m.site.name + ': ' + verdict);
       (m.object.material as THREE.MeshBasicMaterial).color.setHex(palette[verdict]);
       // Never cover an opaque verdict-colored marker with a larger white halo.
-      m.halo.visible = m.site.id === this.selected;
+      m.halo.visible = true;
+      (m.halo.material as THREE.MeshBasicMaterial).opacity = m.site.id === this.selected ? .85 : .40;
     }
+    // Also expose marker meaning to assistive technology, not only colors.
+    this.renderer.domElement.setAttribute('aria-label', '3D Moon markers by seven-day landing verdict: ' + descriptions.join('; '));
   }
 
   private setPoleCallouts(visible:boolean): void {
@@ -308,7 +313,7 @@ export class LunarScene {
     this.targetFocus = marker.normal.clone().multiplyScalar(0.18);
     for (const m of this.markers) {
       m.halo.scale.setScalar(m.site.id === id ? 1.3 : 1);
-      m.halo.visible = m.site.id === id;
+      m.halo.visible = true;
       (m.halo.material as THREE.MeshBasicMaterial).opacity = m.site.id === id ? 0.5 : 0.12;
     }
   }
