@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D23 1–3 PASS; 4 CODE COMPLETE / VERCEL BLOCKED | Credits + D23 mission wording and 10-stop tour tested; origin-checked Moon-to-Explore handoff passes local E2E. Latest fork/main commits cannot deploy: Vercel daily deployment quota (402). Direct physical Moon click not yet browser-verified. |
+| Advik + ChatGPT (Lane B) | D23 production PASS | USMDO Club Pro verified; fork then main deployed production READY. Live cross-origin tour Moon stop and physical rendered-Moon click both open Explore, preserving 2026-11-21 and all 10 site controls. No D23 deployment blocker. |
 | Sheldon (Lane A human) | — | Planning stop 2026-11-14: weights confirmed; D19–D23 signed |
 | Claude Code (Lane A) | D21 + D18 done | D21 filterable ranking and D18 Researcher panel (with D20, D22) DONE and pushed; stopped. Lane B: mount the Researcher panel (instructions below) |
 
@@ -236,6 +236,16 @@ D. **getCoverage()/getMetadata()** (or fields on existing exports)
 **Status accounting:** This blueprint is documentation only. No new feature, scientific validation, build, or deployment has passed merely because this section was committed.
 
 ## Lane B
+
+### 2026-11-14 — D23 production unblocked and live handoff verified
+
+- Re-read current PLAN.md and STATUS.md; fresh heads were fork master `5a21e3677160297011edab91b38a465c89b00a50` and navigator main `8c290fcacc0947ba2c96b081b4133d3e955741b4` (includes previously blocked `a911612`).
+- **Plan/quota:** authenticated Vercel dashboard shows **USMDO Club Pro**. The previous HTTP 402 daily deployment block no longer occurs: both production deployment requests were accepted and reached READY. An exact remaining daily allowance was not exposed; no remaining count is asserted.
+- **Deployed in order:** fork `dpl_5cTsE7kHnTcBq8a88LXTwhPnCZxn` READY, then main `dpl_7Ldt7adLJDfkFuiG8h9mnoy6cj2X` READY, with the above exact SHAs and successful production aliases.
+- **Public URLs:** https://solar-system-simulator-beta.vercel.app and https://lunar-landing-hackathon.vercel.app . The main site embeds https://solar-system-simulator-usmdo-club.vercel.app with its own parentOrigin.
+- **Live desktop browser verification:** chose landing date **2026-11-21**. Advanced the embedded tour to its final Moon stop; the parent switched to **Explore in 3D**, kept that date, and showed all ten landing-site controls. Returned to Overview after exiting the tour, visually located the centered Moon, and physically clicked the visible rendering canvas at the Moon; the parent again switched to Explore with the same date and ten controls. No synthetic postMessage was used for either test.
+- In-app browser console scan returned no warnings/errors. Credits still state NASA LOLA terrain for all ten sites; overview retains Lane A-aligned planets wording. This is D23 verification only, not acceptance of other pending plan steps.
+- Only Lane B's header row and this Lane B log entry changed. Lane A source, panels, status entries and PLAN.md are preserved. The status-only follow-up commit/build is checked separately after this update.
 
 ### 2026-11-14 — M0 frontend migration (ChatGPT/Codex)
 
