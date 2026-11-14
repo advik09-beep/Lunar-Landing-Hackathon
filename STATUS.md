@@ -273,6 +273,18 @@ D. **getCoverage()/getMetadata()** (or fields on existing exports)
 
 **Current single next action remains B0:** Verify `npm run typecheck` / `npm run build` and deploy the 10-site frontend. No /web implementation, live URL, or scientific test has been performed by this planning update.
 
+### 2026-11-14 — PLAN v2 read; prototype_01 preflight (NO implementation)
+
+- **Acknowledgment:** I have read PLAN.md v2 **in full**, the current STATUS.md header and latest Lane A entries, and approved DESIGN.md. PLAN.md v2 supersedes ALL earlier M0–M7, B0–B7, integration-blueprint, and flat-first directions. D1–D6 and data contract v1 are approved by both humans; contract entries marked NOT READY are **not implemented**. I will obey the new 1–9 step order and will **not start coding, deployment, or prompt execution until Advik explicitly says GO**.
+- **Required 3-line Lane B report:** Step 1 = Live URL; pass test = public link shows ten sites on a phone; next single task = verify Vite/TS production build and deploy the site list **after GO**. Do not mark Step 1 passed without a live mobile check.
+- **Design readback for prospective prototype_01 (discussion only):** two views (3D Moon Explore with ten markers + date selector; Compare dates grid); one shared UTC date; site card with Plain/Numbers; visible words plus color for four verdicts; 7-day stays; EDGE_DEG=2, CLEAR_PCT=90, OUT_PCT=10; honest mock banner and flat-terrain provenance; Step 8 true Sun/Earth orientation is deferred. Step 4's 3D Moon is NOT a heliocentric simulation, and visualization is illustrative until validated scene-state data exists.
+- **Questions to Sheldon/Claude before a final Codex prompt** (please respond in your own ## Lane A section, no immediate code needed):
+  1. For Steps 3–4 on MOCK data, what is the planned *mock-ready* source of per-site/day verdicts? The approved `loadDaily/getDaily` and verdict functions are NOT READY. Should Lane A expose a minimal mock version before Step 4, or do you envision another approach through `/lib/visibility.js` only? Lane B must not invent astronomy or fake a ready API.
+  2. In Step 3 Numbers, the approved card needs **margin above local horizon**, source/coverage, and a CSV export. Which exact /lib fields or exports will supply those, and which CSV rows/columns should the download include? Please flag if these are not ready for the mock stage.
+  3. For Step 4 marker accuracy, please confirm the Moon latitude/longitude reference (east-positive, MEAN_ME / MOON_ME), sphere vs altitude, and whether Lane B can use the current `listSites()` coordinates for a **Moon-fixed** renderer with clearly labeled south-pole representative points. Scene illumination must remain illustrative until Step 8.
+- **Open presentation/implementation decisions for Advik:** Which public static host will we use for Step 1? Should `prototype_01` mean only the Step 1 deployed site list or a multi-step visual prototype that Codex will execute step-by-step when explicitly authorized? D1–D6 are not being reopened.
+- **Scope reminder:** Only /web code; only this ## Lane B section of STATUS.md for communication. No application files or other sections changed in this entry. Waiting for Advik's GO.
+
 ## Lane A
 
 ### 2026-11-14 — Reply to the integration blueprint (approved by Sheldon 2026-11-14)
