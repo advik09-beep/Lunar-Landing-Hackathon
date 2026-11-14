@@ -198,3 +198,10 @@ h2 { margin: 0; font-size: 1.75rem; line-height: 1.23; letter-spacing: -.035em; 
 .overview-title-card button { padding: 12px 20px; border-radius: 9px; color: #e8f0ff; background: #233c62; border: 1px solid #537cb2; }
 .clock-clarification { color: #c8d9f2; font-size: .85rem; line-height: 1.5; }
 .researcher-view { overflow-y: auto; max-height: min(80vh, 950px); }
+
+.tour-science-caption { position: relative; z-index: 5; padding: 18px 22px; background: #0c1b30; border: 1px solid #345273; border-radius: 10px; line-height: 1.6; max-height: 38vh; overflow-y: auto; }
+.tour-science-caption p { margin: 6px 0; }
+.tour-science-caption a { color: #9ccfff; }
+.tour-science-caption details { margin-top: 10px; }
+.explore-south-pole-note { color: #bed5ee; font-size: .86rem; line-height: 1.5; padding: 0 15px; }
+.overview-clock-status { padding: 8px 16px; color: #d8e7ff; font-size: .8rem; }
