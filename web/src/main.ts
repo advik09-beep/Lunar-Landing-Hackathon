@@ -70,6 +70,16 @@ app.innerHTML = [
   '    <div class="clock-input-row"><label for="hour-slider">Hour within seven-day stay</label><input id="hour-slider" type="range" min="0" max="167" value="0" step="1" aria-label="Hour of the stay"><output id="hour-output" for="hour-slider">Hour 1 of 168 · 2026-11-14 00:00 UTC</output></div>',
   '    <p id="data-status" class="data-status" role="status" aria-live="polite">Loading validated daily summaries…</p>',
   '  </section>',
+  '  <section id="verdict-legend" class="verdict-legend" aria-label="What landing condition colors mean">',
+  '    <div class="verdict-guide-heading"><strong>What do the marker colors mean?</strong><span>Each verdict covers the full 7-day stay, not only the selected hour.</span></div>',
+  '    <div class="verdict-guide-grid">',
+  `      <div class="verdict-guide-item clear"><strong>● Clear</strong><span>Sunlight and Earth both visible together for at least ${VERDICT_RULE.CLEAR_PCT}% of the stay.</span></div>`,
+  '      <div class="verdict-guide-item partial"><strong>◐ Partial</strong><span>Both are visible together for part of the stay, but not enough to be clear.</span></div>',
+  `      <div class="verdict-guide-item out"><strong>✕ Out</strong><span>Sunlight and Earth are visible together for ${VERDICT_RULE.OUT_PCT}% or less of the stay.</span></div>`,
+  `      <div class="verdict-guide-item edge"><strong>⚠ On the edge</strong><span>Sun or Earth stays near the local horizon (within ${VERDICT_RULE.EDGE_DEG}°); terrain and position matter.</span></div>`,
+  '    </div>',
+  '    <p class="verdict-guide-note">These indicate potential sunlight and direct Earth line of sight, not guaranteed power or communications. Gray means data unavailable. Detailed terrain estimates differ by location.</p>',
+  '  </section>',
   '  <section id="overview-view" class="overview-view" aria-label="Sun Earth Moon overview">',
   '    <div class="overview-window">',
   '      <div class="overview-caption"><strong>THE SUN · EARTH · MOON</strong><span>Illustrative sizes, positions and motion — not to scale; not ephemeris geometry</span></div>',
@@ -86,12 +96,15 @@ app.innerHTML = [
   '        <p id="lighting-status" class="lighting-status" role="status" aria-live="polite">Loading Sun/Earth directions from JPL Horizons…</p>',
   '      </div>',
 
-  '      <div class="legend" aria-label="Landing condition legend">',
-  '        <span><i class="dot clear"></i> Clear</span><span><i class="dot partial"></i> Partial</span><span><i class="dot out"></i> Out</span><span><i class="dot edge"></i> On the edge</span><span><i class="dot unavailable"></i> Unavailable</span>',
-  '      </div>',
+
   '    </div>',
   '    <aside class="info-column">',
-  '      <div id="side-card-mount" class="side-card-mount" aria-label="Site conditions and Plain Numbers details"></div>',
+  '      <div id="side-card-mount" class="side-card-mount" aria-label="Site conditions and Educator Researcher details"></div>',
+  '      <section class="pole-picker" aria-label="Four south pole candidate sites">',
+  '        <h3>Four south-pole candidates</h3>',
+  '        <p>Choose A, B, C or D. Matching offset labels appear in the polar 3D view, with leader lines pointing to their true coordinates.</p>',
+  '        <div id="pole-buttons" class="pole-buttons"></div>',
+  '      </section>',
   '      <div class="site-browser">',
   '        <div class="site-list-header"><h3>Landing sites</h3><span>10 locations</span></div>',
   '        <div id="site-buttons" class="site-buttons" role="group" aria-label="Choose a lunar landing site"></div>',
@@ -138,6 +151,8 @@ dateSlider.max = String(Math.round((DATE_MAX - DATE_MIN) / 86400000));
 
 const buttonById = new Map<string, HTMLButtonElement>();
 const statusById = new Map<string, HTMLSpanElement>();
+const poleButtonById = new Map<string, HTMLButtonElement>();
+const poleStatusById = new Map<string, HTMLSpanElement>();
 
 for (const site of sites) {
   const button = document.createElement('button');
@@ -156,6 +171,29 @@ for (const site of sites) {
   buttonById.set(site.id, button);
   statusById.set(site.id, verdict);
 }
+
+const poleContainer = find<HTMLDivElement>('pole-buttons');
+const poleSites = sites.filter(s => s.kind === 'south-pole');
+poleSites.forEach((site,index) => {
+  const button = document.createElement('button');
+  button.type='button';
+  button.className='pole-choice';
+  const letter = document.createElement('b');
+  letter.className='pole-letter';
+  letter.textContent=['A','B','C','D'][index];
+  const title=document.createElement('span');
+  title.className='pole-name';
+  title.textContent=site.name.split(' (')[0];
+  const statusEl=document.createElement('span');
+  statusEl.className='pole-status unavailable';
+  statusEl.textContent='…';
+  button.append(letter,title,statusEl);
+  button.addEventListener('click',()=>chooseSite(site.id));
+  button.setAttribute('aria-label', 'Select south pole site '+letter.textContent+': '+site.name);
+  poleContainer.append(button);
+  poleButtonById.set(site.id,button);
+  poleStatusById.set(site.id,statusEl);
+});
 
 const cleanVerdict = (value: string): Verdict => ['clear', 'partial', 'out', 'edge'].includes(value) ? value as Verdict : 'unavailable';
 
@@ -190,6 +228,10 @@ function updateButtons(): void {
     button.classList.toggle('active', id === selectedSite);
     button.setAttribute('aria-pressed', String(id === selectedSite));
   }
+  for(const [id,button] of poleButtonById){
+    button.classList.toggle('active',id === selectedSite);
+    button.setAttribute('aria-pressed',String(id === selectedSite));
+  }
 }
 
 function chooseSite(id: string): void {
@@ -214,6 +256,11 @@ function updateDaily(): void {
     if (element) {
       element.className = 'site-choice-status ' + verdict;
       element.textContent = verdictNames[verdict];
+    }
+    const poleStatus=poleStatusById.get(site.id);
+    if(poleStatus){
+      poleStatus.className='pole-status '+verdict;
+      poleStatus.textContent=verdictNames[verdict];
     }
   }
   moon?.setVerdicts(colors);
