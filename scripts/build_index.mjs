@@ -11,9 +11,13 @@ const OUT_DIR = join(dirname(fileURLToPath(import.meta.url)), "..", "data", "eph
 const chunk = (rel) => { const d = JSON.parse(readFileSync(join(OUT_DIR, rel), "utf8")); return { file: rel, start: d.start, end: d.end, count: d.count }; };
 
 export function buildIndex() {
-  const index = { stepHours: 1, timeScale: "UTC", decimals: 3, sites: {}, horizons: {}, scene: [] };
+  const index = { stepHours: 1, timeScale: "UTC", decimals: 3, sites: {}, horizons: {}, scene: [], slopes: {} };
   for (const id of readdirSync(OUT_DIR).filter((d) => !d.includes(".") && !d.startsWith("_"))) {
-    if (existsSync(join(OUT_DIR, id, "horizon.json"))) index.horizons[id] = `${id}/horizon.json`;
+    if (existsSync(join(OUT_DIR, id, "horizon.json"))) {
+      index.horizons[id] = `${id}/horizon.json`;
+      const hz = JSON.parse(readFileSync(join(OUT_DIR, id, "horizon.json"), "utf8"));
+      if (hz.localSlope?.over100m) index.slopes[id] = hz.localSlope.over100m.slopeDeg; // D28: slope limit without loading the site
+    }
     index.sites[id] = readdirSync(join(OUT_DIR, id)).filter((f) => /^(\d{4}|landing)\.json$/.test(f)).sort().map((f) => chunk(`${id}/${f}`));
   }
   if (existsSync(join(OUT_DIR, "_scene"))) {

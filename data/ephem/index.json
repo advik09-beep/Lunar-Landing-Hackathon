@@ -373,5 +373,17 @@
    "end": "2029-12-31T23:00:00Z",
    "count": 8760
   }
- ]
+ ],
+ "slopes": {
+  "apollo11": 0.703,
+  "apollo12": 1.118,
+  "apollo17": 1.923,
+  "chandrayaan3": 1.466,
+  "im1": 11.734,
+  "im2": 2.231,
+  "sp_cabeus_b_peak": 0.873,
+  "sp_haworth": 2.936,
+  "sp_malapert": 3.124,
+  "sp_nobile_rim2": 2.209
+ }
 }

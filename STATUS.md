@@ -6,11 +6,11 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 |-----|------|-----------|
 | Advik + ChatGPT (Lane B) | D18 + D24–D26 PASS; D27 clock linked with caveat | Researcher tab, 00:00 UTC stay-start clarification, still title card, Start/Skip, all-tab tour nav, Restart, sourced /lib captions and south-pole note verified live. UTC clock reaches fork; its planetary positions are NOT validated for chosen dates. |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
-| Claude Code (Lane A) | D25 + D26 text done | Tour captions and south-pole text in /lib with sources and checks; "Why the south pole?" in the side card. Next: D28 (A/B scenarios, mission requirements filter) on Sheldon's go |
+| Claude Code (Lane A) | D28 done | Tour captions revised; D28 planner (A/B scenarios + mission requirements) built and pushed; stopped. Lane B: mount mountPlanner (notes below) |
 
 Acceptance (both humans): steps 1, 2, 3, 6, 8 PASS; step 4 and 7 pending earlier findings. Signed: D7–D23 (see PLAN), **D24–D28** (title card + tour nav, tour captions, why the south pole, one clock, A/B scenarios + requirements filter). Rule: no status-only pushes.
-Waiting on Sheldon: review the ten captions and the south-pole text; go for D28.
-Waiting on Advik: D24, D27; display D25 captions and D26 text (how to read them below); mount the Researcher tab (D18).
+Waiting on Sheldon: review the revised captions, the south-pole one-liner and the D28 planner on web/panels.html.
+Waiting on Advik: mount mountPlanner (D28); refresh the tour captions and the south-pole one-line from /lib (texts changed); D27 status.
 
 ## Continuous two-agent coordination protocol (agreed 2026-11-14)
 
@@ -1421,4 +1421,41 @@ SOUTH_POLE.sources;          // [{ name, url }]
   - South-pole one-line and full text present with quotes; candidate-site Earth max 10.63° ("about 11").
 - DOM test: the side card Educator view shows the clickable "Why the south pole?" (4 paragraphs incl. sources), not repeated in Researcher.
 - All other checks and panel tests PASS. `/web` build OK. README: eight check scripts.
+
+### 2026-11-14 (evening) — Tour captions revised; D28 planner (A/B scenarios + mission requirements) READY to mount
+**Captions revised** (`lib/tour.js`, commit e089b80; each claim checked against NASA/JPL today):
+- **Jupiter:** "NASA says Jupiter is more than twice as massive as the other planets combined" (now citing https://science.nasa.gov/jupiter/; the facts page's "other bodies" sentence is no longer used).
+- **Earth:** retitled **"The direct line home"**. It now says "a lander has a direct line of sight home" (relay satellites exist).
+- **Mercury:** "tilted just 2 degrees", and "may have water ice … inside deep craters … in permanent shadows" (NASA Mercury facts), the same reason the Moon's south pole matters.
+- **Mars:** "about 5 to 20 minutes to reach Mars but only about 1.2 to 1.4 seconds to reach the Moon". **No NASA page we could read states the Earth–Mars signal time**, so the 5–20 minutes come from **JPL Horizons** (quantity 21 "1-way down-leg light-time", Mars from Earth's centre, 2026–2029 daily: 5.38–20.06 min), labeled as JPL Horizons figures.
+- **Neptune:** NASA's "more than 30 times as far", "roughly 900 times as bright" and "high noon … dim twilight" lines. At the Moon sunlight is at full strength (1,310–1,415 W/m², ours), so the problem is never strength, only terrain.
+- **South-pole one-liner (24 words):** "Why the south pole? Water ice and long sunlight, but the Sun and Earth skim the horizon. Any site works; past landings are comparisons." The full version is unchanged.
+- **Lane B:** your tour and Explore header read these from /lib, so they update automatically; please rebuild.
+
+**D28 design:**
+1. **A/B scenarios:** a scenario = site + landing date (7-day stay). `compareScenarios(A, B)` returns both sets of numbers and the differences in plain words, generated in /lib so every view says the same:
+   - Verdict; score; sunlight; Earth in view; longest blackout; longest gap without Earth; eclipse hours; local slope.
+   - Each row reads "A is better / B is better / about the same (A x, B y)", followed by an "Overall: … better on n of 7 measures" line and a note when a historic landing is involved.
+2. **Mission requirements:** `checkRequirements(date, limits, filter)` tests every site against the limits the user sets: `maxDarkHours`, `maxGapHours`, `minSunPct`, `minEarthPct`, `maxSlopeDeg`.
+   - It returns PASS or FAIL per site, naming each failing limit in words, e.g. "Longest blackout (no sunlight) is 119 h, over your limit of 48 h."
+   - It runs on the daily summary, so all sites are instant. Slopes are now in `ephem/index.json`.
+   - Outside the data the result is "No data", never a guessed pass.
+3. **One panel** for both, `mountPlanner`. Saved pairs are kept in the viewer's browser (localStorage, guarded; "kept in this browser only"), with Load, Delete and JSON download. Starting limits are examples, labeled "not recommendations". PASS/FAIL are shown as words and symbols, not color alone.
+
+**/lib (API 1.9.0):** `REQUIREMENTS` (labels, units, direction), `checkRequirements`, `compareScenarios`, and `ephem/index.json` → `slopes`.
+
+**Mount notes for Lane B:**
+1. `import { mountPlanner } from "./panels/index";` and add a tab/view, e.g. **"Planner"** (or "Compare & requirements").
+2. Call `const pl = mountPlanner(el, { siteId, landingDate, onSiteSelected, onDateSelected });` once. Scenario A starts as the shared selection and B as another site; the requirements use the shared landing date.
+3. On selection changes: `pl.update({ siteId, landingDate })`. A date change re-runs the requirements; the user's A/B choices are kept (they can press "Use current selection").
+4. Clicking a site name in the requirements list calls `onSiteSelected(siteId)`. It's a long panel, so give it a scrolling area. It ignores `hour`.
+
+**Checks:**
+- `check_d28` PASS (new):
+  - Slopes in the index = terrain files. Pass/fail and named limits match each site's own numbers (4 of 10 pass the example limits on 2026-11-14).
+  - IM-1 is named for slope (11.7° > 10°); no limits → all pass; candidate filter; unknown limit rejected; outside the data → No data.
+  - A/B values = getMetrics/getScore; differences point the right way; self-comparison all "about the same"; swap mirrors every difference; historic note.
+- DOM test: table + differences; picking B updates them; save/swap/load; JSON download; PASS/FAIL with named limit; changing a limit and the filter re-run; clicking a site → callback.
+- `check_tour` updated for the revised captions (Mars 5.38–20.06 min; Jupiter wording and source; Earth title; Mercury and Neptune quotes; one-liner 24 words < 25).
+- All other checks and panel tests PASS. `/web` build OK (after pulling Lane B's own fix `a7899fb` for a D27 markup typo in main.ts). README: Planner, nine check scripts.
 
