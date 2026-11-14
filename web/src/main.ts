@@ -1,6 +1,6 @@
 import './style.css';
-import { listSites, loadDaily, getDaily, MOCK, API_VERSION, VERDICT_RULE } from '../../lib/visibility.js';
-import { LunarScene, type MoonSite, type Verdict } from './moon';
+import { listSites, loadDaily, getDaily, loadScene, getSceneState, MOCK, API_VERSION, VERDICT_RULE } from '../../lib/visibility.js';
+import { LunarScene, type MoonSite, type Verdict, type SceneState } from './moon';
 import { mountSideCard, mountCompareGrid, mountHorizonView, type PanelHandle } from './panels';
 
 interface Site extends MoonSite {
@@ -64,6 +64,7 @@ app.innerHTML = [
   '        <div class="scene-heading"><span>MOON-FIXED VIEW</span><span>3D · Drag to rotate · Scroll to zoom</span></div>',
   '        <div id="moon-stage" class="moon-stage" aria-label="Interactive 3D Moon with landing markers"></div>',
   '        <div class="scene-controls"><button type="button" id="reset-view">Full Moon</button><button type="button" id="polar-view">South pole view</button><span>NASA SVS Moon imagery · lighting illustrative · no terrain mesh</span></div>',
+  '        <p id="lighting-status" class="lighting-status" role="status" aria-live="polite">Loading Sun/Earth directions from JPL Horizons…</p>',
   '      </div>',
   '      <div class="date-controls">',
   '        <div class="date-heading"><span>LANDING DATE</span><span>All times in UTC · 7-day stay</span></div>',
@@ -110,6 +111,7 @@ find<HTMLElement>('mock-notice').hidden = !MOCK;
 find<HTMLElement>('api-version').textContent = API_VERSION;
 const siteButtons = find<HTMLDivElement>('site-buttons');
 const status = find<HTMLParagraphElement>('data-status');
+const lightingStatus = find<HTMLParagraphElement>('lighting-status');
 const select = find<HTMLInputElement>('landing-date');
 
 const buttonById = new Map<string, HTMLButtonElement>();
@@ -195,12 +197,33 @@ function updateDaily(): void {
   updateButtons();
 }
 
+let sceneReady = false;
+function updateSceneLighting(): void {
+  if (!sceneReady) return;
+  try {
+    const sceneState = getSceneState(selectedDate + 'T00:00:00Z') as SceneState;
+    moon?.setSceneState(sceneState);
+    lightingStatus.textContent =
+      'JPL Horizons Sun/Earth directions · ' + sceneState.sampleUtc +
+      ' · Earth ' + Math.round(sceneState.earth.distKm).toLocaleString() +
+      ' km away (display not to scale). The globe does not model local terrain blocking.';
+    lightingStatus.dataset.state = 'ready';
+  } catch (error) {
+    moon?.clearSceneState();
+    lightingStatus.textContent = String(error).includes('OUT_OF_COVERAGE')
+      ? 'Lighting unavailable for this date: outside validated Horizons scene coverage.'
+      : 'Lighting unavailable: ' + String(error);
+    lightingStatus.dataset.state = 'unavailable';
+  }
+}
+
 function setLandingDate(date: string): void {
   const timestamp = Date.parse(date + 'T00:00:00Z');
   if (!Number.isFinite(timestamp)) return;
   selectedDate = new Date(timestamp).toISOString().slice(0, 10);
   select.value = selectedDate;
   updateAllPanels();
+  updateSceneLighting();
   if (dataReady) {
     try {
       daily = getDaily(selectedDate, 1) as DailyResult;
@@ -259,6 +282,20 @@ async function initializeData(): Promise<void> {
   }
 }
 void initializeData();
+
+async function initializeSceneLighting(): Promise<void> {
+  try {
+    await loadScene();
+    sceneReady = true;
+    updateSceneLighting();
+  } catch (error) {
+    sceneReady = false;
+    moon?.clearSceneState();
+    lightingStatus.textContent = 'Lighting unavailable: scene data could not be loaded (' + String(error) + ').';
+    lightingStatus.dataset.state = 'unavailable';
+  }
+}
+void initializeSceneLighting();
 
 window.addEventListener('pagehide', () => {
   moon?.destroy();
