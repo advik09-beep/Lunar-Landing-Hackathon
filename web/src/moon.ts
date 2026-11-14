@@ -37,55 +37,6 @@ function spherePoint(lat: number, lon: number, radius = 1): THREE.Vector3 {
   );
 }
 
-// This texture is decorative only, not a scientifically registered lunar map.
-function illustrativeTexture(): THREE.CanvasTexture {
-  const canvas = document.createElement('canvas');
-  canvas.width = 1024;
-  canvas.height = 512;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) throw new Error('2D canvas unavailable for illustrative lunar surface');
-  const image = ctx.createImageData(canvas.width, canvas.height);
-  const craters = Array.from({ length: 105 }, (_, i) => {
-    const seed = (n: number) => {
-      const t = Math.sin((i + 7) * n * 123.456) * 43758.5453;
-      return t - Math.floor(t);
-    };
-    return { x: seed(1.3) * 1024, y: seed(4.7) * 512, r: 4 + seed(2.1) * 35 };
-  });
-
-  for (let y = 0; y < 512; y++) {
-    const latitude = Math.abs(y / 512 - 0.5) * 2;
-    for (let x = 0; x < 1024; x++) {
-      const w1 = Math.sin(x * 0.019 + Math.cos(y * 0.033)) * Math.cos(y * 0.022);
-      const w2 = Math.sin(x * 0.072 + y * 0.11) * Math.cos(y * 0.087 - x * 0.035);
-      const w3 = Math.sin(x * 0.16 - y * 0.37) * Math.sin(y * 0.25);
-      const mare = Math.sin(x * 0.008 + 1.3) * Math.cos(y * 0.013 - 1.4);
-      let brightness = 124 + 17 * w1 + 9 * w2 + 4 * w3 - Math.max(0, mare - 0.25) * 65 + latitude * 11;
-      for (const c of craters) {
-        const dx = Math.min(Math.abs(x - c.x), 1024 - Math.abs(x - c.x));
-        const dy = (y - c.y) * 1.45;
-        const d = Math.sqrt(dx * dx + dy * dy) / c.r;
-        if (d < 1.35) {
-          const wall = Math.exp(-Math.pow((d - 0.92) / 0.14, 2));
-          const basin = Math.exp(-Math.pow(d / 0.75, 4));
-          brightness += wall * 25 - basin * 15;
-        }
-      }
-      const v = Math.max(55, Math.min(207, brightness));
-      const k = (y * 1024 + x) * 4;
-      image.data[k] = v;
-      image.data[k + 1] = v * 0.985;
-      image.data[k + 2] = v * 0.96;
-      image.data[k + 3] = 255;
-    }
-  }
-  ctx.putImageData(image, 0, 0);
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = 4;
-  return texture;
-}
-
 export class LunarScene {
   private renderer: THREE.WebGLRenderer;
   private scene = new THREE.Scene();
@@ -134,17 +85,25 @@ export class LunarScene {
     rim.position.set(-3, -1, -3);
     this.scene.add(rim);
 
-    const moon = new THREE.Mesh(
-      new THREE.SphereGeometry(1, 128, 96),
-      new THREE.MeshStandardMaterial({
-        map: illustrativeTexture(),
-        roughness: 1,
-        metalness: 0,
-      }),
-    );
-    // SphereGeometry's texture seam at 180°; longitude/latitude markers are
-    // positioned in our own documented, east-positive Moon-fixed frame.
+    const moonMaterial = new THREE.MeshStandardMaterial({
+      color: 0xffffff, roughness: 1, metalness: 0,
+    });
+    const moon = new THREE.Mesh(new THREE.SphereGeometry(1, 128, 96), moonMaterial);
+    // D11(a) NASA CGI Moon Kit: equirectangular, north up, 0° at centre,
+    // east-positive longitudes. Lane A verified default SphereGeometry UVs
+    // against LOLA: no mesh rotation, UV offset or marker rotation.
     this.scene.add(moon);
+    new THREE.TextureLoader().load(
+      '/moon/lroc_color_2k.jpg',
+      (texture) => {
+        texture.colorSpace = THREE.SRGBColorSpace;
+        texture.anisotropy = Math.min(8, this.renderer.capabilities.getMaxAnisotropy());
+        moonMaterial.map = texture;
+        moonMaterial.needsUpdate = true;
+      },
+      undefined,
+      (error) => console.error('NASA CGI Moon Kit texture failed to load:', error),
+    );
 
     const atmosphere = new THREE.Mesh(
       new THREE.SphereGeometry(1.018, 64, 48),
