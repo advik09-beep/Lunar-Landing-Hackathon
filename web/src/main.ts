@@ -97,7 +97,6 @@ app.innerHTML = [
   '      <p id="overview-mission-message" class="overview-mission-message">Of everything in the solar system, the Sun determines the sunlight available for a lunar lander\'s potential power, while Earth determines when a direct radio link is geometrically possible. Other planets: their gravity is already in our numbers. JPL planetary ephemerides include their gravitational effects; their light is negligible compared with sunlight. Radio from other planets is not modeled.</p>',
   '      <div id="overview-stage" class="overview-stage" aria-label="Solar system overview visualization"></div>',
   '      <p id="overview-clock-status" class="overview-clock-status" role="status">Simulator planetary ephemeris is not validated for the selected date.</p>',
-',
   '      <div id="overview-title-card" class="overview-title-card"><h2>Our Moon in the solar system</h2><p>Only the Sun and Earth determine the sunlight and direct Earth visibility we evaluate for a lunar lander. Other planets’ gravity is already included in NASA’s ephemerides.</p><div><button id="start-tour" type="button">Start tour</button><button id="skip-moon" type="button">Skip to the Moon</button></div></div>',
   '      <div class="overview-footer"><p id="overview-disclaimer">Choose the Moon to explore real landing sites and verified Sun/Earth visibility at your selected UTC date and hour.</p><button id="enter-explore" type="button">Explore the Moon and landing sites</button></div>',
   '    </div>',
