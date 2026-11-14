@@ -107,7 +107,7 @@ app.innerHTML = [
   '        <div class="scene-heading"><span>MOON-FIXED VIEW</span><span>3D · Drag to rotate · Scroll to zoom</span></div>',
   '        <p id="explore-south-pole-note" class="explore-south-pole-note"></p>',
   '        <div id="moon-stage" class="moon-stage" aria-label="Interactive 3D Moon with landing markers"></div>',
-  '        <div class="scene-controls"><button type="button" id="reset-view">Full Moon</button><button type="button" id="polar-view">South pole view</button><span>NASA SVS Moon imagery · JPL Horizons Sun lighting · no terrain mesh</span></div>',
+  '        <div class="scene-controls"><button type="button" id="reset-view">Reset view</button><button type="button" id="polar-view">South pole view</button><span>NASA SVS Moon imagery · JPL Horizons Sun lighting · no terrain mesh</span></div>',
   '        <p id="lighting-status" class="lighting-status" role="status" aria-live="polite">Loading Sun/Earth directions from JPL Horizons…</p>',
   '      </div>',
 

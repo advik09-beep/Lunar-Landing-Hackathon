@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D30 structure theme — built; checking deployment | Exact D30 theme, compact scale, plain-language shell, LunLux title; inactive simulator detached. Structure 7 Vercel READY. |
+| Advik + ChatGPT (Lane B) | D30 presentation pass COMPLETE — STOPPED | Tour / Explore / Compare / Report; desktop verified, TypeScript and production build PASS |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | D30 Lane A part done | Panels follow the D30 theme, short names, Historic tag, interface v1.3 (shared reading level); stopped |
 
@@ -536,6 +536,11 @@ Second task, only after the copy passes and with Advik's authorization: Step 4 T
 ### 2026-11-14 — D30 presentation pass, structure theme
 - Exact D30 theme, compact scale, plain-language shell, LunLux title; inactive simulator detached. Structure 7 Vercel READY.
 - Files: web/src/main.ts, web/src/style.css, web/index.html. TypeScript and Vite/postbuild executed: PASS. Production deployment verification follows this commit. Scientific APIs and Lane A panels unchanged.
+
+
+### 2026-11-14 — D30 presentation pass, structure verification
+- Desktop verification complete; remove residual Explore/Compare page overflow and clarify Reset view camera action. Presentation pass complete; stop here.
+- Files: web/src/main.ts, web/src/style.css. TypeScript and Vite/postbuild executed: PASS. Production at https://lunar-landing-hackathon.vercel.app verified in a desktop browser: Tour title and moving simulator, four-tab navigation, all 10 API-backed site options, shared date/hour and Educator/Researcher controls, Globe/Horizon, Compare grid plus planner, Report and methods; no browser console warnings/errors. All eight preceding Vercel builds READY. Final overflow/camera-label refinement built successfully; deployment check follows. Scientific APIs and Lane A panels unchanged.
 
 ## Lane A
 

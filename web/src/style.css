@@ -76,7 +76,7 @@ p { margin:8px 0; }
 .tour-science-caption details p { font-size:.84rem; }
 .tour-science-caption > p:has(a) { font-size:.75rem; }
 .overview-clock-status { position:absolute; left:32%; bottom:0; right:0; padding:8px 14px; margin:0; font-size:.75rem; background:#091322d9; color:var(--llp-muted); }
-.explorer { display:grid; grid-template-columns:minmax(0,1.7fr) minmax(320px,1fr); gap:16px; height:calc(100dvh - 222px); min-height:360px; }
+.explorer { display:grid; grid-template-columns:minmax(0,1.7fr) minmax(320px,1fr); gap:16px; height:calc(100dvh - 238px); min-height:360px; }
 .scene-column { min-width:0; min-height:0; display:flex; flex-direction:column; gap:8px; }
 .explore-controls { display:flex; align-items:center; justify-content:space-between; flex:none; }
 .view-toggle { display:flex; gap:4px; }
@@ -95,7 +95,7 @@ p { margin:8px 0; }
 .info-column { overflow:auto; min-height:0; overscroll-behavior:contain; padding-right:4px; }
 #horizon-view { margin:0; flex:1; min-height:0; overflow:auto; }
 .panel-view { min-width:0; }
-#compare-view { height:calc(100dvh - 222px); min-height:300px; overflow:auto; overscroll-behavior:contain; padding:0 4px 8px 0; }
+#compare-view { height:calc(100dvh - 238px); min-height:300px; overflow:auto; overscroll-behavior:contain; padding:0 4px 8px 0; }
 #compare-view #planner-view { max-height:none; overflow:visible; padding:0; margin-top:16px; }
 #researcher-view,#credits-view { height:calc(100dvh - 182px); min-height:300px; overflow:auto; overscroll-behavior:contain; padding:0 4px 8px 0; }
 #compare-mount,#planner-mount,#researcher-mount { min-width:0; }
