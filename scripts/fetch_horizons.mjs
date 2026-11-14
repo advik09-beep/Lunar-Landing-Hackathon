@@ -22,6 +22,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import sites from "../data/sites.js";
 import { query, pause, ALT_KM } from "./horizons_api.mjs";
+import { buildIndex } from "./build_index.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const OUT_DIR = join(ROOT, "data", "ephem");
@@ -70,15 +71,5 @@ for (const site of todo) {
   }
 }
 
-// Rebuild the index from whatever chunk files exist.
-// Terrain horizons (step 7, scripts/compute_horizon.mjs) live in the same site folders as horizon.json.
-const index = { stepHours: 1, timeScale: "UTC", decimals: DECIMALS, sites: {}, horizons: {} };
-for (const id of readdirSync(OUT_DIR).filter((d) => !d.includes("."))) {
-  if (existsSync(join(OUT_DIR, id, "horizon.json"))) index.horizons[id] = `${id}/horizon.json`;
-  index.sites[id] = readdirSync(join(OUT_DIR, id)).filter((f) => /^(\d{4}|landing)\.json$/.test(f)).sort().map((f) => {
-    const d = JSON.parse(readFileSync(join(OUT_DIR, id, f), "utf8"));
-    return { file: `${id}/${f}`, start: d.start, end: d.end, count: d.count };
-  });
-}
-writeFileSync(join(OUT_DIR, "index.json"), JSON.stringify(index, null, 1));
+buildIndex();
 console.log("index written");

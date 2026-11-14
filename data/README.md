@@ -14,6 +14,7 @@ header of our own Horizons output, on 2026-11-14. Sources:
 | `ephem/<siteId>/landing.json` | Same quantities, landing day 00:00 UTC −15 days to +15 days (inclusive, 721 rows). Only for landings before 2026: apollo11, apollo12, apollo17, chandrayaan3, im1, im2. |
 | `ephem/index.json` | Every chunk file with its first and last UTC time and row count. |
 | `ephem/sp_malapert/horizon.json` | Terrain horizon (step 7) for sp_malapert only: 360 elevation angles (deg), bin i = azimuth [i−0.5, i+0.5) clockwise from north, plus blocking distance, observer, method and source. Built by `node scripts/compute_horizon.mjs` from LOLA DEMs fetched by `node scripts/fetch_lola.mjs` into `data/raw/` (gitignored, ~485 MB). Checked by `node scripts/check_horizon.mjs`. Listed in `ephem/index.json` under `horizons`. |
+| `ephem/_scene/<YYYY>.json`, `ephem/_scene/landing_<siteId>.json` | Step 8 scene data: hourly sub-solar and sub-Earth points on the Moon (lon/lat, MOON_ME, east-positive), Sun and Earth distances (km), and the Sun–Moon–Earth angle (S-T-O). Same coverage as the site data. Built by `node scripts/fetch_scene.mjs`, checked by `node scripts/check_scene.mjs`. Listed in `ephem/index.json` under `scene`. ~2.3 MB. |
 | `daily.json` | Per-day stay summary for all sites (built by `node scripts/build_daily.mjs`). For every UTC date D whose 7-day stay (D 00:00Z, 168 hourly samples) is fully covered: `[litH, commsH, bothH, sunEdgeH, earthEdgeH, longestDarkH, verdict]`, grouped per site in contiguous segments `{ firstDate, rows }`. Margins use the terrain horizon where one exists (sp_malapert), else flat; edge = \|margin\| ≤ EDGE_DEG (2°). Rule constants are in the file header and in `lib/verdict.js`. ~410 KB, 14,694 rows. |
 
 Each chunk file holds: `siteId, lat, lon, altKm, start, end, stepHours (1), count, decimals (3), timeScale ("UTC"), source, apiVersion, fetchedUtc, horizonsHeader` (lines copied from the Horizons output) and four arrays `sunAz, sunEl, earthAz, earthEl`. Row `i` is at `start + i hours`.
@@ -95,3 +96,21 @@ What it means for us (our own calculation, not a doc statement): after 2027-02-0
 - From the original point: 200 m north → 1.6°; 200 m south → 8.0–8.6°; 200 m east → ~4°; 200 m west → ~11.8°; 10 m mast instead of 2 m → 3.4° (unshifted: ~5.6°).
 - From the D10 point: 200 m north → −3.3° (unchanged); 200 m south → +5.0° to +5.8° (back on the rising slope, set by ground ~80 m away); 200 m east → −2.5°; 200 m west → −3.3° to −2.8°; 10 m mast → no change.
 - Directions blocked by distant ridges barely move: east (az 90°) stays 6.0°–6.7° in every shift. Ray density 10 → 20 per degree: no change.
+
+## Scene data (step 8): Sun and Earth seen from the Moon
+- **Query:** `EPHEM_TYPE=OBSERVER`, `COMMAND='301'` (Moon), `CENTER='500@399'` (Earth centre), `QUANTITIES='14,15,19,20,24'`, `RANGE_UNITS=KM`, `CSV_FORMAT=YES`, hourly.
+- **Quantity definitions (manual):**
+  - 14 = "Apparent planetodetic longitude and latitude of the center of the target disc seen by the OBSERVER at print-time" (the sub-Earth point).
+  - 15 = "Apparent sub-solar longitude and latitude of the Sun on the target" ("Light travel-time from Sun to target and from target to observer is taken into account").
+  - 19 = "The Sun's apparent range ... relative to the target center".
+  - 20 = "Apparent range ... of the target center relative to the observer".
+  - 24 = "The Sun-Target-Observer angle". `RANGE_UNITS` (API doc): `AU` | `KM`.
+- **Output header:** `Target pole/equ : MOON_ME {East-longitude positive}`, `Target radii : 1737.4, 1737.4, 1737.4 km` (a sphere, so planetodetic = planetocentric latitude). Longitudes are output 0–360°E; `getSceneState` returns −180..180°E. The site queries print `MEAN_ME (high precision)` for the observer frame. The checks below show the two agree to within 0.007°.
+- **Caveat (manual):** the sub-points are "not exactly the same as the 'nearest point' for a non-spherical target shape". The Moon here is a sphere, so this doesn't apply.
+- **Checks (`scripts/check_scene.mjs`):**
+  - Sun/Earth elevations implied at a site match Sheldon's three hand-checked site/hours within 0.0034°.
+  - They match our site files for all 10 sites (every 6th hour 2026–2029, 58,440 site-hours) within 0.0007° (Sun) / 0.0065° (Earth).
+  - The angle between the two directions equals Horizons' S-T-O within 0.006°.
+  - At all 49 full moons in 2026–2029 the sub-solar and sub-Earth points are within 5.0° of each other.
+  - Tolerance 0.05°: see STATUS.md.
+

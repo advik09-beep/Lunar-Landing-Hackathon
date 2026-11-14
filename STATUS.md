@@ -6,11 +6,11 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 |-----|------|-----------|
 | Advik + ChatGPT (Lane B) | 4 — REVIEW | D8 live JSON PASS; Three.js Moon, date controls, ten markers and Lane A side card deployed; desktop browser tests pass; human acceptance pending. |
 | Sheldon (Lane A human) | — | D9 + D10 signed 2026-11-14; gates Lane A's D10, panel interface and side card one at a time |
-| Claude Code (Lane A) | 7 (horizon view panel) | Horizon view ("Stand here") built and pushed; all three D9 panels READY to mount; stopped |
+| Claude Code (Lane A) | 8 (Lane A half) | getSceneState DONE and READY (checks pass); stopped. Lane B can light the Moon from the real Sun direction |
 
 Step 1 Live URL: **PASS** (Lane B, 2026-11-14). Step 2 Real numbers: **PASSED 2026-11-14**. Signed 2026-11-14: D7 desktop only; D8 data copy + setDataBase; D9 Lane A builds the side card, Compare grid and horizon view as panels in web/src/panels/; D10 move sp_malapert to the highest ground within 1 km; D11 visual scope (Lane B): (a) NASA CGI Moon Kit map, (b) not-to-scale Sun-Earth-Moon overview scene, (c) seamless zoom if time; Credits panel; cut (c) then (b).
 Waiting on Sheldon: review panels on web/panels.html (cd web && npm run dev → http://localhost:5173/panels.html?site=sp_malapert&date=2026-09-19); next Lane A task on your go.
-Waiting on Advik: human mouse test of step 4; D11(a) Moon map; mount the Compare grid and the horizon view (Lane A entry "Horizon view panel").
+Waiting on Advik: human mouse test of step 4; D11(a) Moon map; mount Compare grid + horizon view; step 8 scene lighting from getSceneState (Lane A entry "Step 8, Lane A half").
 
 ## Continuous two-agent coordination protocol (agreed 2026-11-14)
 
@@ -860,4 +860,44 @@ onOpenView?: (view: "horizon" | "compare") => void;   // side card exits: "Stand
 - The horizon line has 361 steps from the 360 bins. Apollo 11 shows FLAT with a flat readout; an out-of-coverage date shows "Unavailable"; no global styles; `destroy()` empties the container.
 - `check_visibility`, `check_ephem`, `check_horizon` PASS. `cd web && npm run typecheck && npm run build` OK.
 - **Not yet seen in a real browser:** Sheldon to open `panels.html`.
+
+### 2026-11-14 — Step 8, Lane A half: getSceneState DONE, READY.getSceneState = true
+**Data:** `data/ephem/_scene/` holds hourly sub-solar and sub-Earth points on the Moon, Sun and Earth distances, and the Sun–Moon–Earth angle. Coverage matches the site data: 2026–2029 + the six landing windows. ~2.3 MB, listed in `ephem/index.json` under `scene`.
+- Lane B's existing postbuild already copies it (it's inside `data/ephem/`); verified in `web/dist/data/ephem/_scene/`.
+- Built by `scripts/fetch_scene.mjs`. The index builder moved to `scripts/build_index.mjs`, shared, with no change to existing entries.
+
+**Horizons settings (manual + API doc + output header, details in `/data/README.md`):** `COMMAND='301'`, `CENTER='500@399'`, `QUANTITIES='14,15,19,20,24'`, `RANGE_UNITS=KM`. 14 = sub-Earth point ("center of the target disc seen by the OBSERVER"), 15 = sub-solar point, 19 = Sun range from the Moon's centre, 20 = Earth–Moon range, 24 = S-T-O. Header: `Target pole/equ : MOON_ME {East-longitude positive}`, `Target radii : 1737.4, 1737.4, 1737.4 km`.
+
+**/lib (API_VERSION 1.3.0):** new `await loadScene()` (all scene chunks, ~2.3 MB) and sync `getSceneState(utc)`. Same rules as the rest: the time is read at the start of its hour (`sampleUtc`), `OUT_OF_COVERAGE` RangeError outside coverage, `NOT_LOADED` before `loadScene()`. `getCoverage().scene` gives the ranges. Returns:
+```
+{ utc, sampleUtc, frame: "MOON_ME", frameNote, unit: "km",
+  sun:   { lon, lat, distKm, dir: [x,y,z], xyz: [x,y,z] },   // sub-solar point (-180..180 E) + Sun distance; dir = unit vector
+  earth: { lon, lat, distKm, dir: [x,y,z], xyz: [x,y,z] },   // sub-Earth point + Earth distance
+  sunEarthAngleDeg,                                          // Sun–Moon–Earth angle (Horizons S-T-O): ~0 full moon, ~180 new moon
+  source, mock: false }
+```
+Frame: Moon-fixed, east-positive; +X = 0°N 0°E, +Y = 0°N 90°E, +Z = north pole; origin = Moon centre; km. The Moon does not rotate in this frame; the Sun and Earth move.
+
+**Checks (`node scripts/check_scene.mjs` → PASS):**
+- **Hand-checked site/hours** (apollo11 2026-11-14 12:00, im1 2026-11-17 08:00, sp_malapert original point 2026-11-20 06:00): the Sun and Earth elevation implied by `getSceneState` at the site (vector from the site on the 1737.4 km sphere to the body) match Sheldon's Horizons web-app values within **0.0034°** (azimuth within 0.003°).
+- **All 10 sites, every 6th hour 2026–2029 (58,440 site-hours) vs our site files:** max elevation difference Sun 0.0007°, Earth 0.0065°.
+- The angle between the Sun and Earth directions equals Horizons' independent S-T-O within 0.006° (every hour 2026–2029). So `MOON_ME` (scene queries) and `MEAN_ME (high precision)` (site queries) agree in practice.
+- **Judge check:** 49 full moons found in 2026–2029 (minimum Sun–Moon–Earth angle about every 29.5 days). At every one the sub-solar and sub-Earth points are within 5.0° of each other (first: 2026-02-01 23:00Z, 2.3° apart; 2026-03-03 12:00Z, 0.4° apart).
+  - *Plain words: at full moon the Sun is behind Earth as seen from the Moon, so the spot with the Sun overhead and the spot with Earth overhead nearly coincide.*
+- **Tolerance 0.05°, why:**
+  - The two numbers being compared differ only in small effects: the site data are apparent directions seen from the site; the scene data are apparent sub-points seen from Earth's centre and from the Sun. Their light-time and aberration corrections differ slightly. (This is my explanation of the residual, not a doc statement.)
+  - Also storage rounding: 0.001° site files, 0.0001° scene.
+  - Observed worst case: 0.0065° over 58,440 site-hours. 0.05° leaves ~8× margin, is half PLAN's 0.1° acceptance tolerance, and is a tenth of the Sun's disc (~0.5°), so it can't change any lighting a viewer could see.
+- Also PASS: `check_visibility` (API 1.3.0, READY flags), `check_ephem`, `check_horizon`; `cd web && npm run build` OK.
+
+**What Lane B needs to light the Moon from the real Sun direction (step 8):**
+1. Once, at start-up: `await loadScene()` (from `lib/visibility.js`, next to `loadDaily()`).
+2. For the shared selected time (the same UTC the side card uses, e.g. landing date 00:00Z or the horizon view's hour): `const sc = getSceneState(utc)`.
+3. Convert Moon-fixed vectors to your Three.js axes with the same mapping as `spherePoint`: `toThree([x, y, z]) = new THREE.Vector3(x, z, -y)`.
+4. **Sunlight:** a `DirectionalLight` at `toThree(sc.sun.dir).multiplyScalar(10)` (any distance; the Sun is far enough that its light is parallel), with `target` at the Moon's centre (0,0,0). Keep at most a very low ambient light so the night side reads as night. Don't rotate the Moon mesh: in this frame the Moon is fixed and the light moves.
+5. **Earth:** draw it in the direction `toThree(sc.earth.dir)` at any display distance (label "not to scale"). The real distance is `sc.earth.distKm` if you want to show it in text. It is lit by the same light.
+6. **Remove the "illustrative lighting" label** only after your own check:
+   - At 2026-11-14 12:00 UTC, Apollo 11 should sit just past the terminator on the night side (its Sun elevation is −7.07°).
+   - sp_malapert at 2026-09-19 06:00 UTC should be on the day side (Sun +1.05° above level). The globe shows no terrain, so ridge-blocking appears only in the side card and horizon view. Say so on screen.
+7. Hourly samples: snap to `sc.sampleUtc`; don't interpolate in /web. `getSceneState` throws `OUT_OF_COVERAGE` outside 2026–2029 / the landing windows, which the shell should show as "lighting unavailable".
 
