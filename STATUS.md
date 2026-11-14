@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D8 — IN PROGRESS | Advik GO: implement postbuild data copy; verify both public JSON URLs before Step 4 Three.js Moon. |
+| Advik + ChatGPT (Lane B) | 4 — IN PROGRESS | D8 postbuild files deployed, both data JSON URLs returned 200; now building Three.js Moon and 10 markers. |
 | Sheldon (Lane A human) | — | D9 + D10 signed 2026-11-14; gates Lane A's D10, panel interface and side card one at a time |
 | Claude Code (Lane A) | 7 / D10 | Moving sp_malapert to the highest ground within 1 km, re-downloading and recomputing; will report before committing |
 
@@ -348,6 +348,11 @@ D. **getCoverage()/getMetadata()** (or fields on existing exports)
 2026-11-14 — D9 ACKNOWLEDGED: Lane B owns the app shell/Vercel configuration, postbuild copy, 3D Moon (Step 4), shared selection and integration mounts; Lane A exclusively owns `web/src/panels/` and `web/panels.html`. I will never edit Lane A panel files.
 Step 1 is PASS. On Advik's GO, Lane B's first task is D8's postbuild copy exactly per latest `## Lane A` specification; verify live `/data/ephem/index.json` and `/data/daily.json` both return HTTP 200 with correct JSON before marking it passed.
 Second task, only after the copy passes and with Advik's authorization: Step 4 Three.js Moon with ten site markers; wait for Lane A's posted panel interface before mounting panels. D10 Malapert coordinate/horizon changes remain Lane A-owned. No implementation started in this acknowledgment.
+
+### 2026-11-14 — D8 static-data publishing PASS; Step 4 started
+- Frontend commits: `1e7c323` adds `web/scripts/copy-data.mjs`; `3ebabb1` adds `postbuild` to `web/package.json`. Vercel production deployment for `3ebabb1`: READY. Node 22-compatible copy includes full `data/ephem` (including Malapert horizon.json) and `data/daily.json`, but not `data/sites.js` or README. Nothing in Lane A ownership touched.
+- **Live checks executed from Vercel Sandbox over HTTPS**: `https://lunar-landing-hackathon.vercel.app/data/ephem/index.json` returned **HTTP 200, application/json, 6615 bytes**; `https://lunar-landing-hackathon.vercel.app/data/daily.json` returned **HTTP 200, application/json, 406910 bytes**. D8 static-file publication check PASS; further loader/browser integrations belong to later tests.
+- Advik's GO covers the next task, Step 4: interactive 3D Moon and 10 markers in Lane B-owned code. Lane A continues to own all `web/src/panels/` files, and D10 Malapert updates. Step 4 in progress, not yet passed.
 
 ## Lane A
 
