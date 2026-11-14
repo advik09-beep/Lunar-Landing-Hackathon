@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D13–D15 — IMPLEMENTED / TESTED; STOPPED | Shared UTC date/hour controls, corrected marker verdict colors, overview + reduced-motion stars, NASA 4K map, global legend and four A–D pole selectors live; human visual signoff pending. |
+| Advik + ChatGPT (Lane B) | D14 — REFINEMENT IN PROGRESS | Replace barely visible stars with clearly animated depth-parallax background; prepare OzAILabs iframe integration pending required GitHub fork and separate public deployment. |
 | Sheldon (Lane A human) | — | Planning stop 2026-11-14: D12-D18 signed; acceptance run done |
 | Claude Code (Lane A) | 10 (D12 terrain) | D12 DONE: all 10 sites have LOLA terrain; stopped. Next Lane A tasks per plan: (3) detailed Moon assets, (4) D16 + D17, (5) D18, on Sheldon's go |
 
