@@ -4,7 +4,7 @@
 // v1.2: Sun and Earth status are shown at the shared hour of the stay (props.hour, default 0).
 // All values come from /lib/visibility.js; nothing is calculated here except formatting.
 import { V, type Site, type State, type Summary, type Horizon } from "./data";
-import { createPanelRoot, esc, deg, az, pct, VERDICT_WORDS, addDays, fmtUtc, clampHour } from "./shared";
+import { createPanelRoot, esc, deg, az, pct, VERDICT_WORDS, verdictShort, addDays, fmtUtc, clampHour } from "./shared";
 import type { MountPanel, PanelProps } from "./types";
 
 type Mode = "plain" | "numbers"; // shown as Educator / Researcher
@@ -95,7 +95,7 @@ export const mountSideCard: MountPanel = (container, props) => {
       </div>
       <div class="verdict" data-verdict="${summary.verdict}">
         <span class="symbol" aria-hidden="true">${w.symbol}</span>
-        <div><strong>${esc(w.label)}</strong><span class="why-short">: ${esc(w.short)}</span></div>
+        <div><strong>${esc(w.label)}</strong><span class="why-short">: ${esc(verdictShort(summary.verdict, state.horizonModel))}</span></div>
       </div>
       <p class="horizon-label"><span class="tag" data-model="${state.horizonModel}">${flat ? "FLAT" : "TERRAIN"}</span> ${esc(horizonLabel)}</p>
       ${mode === "plain" ? plain() : numbers()}
@@ -208,7 +208,9 @@ function whySentence(s: Summary, flat: boolean): string {
     case "out": return `Sunlight and Earth are in view together just ${both} of the stay (sunlight ${lit}, Earth ${com}).`;
     case "edge": {
       const who = s.pctSunEdge > 50 && s.pctEarthEdge > 50 ? "The Sun and Earth stay" : s.pctSunEdge > 50 ? "The Sun stays" : "Earth stays";
-      return `${who} within 2° of the horizon for most of the stay, so small details of the terrain decide${flat ? " — and this site uses a flat horizon, so treat the answer as uncertain" : ""}.`;
+      return flat
+        ? `${who} within 2° of the horizon for most of the stay, so terrain decides — and this site uses a flat horizon, so treat the answer as uncertain.`
+        : `${who} within 2° of the terrain skyline for most of the stay: grazing the skyline, so small changes in position matter.`;
     }
   }
 }

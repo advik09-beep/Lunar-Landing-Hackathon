@@ -987,3 +987,12 @@ interface PanelHandle { update(next: Partial<Pick<PanelProps, "siteId" | "landin
   - `check_ephem`, `check_scene` PASS. `cd web && npm run build` OK.
 - **Next (stage 2, on Sheldon's go):** IM-2, IM-1, Chandrayaan-3 at their landed coordinates. IM-1 (80.13°S) is at the edge of the 20 m polar map and Chandrayaan-3 (69.4°S) is outside it, so they need other maps (e.g. `ldem_75s_30m`, `ldem_60s_60m`). Lane A will check those products in the PDS folder before using them.
 
+### 2026-11-14 — "On the edge" wording by horizon model; Cabeus B point kept
+- **Sheldon:** at terrain sites, "on the edge" must not say "terrain decides", because terrain is already included.
+  - Lane A panels now use **"grazing the skyline: small changes in position matter"** for terrain (LOLA) sites, and keep **"the Sun or Earth hugs the horizon, so terrain decides"** for flat-horizon sites.
+  - Applied to the side card (verdict line and "why" sentence), the Compare grid (cell tooltips + a legend line explaining both), and the root README. Shared helper: `EDGE_WORDS` / `verdictShort(verdict, model)` in `web/src/panels/shared.ts`.
+  - DOM test: Malapert 2026-01-07 (edge, terrain) → "grazing the skyline"; IM-2 2026-01-05 (edge, flat) → "terrain decides". `/web` build OK.
+- **Not edited, needs both humans:** PLAN.md ("on the edge (terrain decides)", Settled earlier) and DESIGN.md ("…so terrain decides"). Suggested wording: "on the edge (flat sites: terrain decides; terrain sites: grazing the skyline)".
+- **Lane B:** the globe legend and marker labels only say "On the edge" (fine). If you add a description, use the same two phrases.
+- **Cabeus B point kept** (Sheldon). The reason is recorded in the root README: the Earth-facing skyline is downhill ground around a high point, the same situation as Malapert's eastern bins.
+

@@ -3,7 +3,7 @@
 // that day, straight from getDaily() (the daily summary). Timeline strip: hourly sunlight /
 // Earth-in-view for the selected site over the same dates, from getTimeline().
 import { V, type Verdict } from "./data";
-import { createPanelRoot, esc, pct, VERDICT_WORDS, addDays } from "./shared";
+import { createPanelRoot, esc, pct, VERDICT_WORDS, EDGE_WORDS, addDays } from "./shared";
 import type { MountPanel, PanelProps } from "./types";
 
 const COLS = 28;          // landing dates shown at once
@@ -68,7 +68,8 @@ export const mountCompareGrid: MountPanel = (container, props) => {
         const selCell = selRow && d === current.landingDate;
         if (!r) return `<td class="na${selCell ? " selcell" : ""}" title="${esc(`${s.name}, ${d}: no data for this stay`)}"><span aria-label="${esc(`${s.name}, ${d}: no data`)}">–</span></td>`;
         const w = VERDICT_WORDS[r.verdict];
-        const tip = `${s.name}, landing ${d}: ${w.label}. Over ${days} days: sunlight ${pct(r.pctLit)}, Earth in view ${pct(r.pctComms)}, both ${pct(r.pctBoth)}, longest dark ${r.longestDarkHours} h.`;
+        const edgeWhy = r.verdict === "edge" ? ` (${EDGE_WORDS[model === "FLAT" ? "flat" : "lola"]})` : "";
+        const tip = `${s.name}, landing ${d}: ${w.label}${edgeWhy}. Over ${days} days: sunlight ${pct(r.pctLit)}, Earth in view ${pct(r.pctComms)}, both ${pct(r.pctBoth)}, longest dark ${r.longestDarkHours} h.`;
         return `<td class="${selCell ? "selcell" : ""}"><button type="button" class="v" data-verdict="${r.verdict}" data-action="cell" data-site="${s.id}" data-date="${d}" title="${esc(tip)}" aria-label="${esc(tip)}">${w.symbol}</button></td>`;
       }).join("");
       return `<tr class="${selRow ? "selrow" : ""}"><th scope="row"><button type="button" data-action="site" data-site="${s.id}" ${selRow ? 'aria-current="true"' : ""}>${esc(s.name)}</button> <span class="tag" data-model="${model === "FLAT" ? "flat" : "lola"}">${model}</span></th>${cells}</tr>`;
@@ -87,6 +88,7 @@ export const mountCompareGrid: MountPanel = (container, props) => {
         ${(Object.keys(VERDICT_WORDS) as Verdict[]).map((v) => `<span><b class="v" data-verdict="${v}" aria-hidden="true">${VERDICT_WORDS[v].symbol}</b> ${esc(VERDICT_WORDS[v].label)}</span>`).join("")}
         <span><b class="v na" aria-hidden="true">–</b> No data</span>
       </div>
+      <p class="muted small">⚠ On the edge — FLAT rows: ${esc(EDGE_WORDS.flat)}. TERRAIN rows: ${esc(EDGE_WORDS.lola)}.</p>
       <nav class="window" aria-label="Move the date window">
         <button type="button" data-action="earlier">◀ ${SHIFT} days earlier</button>
         <span class="muted">${esc(dates[0])} to ${esc(dates[COLS - 1])}</span>

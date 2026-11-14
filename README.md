@@ -11,7 +11,7 @@ It has two reading levels:
 - **Numbers:** angles, margins, sources and a CSV download, for mission planners and researchers.
 
 ## What you can do
-- **Explore in 3D:** a Moon globe (NASA imagery) with 10 sites, each colored *and* labeled by verdict for the chosen landing date: ✓ Clear, ◐ Partial, ✕ Out, ⚠ On the edge (terrain decides).
+- **Explore in 3D:** a Moon globe (NASA imagery) with 10 sites, each colored *and* labeled by verdict for the chosen landing date: ✓ Clear, ◐ Partial, ✕ Out, ⚠ On the edge (at flat-horizon sites: terrain decides; at terrain sites: grazing the skyline, so small changes in position matter).
 - **Side card:** for one site and date: verdict, Sun and Earth status, whether the horizon is flat or real terrain, sources and coverage, and a CSV of the 168 hourly values.
 - **Compare dates:** a grid of sites × landing dates, plus an hour-by-hour strip showing when the Sun and Earth are in view.
 - **Stand here:** a 360° horizon panorama with the Sun and Earth paths over the stay. For the four south-pole sites it shows real terrain from NASA's LOLA laser altimeter, so you can see the Sun blocked by a ridge (other sites are being added, D12).
@@ -19,7 +19,7 @@ It has two reading levels:
 The 10 sites: Apollo 11, 12 and 17; Chandrayaan-3; Intuitive Machines IM-1 and IM-2; and four south-pole points from NASA's Artemis III candidate regions (Peak near Cabeus B, Haworth, Malapert Massif, Nobile Rim 2).
 
 **Verdict rule** (signed by both team members, shown on screen):
-- *On the edge:* the Sun or Earth is within 2° of the horizon more than half the stay, so terrain decides.
+- *On the edge:* the Sun or Earth is within 2° of the horizon more than half the stay. At flat-horizon sites that means terrain decides; at terrain sites (terrain already included) it means the body is grazing the skyline, so small changes in position matter.
 - Otherwise *clear* if Sun and Earth are both up at least 90% of the stay, *out* if both are up 10% or less, and *partial* in between.
 
 There is no single "best site" score: sunlight and Earth contact trade off, and the right choice depends on the mission.
@@ -78,6 +78,7 @@ The data are static JSON files in `data/`. There is no backend.
 ## Known limits
 - **Sun and Earth are treated as points.** The Sun's disc is about 0.5° wide, so near the horizon real sunlight is partial while we show all-or-nothing.
 - **"Sunlight" is not power and "Earth in view" is not a guaranteed link.** They mean the body is above the horizon.
+- **Cabeus B's view toward Earth is set by ground 0.26–0.7 km away** (76% of Earth hours). That ground slopes downhill around a high point, so it decides how far *below* level Earth can be seen, not a ridge in the way. It's the same situation as Malapert's eastern bins (6°–8°). We kept the point on purpose.
 - **Terrain is modelled at the four south-pole sites so far** (prototype). The other six still use a flat horizon and are labeled FLAT. Each terrain horizon is for one point; nearby spots differ. The observer height (2 m mast) is assumed.
 - **The four south-pole sites are representative points** of ~15 km candidate regions, not landing spots.
 - **Data are hourly.** Sunrise/sunset times are accurate to the hour.

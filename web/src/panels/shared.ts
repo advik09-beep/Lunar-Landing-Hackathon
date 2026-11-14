@@ -40,8 +40,19 @@ export const VERDICT_WORDS: Record<Verdict, { label: string; symbol: string; sho
   clear: { label: "Clear", symbol: "✓", short: "sunlight and Earth in view together most of the stay" },
   partial: { label: "Partial", symbol: "◐", short: "sunlight and Earth in view together only part of the stay" },
   out: { label: "Out", symbol: "✕", short: "sunlight and Earth rarely in view together" },
-  edge: { label: "On the edge", symbol: "⚠", short: "the Sun or Earth hugs the horizon, so terrain decides" },
+  edge: { label: "On the edge", symbol: "⚠", short: "the Sun or Earth hugs the horizon, so terrain decides" }, // flat-horizon wording
 };
+
+/** "On the edge" means different things by horizon model (Sheldon, 2026-11-14):
+ *  flat sites: terrain isn't modelled, so terrain decides; terrain sites: terrain is already included,
+ *  so the body is grazing the skyline and small changes in position matter. */
+export const EDGE_WORDS = {
+  flat: "the Sun or Earth hugs the horizon, so terrain decides",
+  lola: "grazing the skyline: small changes in position matter",
+} as const;
+export function verdictShort(v: Verdict, model: "flat" | "lola"): string {
+  return v === "edge" ? EDGE_WORDS[model] : VERDICT_WORDS[v].short;
+}
 
 /** Clamp a shared hour to the stay: 0 .. hours-1 (whole hours). */
 export function clampHour(h: number | undefined, hours: number): number {
