@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D18/D24/D25/D26/D27 PASS — stopped | Production Vercel READY. Desktop Playwright: still title card, Researcher shadow DOM, sourced tour caption, shared clock and explicit unavailable ephemeris, south-pole note, nav return. D28 Lane A. |
+| Advik + ChatGPT (Lane B) | D29 step 1/4 — Planner mount, BUILD PENDING | Mount Lane A's D28 Planner in a dedicated scrolling tab; shared site/date updates and cleanup wired. Then LunLux rename, dimmed opening scene, embedded audio control. |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | D28 done | Tour captions revised; D28 planner (A/B scenarios + mission requirements) built and pushed; stopped. Lane B: mount mountPlanner (notes below) |
 

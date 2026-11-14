@@ -3,7 +3,7 @@ import { listSites, loadDaily, getDaily, loadScene, getSceneState, MOCK, API_VER
 import { LunarScene, type MoonSite, type Verdict, type SceneState } from './moon';
 import { OverviewScene } from './overview';
 import { mountStarfield } from './starfield';
-import { mountSideCard, mountCompareGrid, mountHorizonView, mountResearcher, type PanelHandle } from './panels';
+import { mountSideCard, mountCompareGrid, mountHorizonView, mountResearcher, mountPlanner, type PanelHandle } from './panels';
 
 interface Site extends MoonSite {
   kind?: string;
@@ -63,7 +63,7 @@ app.innerHTML = [
   '<main class="app-shell">',
   '  <header class="topbar">',
   '    <div class="brand"><span class="brand-kicker">NASA SPACE APPS 2026</span><strong>Lunar Landing Site Navigator</strong></div>',
-  '    <nav class="primary-nav" aria-label="Application views"><button id="nav-overview" type="button" class="nav-active" aria-pressed="true">Overview</button><button id="nav-tour" type="button">Solar system tour</button><button id="nav-explore" type="button" aria-pressed="false">Explore in 3D</button><button id="nav-compare" type="button" aria-pressed="false">Compare dates</button><button id="nav-horizon" type="button" aria-pressed="false">Stand here</button><button id="nav-researcher" type="button" aria-pressed="false">Researcher</button><button id="nav-credits" type="button" aria-pressed="false">Credits</button></nav>',
+  '    <nav class="primary-nav" aria-label="Application views"><button id="nav-overview" type="button" class="nav-active" aria-pressed="true">Overview</button><button id="nav-tour" type="button">Solar system tour</button><button id="nav-explore" type="button" aria-pressed="false">Explore in 3D</button><button id="nav-compare" type="button" aria-pressed="false">Compare dates</button><button id="nav-horizon" type="button" aria-pressed="false">Stand here</button><button id="nav-researcher" type="button" aria-pressed="false">Researcher</button><button id="nav-planner" type="button" aria-pressed="false">Planner</button><button id="nav-credits" type="button" aria-pressed="false">Credits</button></nav>',
   '    <span class="real-data-chip">JPL Horizons · real data</span>',
   '  </header>',
   '  <section class="intro-block">',
@@ -130,6 +130,7 @@ app.innerHTML = [
   '  <section id="compare-view" class="panel-view" aria-label="Compare landing dates" hidden><div id="compare-mount"></div></section>',
   '  <section id="horizon-view" class="panel-view" aria-label="Stand here horizon panorama" hidden><div id="horizon-mount"></div></section>',
   '  <section id="researcher-view" class="panel-view researcher-view" aria-label="Researcher analysis" hidden><div id="researcher-mount"></div></section>',
+  '  <section id="planner-view" class="panel-view planner-view" aria-label="Planner: A/B scenarios and mission requirements" hidden><div id="planner-mount"></div></section>',
   '  <section id="credits-view" class="panel-view credits-view" aria-label="Project credits" hidden>',
   '    <h2>Credits and sources</h2>',
   '    <p>We distinguish scientific data from visual illustration. The Moon image is aesthetic imagery; it is not used to calculate landing-site visibility.</p>',
@@ -223,7 +224,8 @@ let sideCard: PanelHandle | null = null;
 let compareGrid: PanelHandle | null = null;
 let horizonView: PanelHandle | null = null;
 let researcherView: PanelHandle | null = null;
-type View = 'overview' | 'explore' | 'compare' | 'horizon' | 'researcher' | 'credits';
+let plannerView: PanelHandle | null = null;
+type View = 'overview' | 'explore' | 'compare' | 'horizon' | 'researcher' | 'planner' | 'credits';
 let activeView: View = 'overview';
 
 function showTourTitle(): void {
@@ -240,7 +242,7 @@ function startSolarTour(): void {
 }
 function openView(view: View): void {
   activeView = view;
-  for (const name of ['overview', 'explore', 'compare', 'horizon', 'researcher', 'credits'] as View[]) {
+  for (const name of ['overview', 'explore', 'compare', 'horizon', 'researcher', 'planner', 'credits'] as View[]) {
     find<HTMLElement>(name + '-view').hidden = name !== view;
     const button = find<HTMLButtonElement>('nav-' + name);
     button.classList.toggle('nav-active', name === view);
@@ -256,6 +258,7 @@ function updateAllPanels(): void {
   compareGrid?.update(next);
   horizonView?.update(next);
   researcherView?.update(next);
+  plannerView?.update({siteId: selectedSite, landingDate: selectedDate});
 }
 
 
@@ -508,7 +511,8 @@ sideCard = mountSideCard(find<HTMLDivElement>('side-card-mount'), panelProps);
 compareGrid = mountCompareGrid(find<HTMLDivElement>('compare-mount'), panelProps);
 horizonView = mountHorizonView(find<HTMLDivElement>('horizon-mount'), panelProps);
 researcherView = mountResearcher(find<HTMLDivElement>('researcher-mount'), panelProps);
-for (const name of ['overview', 'explore', 'compare', 'horizon', 'researcher', 'credits'] as View[]) {
+plannerView = mountPlanner(find<HTMLDivElement>('planner-mount'), panelProps);
+for (const name of ['overview', 'explore', 'compare', 'horizon', 'researcher', 'planner', 'credits'] as View[]) {
   find<HTMLButtonElement>('nav-' + name).addEventListener('click', () => openView(name));
 }
 updateButtons();
@@ -548,4 +552,5 @@ window.addEventListener('pagehide', () => {
   compareGrid?.destroy();
   horizonView?.destroy();
   researcherView?.destroy();
+  plannerView?.destroy();
 }, { once: true });

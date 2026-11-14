@@ -205,3 +205,6 @@ h2 { margin: 0; font-size: 1.75rem; line-height: 1.23; letter-spacing: -.035em; 
 .tour-science-caption details { margin-top: 10px; }
 .explore-south-pole-note { color: #bed5ee; font-size: .86rem; line-height: 1.5; padding: 0 15px; }
 .overview-clock-status { padding: 8px 16px; color: #d8e7ff; font-size: .8rem; }
+
+/* D28 Planner: the full site/date A/B comparison and constraints remain scrollable. */
+.planner-view { max-height: min(82vh, 1000px); overflow-y: auto; overscroll-behavior: contain; padding-bottom: 24px; }
