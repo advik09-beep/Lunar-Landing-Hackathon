@@ -8,7 +8,7 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 0.0.0.0",
     "typecheck": "tsc --noEmit",
-    "postbuild": "node scripts/copy-data.mjs && node scripts/copy-moon.mjs"
+    "postbuild": "node scripts/copy-data.mjs"
   },
   "devDependencies": {
     "typescript": "^5.5.0",
