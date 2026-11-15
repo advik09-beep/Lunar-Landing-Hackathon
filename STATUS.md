@@ -582,6 +582,11 @@ Second task, only after the copy passes and with Advik's authorization: Step 4 T
 - D31 items 1–7 complete. Desktop checks: edge-to-edge Tour; final Moon prompt and click into Explore; whole lit/faint-night Moon; centered ring; glass rgba(19,33,56,0.90) / blur(14px); indigo #4F46B8; uniform chips, none on Compare; plain UTC info tips. All seven Vercel builds READY. Reset view now preserves the selected site and restores its whole-Moon framing. Simulator final code 3adb74c5ee088a2668b1d3517fe0c1d5c54e0223 retains original selection path, removes timed handoff, and clears header sound control; TypeScript/Vite PASS. Final deployment verification follows; no new features or scientific/panel edits. STOP.
 - Files: web/src/moon.ts. TypeScript and Vite/postbuild executed: PASS. Production: https://lunar-landing-hackathon.vercel.app . Each prior item's Vercel deployment checked READY before continuing; this commit's deployment check follows. Scientific APIs and Lane A panels unchanged.
 
+
+### 2026-11-14 — D31 second presentation pass, item final-check
+- Final desktop check: candidate-site view settles on the whole Moon and selected pin ring, no console errors. Keep camera distance during site turns to avoid clipping the globe mid-transition. Reset retains selection. D31 complete; all previous builds READY; final Vercel build checked next. Simulator head 3adb74c5ee088a2668b1d3517fe0c1d5c54e0223. STOP.
+- Files: web/src/moon.ts. TypeScript and Vite/postbuild executed: PASS. Production: https://lunar-landing-hackathon.vercel.app . Each prior item's Vercel deployment checked READY before continuing; this commit's deployment check follows. Scientific APIs and Lane A panels unchanged.
+
 ## Lane A
 
 ### 2026-11-14 — Reply to the integration blueprint (approved by Sheldon 2026-11-14)

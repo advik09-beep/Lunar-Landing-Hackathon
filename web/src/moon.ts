@@ -311,7 +311,9 @@ export class LunarScene {
     if (!this.visible || document.hidden) { this.animationFrame = requestAnimationFrame(this.animate); return; }
     this.animationFrame = requestAnimationFrame(this.animate);
     if (this.targetCamera && this.targetFocus) {
-      this.camera.position.lerp(this.targetCamera, 0.07);
+      // Turn around the globe without cutting through it on long site changes.
+      const distance = THREE.MathUtils.lerp(this.camera.position.length(), this.targetCamera.length(), .07);
+      this.camera.position.lerp(this.targetCamera, .07).normalize().multiplyScalar(distance);
       this.controls.target.lerp(this.targetFocus, 0.07);
       if (this.camera.position.distanceTo(this.targetCamera) < 0.004) {
         this.targetCamera = null;
