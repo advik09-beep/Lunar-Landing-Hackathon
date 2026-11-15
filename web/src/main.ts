@@ -4,7 +4,7 @@ import '@fontsource/source-serif-4/600.css';
 import '@fontsource/source-serif-4/700.css';
 import './style.css';
 import { syncShellCopy, syncTourSources } from './educatorCopy';
-import { listSites, loadDaily, getDaily, loadScene, getSceneState, MOCK, VERDICT_RULE, TOUR_STOPS, SOUTH_POLE } from '../../lib/visibility.js';
+import { listSites, loadDaily, getDaily, loadScene, getSceneState, MOCK, VERDICT_RULE, TOUR_STOPS, SOUTH_POLE, SCORE_OWN_FORMULA } from '../../lib/visibility.js';
 import { LunarScene, type MoonSite, type Verdict, type SceneState } from './moon';
 import { OverviewScene } from './overview';
 import { mountStarfield } from './starfield';
@@ -150,6 +150,8 @@ app.innerHTML = [
   '  <section id="planner-view" class="panel-view planner-view" aria-label="Planner: A/B scenarios and mission requirements" hidden><div id="planner-mount"></div></section>',
   '  <section id="credits-view" class="panel-view credits-view" aria-label="Project credits" hidden>',
   '    <h2>LunLux — Credits and sources</h2>',
+  '    <p>Made for the NASA Space Apps Challenge 2026. <a href="https://github.com/advik09-beep/Lunar-Landing-Hackathon" target="_blank" rel="noopener noreferrer">View the code on GitHub</a>.</p>',
+  '    <p>' + SCORE_OWN_FORMULA + '</p>',
   '    <p><strong>LunLux</strong> — Sunlight and Earth contact for lunar landing sites.</p><p>We distinguish scientific data from visual illustration. The Moon image is aesthetic imagery; it is not used to calculate landing-site visibility.</p>',
   '    <h3>NASA Scientific Visualization Studio — CGI Moon Kit</h3>',
   '    <p>Moon surface color map: <a href="https://svs.gsfc.nasa.gov/4720" target="_blank" rel="noopener noreferrer">NASA SVS CGI Moon Kit (2025), official 2K JPEG and 4K color JPEG derived once from the 2025 4096×2048 sRGB TIFF</a>. Credit: NASA\'s Scientific Visualization Studio. Derived from LROC color data with polar albedo fill. NASA media usage is governed by <a href="https://www.nasa.gov/nasa-brand-center/images-and-media/" target="_blank" rel="noopener noreferrer">NASA media usage guidelines</a>; no separate software license is asserted for the imagery.</p>',

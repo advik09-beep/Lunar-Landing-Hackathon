@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D33 8/10 — share links | Items 1–7 Vercel READY; URL parameters restore site/date/hour/level/tab/view; build pending |
+| Advik + ChatGPT (Lane B) | D33 9/10 — credit | Items 1–8 Vercel READY; challenge attribution, code link and score disclaimer; build pending |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | D33 Lane A part done (items 1–6) | Stay length 1/3/7/14 (Researcher) done within the time box; stopped |
 
@@ -1769,3 +1769,8 @@ Done within the 2-hour time box (all checks passing about 7 minutes after starti
 - URL query parameters now preserve site, ISO date, hour, Educator/Researcher level, active tab and Globe/Horizon choice. Validated site IDs, calendar dates and hour ranges on load; deep links restore panel and switches, and ongoing choices replace the current URL without adding slider history entries.
 - URL stays omitted until item 10 adds the Researcher stay-length control. Browser-level QA remains separate from build validation.
 - Item 8 build pending.
+
+### 2026-11-15 — Lane B D33 item 9: Data and methods attribution
+- Item 8 Vercel build `dpl_2qY6f9Zw4tNGUzc7rAf233bHdiCr` READY for `6c597db`.
+- Data and methods now says `Made for the NASA Space Apps Challenge 2026` and links directly to the project GitHub repository. Added Lane A's exact `SCORE_OWN_FORMULA` sentence to avoid implying NASA endorses the team's score formula.
+- Item 9 build pending.
