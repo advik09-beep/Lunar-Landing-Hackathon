@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D31 COMPLETE — STOPPED | Seven presentation items built and deployed in order; desktop checks PASS |
+| Advik + ChatGPT (Lane B) | D32 item 1/5 — branding | Wordmark in header and Tour; browser icon; awaiting Vercel build before item 2 |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | D32 Lane A part done | Seven-year-old Educator screens, Learn / Report, kid tour captions, best week, all-sites download; stopped |
 
@@ -1636,3 +1636,8 @@ SOUTH_POLE.sources;          // [{ name, url }]
 
 **Checks:** all ten scripts PASS (new `check_d32`: kid captions, best week = highest score, series = hourly recount, every Malapert eclipse on NASA's list, all-sites table, Learn facts, brand and photo files). Panel tests PASS, with the new D32 test: no degrees in Educator text, sentences ≤ 20 words, rings and strip equal the data, best week, planner hidden, exact photo credits, charts, all-sites CSV. Older tests were updated where they checked the old Educator wording, and the stale flat-horizon wording test was retired. `cd web && npm run build` OK.
 
+
+### 2026-11-14 — Lane B D32 item 1: brand assets
+- Re-read PLAN.md D32, DESIGN.md D32 and the STATUS.md live board before editing.
+- Header and Tour use the committed LunLux wordmark with `alt="LunLux"`; the browser icon is `/brand/lunlux-icon.png`.
+- Build status: pending Vercel verification on this source commit; next task is self-hosted Urbanist only after a successful deployment.
