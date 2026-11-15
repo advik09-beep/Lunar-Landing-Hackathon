@@ -6,7 +6,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 |-----|------|-----------|
 | Advik + ChatGPT (Lane B) | Borealis background music added; Vercel READY, listening QA pending | Opt-in music button across tabs, 12% volume, older embedded simulator sound remains muted; CC BY 4.0 credit on site and in NOTICE/README |
 | Sheldon (Lane A human) | D35 signed with Advik | 2026-11-15: D29–D35 signed; directed the D35 final look and deck pass (Lane A does the whole pass incl. web shell and deck); reviewing the recoloured site and the seven-page PDF |
-| Claude Code (Lane A) | D35 done (parts 1–4) | Grey theme + Moon-phase verdicts, today's date, deck fixed and recoloured with turning cover Moon, screenshots and PDF redone; stopped |
+| Claude Code (Lane A) | D36 done (parts 1–3) | Coloured globe pins with spreading and leader lines, larger grid icons, deck slides 6–7 fixed, 02/03 retaken, PDF re-exported; stopped |
 | Collaborative presentation | Seven-slide screenshot pass deployed | Separate Vercel project `lunlux-presentation`, production build READY; all six screenshots and wordmark HTTP 200; final human visual QA pending |
 
 ## 2026-11-15 — Lane B background music: Borealis by Scott Buckley
@@ -1932,4 +1932,20 @@ Done within the 2-hour time box (all checks passing about 7 minutes after starti
 - **Part 4:** README eclipse row (nine of ten found directly, within 3 h; the tenth a graze missed by under 1%) and AI-use additions. `check_d19`'s summary line now says the same thing. Sheldon's row updated.
 - **Checks:** all twelve scripts PASS, panel tests PASS, `cd web && npm run build` OK, `cd presentation && npm run build` OK.
 - **Note for Lane B:** the shell files touched were `web/src/style.css`, `main.ts`, `moon.ts`, `starfield.ts`, `overview.ts`, `educatorCopy.ts` and `web/index.html`. Please pull before your next edit. Your code comment "D35 Moon handoff" in `style.css` predates PLAN's D35 and refers to something else.
+
+### 2026-11-15 — D36 pins, grid icons and deck polish: Lane A DONE (Lane B not editing)
+- **Recorded:** D36 in PLAN.md and DESIGN.md.
+- **Part 1, globe pins (`b07083d`, `3ea91a6`):**
+  - Solid bodies with a dark `#0A0A0B` outline and the grey Moon-phase icon on a dark disc inside. Green `#4FBF7A` for Clear / Partial, coral `#F28B82` for Out, violet `#B48CF0` for On the edge, grey for no data. Checked in headless Chromium on the lit and the dark Moon (Malapert 2026-11-22; Apollo 11 2026-11-01 at night) and in the south-pole view.
+  - The Explore legend chips use the same colours (`.pin-swatch`, `--llp-pin-*`).
+  - Overlapping pins are pushed apart on screen with thin leader lines to their true spots. Pins draw on top and are hidden on the far side; hit-testing only sees near-side pins. The selected and hovered site names sit beside the drawn pin, in whichever spot covers the fewest other pins.
+  - Done well inside the 45-minute time box, so pins were not shrunk. Everything else stays black and grey.
+- **Part 2 (`3d231ab`):** Compare grid phase icons enlarged (24 px cells, 22 px legend). Hard (solid ring) and Tricky (dashed ring with dot) are now easy to tell apart.
+- **Part 3, deck:**
+  - Slide 6's two panels fill the slide, with larger text, top-aligned.
+  - Screenshot captions now sit below the picture, so slide 7's caption no longer covers the chart (slides 2 and 4 too).
+  - Screenshots 02 and 03 retaken at 1440×810 @2x.
+  - PDF re-exported: 7 pages, each looked at. All seven slides show when stepping with the arrow keys, no page errors.
+- **Checks:** all twelve scripts PASS, panel tests PASS, web build and presentation build OK.
+- **Not retaken:** 01, 04 and 05 (not asked). Screenshot 04 still shows the smaller grid icons from before Part 2.
 
