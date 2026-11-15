@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D33 COMPLETE — STOPPED | All 10 D33 items implemented; item 10 production build e25d4c7 READY. Human browser QA remains open. |
+| Advik + ChatGPT (Lane B) | D34 item 2 — Data and methods | Six simulator textures removed and live alias 404; comprehensive credits implementation awaiting build |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | D34 Lane A part done | LICENSE + NOTICE, audit reply, Learn redesign, slider/compass/Stand here fixes, README licence; stopped |
 | Collaborative presentation | Initial web deck | Separate `presentation/` draft; Sheldon + Claude science review pending; build unverified |
@@ -1849,3 +1849,7 @@ Done within the 2-hour time box (all checks passing about 7 minutes after starti
 - Advik + ChatGPT lead narrative/design; Sheldon + Claude lead scientific source review. Shared presentation status and README establish ownership and safe GitHub coordination.
 - Demo is currently an external link to the same site/date/hour in Educator and Researcher; iframe and borrowed simulator images are NOT included pending browser and licensing checks.
 - Dependency install, build, browser QA, separate Vercel project and human narrative sign-off are NOT YET VERIFIED. The current PLAN D34 license/attribution decisions remain unaffected.
+
+### 2026-11-15 — D34 Lane B items 1 and 2 (one at a time)
+- Item 1 already completed on fork commit `aa00c53` (removed six image binaries; Pluto, Europa, Io, Ganymede, Callisto and Titan `texturePath:null`); Vercel fork build `dpl_GEXhAFVqUH8AgcgNeCVHdzCMUqP4` READY. Found legacy LunLux simulator alias still serving six assets (all HTTP 200), reassigned `solar-system-simulator-usmdo-club.vercel.app` to the clean deployment. Verified all six endpoints HTTP **404** on canonical alias, clean `beta` alias and new deployment; a retained Earth texture returned 200. Old immutable deployment URLs may still exist and are not claimed purged. No wider audit performed.
+- Item 2: Data and methods now enumerates NASA scientific datasets and landing-site sources, each Learn NASA photo with exact credits, CMU/Source Serif licences, Three.js/Vite/TypeScript/types, simulator upstream license uncertainty, and the twelve retained CC BY 4.0 texture files. Links to Lane A NOTICE and appropriate official licence/source pages. Removed misleading assertion that the six deleted maps remain in use. Build pending.

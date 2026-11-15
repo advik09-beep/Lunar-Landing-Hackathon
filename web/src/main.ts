@@ -4,6 +4,7 @@ import '@fontsource/source-serif-4/600.css';
 import '@fontsource/source-serif-4/700.css';
 import './style.css';
 import { syncShellCopy, syncTourSources } from './educatorCopy';
+import { methodsCredits } from './methodsCredits';
 import { listSites, loadDaily, getDaily, loadScene, getSceneState, MOCK, VERDICT_RULE, TOUR_STOPS, SOUTH_POLE, SCORE_OWN_FORMULA, STAY_OPTIONS } from '../../lib/visibility.js';
 import { LunarScene, type MoonSite, type Verdict, type SceneState } from './moon';
 import { OverviewScene } from './overview';
@@ -159,20 +160,7 @@ app.innerHTML = [
   '    <p>Made for the NASA Space Apps Challenge 2026. <a href="https://github.com/advik09-beep/Lunar-Landing-Hackathon" target="_blank" rel="noopener noreferrer">View the code on GitHub</a>.</p>',
   '    <p>' + SCORE_OWN_FORMULA + '</p>',
   '    <p><strong>LunLux</strong> — Sunlight and Earth contact for lunar landing sites.</p><p>We distinguish scientific data from visual illustration. The Moon image is aesthetic imagery; it is not used to calculate landing-site visibility.</p>',
-  '    <h3>NASA Scientific Visualization Studio — CGI Moon Kit</h3>',
-  '    <p>Moon surface color map: <a href="https://svs.gsfc.nasa.gov/4720" target="_blank" rel="noopener noreferrer">NASA SVS CGI Moon Kit (2025), official 2K JPEG and 4K color JPEG derived once from the 2025 4096×2048 sRGB TIFF</a>. Credit: NASA\'s Scientific Visualization Studio. Derived from LROC color data with polar albedo fill. NASA media usage is governed by <a href="https://www.nasa.gov/nasa-brand-center/images-and-media/" target="_blank" rel="noopener noreferrer">NASA media usage guidelines</a>; no separate software license is asserted for the imagery.</p>',
-  '    <h3>Scientific ephemerides and terrain</h3>',
-  '    <p>Sun and Earth directions, visibility and stay summaries: <a href="https://ssd.jpl.nasa.gov/horizons/" target="_blank" rel="noopener noreferrer">NASA/JPL Horizons</a>. Terrain horizons at all ten landing sites use NASA Lunar Reconnaissance Orbiter Laser Altimeter (LOLA) GDR elevation maps via PDS Geosciences, including polar and global coverage; observer coordinates, map sources and resolution for each site are listed in each site’s report. NASA/JPL Horizons supplies Sun/Earth ephemerides. The decorative Moon texture is not terrain elevation data.</p>',
-  '    <h3>NASA planet facts and tour captions</h3>',
-  '    <p>Tour captions use NASA science.nasa.gov planet fact pages, NASA SVS and JPL Horizons. Planet brightness figures are from our own JPL Horizons magnitude queries, labeled as team calculations.</p>',
-  '    <h3>Fonts</h3>',
-  '    <p>Headings: <a href="https://www.npmjs.com/package/computer-modern" target="_blank" rel="noopener noreferrer">CMU Serif (computer-modern)</a>; the font files use SIL Open Font License 1.1 (the npm wrapper is MIT). All other text: <a href="https://www.npmjs.com/package/@fontsource/source-serif-4" target="_blank" rel="noopener noreferrer">Source Serif 4 (@fontsource/source-serif-4)</a>, SIL Open Font License 1.1. Both are self-hosted; no external font requests.</p>',
-  '    <h3>3D rendering library</h3>',
-  '    <p><a href="https://threejs.org/" target="_blank" rel="noopener noreferrer">Three.js</a> and OrbitControls, copyright Three.js authors, <a href="https://github.com/mrdoob/three.js/blob/master/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>. The interactive globe and three-body overview were written for this project. Original drifting starfield visually informed by <a href="https://www.huescreen.com/starfield/" target="_blank" rel="noopener noreferrer">Hue Screen Starfield</a> (no code or assets copied), and previously by <a href="https://github.com/etrepat/starfield" target="_blank" rel="noopener noreferrer">etrepat/starfield</a>, copyright (c) 2010 Estanislau Trepat, <a href="https://github.com/etrepat/starfield/blob/develop/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>; legacy Three.js source was not copied.</p>',
-  '    <h3>Solar-system overview — upstream simulator</h3>',
-  '    <p>Approved upstream: <a href="https://github.com/OzAILabs/SolarSystemSimulator" target="_blank" rel="noopener noreferrer">OzAILabs/SolarSystemSimulator</a>. The authors describe its source as MIT-licensed in the README. Its planetary textures are separately sourced from <a href="https://www.solarsystemscope.com/textures/" target="_blank" rel="noopener noreferrer">Solar System Scope</a> (CC BY 4.0), Planet Pixel Emporium, NASA/USGS Astrogeology and Steve Albers; attribution and individual reuse terms follow the upstream README. Our public <a href="https://github.com/advik09-beep/SolarSystemSimulator" target="_blank" rel="noopener noreferrer">GitHub fork</a> runs separately at <a href="https://solar-system-simulator-usmdo-club.vercel.app/" target="_blank" rel="noopener noreferrer">solar-system-simulator-usmdo-club.vercel.app</a>; the embedded simulator receives the shared UTC inspection clock, but its planetary positions are illustrative and not validated JPL ephemerides.</p>',
-  '    <h3>Implementation and limitations</h3>',
-  '    <p>Moon-fixed Sun lighting uses verified hourly JPL Horizons scene data. Earth position and terrain visibility remain available in the Stand here horizon view. The globe is smooth; local terrain appears in Horizon. A faint light shows the night side as a visual aid, not sunlight. The moving stars are decorative, not an observed lunar sky. Any future borrowed assets must be added here with attribution and license before release.</p>',
+  ...methodsCredits(sites),
   '  </section>',
   '  <footer class="site-footer">NASA/JPL Horizons; NASA LRO LOLA; Hourly data</footer>',
   '</main>',
