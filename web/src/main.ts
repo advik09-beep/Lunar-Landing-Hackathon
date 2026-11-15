@@ -80,7 +80,7 @@ app.innerHTML = [
   '    <label class="toolbar-site" for="site-picker">Site <select id="site-picker" aria-label="Landing site"></select></label>',
   '    <div class="toolbar-date"><button id="date-prev" type="button" aria-label="Move landing date seven days earlier">−7</button><label class="sr-only" for="landing-date">Landing date UTC</label><input id="landing-date" type="date" value="2026-11-14" aria-label="Landing date UTC"><button id="date-next" type="button" aria-label="Move landing date seven days later">+7</button></div>',
   '    <label class="toolbar-hour" for="hour-slider">Inspect <input id="hour-slider" type="range" min="0" max="167" value="0" step="1" aria-label="Moment inspected within the seven-day stay"><output id="hour-output" for="hour-slider">Day 1 · 00:00 UTC</output></label>',
-  '    <details class="clock-tip"><summary aria-label="About the date and inspection time">ⓘ</summary><p>The 7-day stay starts at 00:00 UTC on the landing date. The slider chooses the moment you inspect within that stay; it does not move the landing time. Hourly data.</p></details>',
+  '    <details class="clock-tip"><summary aria-label="About the date and inspection time">ⓘ</summary><p>The 7-day stay starts at 00:00 UTC on the landing date. The slider chooses the moment you inspect within that stay; it does not move the landing time. Hourly data. Drag the Moon to turn it; scroll to zoom. A faint light shows the night side; it is a visual aid, not sunlight.</p></details>',
   '    <p id="data-status" class="sr-only" role="status" aria-live="polite">Loading conditions…</p>',
   '  </section>',
   '  <section id="verdict-legend" class="verdict-legend" aria-label="Seven-day verdict legend" hidden>',
@@ -104,11 +104,9 @@ app.innerHTML = [
   '    <div class="scene-column">',
   '      <div class="explore-controls"><div class="view-toggle" role="group" aria-label="Explore view"><button id="globe-mode" type="button" aria-pressed="true">Globe</button><button id="horizon-mode" type="button" aria-pressed="false">Horizon</button></div></div>',
   '      <div class="moon-window">',
-  '        <div class="scene-heading"><span>MOON-FIXED VIEW</span><span>3D · Drag to rotate · Scroll to zoom</span></div>',
-  '        <p id="explore-south-pole-note" class="explore-south-pole-note"></p>',
   '        <div id="moon-stage" class="moon-stage" aria-label="Interactive 3D Moon with landing markers"></div>',
-  '        <div class="scene-controls"><button type="button" id="reset-view">Reset view</button><button type="button" id="polar-view">South pole view</button><span>NASA SVS Moon imagery · JPL Horizons Sun lighting · no terrain mesh</span></div>',
-  '        <p id="lighting-status" class="lighting-status" role="status" aria-live="polite">Loading Sun/Earth directions from JPL Horizons…</p>',
+  '        <div class="scene-controls"><button type="button" id="reset-view">Reset view</button><button type="button" id="polar-view">South pole view</button></div>',
+  '        <p id="lighting-status" class="lighting-status sr-only" role="status" aria-live="polite">Loading Sun/Earth directions from JPL Horizons…</p>',
   '      </div>',
 
 
@@ -152,7 +150,6 @@ const sitePicker = find<HTMLSelectElement>('site-picker');
 const status = find<HTMLParagraphElement>('data-status');
 const lightingStatus = find<HTMLParagraphElement>('lighting-status');
 const select = find<HTMLInputElement>('landing-date');
-find<HTMLElement>('explore-south-pole-note').textContent = SOUTH_POLE.oneLine;
 const hourSlider = find<HTMLInputElement>('hour-slider');
 const hourOutput = find<HTMLOutputElement>('hour-output');
 const DATE_MIN = Date.UTC(2026, 0, 1);
@@ -210,6 +207,7 @@ function startSolarTour(): void {
 function openView(view: View): void {
   if (view === 'horizon') { exploreMode = 'horizon'; view = 'explore'; }
   if (view === 'planner') view = 'compare';
+  const enteringExplore = view === 'explore' && activeView !== 'explore';
   activeView = view;
   document.body.dataset.view = view;
   find<HTMLElement>('global-clock').hidden = view === 'overview' || view === 'credits';
@@ -223,6 +221,7 @@ function openView(view: View): void {
   if (view === 'compare') find<HTMLElement>('planner-view').hidden = false;
   updateAllPanels();
   setExploreMode(exploreMode);
+  if (enteringExplore) moon?.focusSite(selectedSite);
   // Detach the independent WebGL iframe outside Tour so it cannot consume GPU time.
   if (simulatorFrame) {
     if (view === 'overview' && !simulatorFrame.isConnected) find<HTMLElement>('overview-stage').append(simulatorFrame);

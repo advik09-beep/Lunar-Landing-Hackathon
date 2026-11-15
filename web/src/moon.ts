@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { THEME } from './panels/shared';
-import { createNebulaBackground } from './nebula';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 export type MoonSite = {
@@ -51,7 +50,7 @@ export class LunarScene {
   private renderer: THREE.WebGLRenderer;
   private readonly ambientLight: THREE.AmbientLight;
   private readonly sunLight: THREE.DirectionalLight;
-  private readonly nebula: THREE.CanvasTexture;
+  private readonly inspectionLight: THREE.DirectionalLight;
   private scene = new THREE.Scene();
   private camera: THREE.PerspectiveCamera;
   private controls: OrbitControls;
@@ -103,8 +102,8 @@ export class LunarScene {
     this.renderer.toneMappingExposure = 1.5;
     this.container.appendChild(this.renderer.domElement);
 
-    this.nebula = createNebulaBackground();
-    this.scene.background = this.nebula;
+    // Transparent canvas lets the shared moving starfield continue behind the Moon.
+    this.renderer.setClearColor(0x000000, 0);
 
     this.camera = new THREE.PerspectiveCamera(42, 1, 0.01, 100);
     this.camera.position.set(2.6, 1.4, 3.4);
@@ -115,10 +114,11 @@ export class LunarScene {
     this.controls.maxDistance = 7.2;
     this.controls.enablePan = false;
 
-    // One authoritative Sun source from Lane A scene data; no second key/rim
-    // that would incorrectly illuminate the Moon's true night side.
-    this.ambientLight = new THREE.AmbientLight(0xffffff, 0.32);
+    // Sun direction remains data-driven. This faint camera-side light is a labeled visual aid.
+    this.ambientLight = new THREE.AmbientLight(0xffffff, 0.14);
     this.scene.add(this.ambientLight);
+    this.inspectionLight = new THREE.DirectionalLight(0xcbd5e8, 0.24);
+    this.scene.add(this.inspectionLight);
     this.sunLight = new THREE.DirectionalLight(0xfff9ed, 0);
     this.sunLight.position.set(10, 0, 0);
     this.sunLight.target.position.set(0, 0, 0);
@@ -228,7 +228,7 @@ export class LunarScene {
     // The Moon is fixed; the actual Sun direction changes with UTC.
     this.sunLight.position.copy(sun).multiplyScalar(10);
     this.sunLight.intensity = 3.2;
-    this.ambientLight.intensity = 0.065;
+    this.ambientLight.intensity = 0.14;
 
   }
 
@@ -262,9 +262,9 @@ export class LunarScene {
     if (!marker) return;
     this.selected = id;
     this.setPoleCallouts(marker.site.kind === 'south-pole');
-    const position = marker.normal.clone().multiplyScalar(2.0);
+    const position = marker.normal.clone().multiplyScalar(this.wholeMoonDistance());
     this.targetCamera = position;
-    this.targetFocus = marker.normal.clone().multiplyScalar(0.18);
+    this.targetFocus = new THREE.Vector3();
     for (const m of this.markers) {
       m.halo.scale.setScalar(m.site.id === id ? 1.3 : 1);
       m.halo.visible = true;
@@ -283,6 +283,12 @@ export class LunarScene {
     this.selected = null;
     this.targetCamera = new THREE.Vector3(2.6, 1.4, 3.4);
     this.targetFocus = new THREE.Vector3(0, 0, 0);
+  }
+
+  private wholeMoonDistance(): number {
+    const halfVertical = THREE.MathUtils.degToRad(this.camera.fov) / 2;
+    const halfHorizontal = Math.atan(Math.tan(halfVertical) * this.camera.aspect);
+    return 1.14 / Math.sin(Math.min(halfVertical, halfHorizontal));
   }
 
   private resize(): void {
@@ -305,6 +311,7 @@ export class LunarScene {
       }
     }
     this.controls.update();
+    this.inspectionLight.position.copy(this.camera.position);
     this.renderer.render(this.scene, this.camera);
   };
 
@@ -334,7 +341,6 @@ export class LunarScene {
         material.dispose();
       }
     });
-    this.nebula.dispose();
     this.renderer.dispose();
     this.renderer.domElement.remove();
   }
