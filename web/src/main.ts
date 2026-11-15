@@ -1,3 +1,5 @@
+import '@fontsource/urbanist/400.css';
+import '@fontsource/urbanist/600.css';
 import './style.css';
 import { listSites, loadDaily, getDaily, loadScene, getSceneState, MOCK, VERDICT_RULE, TOUR_STOPS, SOUTH_POLE } from '../../lib/visibility.js';
 import { LunarScene, type MoonSite, type Verdict, type SceneState } from './moon';
@@ -133,6 +135,8 @@ app.innerHTML = [
   '    <p>Sun and Earth directions, visibility and stay summaries: <a href="https://ssd.jpl.nasa.gov/horizons/" target="_blank" rel="noopener noreferrer">NASA/JPL Horizons</a>. Terrain horizons at all ten landing sites use NASA Lunar Reconnaissance Orbiter Laser Altimeter (LOLA) GDR elevation maps via PDS Geosciences, including polar and global coverage; observer coordinates, map sources and resolution for each site are listed in each site’s report. NASA/JPL Horizons supplies Sun/Earth ephemerides. The decorative Moon texture is not terrain elevation data.</p>',
   '    <h3>NASA planet facts and tour captions</h3>',
   '    <p>Tour captions use NASA science.nasa.gov planet fact pages, NASA SVS and JPL Horizons. Planet brightness figures are from our own JPL Horizons magnitude queries, labeled as team calculations.</p>',
+  '    <h3>Heading font</h3>',
+  '    <p><a href="https://fontsource.org/fonts/urbanist/about" target="_blank" rel="noopener noreferrer">Urbanist</a> by Corey Hu / The Urbanist Project Authors, self-hosted via @fontsource/urbanist. Licensed under the <a href="https://openfontlicense.org/open-font-license-official-text/" target="_blank" rel="noopener noreferrer">SIL Open Font License 1.1</a> (Copyright 2021 The Urbanist Project Authors).</p>',
   '    <h3>3D rendering library</h3>',
   '    <p><a href="https://threejs.org/" target="_blank" rel="noopener noreferrer">Three.js</a> and OrbitControls, copyright Three.js authors, <a href="https://github.com/mrdoob/three.js/blob/master/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>. The interactive globe and three-body overview were written for this project. Original drifting starfield visually informed by <a href="https://www.huescreen.com/starfield/" target="_blank" rel="noopener noreferrer">Hue Screen Starfield</a> (no code or assets copied), and previously by <a href="https://github.com/etrepat/starfield" target="_blank" rel="noopener noreferrer">etrepat/starfield</a>, copyright (c) 2010 Estanislau Trepat, <a href="https://github.com/etrepat/starfield/blob/develop/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>; legacy Three.js source was not copied.</p>',
   '    <h3>Solar-system overview — upstream simulator</h3>',

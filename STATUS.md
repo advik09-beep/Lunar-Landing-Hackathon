@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D32 item 1/5 — branding | Wordmark in header and Tour; browser icon; awaiting Vercel build before item 2 |
+| Advik + ChatGPT (Lane B) | D32 item 2/5 — headings | Item 1 Vercel READY; Urbanist heading imports and license; checking Vercel build |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | D32 Lane A part done | Seven-year-old Educator screens, Learn / Report, kid tour captions, best week, all-sites download; stopped |
 
@@ -1641,3 +1641,9 @@ SOUTH_POLE.sources;          // [{ name, url }]
 - Re-read PLAN.md D32, DESIGN.md D32 and the STATUS.md live board before editing.
 - Header and Tour use the committed LunLux wordmark with `alt="LunLux"`; the browser icon is `/brand/lunlux-icon.png`.
 - Build status: pending Vercel verification on this source commit; next task is self-hosted Urbanist only after a successful deployment.
+
+### 2026-11-14 — Lane B D32 item 2: Urbanist heading font
+- Item 1 Vercel deployment `dpl_Cw2kQfLQwcuDZJMUbA8kkHBjVGgk` READY for `fd60ce0`.
+- Added self-hosted Urbanist 400/600 via `@fontsource/urbanist` 5.3.0 and the shared `--llp-heading-font` variable; heading-only CSS leaves body copy and numbers unchanged.
+- Checked the font license against Fontsource and npm: **SIL OFL 1.1**, copyright 2021 The Urbanist Project Authors. Credits link to the notice and license.
+- Build status for item 2: pending Vercel verification before tab-label work.
