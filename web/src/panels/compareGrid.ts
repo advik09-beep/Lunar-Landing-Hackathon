@@ -91,7 +91,7 @@ export const mountCompareGrid: MountPanel = (container, props) => {
         const edgeWhy = r.verdict === "edge" ? ` (${EDGE_WORDS[model === "FLAT" ? "flat" : "lola"]})` : "";
         const tip = kid ? `${s.shortName}, landing ${kidDate(d)}: ${KID_VERDICT[r.verdict].label}.`
           : `${s.name}, landing ${d}: ${w.label}${edgeWhy}. Over ${days} days: sunlight ${pct(r.pctLit)}, Earth in view ${pct(r.pctComms)}, both ${pct(r.pctBoth)}, longest dark ${r.longestDarkHours} h.`;
-        return `<td class="${selCell ? "selcell" : ""}"><button type="button" class="v" data-verdict="${r.verdict}" data-action="cell" data-site="${s.id}" data-date="${d}" title="${esc(tip)}" aria-label="${esc(tip)}">${verdictIcon(r.verdict, 16)}</button></td>`;
+        return `<td class="${selCell ? "selcell" : ""}"><button type="button" class="v" data-verdict="${r.verdict}" data-action="cell" data-site="${s.id}" data-date="${d}" title="${esc(tip)}" aria-label="${esc(tip)}">${verdictIcon(r.verdict, 24)}</button></td>`;
       }).join("");
       return `<tr class="${selRow ? "selrow" : ""}"><th scope="row"><button type="button" data-action="site" data-site="${s.id}" title="${esc(s.name)}" ${selRow ? 'aria-current="true"' : ""}>${esc(s.shortName)}</button>${model === "FLAT" ? ' <span class="tag" data-model="flat">FLAT</span>' : ""}${s.category === "historic" ? (kid ? ' <span class="tag hist" title="A lander really landed here">Landed here</span>' : ' <span class="tag hist" title="Historic landing, shown for comparison">Historic</span>') : ""}</th>${cells}</tr>`;
     }).join("");
@@ -108,7 +108,7 @@ export const mountCompareGrid: MountPanel = (container, props) => {
         <p class="muted">Each cell is the verdict for a ${days}-day stay that starts at 00:00 UTC on that date. Click a cell to select that site and date.</p>
       </header>
       <div class="legend" aria-label="Legend">
-        ${(Object.keys(VERDICT_WORDS) as Verdict[]).map((v) => `<span><b class="v" data-verdict="${v}" aria-hidden="true">${verdictIcon(v, 16)}</b> ${esc(VERDICT_WORDS[v].label)}</span>`).join("")}
+        ${(Object.keys(VERDICT_WORDS) as Verdict[]).map((v) => `<span><b class="v" data-verdict="${v}" aria-hidden="true">${verdictIcon(v, 22)}</b> ${esc(VERDICT_WORDS[v].label)}</span>`).join("")}
         <span><b class="v na" aria-hidden="true">–</b> No data</span>
       </div>
       <p class="muted small">${verdictIcon("edge", 14)} On the edge: ${[...terrain.values()].some((t) => t !== "lola") ? `FLAT rows: ${esc(EDGE_WORDS.flat)}. TERRAIN rows: ${esc(EDGE_WORDS.lola)}.` : `${esc(EDGE_WORDS.lola)} (every site uses a terrain horizon).`}</p>
@@ -148,7 +148,7 @@ export const mountCompareGrid: MountPanel = (container, props) => {
         <button type="button" data-action="score-educator" aria-pressed="true">Educator</button>
         <button type="button" data-action="score-researcher" aria-pressed="false">Researcher</button></div>`}
       <div class="legend" aria-label="Legend">
-        ${(Object.keys(VERDICT_WORDS) as Verdict[]).map((v) => `<span><b class="v" data-verdict="${v}" aria-hidden="true">${verdictIcon(v, 16)}</b> ${esc(KID_VERDICT[v].label)}</span>`).join("")}
+        ${(Object.keys(VERDICT_WORDS) as Verdict[]).map((v) => `<span><b class="v" data-verdict="${v}" aria-hidden="true">${verdictIcon(v, 22)}</b> ${esc(KID_VERDICT[v].label)}</span>`).join("")}
         <span><b class="v na" aria-hidden="true">–</b> No data</span>
         <span class="bright-note">Bright means a better week.</span>
       </div>
@@ -305,10 +305,10 @@ table.grid { width: 100%; table-layout: fixed; border-collapse: separate; border
 .grid th[scope="row"] button { border: 0; background: transparent; color: inherit; padding: 2px 0; text-align: left; font-size: .8rem; max-width: 230px; overflow: hidden; text-overflow: ellipsis; vertical-align: middle; }
 .grid tr.selrow th[scope="row"] button { font-weight: 700; }
 .corner { text-align: left; color: var(--_muted); font-weight: 500; }
-.v { display: inline-flex; align-items: center; justify-content: center; width: 100%; max-width: 34px; height: 24px; border-radius: 5px; border: 1px solid transparent; background: rgba(255,255,255,.04); padding: 0; line-height: 1; }
+.v { display: inline-flex; align-items: center; justify-content: center; width: 100%; max-width: 36px; height: 32px; /* D36: larger phase icons so Hard and Tricky read at a glance */ border-radius: 5px; border: 1px solid transparent; background: rgba(255,255,255,.04); padding: 0; line-height: 1; }
 button.v { cursor: pointer; }
 .legend .v { width: auto; background: transparent; }
-.v.na, td.na span { display: inline-flex; align-items: center; justify-content: center; width: 100%; max-width: 34px; height: 24px; color: var(--_muted); background: transparent; border: 1px dashed var(--_border); border-radius: 5px; }
+.v.na, td.na span { display: inline-flex; align-items: center; justify-content: center; width: 100%; max-width: 36px; height: 32px; color: var(--_muted); background: transparent; border: 1px dashed var(--_border); border-radius: 5px; }
 td.selcell .v, td.selcell span { outline: 3px solid var(--_text); outline-offset: 1px; }
 .tag { display: inline-block; padding: 0 5px; border-radius: 5px; font-size: .62rem; font-weight: 700; letter-spacing: .05em; border: 1px solid currentColor; vertical-align: middle; }
 .tag[data-model="flat"] { color: var(--_muted); }
