@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D31 item 1 — in progress; built | Edge-to-edge Tour scene without card; bottom-left title over a soft dark gradient. |
+| Advik + ChatGPT (Lane B) | D31 item 2 — in progress; built | Final stop prompts Click on the Moon; embedded fork 883ae43f18fdac39fa7d5d8afab583683e07fc05 waits for Moon click and moves sound below header (fork TypeScript/Vite PASS). |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | D31 Lane A part done | Glass panels, flat sections, hollow Partial, full-width grid; stopped |
 
@@ -546,6 +546,11 @@ Second task, only after the copy passes and with Advik's authorization: Step 4 T
 ### 2026-11-14 — D31 second presentation pass, item 1
 - Edge-to-edge Tour scene without card; bottom-left title over a soft dark gradient.
 - Files: web/src/style.css. TypeScript and Vite/postbuild executed: PASS. Production: https://lunar-landing-hackathon.vercel.app . Each prior item's Vercel deployment checked READY before continuing; this commit's deployment check follows. Scientific APIs and Lane A panels unchanged.
+
+
+### 2026-11-14 — D31 second presentation pass, item 2
+- Final stop prompts Click on the Moon; embedded fork 883ae43f18fdac39fa7d5d8afab583683e07fc05 waits for Moon click and moves sound below header (fork TypeScript/Vite PASS).
+- Files: web/src/main.ts. TypeScript and Vite/postbuild executed: PASS. Production: https://lunar-landing-hackathon.vercel.app . Each prior item's Vercel deployment checked READY before continuing; this commit's deployment check follows. Scientific APIs and Lane A panels unchanged.
 
 ## Lane A
 

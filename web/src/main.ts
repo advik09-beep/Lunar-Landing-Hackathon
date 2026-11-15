@@ -437,7 +437,8 @@ if (embedUrl) {
         }
         caption.append(details);
         const handoff = document.createElement('p');
-        handoff.textContent = 'The tour will open Explore in about 12 seconds. Choose Skip to the Moon to open it now.';
+        handoff.className = 'moon-prompt';
+        handoff.textContent = 'Click on the Moon';
         caption.append(handoff);
       }
       caption.hidden = false;
