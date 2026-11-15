@@ -114,7 +114,7 @@ body[data-view="overview"] .brand-wordmark { visibility:hidden; }
 #compare-view #planner-view { max-height:none; overflow:visible; padding:0; margin-top:16px; }
 #researcher-view,#credits-view { height:calc(100dvh - 182px); min-height:300px; overflow:auto; overscroll-behavior:contain; padding:0 4px 8px 0; }
 #compare-mount,#planner-mount,#researcher-mount { min-width:0; }
-.credits-view { max-width:1040px; background:var(--llp-glass); backdrop-filter:blur(var(--llp-glass-blur)); -webkit-backdrop-filter:blur(var(--llp-glass-blur)); padding:12px 14px !important; border:0; border-radius:8px; font-size:.84rem; }
+.credits-view { max-width:1400px; margin-left:auto !important; margin-right:auto !important; background:var(--llp-glass); backdrop-filter:blur(var(--llp-glass-blur)); -webkit-backdrop-filter:blur(var(--llp-glass-blur)); padding:12px 14px !important; border:0; border-radius:8px; font-size:.84rem; }
 .credits-view h3 { margin-top:24px; }
 .credits-view p { color:var(--llp-muted); }
 .site-footer { display:flex; justify-content:flex-end; margin:8px 0; font-size:.75rem; color:var(--llp-muted); }
@@ -147,16 +147,17 @@ body[data-view="overview"] .site-footer { display:none; }
 
 /* D34 Educator: the "How we know" panel hugs its short facts list rather than filling the screen. */
 body[data-reading-level="educator"] #credits-view {
-  width:min(620px,100%); max-width:min(620px,100%);
+  width:min(900px,100%); max-width:min(900px,100%); margin-left:auto !important; margin-right:auto !important;
   height:fit-content; min-height:0; max-height:calc(100dvh - 180px);
   overflow-y:auto; padding:22px 26px !important;
 }
-.kid-sources-list { max-width:48ch; }
+.kid-sources-list { max-width:none; }
 .kid-sources-list p { margin:12px 0 14px; color:var(--llp-text); }
-.kid-sources-list ul { padding-left:24px; margin:0 0 18px; }
+.kid-sources-list ul { padding-left:24px; margin:0 0 18px; columns:2; column-gap:40px; }
 .kid-sources-list li { padding:5px 0; line-height:1.5; }
 .educator-credits summary { cursor:pointer; color:var(--llp-link); margin:6px 0 10px; }
-.rights-list { margin:10px 0 24px; padding-left:20px; }
+.rights-list { margin:10px 0 24px; padding-left:20px; columns:2; column-gap:40px; } /* final polish: two columns, no blank area */
+.rights-list li { break-inside:avoid; }
 .rights-list li { padding:8px 0; line-height:1.35; border-bottom:1px solid var(--llp-divider); }
 .rights-list li strong { display:block; font-weight:600; color:var(--llp-text); }
 .rights-list li span { color:var(--llp-muted); }

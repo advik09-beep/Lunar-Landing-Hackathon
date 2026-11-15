@@ -6,7 +6,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 |-----|------|-----------|
 | Lane B lead + ChatGPT (Lane B) | Borealis background music added; Vercel READY, listening QA pending | Opt-in music button across tabs, 12% volume, older embedded simulator sound remains muted; CC BY 4.0 credit on site and in NOTICE/README |
 | Lane A lead (human) | D35 signed with the Lane B lead | 2026-11-15: D29–D35 signed; directed the D35 final look and deck pass (Lane A does the whole pass incl. web shell and deck); reviewing the recoloured site and the seven-page PDF |
-| Claude Code (Lane A) | D37 done (parts 1–2) | Pins on true spots, verdict colours everywhere, Safari slider fix, names removed, deck relabelled with starfield, shots and PDF redone; stopped |
+| Claude Code (Lane A) | CODE FROZEN for submission | No further changes unless a human reports a bug |
 | Collaborative presentation | Seven-slide screenshot pass deployed | Separate Vercel project `lunlux-presentation`, production build READY; all six screenshots and wordmark HTTP 200; final human visual QA pending |
 
 ## 2026-11-15 — Lane B background music: Borealis by Scott Buckley
@@ -1962,4 +1962,10 @@ Done within the 2-hour time box (all checks passing about 7 minutes after starti
   - NASA demo-outline labels and the requested titles; slide 6 lists three achievements and three hurdles, each verified in the repo (sources in the slide notes); slide 7 adds "Next: pick any spot on the Moon and get its real terrain horizon."
   - Screenshots 01–05 retaken; PDF 7 pages, each looked at.
 - **Checks:** all twelve scripts, panel tests, web and presentation builds pass.
+
+### 2026-11-15 — Final polish; CODE FROZEN for submission
+- "How we know" (Educator) and "Data and methods" (Researcher) are centred and use more of the width; the Researcher lists are in two columns (the Educator facts list too).
+- Deck slide 3's three figure boxes span the full content width. PDF re-exported: 7 pages, each looked at.
+- All twelve check scripts, panel tests, web build and presentation build pass.
+- **The code is frozen for submission. No further changes unless a human reports a bug.**
 

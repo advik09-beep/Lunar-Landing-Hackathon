@@ -82,7 +82,8 @@ html,body,.reveal-viewport { background:var(--deep) !important; } /* Reveal pain
 .reflection-slide .facts { margin:22px 0 0; padding-left:28px; display:grid; gap:22px; }
 .reflection-slide .facts li { font-size:27px; line-height:1.3; color:var(--text); }
 .reveal .data-slide h2 { font-size:56px; margin:18px 0 18px; }
-.reveal .data-slide .stats { margin-top:30px; }
+.reveal .data-slide .stats { margin-top:30px; width:100%; max-width:none; } /* boxes span the full slide width */
+.reveal .data-slide .lead { max-width:none; }
 .reveal .data-slide .stats article { min-height:250px; }
 .reveal .data-slide .source { margin-top:24px; }
 .reveal .next-line { font-size:24px; color:var(--muted); margin:-12px 0 0; }
