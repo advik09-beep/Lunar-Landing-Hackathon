@@ -408,11 +408,14 @@ async function refreshDaily(): Promise<void> {
   const token = ++dailyRequestToken;
   const days = activeStayDays();
   daily = null;
+  moon?.setVerdicts(new Map<string, Verdict>(), days); // Do not show old stay/date verdicts while a new daily file loads.
+  status.dataset.state = 'loading';
   status.textContent = readingLevel === 'educator' ? 'Checking this week.' : 'Loading landing-site conditions…';
   try {
     await loadDaily(days);
     if (token !== dailyRequestToken) return;
     daily = getDaily(selectedDate, 1, days) as DailyResult;
+    status.dataset.state = 'ready';
     status.textContent = readingLevel === 'educator' ? 'Showing the week that starts on your day.' : days + '-day stay starting ' + formatUtc(selectedDate + 'T00:00:00Z') + '; hourly NASA/JPL Horizons data';
   } catch (error) {
     if (token !== dailyRequestToken) return;

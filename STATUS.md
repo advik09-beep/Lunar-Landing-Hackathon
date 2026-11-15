@@ -4,13 +4,13 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D33 10/10 — stay length | Items 1–9 Vercel READY; Researcher stay selector + shared hour/panels/links; checking final build |
+| Advik + ChatGPT (Lane B) | D33 COMPLETE — STOPPED | All 10 D33 items implemented; item 10 production build e25d4c7 READY. Human browser QA remains open. |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | D33 Lane A part done (items 1–6) | Stay length 1/3/7/14 (Researcher) done within the time box; stopped |
 
 Acceptance (both humans): steps 1, 2, 3, 6, 8 PASS; step 4 and 7 pending earlier findings. Signed: D7–D23 (see PLAN), **D24–D28** (title card + tour nav, tour captions, why the south pole, one clock, A/B scenarios + requirements filter). Rule: no status-only pushes.
 Waiting on Sheldon: read the new Educator screens on web/panels.html (level = Educator) and the Learn tab; confirm the two NASA photos and their captions.
-Waiting on Advik: D33 shell items: CMU Serif + Source Serif 4 (licences confirmed, see Lane A notes), --llp-heading-font, own-formula sentence in Data and methods, middle dots in shell files, the Researcher stay control and shareable links (Lane A notes, 2026-11-15).
+Waiting on Advik: Human visual and interaction QA of D33 in both reading levels: font loading, Tour overlays, verdict icons, Earth-overhead/selected/hover markers, small-screen note, shareable link restore, Researcher stay 1/3/7/14 with hour clamping and globe verdicts. The previous NASA objective audit gaps (optional custom coordinates, variable landing hour, no autoplay, no 3D terrain mesh) are documented below. No extra feature work requested.
 
 ## Continuous two-agent coordination protocol (agreed 2026-11-14)
 
@@ -1780,3 +1780,10 @@ Done within the 2-hour time box (all checks passing about 7 minutes after starti
 - Lane A's D33 `STAY_OPTIONS` and panel interface v1.5 are available. Added Researcher-only Stay dropdown (1, 3, 7, 14 days), 7 days in Educator; shared hour max and clamping; `stayDays` passed on mount and update; date/date-step stays shared.
 - Globe marker verdicts now load the matching precomputed daily file via `loadDaily(days)` then call `getDaily(date,1,days)`, guarding against stale async requests. Shareable URLs preserve `stay` only in Researcher. Fixed date share-link regex to parse numeric ISO dates as intended.
 - Awaiting item 10 Vercel build; no new work after final acceptance.
+
+
+### 2026-11-15 — Lane B D33 closure and NASA objective source audit
+- **D33 items 1–10 all implemented in order**, each with a separate Vercel production build checked before proceeding. Verified READY for 1 `4654da2` (`dpl_DDec3FEnwvjbc9jV6r1bCfoHngsY`); 2 `136cd61` (`dpl_BnqT6awjNLaHHoU9P3jDGMGpEy6R`); 3 `b8c53ee` (`dpl_7Dmg1CyEtLnoshzgyU4PmECR2WDT`); 4 `a3b774c` (`dpl_9K1ugfHwejYJBrABdqFaXbTDceWG`); 5 `c9d96ee` (`dpl_8rZ9QCdV7qLDPFxPhs8Pt4ifyZyS`); 6 `810b0de` (`dpl_9SrXqoTk5izqFi53ToEcYSdBkf7X`); 7 `e153b9d` (`dpl_9JRYrWaBAToVRNKgmgrLPJoq5fSU`); 8 `6c597db` (`dpl_2qY6f9Zw4tNGUzc7rAf233bHdiCr`); 9 `63b74e2` (`dpl_2Cf1Pq533fdEhauGbNAuthevwrec`); 10 `e25d4c7` (`dpl_GYZDCpmCH9xyc7ir8Gz7kvQJmyyg`). An in-scope loading-state correction in this closing code commit clears old globe verdicts while new date/stay data load; it still needs its own Vercel build verification.
+- **NASA challenge objectives source audit; not a browser interaction test:** Curated real landing sites; site/date grids and A/B comparison; Explore globe plus Sun/Earth horizon diagram; hourly and monthly timelines; Researcher elevation, time until next Sun/Earth visibility change, percentages, gap durations, power estimates; Educator/Researcher reading levels; actual NASA JPL Horizons ephemerides and LOLA terrain skyline models are present in source.
+- **Optional capabilities not implemented:** custom lunar coordinate input (deliberately cut per PLAN D6); arbitrary landing clock time (the hour slider inspects an hour within a stay starting 00:00 UTC, rather than changing touchdown time); automatic playback animation through a whole lunar day (manual hour slider and period charts exist); detailed 3D terrain mesh on the globe (smooth NASA imagery globe, scientific LOLA skyline in Horizon only). A broader mission-feasibility model (e.g. propulsion, hazards, full comms link budget) is also outside scope; the Sun/Earth score is a team-made score, not overall landing safety.
+- **Testing scope:** Vercel build READY verifies bundling and deployment, not that every visual interaction works. Human end-to-end review, mobile note check, NASA objective usability and signed step 4/7 acceptance remain open; no additional features authorized.
