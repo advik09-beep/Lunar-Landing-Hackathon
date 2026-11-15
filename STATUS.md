@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | Requested pass 1/5 completed | Simulator real-time templates corrected; six paths 404 on READY build; audit updated; next item 2 |
+| Advik + ChatGPT (Lane B) | Requested pass item 2 / 5 — Explore Earth horizon | Blue sub-Earth marker/label/explanation and dashed Earth-horizon great circle coded; build pending |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | Learn full width + Watch a month + Can you tell? done; slide 9 / 10 | stopped |
 | Collaborative presentation | Official working slides — changes required | Advik designated `presentation/` the official working deck; local preview `http://127.0.0.1:5179/` is not public. Revisions, Sheldon + Claude science review, build verification and final human approval pending. |
@@ -1882,3 +1882,7 @@ Done within the 2-hour time box (all checks passing about 7 minutes after starti
 - Simulator fork master `bc1c78f` replaced stale paths for Pluto, Europa, Io, Ganymede, Callisto, Titan in `src/data/realTimeOrbits.ts` with `texturePath: null`; primary body templates had already been corrected, so all six remain plain spheres.
 - Fork production Vercel build `dpl_8D4GRP7Az5cnvF2CWAKAtmGCUooD` READY; six deleted texture paths all 404, Earth retained texture 200. Source confirms both runtime template paths no longer request missing textures. No browser network trace.
 - `THIRD_PARTY_LICENSE_AUDIT.md` now distinguishes the six resolved texture cases from remaining upstream-code/CC BY/data/media approval questions. Not an expanded audit or overall license clearance. Next: item 2 Earth marker after this repo's deployment build.
+
+### 2026-11-15 — Five-item pass, item 2: Earth geometry and explanation
+- `web/src/moon.ts`: blue sub-Earth point now says "Earth is straight above here". Clicking its label or marker opens an accessible short explanation; close control provided. Computed Moon-fixed perpendicular great circle in a blue dashed line at radius 1.025; updated with the scene's actual Earth direction and hidden when no data. This is 0° geometric horizon, not LOLA terrain skyline.
+- `web/src/main.ts` and CSS: Explore-only blue dashed legend chip "Earth on horizon", interactive label and explanation styles. No Lane A files changed. Awaiting Vercel build. Next item 3 after READY.

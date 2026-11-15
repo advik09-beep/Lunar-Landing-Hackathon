@@ -109,6 +109,8 @@ export class LunarScene {
   private hoveredNameLabel!: HTMLDivElement;
   private earthOverheadLabel!: HTMLDivElement;
   private earthOverheadSprite!: THREE.Sprite;
+  private earthHorizonRing!: THREE.Line;
+  private earthExplanation!: HTMLDivElement;
   private earthOverheadNormal = new THREE.Vector3();
   private targetCamera: THREE.Vector3 | null = null;
   private targetFocus: THREE.Vector3 | null = null;
@@ -140,7 +142,29 @@ export class LunarScene {
     this.selectedNameLabel = this.createMapLabel('moon-site-label selected');
     this.hoveredNameLabel = this.createMapLabel('moon-site-label hovered');
     this.earthOverheadLabel = this.createMapLabel('moon-site-label earth-overhead-label');
-    this.earthOverheadLabel.textContent = 'Earth overhead';
+    this.earthOverheadLabel.textContent = 'Earth is straight above here';
+    this.earthOverheadLabel.setAttribute('role', 'button');
+    this.earthOverheadLabel.setAttribute('aria-label', 'Earth is straight above here. Read explanation');
+    this.earthOverheadLabel.tabIndex = 0;
+    this.earthOverheadLabel.addEventListener('click', () => this.toggleEarthExplanation());
+    this.earthOverheadLabel.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.toggleEarthExplanation(); }
+    });
+    this.earthExplanation = document.createElement('div');
+    this.earthExplanation.className = 'earth-explanation';
+    this.earthExplanation.hidden = true;
+    this.earthExplanation.setAttribute('role', 'note');
+    const heading = document.createElement('strong');
+    heading.textContent = 'Earth on the Moon';
+    const description = document.createElement('p');
+    description.textContent = 'At the blue dot, Earth is directly overhead. Along the dashed blue circle, Earth sits on the geometric horizon. Beyond that circle, the Moon blocks Earth. Nearby hills can also block the view.';
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'earth-explanation-close';
+    close.textContent = 'Close';
+    close.addEventListener('click', () => this.toggleEarthExplanation(false));
+    this.earthExplanation.append(heading, description, close);
+    this.container.append(this.earthExplanation);
 
     // Transparent canvas lets the shared moving starfield continue behind the Moon.
     this.renderer.setClearColor(0x000000, 0);
@@ -205,6 +229,21 @@ export class LunarScene {
     this.earthOverheadSprite.visible = false;
     this.scene.add(this.earthOverheadSprite);
 
+    // The great circle perpendicular to the Moon-fixed direction to Earth:
+    // every point on this line has Earth at exactly 0° geometric elevation.
+    // This is not a terrain-aware skyline; the Horizon panel handles terrain.
+    const horizonPoints = Array.from({ length: 257 }, (_, i) => {
+      const angle = i * Math.PI * 2 / 256;
+      return new THREE.Vector3(Math.cos(angle) * 1.025, Math.sin(angle) * 1.025, 0);
+    });
+    const horizonMaterial = new THREE.LineDashedMaterial({
+      color: THEME.earth, dashSize: 0.045, gapSize: 0.028, transparent: true, opacity: 0.85, depthWrite: false,
+    });
+    this.earthHorizonRing = new THREE.Line(new THREE.BufferGeometry().setFromPoints(horizonPoints), horizonMaterial);
+    this.earthHorizonRing.computeLineDistances();
+    this.earthHorizonRing.visible = false;
+    this.scene.add(this.earthHorizonRing);
+
     const gridMaterial = new THREE.LineBasicMaterial({ color: 0x7692bb, transparent: true, opacity: 0.19 });
     for (const lat of [-60, -30, 0, 30, 60]) {
       const points = Array.from({ length: 145 }, (_, i) => spherePoint(lat, i * 2.5 - 180, 1.006));
@@ -241,7 +280,11 @@ export class LunarScene {
     this.onPointerUp = (e) => {
       if (!this.downPosition || Math.hypot(e.clientX - this.downPosition.x, e.clientY - this.downPosition.y) > 7) return;
       const id = this.hitTest(e);
-      if (id) this.onSelect(id);
+      if (this.earthOverheadSprite.visible &&
+          this.earthOverheadNormal.dot(this.camera.position.clone().normalize()) > 0.1 &&
+          this.raycaster.intersectObject(this.earthOverheadSprite).length > 0) {
+        this.toggleEarthExplanation();
+      } else if (id) this.onSelect(id);
       this.downPosition = null;
     };
     this.onPointerMove = (e) => {
@@ -259,6 +302,11 @@ export class LunarScene {
     this.resizeObserver.observe(container);
     this.resize();
     this.animate();
+  }
+
+  private toggleEarthExplanation(open = this.earthExplanation.hidden): void {
+    this.earthExplanation.hidden = !open;
+    this.earthOverheadLabel.setAttribute('aria-expanded', String(open));
   }
 
   private hitTest(e: PointerEvent): string | null {
@@ -320,7 +368,7 @@ export class LunarScene {
       this.hoveredNameLabel.textContent = hovered.site.name;
       this.positionMapLabel(this.hoveredNameLabel, hovered.normal, 1.035, true);
     } else this.hoveredNameLabel.hidden = true;
-    if (this.earthOverheadSprite.visible) this.positionMapLabel(this.earthOverheadLabel, this.earthOverheadNormal, 1.14);
+    if (this.earthOverheadSprite.visible) this.positionMapLabel(this.earthOverheadLabel, this.earthOverheadNormal, 1.05, true);
     else this.earthOverheadLabel.hidden = true;
   }
 
@@ -336,6 +384,8 @@ export class LunarScene {
     this.earthOverheadNormal.copy(toThree(state.earth.dir)).normalize();
     this.earthOverheadSprite.position.copy(this.earthOverheadNormal).multiplyScalar(1.05);
     this.earthOverheadSprite.visible = true;
+    this.earthHorizonRing.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), this.earthOverheadNormal);
+    this.earthHorizonRing.visible = true;
   }
 
   clearSceneState(): void {
@@ -343,7 +393,9 @@ export class LunarScene {
     this.sunLight.intensity = 0;
     this.ambientLight.intensity = 0.32; // neutral inspection light, not ephemeris
     this.earthOverheadSprite.visible = false;
+    this.earthHorizonRing.visible = false;
     this.earthOverheadLabel.hidden = true;
+    this.toggleEarthExplanation(false);
   }
 
   setVerdicts(values: Map<string, Verdict>, stayDays = 7): void {
@@ -429,6 +481,7 @@ export class LunarScene {
     this.selectedNameLabel.remove();
     this.hoveredNameLabel.remove();
     this.earthOverheadLabel.remove();
+    this.earthExplanation.remove();
     for (const texture of this.pinTextures.values()) texture.dispose();
     this.pinTextures.clear();
     this.selectionTexture.dispose();
