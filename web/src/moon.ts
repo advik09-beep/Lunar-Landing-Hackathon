@@ -5,6 +5,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 export type MoonSite = {
   id: string;
   name: string;
+  shortName?: string;
   lat: number;
   lon: number;
   kind?: string;
@@ -105,6 +106,7 @@ export class LunarScene {
   private pointer = new THREE.Vector2();
   private selected: string | null = null;
   private hovered: string | null = null;
+  private readingLevel: 'educator' | 'researcher' = 'educator';
   private selectedNameLabel!: HTMLDivElement;
   private hoveredNameLabel!: HTMLDivElement;
   private earthOverheadLabel!: HTMLDivElement;
@@ -360,7 +362,7 @@ export class LunarScene {
   private updateMapLabels(): void {
     const selected = this.markers.find(marker => marker.site.id === this.selected);
     if (selected) {
-      this.selectedNameLabel.textContent = selected.site.name;
+      this.selectedNameLabel.textContent = this.readingLevel === 'educator' ? (selected.site.shortName || selected.site.name) : selected.site.name;
       this.positionMapLabel(this.selectedNameLabel, selected.normal, 1.035, true);
     } else this.selectedNameLabel.hidden = true;
     const hovered = this.markers.find(marker => marker.site.id === this.hovered && marker.site.id !== this.selected);
@@ -396,6 +398,11 @@ export class LunarScene {
     this.earthHorizonRing.visible = false;
     this.earthOverheadLabel.hidden = true;
     this.toggleEarthExplanation(false);
+  }
+
+  setReadingLevel(level: 'educator' | 'researcher'): void {
+    this.readingLevel = level;
+    this.updateMapLabels();
   }
 
   setVerdicts(values: Map<string, Verdict>, stayDays = 7): void {

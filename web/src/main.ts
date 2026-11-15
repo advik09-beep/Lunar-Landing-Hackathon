@@ -574,6 +574,7 @@ function syncReadingLevelUI(): void {
   find<HTMLElement>('researcher-view').setAttribute('aria-label', isEducator ? 'Learn about the Moon' : 'Researcher report');
   find<HTMLElement>('planner-view').hidden = activeView !== 'compare' || isEducator;
   document.body.dataset.readingLevel = readingLevel;
+  moon?.setReadingLevel(readingLevel);
   find<HTMLElement>('stay-control').hidden = isEducator;
   stayPicker.value = String(stayDays);
   hourSlider.max = String(activeStayDays()*24 - 1);

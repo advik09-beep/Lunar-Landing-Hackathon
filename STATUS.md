@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | Requested pass item 2 / 5 — Explore Earth horizon | Blue sub-Earth marker/label/explanation and dashed Earth-horizon great circle coded; build pending |
+| Advik + ChatGPT (Lane B) | Requested pass item 3/5 — short names | Selected 3D pin name now uses `shortName` in Educator, full name in Researcher; build pending |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | Learn full width + Watch a month + Can you tell? done; slide 9 / 10 | stopped |
 | Collaborative presentation | Official working slides — changes required | Advik designated `presentation/` the official working deck; local preview `http://127.0.0.1:5179/` is not public. Revisions, Sheldon + Claude science review, build verification and final human approval pending. |
@@ -1886,3 +1886,7 @@ Done within the 2-hour time box (all checks passing about 7 minutes after starti
 ### 2026-11-15 — Five-item pass, item 2: Earth geometry and explanation
 - `web/src/moon.ts`: blue sub-Earth point now says "Earth is straight above here". Clicking its label or marker opens an accessible short explanation; close control provided. Computed Moon-fixed perpendicular great circle in a blue dashed line at radius 1.025; updated with the scene's actual Earth direction and hidden when no data. This is 0° geometric horizon, not LOLA terrain skyline.
 - `web/src/main.ts` and CSS: Explore-only blue dashed legend chip "Earth on horizon", interactive label and explanation styles. No Lane A files changed. Awaiting Vercel build. Next item 3 after READY.
+
+### 2026-11-15 — Five-item pass, item 3: Educator site label
+- `web/src/moon.ts` now accepts the scientific site catalog's `shortName` field, uses it for the selected marker in Educator, and keeps full `name` in Researcher. Reading level changes refresh the label immediately via `setReadingLevel` from the shell. Hover labels remain unchanged; no Lane A files touched.
+- Item 2 build and its CSS follow-up both READY (`dpl_2BLGZ85f3N7dhZxFU4mbxKmbeE37`, `dpl_21UJa8ddPzq3zJghrmGKZtFyEg1X`). Item 3 build pending before Tour item 4.
