@@ -139,6 +139,11 @@ Everything this project uses that it did not make itself, with its licence or te
 | South Pole Illumination Map (PIA13720) | Learn tab | "Credits: NASA/GSFC/Arizona State University" | as published by NASA with that credit | https://science.nasa.gov/photojournal/south-pole-illumination-map |
 | NASA Releases New High-Resolution Earthrise Image (LRO) | Learn tab | "Image Credit: NASA/Goddard/Arizona State University" | as published by NASA with that credit | https://www.nasa.gov/image-article/nasa-releases-new-high-resolution-earthrise-image-2/ |
 
+**Audio**
+| Item | Used for | Licence / terms | Source |
+|---|---|---|---|
+| 'Borealis' by Scott Buckley | Quiet opt-in looping background music across LunLux; original MP3 streamed from the composer's site, player volume set to 12% | Creative Commons Attribution 4.0 International (CC BY 4.0); credit required, recording not part of our Apache-licensed work | https://www.scottbuckley.com.au/library/borealis/ , https://creativecommons.org/licenses/by/4.0/ |
+
 **Software, fonts and code**
 | Item | Used for | Licence | Source |
 |---|---|---|---|
