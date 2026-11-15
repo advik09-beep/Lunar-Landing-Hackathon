@@ -96,6 +96,25 @@ https://www.nasa.gov/nasa-brand-center/images-and-media/
      The music is not included in this repository and is not licensed under
      our Apache License.
 
+4b. Generated data used by the embedded Tour simulator (in the fork,
+    not in the original LunLux application)
+   - public/data/stars.json is a converted rendering table from Bretton
+     Wade's YaleBrightStarCatalog (bsc5-short.json), MIT License,
+     Copyright (c) 2016 Bretton Wade, with the underlying Yale Bright Star
+     Catalog acknowledged. Source and licence:
+     https://github.com/brettonw/YaleBrightStarCatalog
+     https://github.com/brettonw/YaleBrightStarCatalog/blob/master/LICENSE
+   - public/data/asteroids.bin and public/data/asteroids.json are generated
+     by the fork's scripts/build-asteroids.js from NASA/JPL Small-Body
+     Database Query API data:
+     https://ssd-api.jpl.nasa.gov/doc/sbdb_query.html
+   - public/ephemeris/*.bin and public/ephemeris/index.json are generated
+     by scripts/generate-horizons-cache.js from NASA/JPL Horizons vectors:
+     https://ssd-api.jpl.nasa.gov/doc/horizons.html
+   - The fork's source-generation scripts and its NOTICE document the
+     transformations. These credits do not imply that the upstream
+     simulator's incomplete standalone MIT documentation is resolved.
+
 5. npm packages (installed at build time, not stored in this repository)
    The presentation (presentation/) also uses reveal.js 6.0 (MIT),
    https://revealjs.com/ , three 0.181 (MIT) for the turning cover Moon,
