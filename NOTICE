@@ -30,7 +30,8 @@ https://www.nasa.gov/nasa-brand-center/images-and-media/
      State University, ISRO, NASA).
 
 2. NASA imagery (in web/)
-   - web/public/moon/lroc_color_2k.jpg and lroc_color_4k.jpg: NASA's
+   - web/public/moon/lroc_color_2k.jpg and lroc_color_4k.jpg (a copy of the 2K
+     map is also at presentation/public/moon/ for the slide-deck cover): NASA's
      Scientific Visualization Studio, CGI Moon Kit.
      Credit: NASA's Scientific Visualization Studio.
      https://svs.gsfc.nasa.gov/4720
@@ -87,7 +88,8 @@ https://www.nasa.gov/nasa-brand-center/images-and-media/
 
 5. npm packages (installed at build time, not stored in this repository)
    The presentation (presentation/) also uses reveal.js 6.0 (MIT),
-   https://revealjs.com/ , with Vite 7 (MIT) and the same two font packages.
+   https://revealjs.com/ , three 0.181 (MIT) for the turning cover Moon,
+   Vite 7 (MIT) and the same two font packages.
    Each is under its own licence, in its folder under web/node_modules:
    - three 0.181 (MIT), https://threejs.org/
    - vite 5.4 (MIT), https://vite.dev/

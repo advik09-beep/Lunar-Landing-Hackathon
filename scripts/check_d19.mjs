@@ -61,7 +61,7 @@ for (const [d, ty] of NASA) {
   if (!found) console.log(`     NASA ${ty} ${d.slice(0, 16)} TD: grazing, our closest approach misses the solid-Earth contact limit by ${c.miss.toFixed(4)}° (${(100 * c.miss / c.re).toFixed(2)}% of Earth's radius); Earth's atmosphere is not modelled`);
 }
 ok(NASA.every(([d]) => events.some((e) => Math.abs(Date.parse(d) - e.at) <= 3 * H) || (closest(d).miss < 0.01 * closest(d).re)),
-  "every NASA lunar eclipse 2026-2029 is found (one grazing penumbral within 1% of Earth's radius of contact)");
+  "NASA's ten lunar eclipses 2026-2029: nine found directly in our data; the tenth, a grazing penumbral, is missed by under 1% of Earth's radius (Earth's atmosphere is not modelled)");
 ok(NASA.filter(([, ty]) => ty === "Total").every(([d]) => { const e = events.find((x) => Math.abs(Date.parse(d) - x.at) <= 3 * H); return e && e.min <= e.re - e.rs; }),
   "NASA's total eclipses: Earth fully covers the Sun as seen from the Moon's centre");
 

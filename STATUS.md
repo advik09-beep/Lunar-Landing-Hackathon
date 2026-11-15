@@ -5,8 +5,8 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 | Who | Step | Doing now |
 |-----|------|-----------|
 | Advik + ChatGPT (Lane B) | Five requested items COMPLETE — STOPPED | Simulator/template fixes, Explore Earth circle, Educator names, Tour CTA and seven-slide deck committed; builds READY; visual QA pending |
-| Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
-| Claude Code (Lane A) | Learn full width + Watch a month + Can you tell? done; slide 9 / 10 | stopped |
+| Sheldon (Lane A human) | D35 signed with Advik | 2026-11-15: D29–D35 signed; directed the D35 final look and deck pass (Lane A does the whole pass incl. web shell and deck); reviewing the recoloured site and the seven-page PDF |
+| Claude Code (Lane A) | D35 done (parts 1–4) | Grey theme + Moon-phase verdicts, today's date, deck fixed and recoloured with turning cover Moon, screenshots and PDF redone; stopped |
 | Collaborative presentation | Seven-slide screenshot pass deployed | Separate Vercel project `lunlux-presentation`, production build READY; all six screenshots and wordmark HTTP 200; final human visual QA pending |
 
 Acceptance (both humans): steps 1, 2, 3, 6, 8 PASS; step 4 and 7 pending earlier findings. Signed: D7–D23 (see PLAN), **D24–D28** (title card + tour nav, tour captions, why the south pole, one clock, A/B scenarios + requirements filter). Rule: no status-only pushes.
@@ -1904,3 +1904,24 @@ Done within the 2-hour time box (all checks passing about 7 minutes after starti
 - LunLux item builds READY: Earth circle commit `eda129d` / `dpl_2BLGZ85f3N7dhZxFU4mbxKmbeE37`; marker-label click CSS `f17f998` / `dpl_21UJa8ddPzq3zJghrmGKZtFyEg1X`; Educator site label `394edbf` / `dpl_4Z34jNZacbsxtB3eGbwXrsfm3gK4`; Tour caption `231175c` / `dpl_9iMqoBUkucw7xiBKkHhopz35AhoA`.
 - Seven-slide screenshot deck commit `e724eb9`; new separate Vercel project `lunlux-presentation`, production deployment `dpl_81ud6LDKwLiu3jEwYq4B6gPcWxaV` READY; Vite build succeeded. Homepage, six image assets and wordmark each HTTP 200. Static source count 4 narrative + 2 science + 1 demo = **7 slides**. Live deployment has Vercel SSO protection; do not present as a public submission URL until access is addressed.
 - Scope: user ordered STOP after these five. No wider rights audit, no extra application features. Build/asset availability verified, but browser visual layout, slide 6 overlap and interactive Tour/Explore behavior still require human QA.
+
+### 2026-11-15 — D35 final look and deck pass: Lane A DONE (both humans agreed Lane A edits web shell files and presentation/; Lane B not editing)
+- **Part 1, colours (`2a7d9a3`):**
+  - Near-black page `#0A0A0B`, dark grey glass `rgba(28,28,30,0.90)`, warm off-white text `#F2EEE6`, muted `#A6A29B`, thin light dividers.
+  - Moonlight buttons and the selected tab (`#E8E4DA`, black text); links off-white and underlined.
+  - Only gold `#F2C14E` (Sun) and blue `#5AA9E6` (Earth) remain; no navy, indigo, green, violet or coral. Stars are neutral.
+  - Verdicts are grey Moon phases with their word, in every panel, the Compare grid, the legend chips and the globe pins. The Educator legend adds "Bright means a better week."
+  - Lowest text contrast is 4.96:1 (muted or blue over the 0.90 glass on pure white).
+  - DESIGN.md table, `THEME` in `web/src/panels/shared.ts` and the shell's `--llp-*` variables changed together.
+- **Part 2 (`75db1fa`):** Explore opens on today's date (UTC), kept inside 2026-01-01..2029-12-24. A link's date still wins (checked in headless Chromium: no date → 2026-11-15; `date=2027-03-05` → 2027-03-05).
+- **Part 3, deck (`3e68256`, `f78e108`):**
+  - Root cause of the blank slides: `.page { position:relative }` stacked slides 2–7 below the screen (reproduced: 899 / 1,677 px). Advik's `9fdf986` had already switched it to absolute; it is now fully explicit (`top:0; left:0; width:100%; height:100%`). All seven slides show when stepping with the arrow keys, at six screen sizes.
+  - Recoloured.
+  - Cover: "Challenge: Lunar Landing Site Navigator", plus a turning NASA SVS Moon (three.js) peeking in from the right, credited to NASA's Scientific Visualization Studio. The PDF gets a still image of it.
+  - Slide 6's closing line removed; slide 7 asks "Where would you land?" once.
+  - Screenshots 01–05 retaken (1440×810 @2x).
+  - PDF re-exported: 7 pages, each looked at.
+- **Part 4:** README eclipse row (nine of ten found directly, within 3 h; the tenth a graze missed by under 1%) and AI-use additions. `check_d19`'s summary line now says the same thing. Sheldon's row updated.
+- **Checks:** all twelve scripts PASS, panel tests PASS, `cd web && npm run build` OK, `cd presentation && npm run build` OK.
+- **Note for Lane B:** the shell files touched were `web/src/style.css`, `main.ts`, `moon.ts`, `starfield.ts`, `overview.ts`, `educatorCopy.ts` and `web/index.html`. Please pull before your next edit. Your code comment "D35 Moon handoff" in `style.css` predates PLAN's D35 and refers to something else.
+
