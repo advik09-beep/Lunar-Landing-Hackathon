@@ -4,10 +4,10 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | Requested pass item 5/5 — seven-slide screenshot deck | Committed shot placements, cover credit/wordmark, footer fix; presentation build pending |
+| Advik + ChatGPT (Lane B) | Five requested items COMPLETE — STOPPED | Simulator/template fixes, Explore Earth circle, Educator names, Tour CTA and seven-slide deck committed; builds READY; visual QA pending |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | Learn full width + Watch a month + Can you tell? done; slide 9 / 10 | stopped |
-| Collaborative presentation | Official working slides — changes required | Advik designated `presentation/` the official working deck; local preview `http://127.0.0.1:5179/` is not public. Revisions, Sheldon + Claude science review, build verification and final human approval pending. |
+| Collaborative presentation | Seven-slide screenshot pass deployed | Separate Vercel project `lunlux-presentation`, production build READY; all six screenshots and wordmark HTTP 200; final human visual QA pending |
 
 Acceptance (both humans): steps 1, 2, 3, 6, 8 PASS; step 4 and 7 pending earlier findings. Signed: D7–D23 (see PLAN), **D24–D28** (title card + tour nav, tour captions, why the south pole, one clock, A/B scenarios + requirements filter). Rule: no status-only pushes.
 Waiting on Sheldon: read the new Educator screens on web/panels.html (level = Educator) and the Learn tab; confirm the two NASA photos and their captions.
@@ -1898,3 +1898,9 @@ Done within the 2-hour time box (all checks passing about 7 minutes after starti
 ### 2026-11-15 — Five-item pass, item 5: official seven-slide deck
 - The Tour final-stop shell build `dpl_9iMqoBUkucw7xiBKkHhopz35AhoA` READY. `presentation/` remains exactly seven slides; screenshots 00 cover background (dimmed, Solar System Scope CC BY 4.0 credit), 01 problem, 04 workflow, 02/03 side by side Educator/Researcher, 05 demo. Copied the exact existing team wordmark blob to presentation assets.
 - Removed internal process text from displayed demo; maintained speaker notes and Claude's scientific evidence slide; moved slide 6 closing thought away from footer. Presentation build and browser QA still require separate evidence; no wider licensing audit.
+
+### 2026-11-15 — Five-item pass CLOSE; no wider audit or additional changes
+- Fork commits `bc1c78f` (stale real-time texture paths, READY `dpl_8D4GRP7Az5cnvF2CWAKAtmGCUooD`) and `305fb62` (tracked final Moon Tour label/button, READY `dpl_472sEe1jAfrzhDzUocZdiAWLTujm`). Deleted texture routes: six 404, retained Earth 200.
+- LunLux item builds READY: Earth circle commit `eda129d` / `dpl_2BLGZ85f3N7dhZxFU4mbxKmbeE37`; marker-label click CSS `f17f998` / `dpl_21UJa8ddPzq3zJghrmGKZtFyEg1X`; Educator site label `394edbf` / `dpl_4Z34jNZacbsxtB3eGbwXrsfm3gK4`; Tour caption `231175c` / `dpl_9iMqoBUkucw7xiBKkHhopz35AhoA`.
+- Seven-slide screenshot deck commit `e724eb9`; new separate Vercel project `lunlux-presentation`, production deployment `dpl_81ud6LDKwLiu3jEwYq4B6gPcWxaV` READY; Vite build succeeded. Homepage, six image assets and wordmark each HTTP 200. Static source count 4 narrative + 2 science + 1 demo = **7 slides**. Live deployment has Vercel SSO protection; do not present as a public submission URL until access is addressed.
+- Scope: user ordered STOP after these five. No wider rights audit, no extra application features. Build/asset availability verified, but browser visual layout, slide 6 overlap and interactive Tour/Explore behavior still require human QA.

@@ -2,13 +2,13 @@
 
 A standalone Reveal.js + Vite presentation. **This is the official LunLux presentation working deck, designated by Advik; it still needs changes and has not received final approval.** It is separate from production LunLux (`web/`).
 
-**Local preview link (on the computer running Vite only):** `http://127.0.0.1:5179/`. This is a loopback address, **not a public URL**; opening it on GitHub or another person's device will not show the slides unless that device is running the presentation server on port 5179. GitHub source: `presentation/index.html`. A publicly shareable presentation link requires a separate deployment.
+**Local preview link (on the computer running Vite only):** `http://127.0.0.1:5179/`. This is a loopback address, **not a public URL**; opening it on GitHub or another person's device will not show the slides unless that device is running the presentation server on port 5179. GitHub source: `presentation/index.html`. The separately deployed presentation is `https://lunlux-presentation-lunlux.vercel.app/` (currently protected by Vercel Authentication; access is not yet publicly verified).
 
 **Development:** `cd presentation && npm install && npm run dev`.
 
 **Build:** `cd presentation && npm run build`.
 
-**Deployment:** create a **separate Vercel project** connected to the same GitHub repository, with Root Directory `presentation/`. Do not alter the existing LunLux Vercel project. No deploy/build/browser verification is claimed for this initial scaffold.
+**Deployment:** separate Vercel project `lunlux-presentation` connected to this GitHub repo, Root Directory `presentation/`, Vite build output `dist/`. The deployed build is READY and screenshot/wordmark URLs returned 200; browser visual QA is still pending. Production LunLux app deployment remains a different Vercel project.
 
 ## Collaboration contract
 - Advik and ChatGPT lead `src/slides/story.js` (narrative) and `src/style.css` (presentation design).
@@ -18,9 +18,9 @@ A standalone Reveal.js + Vite presentation. **This is the official LunLux presen
 - Both humans approve slide claims, narrative, visuals and final delivery. Neither assistant modifies production `web/`, `lib/`, `data/`, `scripts/` from this presentation workflow.
 
 ## Demo and licensing
-Demo slide uses **two external links**: identical Malapert site/date/hour, Educator then Researcher. Embedding the live application is an optional later improvement. Before adding an iframe or screenshots, verify frame policy, fallback behavior and permitted media usage. The Tour simulator's third-party textures are subject to `../THIRD_PARTY_LICENSE_AUDIT.md`; do not copy those assets.
+Demo slide uses **two external links**: identical Malapert site/date/hour, Educator then Researcher. Embedding the live application is an optional later improvement. Before adding an iframe or new screenshots, verify frame policy, fallback behavior and permitted media usage. The supplied cover screenshot shows Solar System Scope CC BY 4.0 planet images and is credited on the cover; all six removed disputed textures are absent from the current simulator fork. The remaining third-party rights questions are recorded in `../THIRD_PARTY_LICENSE_AUDIT.md`.
 
-The artwork in this draft is original CSS. Reveal.js is MIT licensed; the bundled fonts use their own OFL notices. Future media must be individually documented.
+The deck uses the team's LunLux screenshots and wordmark plus the credited Solar System Scope planet imagery visible in the cover screenshot. Reveal.js is MIT licensed; the bundled fonts use their own OFL notices. Future media must be individually documented.
 
 ## Initial story (proposed)
 1. The question
