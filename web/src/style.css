@@ -54,10 +54,8 @@ p { margin:8px 0; }
 .clock-tip p { position:absolute; top:24px; right:0; z-index:30; width:360px; margin:0; padding:12px 14px; background:var(--llp-glass); backdrop-filter:blur(var(--llp-glass-blur)); -webkit-backdrop-filter:blur(var(--llp-glass-blur)); border:0; border-radius:12px; font-size:.84rem; box-shadow:0 8px 32px #0008; white-space:normal; }
 .verdict-legend { display:flex; align-items:center; gap:8px; padding:0 0 12px; margin:0; }
 .verdict-chip { display:inline-flex; align-items:center; gap:6px; padding:4px 12px; border:1px solid var(--llp-divider); border-radius:99px; background:var(--llp-glass); color:var(--llp-text); font-size:.75rem; }
-.verdict-chip b { font-size:.84rem; }
-.verdict-chip.clear b,.verdict-chip.partial b { color:var(--llp-clear); }
-.verdict-chip.out b { color:var(--llp-out); }
-.verdict-chip.edge b { color:var(--llp-edge); }
+.verdict-chip { --_clear:var(--llp-clear); --_partial:var(--llp-partial); --_out:var(--llp-out); --_edge:var(--llp-edge); }
+.verdict-chip .vi { display:block; flex:none; }
 .overview-view { position:fixed; inset:0; margin:0; z-index:0; }
 .overview-window { position:absolute; inset:0; height:100%; border:0; border-radius:0; overflow:hidden; background:#060d17; }
 .overview-stage { position:absolute; inset:0; height:100%; width:100%; }

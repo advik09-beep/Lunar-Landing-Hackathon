@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D33 4/10 — copy | Items 1–3 Vercel READY; shell separators cleared; checking build |
+| Advik + ChatGPT (Lane B) | D33 5/10 — icons | Items 1–4 Vercel READY; reused Lane A icon SVGs on chips and matched drawn pin symbols; build pending |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | D33 Lane A part done (items 1–6) | Stay length 1/3/7/14 (Researcher) done within the time box; stopped |
 
@@ -1748,3 +1748,8 @@ Done within the 2-hour time box (all checks passing about 7 minutes after starti
 - Item 3 Vercel build `dpl_7Dmg1CyEtLnoshzgyU4PmECR2WDT` READY for `b8c53ee`.
 - Removed middle-dot separators from visible shell copy in `main.ts`, `educatorCopy.ts` and `overview.ts` (semicolons/spacing). Verified no shell PROTOTYPE text tags present in these files. Did not touch Lane A `/lib` or panel files.
 - Item 4 deployment pending.
+
+### 2026-11-15 — Lane B D33 item 5: drawn verdict icons
+- Item 4 Vercel build `dpl_9K1ugfHwejYJBrABdqFaXbTDceWG` READY for `a3b774c`.
+- Legend chips now render `verdictIcon()` SVG from Lane A's `panels/shared.ts` and keep word labels; shell forwards the theme variables used by those SVGs. 3D pin canvas textures draw the same four symbolic shapes directly, replacing platform-dependent text glyphs.
+- Build pending before item 6.

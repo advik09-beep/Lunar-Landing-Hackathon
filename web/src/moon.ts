@@ -33,7 +33,6 @@ type Marker = {
 const palette: Record<Verdict,string> = {
   clear:THEME.clear, partial:THEME.partial, out:THEME.out, edge:THEME.edge, unavailable:THEME.warn,
 };
-const symbols: Record<Verdict,string> = {clear:'✓',partial:'◐',out:'✕',edge:'⚠',unavailable:'?'};
 
 function spherePoint(lat: number, lon: number, radius = 1): THREE.Vector3 {
   // Mean Earth / polar-axis frame, east-positive. Display rotation: (x,z,-y).
@@ -72,7 +71,33 @@ export class LunarScene {
     c.beginPath(); c.moveTo(28,72); c.lineTo(48,112); c.lineTo(68,72); c.closePath(); c.fill(); c.stroke();
     c.beginPath(); c.arc(48,44,34,0,Math.PI*2); c.fillStyle=verdict==='clear'?palette.clear:THEME.bg; c.fill(); c.stroke();
     c.setLineDash([]);
-    c.fillStyle=verdict==='clear'?'#0B1322':palette[verdict]; c.font='bold 39px sans-serif'; c.textAlign='center'; c.textBaseline='middle'; c.fillText(symbols[verdict],48,45);
+    // Match Lane A's D33 SVG icon shapes, drawn as canvas paths; no font glyphs.
+    const ink='#0B1322';
+    c.save(); c.translate(48,44);
+    if (verdict === 'clear') {
+      c.fillStyle=palette.clear; c.beginPath(); c.arc(0,0,23,0,Math.PI*2); c.fill();
+      c.strokeStyle=ink; c.lineWidth=5; c.lineCap='round'; c.lineJoin='round';
+      c.beginPath(); c.moveTo(-11,1); c.lineTo(-3,9); c.lineTo(14,-10); c.stroke();
+    } else if (verdict === 'partial') {
+      c.strokeStyle=palette.partial; c.lineWidth=5;
+      c.beginPath(); c.arc(0,0,22,0,Math.PI*2); c.stroke();
+      c.fillStyle=palette.partial; c.beginPath(); c.arc(0,0,15,Math.PI/2,Math.PI*1.5); c.closePath(); c.fill();
+    } else if (verdict === 'out') {
+      c.fillStyle=palette.out; c.beginPath(); c.arc(0,0,23,0,Math.PI*2); c.fill();
+      c.strokeStyle=ink; c.lineWidth=5; c.lineCap='round';
+      c.beginPath(); c.moveTo(-9,-9); c.lineTo(9,9); c.moveTo(9,-9); c.lineTo(-9,9); c.stroke();
+    } else if (verdict === 'edge') {
+      c.fillStyle=palette.edge; c.beginPath(); c.arc(0,0,23,0,Math.PI*2); c.fill();
+      c.strokeStyle=ink; c.lineWidth=2.5; c.setLineDash([5,4]);
+      c.beginPath(); c.arc(0,0,19,0,Math.PI*2); c.stroke(); c.setLineDash([]);
+      c.lineWidth=5; c.lineCap='round'; c.beginPath(); c.moveTo(0,-12); c.lineTo(0,2); c.stroke();
+      c.fillStyle=ink; c.beginPath(); c.arc(0,11,3,0,Math.PI*2); c.fill();
+    } else {
+      c.strokeStyle=palette.unavailable; c.lineWidth=5;
+      c.beginPath(); c.arc(0,0,21,0,Math.PI*2); c.stroke();
+      c.beginPath(); c.moveTo(-9,0); c.lineTo(9,0); c.stroke();
+    }
+    c.restore();
     const texture=new THREE.CanvasTexture(canvas); texture.colorSpace=THREE.SRGBColorSpace; this.pinTextures.set(verdict,texture); return texture;
   }
   private readonly poleCallouts: Array<{id:string;sprite:THREE.Sprite;leader:THREE.Line}> = [];

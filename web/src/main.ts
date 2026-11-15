@@ -9,6 +9,7 @@ import { LunarScene, type MoonSite, type Verdict, type SceneState } from './moon
 import { OverviewScene } from './overview';
 import { mountStarfield } from './starfield';
 import { mountSideCard, mountCompareGrid, mountHorizonView, mountResearcher, mountPlanner, type PanelHandle } from './panels';
+import { verdictIcon } from './panels/shared';
 
 interface Site extends MoonSite {
   kind?: string;
@@ -96,10 +97,10 @@ app.innerHTML = [
   '    <p id="data-status" class="sr-only" role="status" aria-live="polite">Loading conditions…</p>',
   '  </section>',
   '  <section id="verdict-legend" class="verdict-legend" aria-label="Seven-day verdict legend" hidden>',
-  `    <span class="verdict-chip clear" title="Sunlight and Earth both visible for at least ${VERDICT_RULE.CLEAR_PCT}% of the stay"><b>✓</b> Clear</span>`,
-  '    <span class="verdict-chip partial" title="Sunlight and Earth visible together for part of the stay"><b>◐</b> Partial</span>',
-  `    <span class="verdict-chip out" title="Sunlight and Earth visible together for ${VERDICT_RULE.OUT_PCT}% or less of the stay"><b>✕</b> Out</span>`,
-  `    <span class="verdict-chip edge" title="Sun or Earth grazes the skyline within ${VERDICT_RULE.EDGE_DEG}° for most of the stay; small position changes matter"><b>⚠</b> On the edge</span>`,
+  `    <span class="verdict-chip clear" title="Sunlight and Earth both visible for at least ${VERDICT_RULE.CLEAR_PCT}% of the stay">${verdictIcon("clear",18)} Clear</span>`,
+  `    <span class="verdict-chip partial" title="Sunlight and Earth visible together for part of the stay">${verdictIcon("partial",18)} Partial</span>`,
+  `    <span class="verdict-chip out" title="Sunlight and Earth visible together for ${VERDICT_RULE.OUT_PCT}% or less of the stay">${verdictIcon("out",18)} Out</span>`,
+  `    <span class="verdict-chip edge" title="Sun or Earth grazes the skyline within ${VERDICT_RULE.EDGE_DEG}° for most of the stay; small position changes matter">${verdictIcon("edge",18)} On the edge</span>`,
   '  </section>',
   '  <section id="overview-view" class="overview-view" aria-label="Sun Earth Moon overview">',
   '    <div class="overview-window">',
