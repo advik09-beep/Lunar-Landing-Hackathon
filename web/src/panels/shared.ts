@@ -19,21 +19,24 @@ export function createPanelRoot(container: HTMLElement, kind: string, css: strin
   return { host, root };
 }
 
-/** D30 colour roles and scale (identical in shell and panels). Contrast on the card colour #132138:
- *  sun 9.6:1, earth 6.3:1, clear 7.0:1, out 6.3:1, edge 6.1:1, text 14.4:1, muted 8.2:1, warn 6.8:1, link 9.2:1. */
+/** D35 colour roles (identical in shell, panels and deck). Only two hues: gold for the Sun, blue for Earth.
+ *  Everything else is grey. Contrast on the panel colour #1C1C1E: text 14.7:1, muted 6.7:1, sun 10.1:1, earth 6.7:1;
+ *  on the 0.90 glass over pure white (#333334): text 10.9:1, muted 5.0:1, sun 7.5:1, earth 5.0:1. Black on the
+ *  moonlight accent: 15.6:1. Verdict colours draw Moon-phase icons, not text. */
 export const THEME = Object.freeze({
   sun: "#F2C14E",       // gold = the Sun and sunlight (only)
   earth: "#5AA9E6",     // blue = Earth and contact (only)
-  clear: "#4FBF7A",     // verdict Clear: solid green
-  partial: "#4FBF7A",   // verdict Partial: half-filled green outline (same green, never yellow)
-  out: "#94A3B8",       // verdict Out: slate grey
-  edge: "#B48CF0",      // verdict On the edge: violet
-  text: "#ECF2FF", muted: "#A8BBD3", warn: "#F28B82", link: "#9CC6FF",
-  bg: "#132138", page: "#091322", border: "#344B69", focus: "#9CC6FF",
-  accent: "#4F46B8",    // D31: indigo for selected controls, kept distinct from Earth blue (white text on it 6.45:1)
-  glass: "rgba(19, 33, 56, 0.90)", glassBlur: "14px", // D31 glass panels: at 0.90 every text colour passes 4.5:1 even over white
-  divider: "rgba(168, 187, 211, 0.18)",
-  horizon: "#E8E2D0", ground: "#2A2620", groundLine: "#4A443A", sky: "#0D1A2E",
+  clear: "#E8E4DA",     // verdict Clear: full bright disc (moonlight)
+  partial: "#E8E4DA",   // verdict Partial: half-lit disc
+  out: "#8E8B85",       // verdict Out: dark disc with this thin outline (not used for text)
+  outFill: "#2A2A2C",
+  edge: "#B5B1A9",      // verdict On the edge: dashed ring with a centre dot
+  text: "#F2EEE6", muted: "#A6A29B", warn: "#F2EEE6", link: "#F2EEE6",
+  bg: "#1C1C1E", page: "#0A0A0B", border: "#3A3A3C", focus: "#F2EEE6",
+  accent: "#E8E4DA", onAccent: "#0A0A0B", // moonlight buttons and selected tabs, black text
+  glass: "rgba(28, 28, 30, 0.90)", glassBlur: "14px",
+  divider: "rgba(242, 238, 230, 0.16)",
+  horizon: "#E8E2D0", ground: "#262626", groundLine: "#3A3A3A", sky: "#121214",
 });
 
 const BASE_CSS = `
@@ -45,7 +48,8 @@ const BASE_CSS = `
   --_out: var(--llp-out, ${THEME.out}); --_edge: var(--llp-edge, ${THEME.edge});
   --_text: var(--llp-text, ${THEME.text}); --_muted: var(--llp-muted, ${THEME.muted}); --_warn: var(--llp-warn, ${THEME.warn});
   --_link: var(--llp-link, ${THEME.link}); --_bg: var(--llp-bg, ${THEME.bg}); --_border: var(--llp-border, ${THEME.border});
-  --_accent: var(--llp-accent, ${THEME.accent}); --_focus: var(--llp-focus, ${THEME.focus});
+  --_accent: var(--llp-accent, ${THEME.accent}); --_on-accent: var(--llp-on-accent, ${THEME.onAccent}); --_focus: var(--llp-focus, ${THEME.focus});
+  --_out-fill: var(--llp-out-fill, ${THEME.outFill});
   --_horizon: var(--llp-horizon, ${THEME.horizon}); --_ground: var(--llp-ground, ${THEME.ground});
   --_ground-line: var(--llp-ground-line, ${THEME.groundLine}); --_sky: var(--llp-sky, ${THEME.sky});
   --_glass: var(--llp-glass, ${THEME.glass}); --_glass-blur: var(--llp-glass-blur, ${THEME.glassBlur}); --_divider: var(--llp-divider, ${THEME.divider});
@@ -55,6 +59,7 @@ const BASE_CSS = `
 }
 * { box-sizing: border-box; }
 .muted { color: var(--_muted); }
+a { color: var(--_link); text-decoration: underline; text-underline-offset: 3px; }
 .warn { color: var(--_warn); }
 button { font: inherit; cursor: pointer; }
 :focus-visible { outline: 2px solid var(--_focus); outline-offset: 2px; }
@@ -80,20 +85,21 @@ export const VERDICT_WORDS: Record<Verdict, { label: string; symbol: string; sho
 /** D33: verdict symbols drawn as small inline SVG icons (not text characters), so they look the same on every
  *  computer. The word label always goes with them (never colour alone). */
 export function verdictIcon(v: Verdict, size = 18): string {
-  const dark = "#0b1322";
+  // D35: Moon phases in greys. Clear = full bright disc; Partial = half-lit disc; Out = dark disc, thin outline;
+  // On the edge = dashed ring with a centre dot. The word label always goes with them.
   const body = {
-    clear: `<circle cx="10" cy="10" r="9" style="fill:var(--_clear)"/><path d="M5.5 10.3l3 3 6-6.6" fill="none" stroke="${dark}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
-    partial: `<circle cx="10" cy="10" r="8" fill="none" style="stroke:var(--_partial)" stroke-width="2.4"/><path d="M10 4.5a5.5 5.5 0 0 0 0 11z" style="fill:var(--_partial)"/>`,
-    out: `<circle cx="10" cy="10" r="9" style="fill:var(--_out)"/><path d="M6.6 6.6l6.8 6.8M13.4 6.6l-6.8 6.8" stroke="${dark}" stroke-width="2.2" stroke-linecap="round"/>`,
-    edge: `<circle cx="10" cy="10" r="9" style="fill:var(--_edge)"/><circle cx="10" cy="10" r="7.4" fill="none" stroke="${dark}" stroke-width="1.3" stroke-dasharray="2.2 1.8"/><path d="M10 5.6v5.4" stroke="${dark}" stroke-width="2.2" stroke-linecap="round"/><circle cx="10" cy="13.9" r="1.3" fill="${dark}"/>`,
+    clear: `<circle cx="10" cy="10" r="8.6" style="fill:var(--_clear);stroke:var(--_clear)" stroke-width="1"/>`,
+    partial: `<circle cx="10" cy="10" r="8" style="fill:var(--_out-fill);stroke:var(--_partial)" stroke-width="1.6"/><path d="M10 2a8 8 0 0 1 0 16z" style="fill:var(--_partial)"/>`,
+    out: `<circle cx="10" cy="10" r="8" style="fill:var(--_out-fill);stroke:var(--_out)" stroke-width="1.3"/>`,
+    edge: `<circle cx="10" cy="10" r="8" fill="none" style="stroke:var(--_edge)" stroke-width="1.6" stroke-dasharray="2.6 2.2"/><circle cx="10" cy="10" r="2.2" style="fill:var(--_edge)"/>`,
   }[v];
   return `<svg class="vi" data-icon="${v}" width="${size}" height="${size}" viewBox="0 0 20 20" aria-hidden="true" focusable="false">${body}</svg>`;
 }
 /** Pass / fail icons for the requirements list (D33). */
 export function markIcon(pass: boolean, size = 16): string {
   return pass
-    ? `<svg class="vi" data-icon="pass" width="${size}" height="${size}" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="9" style="fill:var(--_clear)"/><path d="M5.5 10.3l3 3 6-6.6" fill="none" stroke="#0b1322" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`
-    : `<svg class="vi" data-icon="fail" width="${size}" height="${size}" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="9" style="fill:var(--_warn)"/><path d="M6.6 6.6l6.8 6.8M13.4 6.6l-6.8 6.8" stroke="#0b1322" stroke-width="2.2" stroke-linecap="round"/></svg>`;
+    ? `<svg class="vi" data-icon="pass" width="${size}" height="${size}" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="9" style="fill:var(--_clear)"/><path d="M5.5 10.3l3 3 6-6.6" fill="none" style="stroke:var(--_on-accent)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+    : `<svg class="vi" data-icon="fail" width="${size}" height="${size}" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="8" style="fill:var(--_out-fill);stroke:var(--_out)" stroke-width="1.3"/><path d="M6.8 6.8l6.4 6.4M13.2 6.8l-6.4 6.4" style="stroke:var(--_text)" stroke-width="2" stroke-linecap="round"/></svg>`;
 }
 
 /** "On the edge" means different things by horizon model (Sheldon, 2026-11-14):

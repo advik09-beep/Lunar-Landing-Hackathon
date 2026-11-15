@@ -67,7 +67,7 @@ export function mountStarfield(): () => void {
         radius: depth < .45 ? .65 : depth < .75 ? .9 + random() * .6 : 1.5 + random() * 1.1,
         brightness: .4 + random() * .45,
         phase: random() * Math.PI * 2,
-        tint: color < .71 ? '220,235,255' : color < .89 ? '170,205,255' : '255,223,194',
+        tint: color < .71 ? '236,233,226' : color < .89 ? '214,211,204' : '245,241,232', // D35: neutral stars, no tint
       };
     });
     render();

@@ -68,30 +68,30 @@ Plain-language brief for the app shell (Lane B builds the structure; both lanes 
 7. **Globe markers:** small pins in the verdict colour with the verdict symbol on them, and a ring around the selected site.
 
 ### Theme (identical in the shell and the panels)
-8. **Colour roles.** Each colour has one meaning, everywhere. Colour is never the only signal: always use the symbol and the word too. Contrast is measured on the card colour `#132138` (page `#091322`):
+8. **Colour roles (D35).** Near-black page, dark grey glass panels, warm off-white text, mid-grey secondary text, thin light dividers. No navy, no indigo. Exactly two hues remain: gold for the Sun and sunlight, blue for Earth and contact. Everything else is grey. Colour is never the only signal: verdicts always carry their word and their Moon-phase shape. Contrast is measured on the panel colour `#1C1C1E` (page `#0A0A0B`) and, for the worst case, on the 0.90 glass over pure white (`#333334`):
 
-| Role | Colour | Meaning | Contrast on card |
+| Role | Colour | Meaning | Contrast on panel / worst-case glass |
 |---|---|---|---|
-| Sun | `#F2C14E` gold | the Sun and sunlight, **only** | 9.6 : 1 |
-| Earth | `#5AA9E6` blue | Earth and contact, **only** | 6.3 : 1 |
-| Clear | `#4FBF7A` green, solid | verdict ✓ Clear | 7.0 : 1 |
-| Partial | `#4FBF7A` green, **hollow outline** (D31) | verdict ◐ Partial (never yellow) | 7.0 : 1 |
-| Out | `#94A3B8` slate grey | verdict ✕ Out | 6.3 : 1 |
-| On the edge | `#B48CF0` violet, dashed outline | verdict ⚠ On the edge | 6.1 : 1 |
-| Text / muted | `#ECF2FF` / `#A8BBD3` | body text / secondary text | 14.4 / 8.2 : 1 |
-| Warning | `#F28B82` coral | real warnings only (e.g. "Unavailable") | 6.8 : 1 |
-| Link | `#9CC6FF` | links | 9.2 : 1 |
-| Card / divider / accent | `#132138` / `rgba(168,187,211,0.18)` / `#4F46B8` indigo (D31) | surfaces, thin dividers, selected controls; the accent is indigo so it never reads as Earth blue (white text on it 6.45 : 1) | — |
+| Sun | `#F2C14E` gold | the Sun and sunlight, **only** | 10.1 / 7.5 : 1 |
+| Earth | `#5AA9E6` blue | Earth and contact, **only** | 6.7 / 5.0 : 1 |
+| Text | `#F2EEE6` warm off-white | body text, links (underlined), warnings | 14.7 / 10.9 : 1 |
+| Muted | `#A6A29B` mid grey | secondary text | 6.7 / 5.0 : 1 |
+| Accent | `#E8E4DA` moonlight, text `#0A0A0B` | buttons and the selected tab (black text on it) | 15.6 : 1 |
+| Clear / Great week | `#E8E4DA` full bright disc | verdict icon | (shape, not text) |
+| Partial / Okay week | half-lit disc, `#E8E4DA` on `#2A2A2C` | verdict icon | (shape, not text) |
+| Out / Hard week | dark disc `#2A2A2C`, thin outline `#8E8B85` | verdict icon | (shape, not text) |
+| On the edge / Tricky week | dashed ring with centre dot, `#B5B1A9` | verdict icon | (shape, not text) |
+| Panel / page / border / divider | `rgba(28,28,30,0.90)` glass on `#1C1C1E`; `#0A0A0B`; `#3A3A3C`; `rgba(242,238,230,0.16)` | surfaces and thin dividers | — |
 
-Dark text (`#0B1322`) on the verdict fills is 7.0 : 1 or better. The panels use these as defaults through CSS variables. The shell can set the same variables once on a parent element, and the panels then follow:
+The Educator legend adds "Bright means a better week." The verdict icons are used in every panel, the Compare grid, the legend chips and the globe pins. The panels use these as defaults through CSS variables; the shell sets the same variables once:
 
 ```css
 :root {
-  --llp-sun: #F2C14E; --llp-earth: #5AA9E6;
-  --llp-clear: #4FBF7A; --llp-partial: #4FBF7A; --llp-out: #94A3B8; --llp-edge: #B48CF0;
-  --llp-text: #ECF2FF; --llp-muted: #A8BBD3; --llp-warn: #F28B82; --llp-link: #9CC6FF;
-  --llp-bg: #132138; --llp-border: #344B69; --llp-accent: #4F46B8; --llp-focus: #9CC6FF;
-  --llp-glass: rgba(19, 33, 56, 0.90); --llp-glass-blur: 14px; --llp-divider: rgba(168, 187, 211, 0.18);
+  --llp-sun:#F2C14E; --llp-earth:#5AA9E6;
+  --llp-clear:#E8E4DA; --llp-partial:#E8E4DA; --llp-out:#8E8B85; --llp-out-fill:#2A2A2C; --llp-edge:#B5B1A9;
+  --llp-text:#F2EEE6; --llp-muted:#A6A29B; --llp-warn:#F2EEE6; --llp-link:#F2EEE6;
+  --llp-bg:#1C1C1E; --llp-page:#0A0A0B; --llp-border:#3A3A3C; --llp-accent:#E8E4DA; --llp-on-accent:#0A0A0B; --llp-focus:#F2EEE6;
+  --llp-glass:rgba(28, 28, 30, 0.90); --llp-glass-blur:14px; --llp-divider:rgba(242, 238, 230, 0.16);
 }
 ```
 The same values are exported as `THEME` from `web/src/panels/shared.ts` for code that draws (e.g. globe pins).

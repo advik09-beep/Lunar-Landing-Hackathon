@@ -282,6 +282,31 @@ and researchers get the numbers behind them.
   Licence section with every outside item and its licence; (4) README
   team line "by Sheldon Spence and Advik Chaudhary".
 
+- D35 Final look and deck pass (both humans, 2026-11-15). Lane A does this
+  whole pass, including the web shell files and presentation/; Lane B is
+  not editing. (1) New colours, whole site and deck: near-black
+  background, dark grey glass panels, warm off-white text, mid-grey
+  secondary text, thin light dividers, no navy or indigo; buttons and the
+  selected tab moonlight off-white with black text; links off-white,
+  underlined; only two colours remain, gold for the Sun and sunlight and
+  blue for Earth and contact. Verdicts become grey Moon phases, always
+  with their word: Clear / Great week = full bright disc; Partial / Okay
+  week = half-lit disc; Out / Hard week = dark disc with a thin outline;
+  On the edge / Tricky week = dashed ring with a centre dot; in every
+  panel, the Compare grid, the legend chips and the globe pins; the
+  Educator legend adds "Bright means a better week." Every text colour
+  passes 4.5:1; DESIGN.md's colour table, the panel theme defaults and
+  the shell variables change together. (2) Explore opens on today's date
+  (UTC), kept inside the data range; a date in a shared link still wins.
+  (3) Deck: exactly seven slides; fix slides 2-7 rendering below the
+  screen; the new colours; cover gains the challenge name "Lunar Landing
+  Site Navigator" and a slowly turning 3D Moon (the site's NASA SVS map)
+  peeking in from the right, a still image in the PDF, credited to NASA's
+  Scientific Visualization Studio; slide 6 loses its old closing line;
+  slide 7 says "Where would you land?" once; screenshots 01-05 retaken
+  after the recolour; the PDF re-exported and checked page by page.
+  (4) README eclipse row and AI-use section; STATUS Sheldon row.
+
 ## Settled earlier (do not reopen without both humans)
 - 10 fixed sites: 3 Apollo, Chandrayaan-3, IM-1, IM-2, 4 south pole
   representative points.

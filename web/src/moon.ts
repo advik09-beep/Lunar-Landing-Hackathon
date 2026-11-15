@@ -32,7 +32,7 @@ type Marker = {
 };
 
 const palette: Record<Verdict,string> = {
-  clear:THEME.clear, partial:THEME.partial, out:THEME.out, edge:THEME.edge, unavailable:THEME.warn,
+  clear:THEME.clear, partial:THEME.partial, out:THEME.out, edge:THEME.edge, unavailable:THEME.muted,
 };
 
 function spherePoint(lat: number, lon: number, radius = 1): THREE.Vector3 {
@@ -59,7 +59,7 @@ export class LunarScene {
   private readonly selectionTexture = (() => {
     const canvas = document.createElement('canvas'); canvas.width = 96; canvas.height = 128;
     const c = canvas.getContext('2d')!;
-    c.strokeStyle = '#ECF2FF'; c.lineWidth = 4;
+    c.strokeStyle = THEME.text; c.lineWidth = 4;
     c.beginPath(); c.arc(48, 44, 42, 0, Math.PI * 2); c.stroke();
     return new THREE.CanvasTexture(canvas);
   })();
@@ -67,34 +67,26 @@ export class LunarScene {
     const cached = this.pinTextures.get(verdict); if (cached) return cached;
     const canvas = document.createElement('canvas'); canvas.width=96; canvas.height=128;
     const c=canvas.getContext('2d')!;
-    c.strokeStyle=palette[verdict]; c.fillStyle=THEME.bg; c.lineWidth=5;
-    if(verdict==='edge') c.setLineDash([7,5]);
+    // D35: a dark grey pin holding the verdict's grey Moon phase (same shapes as verdictIcon in the panels).
+    c.strokeStyle=THEME.muted; c.fillStyle=THEME.bg; c.lineWidth=4;
     c.beginPath(); c.moveTo(28,72); c.lineTo(48,112); c.lineTo(68,72); c.closePath(); c.fill(); c.stroke();
-    c.beginPath(); c.arc(48,44,34,0,Math.PI*2); c.fillStyle=verdict==='clear'?palette.clear:THEME.bg; c.fill(); c.stroke();
-    c.setLineDash([]);
-    // Match Lane A's D33 SVG icon shapes, drawn as canvas paths; no font glyphs.
-    const ink='#0B1322';
+    c.beginPath(); c.arc(48,44,34,0,Math.PI*2); c.fill(); c.stroke();
     c.save(); c.translate(48,44);
     if (verdict === 'clear') {
       c.fillStyle=palette.clear; c.beginPath(); c.arc(0,0,23,0,Math.PI*2); c.fill();
-      c.strokeStyle=ink; c.lineWidth=5; c.lineCap='round'; c.lineJoin='round';
-      c.beginPath(); c.moveTo(-11,1); c.lineTo(-3,9); c.lineTo(14,-10); c.stroke();
     } else if (verdict === 'partial') {
-      c.strokeStyle=palette.partial; c.lineWidth=5;
-      c.beginPath(); c.arc(0,0,22,0,Math.PI*2); c.stroke();
-      c.fillStyle=palette.partial; c.beginPath(); c.arc(0,0,15,Math.PI/2,Math.PI*1.5); c.closePath(); c.fill();
+      c.fillStyle=THEME.outFill; c.beginPath(); c.arc(0,0,22,0,Math.PI*2); c.fill();
+      c.strokeStyle=palette.partial; c.lineWidth=4; c.stroke();
+      c.fillStyle=palette.partial; c.beginPath(); c.arc(0,0,22,-Math.PI/2,Math.PI/2); c.closePath(); c.fill();
     } else if (verdict === 'out') {
-      c.fillStyle=palette.out; c.beginPath(); c.arc(0,0,23,0,Math.PI*2); c.fill();
-      c.strokeStyle=ink; c.lineWidth=5; c.lineCap='round';
-      c.beginPath(); c.moveTo(-9,-9); c.lineTo(9,9); c.moveTo(9,-9); c.lineTo(-9,9); c.stroke();
+      c.fillStyle=THEME.outFill; c.strokeStyle=palette.out; c.lineWidth=3;
+      c.beginPath(); c.arc(0,0,22,0,Math.PI*2); c.fill(); c.stroke();
     } else if (verdict === 'edge') {
-      c.fillStyle=palette.edge; c.beginPath(); c.arc(0,0,23,0,Math.PI*2); c.fill();
-      c.strokeStyle=ink; c.lineWidth=2.5; c.setLineDash([5,4]);
-      c.beginPath(); c.arc(0,0,19,0,Math.PI*2); c.stroke(); c.setLineDash([]);
-      c.lineWidth=5; c.lineCap='round'; c.beginPath(); c.moveTo(0,-12); c.lineTo(0,2); c.stroke();
-      c.fillStyle=ink; c.beginPath(); c.arc(0,11,3,0,Math.PI*2); c.fill();
+      c.strokeStyle=palette.edge; c.lineWidth=4; c.setLineDash([7,6]);
+      c.beginPath(); c.arc(0,0,21,0,Math.PI*2); c.stroke(); c.setLineDash([]);
+      c.fillStyle=palette.edge; c.beginPath(); c.arc(0,0,6,0,Math.PI*2); c.fill();
     } else {
-      c.strokeStyle=palette.unavailable; c.lineWidth=5;
+      c.strokeStyle=palette.unavailable; c.lineWidth=4;
       c.beginPath(); c.arc(0,0,21,0,Math.PI*2); c.stroke();
       c.beginPath(); c.moveTo(-9,0); c.lineTo(9,0); c.stroke();
     }
@@ -183,7 +175,7 @@ export class LunarScene {
     // Sun direction remains data-driven. This faint camera-side light is a labeled visual aid.
     this.ambientLight = new THREE.AmbientLight(0xffffff, 0.14);
     this.scene.add(this.ambientLight);
-    this.inspectionLight = new THREE.DirectionalLight(0xcbd5e8, 0.24);
+    this.inspectionLight = new THREE.DirectionalLight(0xd8d6d0, 0.24);
     this.scene.add(this.inspectionLight);
     this.sunLight = new THREE.DirectionalLight(0xfff9ed, 0);
     this.sunLight.position.set(10, 0, 0);
@@ -212,7 +204,7 @@ export class LunarScene {
 
     const atmosphere = new THREE.Mesh(
       new THREE.SphereGeometry(1.018, 64, 48),
-      new THREE.MeshBasicMaterial({ color: 0x9ab4db, transparent: true, opacity: 0.035, side: THREE.BackSide, depthWrite: false }),
+      new THREE.MeshBasicMaterial({ color: 0xbdbab3, transparent: true, opacity: 0.035, side: THREE.BackSide, depthWrite: false }),
     );
     this.scene.add(atmosphere);
 
@@ -222,7 +214,7 @@ export class LunarScene {
     const earthContext = earthCanvas.getContext('2d')!;
     earthContext.fillStyle = THEME.earth;
     earthContext.beginPath(); earthContext.arc(32,32,19,0,Math.PI*2); earthContext.fill();
-    earthContext.strokeStyle = '#ECF2FF'; earthContext.lineWidth = 4;
+    earthContext.strokeStyle = THEME.text; earthContext.lineWidth = 4;
     earthContext.beginPath(); earthContext.arc(32,32,19,0,Math.PI*2); earthContext.stroke();
     const earthTexture = new THREE.CanvasTexture(earthCanvas);
     earthTexture.colorSpace = THREE.SRGBColorSpace;
@@ -246,7 +238,7 @@ export class LunarScene {
     this.earthHorizonRing.visible = false;
     this.scene.add(this.earthHorizonRing);
 
-    const gridMaterial = new THREE.LineBasicMaterial({ color: 0x7692bb, transparent: true, opacity: 0.19 });
+    const gridMaterial = new THREE.LineBasicMaterial({ color: 0x8a8780, transparent: true, opacity: 0.19 });
     for (const lat of [-60, -30, 0, 30, 60]) {
       const points = Array.from({ length: 145 }, (_, i) => spherePoint(lat, i * 2.5 - 180, 1.006));
       this.scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(points), gridMaterial));

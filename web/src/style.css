@@ -1,14 +1,16 @@
 
 :root {
   color-scheme:dark;
+  /* D35: near-black page, dark grey glass, warm off-white text; only gold (Sun) and blue (Earth) are coloured.
+     Same values as THEME in web/src/panels/shared.ts and DESIGN.md's colour table. */
   --llp-sun:#F2C14E; --llp-earth:#5AA9E6;
-  --llp-clear:#4FBF7A; --llp-partial:#4FBF7A; --llp-out:#94A3B8; --llp-edge:#B48CF0;
-  --llp-text:#ECF2FF; --llp-muted:#A8BBD3; --llp-warn:#F28B82; --llp-link:#9CC6FF;
-  --llp-bg:#132138; --llp-border:#344B69; --llp-accent:#4F46B8; --llp-focus:#9CC6FF;
-  --llp-glass:rgba(19, 33, 56, 0.90); --llp-glass-blur:14px; --llp-divider:rgba(168, 187, 211, 0.18);
+  --llp-clear:#E8E4DA; --llp-partial:#E8E4DA; --llp-out:#8E8B85; --llp-out-fill:#2A2A2C; --llp-edge:#B5B1A9;
+  --llp-text:#F2EEE6; --llp-muted:#A6A29B; --llp-warn:#F2EEE6; --llp-link:#F2EEE6;
+  --llp-bg:#1C1C1E; --llp-page:#0A0A0B; --llp-border:#3A3A3C; --llp-accent:#E8E4DA; --llp-on-accent:#0A0A0B; --llp-focus:#F2EEE6;
+  --llp-glass:rgba(28, 28, 30, 0.90); --llp-glass-blur:14px; --llp-divider:rgba(242, 238, 230, 0.16);
   --llp-heading-font:"CMU Serif";
   font-family:"Source Serif 4";
-  font-size:16px; color:var(--llp-text); background:#091322;
+  font-size:16px; color:var(--llp-text); background:var(--llp-page);
 }
 * { box-sizing:border-box; }
 body { margin:0; font-size:.95rem; line-height:1.5; }
@@ -18,7 +20,7 @@ button { cursor:pointer; }
 button,input,select { border:0; border-radius:6px; padding:6px 10px; background:var(--llp-glass); color:var(--llp-text); font-size:.84rem; }
 button:hover { border-color:var(--llp-focus); }
 :focus-visible { outline:2px solid var(--llp-focus); outline-offset:3px; }
-a { color:var(--llp-link); text-underline-offset:3px; }
+a { color:var(--llp-link); text-decoration:underline; text-underline-offset:3px; }
 [hidden] { display:none !important; }
 h1,h2,h3,h4 { font-family:var(--llp-heading-font); }
 h1,h2,h3 { font-size:1.1rem; font-weight:600; line-height:1.3; margin:0 0 8px; }
@@ -32,11 +34,11 @@ p { margin:8px 0; }
 .brand-kicker,.brand-subtitle,.intro-block { display:none; }
 .primary-nav { display:flex; align-items:center; gap:8px; }
 .primary-nav button { border:0; background:transparent; padding:8px 16px; color:var(--llp-muted); font-size:.84rem; border-radius:99px; }
-.primary-nav .nav-active { color:var(--llp-text); background:var(--llp-accent); }
+.primary-nav .nav-active { color:var(--llp-on-accent); background:var(--llp-accent); }
 .header-tools { display:flex; align-items:center; gap:16px; }
 .reading-level { display:flex; border:0; border-radius:99px; padding:3px; background:var(--llp-glass); backdrop-filter:blur(var(--llp-glass-blur)); -webkit-backdrop-filter:blur(var(--llp-glass-blur)); }
 .reading-level button { border:0; border-radius:99px; padding:5px 10px; font-size:.75rem; background:none; color:var(--llp-muted); }
-.reading-level [aria-pressed="true"] { background:var(--llp-accent); color:var(--llp-text); }
+.reading-level [aria-pressed="true"] { background:var(--llp-accent); color:var(--llp-on-accent); }
 .methods-link { padding:0; border:0; background:none; color:var(--llp-muted); font-size:.75rem; white-space:nowrap; text-decoration:underline; text-underline-offset:4px; }
 .mock-notice { padding:8px 14px; border:1px solid var(--llp-warn); color:var(--llp-warn); font-size:.84rem; }
 .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
@@ -54,14 +56,15 @@ p { margin:8px 0; }
 .clock-tip p { position:absolute; top:24px; right:0; z-index:30; width:360px; margin:0; padding:12px 14px; background:var(--llp-glass); backdrop-filter:blur(var(--llp-glass-blur)); -webkit-backdrop-filter:blur(var(--llp-glass-blur)); border:0; border-radius:12px; font-size:.84rem; box-shadow:0 8px 32px #0008; white-space:normal; }
 .verdict-legend { display:flex; align-items:center; gap:8px; padding:0 0 12px; margin:0; }
 .verdict-chip { display:inline-flex; align-items:center; gap:6px; padding:4px 12px; border:1px solid var(--llp-divider); border-radius:99px; background:var(--llp-glass); color:var(--llp-text); font-size:.75rem; }
-.verdict-chip { --_clear:var(--llp-clear); --_partial:var(--llp-partial); --_out:var(--llp-out); --_edge:var(--llp-edge); }
+.verdict-chip { --_clear:var(--llp-clear); --_partial:var(--llp-partial); --_out:var(--llp-out); --_out-fill:var(--llp-out-fill); --_edge:var(--llp-edge); }
+.bright-note { font-size:.75rem; color:var(--llp-muted); margin-left:4px; }
 .verdict-chip .vi { display:block; flex:none; }
 .overview-view { position:fixed; inset:0; margin:0; z-index:0; }
-.overview-window { position:absolute; inset:0; height:100%; border:0; border-radius:0; overflow:hidden; background:#060d17; }
+.overview-window { position:absolute; inset:0; height:100%; border:0; border-radius:0; overflow:hidden; background:#050506; }
 .overview-stage { position:absolute; inset:0; height:100%; width:100%; }
 .overview-stage canvas,.overview-stage iframe { display:block; width:100%; height:100%; border:0; }
 .overview-caption,.overview-mission-message,.overview-footer { display:none; }
-.overview-title-card { position:absolute; z-index:8; left:0; bottom:0; width:min(640px,60%); display:flex; flex-direction:column; align-items:flex-start; text-align:left; padding:96px 64px 56px 32px; gap:16px; background:radial-gradient(ellipse at bottom left,#091322f5 15%,#091322d0 45%,#09132200 75%); }
+.overview-title-card { position:absolute; z-index:8; left:0; bottom:0; width:min(640px,60%); display:flex; flex-direction:column; align-items:flex-start; text-align:left; padding:96px 64px 56px 32px; gap:16px; background:radial-gradient(ellipse at bottom left,#0A0A0Bf5 15%,#0A0A0Bd0 45%,#0A0A0B00 75%); }
 .overview-title-card h2 { margin:0; line-height:1; }
 .overview-wordmark { display:block; width:min(198px,100%); height:auto; }
 body[data-view="overview"] .brand-wordmark { visibility:hidden; }
@@ -69,21 +72,21 @@ body[data-view="overview"] .brand-wordmark { visibility:hidden; }
 .overview-title-subtitle { font-size:1.1rem; line-height:1.4; }
 .overview-title-card > p:not(.overview-title-subtitle):not(.overview-audio-note) { font-size:.84rem; color:var(--llp-muted); }
 .overview-title-card > div { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
-#start-tour { border-color:var(--llp-accent); background:var(--llp-accent); border-radius:99px; padding:10px 20px; }
+#start-tour { border-color:var(--llp-accent); background:var(--llp-accent); color:var(--llp-on-accent); border-radius:99px; padding:10px 20px; }
 #skip-moon { background:transparent; border:0; color:var(--llp-link); padding:10px 4px; }
 .overview-audio-note { font-size:.75rem; color:var(--llp-muted); }
-.tour-science-caption { position:absolute; z-index:5; top:auto; bottom:56px; left:32px; width:min(480px,45vw); max-height:calc(100% - 144px); transform:none; padding:14px 16px; font-size:.84rem; line-height:1.5; background:rgba(19,33,56,.52); backdrop-filter:blur(26px); -webkit-backdrop-filter:blur(26px); border:0; border-radius:12px; overflow:auto; }
+.tour-science-caption { position:absolute; z-index:5; top:auto; bottom:56px; left:32px; width:min(480px,45vw); max-height:calc(100% - 144px); transform:none; padding:14px 16px; font-size:.84rem; line-height:1.5; background:rgba(28,28,30,.55); backdrop-filter:blur(26px); -webkit-backdrop-filter:blur(26px); border:0; border-radius:12px; overflow:auto; }
 .tour-science-caption > strong { font-size:1.1rem; font-weight:500; }
 .tour-science-caption details { margin-top:8px; }
 .tour-science-caption details p { font-size:.84rem; }
 .tour-science-caption > p:has(a) { font-size:.75rem; }
-.overview-clock-status { position:absolute; left:32%; bottom:0; right:0; padding:8px 14px; margin:0; font-size:.75rem; background:#091322d9; color:var(--llp-muted); }
+.overview-clock-status { position:absolute; left:32%; bottom:0; right:0; padding:8px 14px; margin:0; font-size:.75rem; background:#0A0A0Bd9; color:var(--llp-muted); }
 .explorer { display:grid; grid-template-columns:minmax(0,1.7fr) minmax(320px,1fr); gap:16px; height:calc(100dvh - 238px); min-height:360px; }
 .scene-column { min-width:0; min-height:0; display:flex; flex-direction:column; gap:8px; }
 .explore-controls { display:flex; align-items:center; justify-content:space-between; flex:none; }
 .view-toggle { display:flex; gap:4px; }
 .view-toggle button { padding:5px 16px; font-size:.84rem; border-radius:99px; background:none; }
-.view-toggle [aria-pressed="true"] { background:var(--llp-accent); border-color:var(--llp-accent); }
+.view-toggle [aria-pressed="true"] { background:var(--llp-accent); border-color:var(--llp-accent); color:var(--llp-on-accent); }
 .moon-window { position:relative; flex:1; min-height:0; display:flex; flex-direction:column; background:transparent; border:0; border-radius:0; }
 .scene-heading { display:flex; justify-content:space-between; padding:8px 14px; font-size:.75rem; color:var(--llp-muted); }
 .moon-stage { position:relative; min-height:200px; flex:1; }
@@ -108,7 +111,7 @@ body[data-view="overview"] .brand-wordmark { visibility:hidden; }
 ::-webkit-scrollbar { width:7px; height:7px; }
 ::-webkit-scrollbar-thumb { background:var(--llp-border); border-radius:8px; }
 
-body[data-view="overview"] .topbar { position:relative; z-index:20; border-bottom-color:transparent; background:linear-gradient(#091322b0,transparent); }
+body[data-view="overview"] .topbar { position:relative; z-index:20; border-bottom-color:transparent; background:linear-gradient(#0A0A0Bb0,transparent); }
 body[data-view="overview"] .site-footer { display:none; }
 
 .tour-info { position:absolute; z-index:9; bottom:24px; right:24px; }
@@ -160,5 +163,5 @@ body[data-reading-level="educator"] #credits-view {
 
 /* D35 Moon handoff: a clear actionable fallback beside the 3D Moon callout. */
 .moon-handoff { display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding-top:8px; }
-.moon-tour-action { background:var(--llp-accent); color:var(--llp-text); font-weight:600; border-radius:99px; padding:9px 14px; }
+.moon-tour-action { background:var(--llp-accent); color:var(--llp-on-accent); font-weight:600; border-radius:99px; padding:9px 14px; }
 .moon-tour-action:focus-visible { outline:2px solid var(--llp-text); outline-offset:2px; }

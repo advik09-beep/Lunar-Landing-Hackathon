@@ -282,12 +282,12 @@ svg.pano { width: 100%; height: auto; display: block; margin-top: 8px; }
 .sun-path { stroke: var(--_sun); opacity: .75; }
 .earth-path { stroke: var(--_earth); stroke-dasharray: 2 4; opacity: .9; }
 .margin { stroke: var(--_text); stroke-width: 1; stroke-dasharray: 3 3; }
-.body circle { stroke: #0b1322; stroke-width: 2; }
+.body circle { stroke: #0A0A0B; stroke-width: 2; }
 .body line { stroke-width: 2; }
 .sun circle { fill: var(--_sun); } .sun line { stroke: var(--_sun); }
-.earth circle { fill: var(--_earth); } .earth line { stroke: #0b1322; }
+.earth circle { fill: var(--_earth); } .earth line { stroke: #0A0A0B; }
 .body.hidden circle { fill-opacity: .35; stroke-dasharray: 3 2; stroke: var(--_text); }
-.label { fill: var(--_text); font-size: 13px; font-weight: 700; paint-order: stroke; stroke: #0b1322; stroke-width: 3px; }
+.label { fill: var(--_text); font-size: 13px; font-weight: 700; paint-order: stroke; stroke: #0A0A0B; stroke-width: 3px; }
 .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; }
 .legend span { display: inline-flex; gap: 6px; align-items: center; white-space: nowrap; }
 .controls { display: flex; align-items: center; gap: 8px; margin: 10px 0 4px; flex-wrap: wrap; }

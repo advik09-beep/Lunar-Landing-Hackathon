@@ -137,8 +137,8 @@ export class OverviewScene {
     canvas.width = 512; canvas.height = 82;
     const ctx = canvas.getContext('2d');
     if(ctx) {
-      ctx.fillStyle = 'rgba(13,24,40,.8)'; ctx.fillRect(0,0,512,82);
-      ctx.fillStyle = '#e5f2ff'; ctx.textAlign='center';
+      ctx.fillStyle = 'rgba(20,20,22,.8)'; ctx.fillRect(0,0,512,82);
+      ctx.fillStyle = '#F2EEE6'; ctx.textAlign='center';
       ctx.font='600 29px sans-serif'; ctx.fillText(text,256,54);
     }
     const texture = new THREE.CanvasTexture(canvas);

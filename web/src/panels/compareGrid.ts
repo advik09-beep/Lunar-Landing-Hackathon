@@ -150,6 +150,7 @@ export const mountCompareGrid: MountPanel = (container, props) => {
       <div class="legend" aria-label="Legend">
         ${(Object.keys(VERDICT_WORDS) as Verdict[]).map((v) => `<span><b class="v" data-verdict="${v}" aria-hidden="true">${verdictIcon(v, 16)}</b> ${esc(KID_VERDICT[v].label)}</span>`).join("")}
         <span><b class="v na" aria-hidden="true">–</b> No data</span>
+        <span class="bright-note">Bright means a better week.</span>
       </div>
       <nav class="window" aria-label="Move the date window">
         <button type="button" data-action="earlier">◀ Earlier</button>
@@ -322,7 +323,7 @@ svg.strip { width: 100%; height: auto; display: block; }
 .proto { display: inline-block; padding: 0 6px; border-radius: 5px; font-size: .68rem; letter-spacing: .06em; border: 1px dashed var(--_muted); color: var(--_muted); vertical-align: middle; }
 .switch { display: inline-flex; margin: 6px 0; border: 1px solid var(--_border); border-radius: 999px; overflow: hidden; }
 .switch button { padding: 4px 14px; border: 0; background: transparent; color: inherit; font-size: .85rem; }
-.switch button[aria-pressed="true"] { background: var(--_accent); font-weight: 650; }
+.switch button[aria-pressed="true"] { background: var(--_accent); color: var(--_on-accent); font-weight: 650; }
 .weights { display: grid; grid-template-columns: auto 160px 2.5rem; justify-content: start; gap: 4px 10px; align-items: center; margin: 6px 0; font-size: .82rem; } /* D34: each slider sits right beside its label */
 .weights label { display: contents; }
 .reset { padding: 4px 10px; border: 1px solid var(--_border); border-radius: 8px; background: transparent; color: inherit; font-size: .8rem; }
@@ -341,5 +342,5 @@ ol.rank { margin: 6px 0; padding-left: 22px; font-size: .88rem; }
 .strip .nodata-bg { fill: transparent; }
 .strip .hatch { stroke: var(--_border); stroke-width: 2; }
 .strip text { fill: var(--_muted); font-size: 11px; }
-.pick { margin-left: 6px; padding: 3px 10px; border: 1px solid var(--_accent); border-radius: 8px; background: var(--_accent); color: inherit; font-size: .85rem; }
+.pick { margin-left: 6px; padding: 3px 10px; border: 1px solid var(--_accent); border-radius: 8px; background: var(--_accent); color: var(--_on-accent); font-size: .85rem; }
 `;

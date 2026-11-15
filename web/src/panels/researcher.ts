@@ -283,7 +283,7 @@ h4 { margin: 12px 0 4px; font-size: .9rem; }
 p { margin: 6px 0; }
 .small { font-size: var(--_fs-sm); }
 .dl { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
-.dl button { padding: 6px 12px; border: 1px solid var(--_accent); border-radius: 8px; background: var(--_accent); color: inherit; font-weight: 600; }
+.dl button { padding: 6px 12px; border: 1px solid var(--_accent); border-radius: 8px; background: var(--_accent); color: var(--_on-accent); font-weight: 600; }
 table { width: 100%; border-collapse: collapse; font-size: .82rem; font-variant-numeric: tabular-nums; margin: 4px 0; }
 th, td { text-align: left; padding: 4px 6px; border-bottom: 1px solid var(--_border); vertical-align: top; }
 .kv th { color: var(--_muted); font-weight: 500; width: 22%; }

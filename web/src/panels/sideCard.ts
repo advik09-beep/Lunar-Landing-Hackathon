@@ -370,7 +370,7 @@ p { margin: 6px 0; }
 .small { font-size: var(--_fs-sm); }
 .switch { display: inline-flex; margin: 12px 0; border: 1px solid var(--_border); border-radius: 999px; overflow: hidden; }
 .switch button { padding: 6px 16px; border: 0; background: transparent; color: inherit; }
-.switch button[aria-pressed="true"] { background: var(--_accent); font-weight: 650; }
+.switch button[aria-pressed="true"] { background: var(--_accent); color: var(--_on-accent); font-weight: 650; }
 .verdict { display: flex; gap: 12px; align-items: center; padding: 10px 0; border-top: 1px solid var(--_divider); border-bottom: 1px solid var(--_divider); }
 .verdict .symbol { display: inline-flex; width: 30px; height: 30px; flex: none; }
 .tag { display: inline-block; padding: 1px 7px; margin-right: 4px; border-radius: 6px; font-size: .72rem; font-weight: 700; letter-spacing: .06em; border: 1px solid currentColor; }
@@ -397,5 +397,5 @@ thead th { color: var(--_muted); font-weight: 600; }
 .calc { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px 12px; margin: 6px 0; font-size: .85rem; }
 .calc label { display: grid; gap: 3px; color: var(--_muted); }
 .calc input, .calc select { font: inherit; padding: 4px 6px; border-radius: 6px; border: 1px solid var(--_border); background: transparent; color: var(--_text); }
-.exits button { flex: 1; padding: 8px 12px; border: 1px solid var(--_accent); border-radius: 8px; background: var(--_accent); color: inherit; font-weight: 600; }
+.exits button { flex: 1; padding: 8px 12px; border: 1px solid var(--_accent); border-radius: 8px; background: var(--_accent); color: var(--_on-accent); font-weight: 600; }
 `;

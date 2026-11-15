@@ -100,6 +100,9 @@ export function syncShellCopy(level: ReadingLevel): void {
     chip.title = kid ? childTip : chip.dataset.adultTip;
   }
 
+  const brightNote = document.getElementById('bright-note'); // D35: Educator legend line
+  if (brightNote) brightNote.hidden = !kid;
+
   const aria = (id: string, child: string, adult: string) =>
     document.getElementById(id)?.setAttribute('aria-label', kid ? child : adult);
   aria('global-clock', 'Pick a place and a day', 'Landing site and time');

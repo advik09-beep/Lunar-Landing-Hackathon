@@ -93,7 +93,7 @@ h2, h3, h4 { font-family: var(--llp-heading-font, inherit); }
 .ring figcaption span { color: var(--_muted); white-space: nowrap; }
 .ring figcaption strong { white-space: nowrap; }
 .ic-sun { fill: var(--_sun); } .ic-ray { stroke: var(--_sun); stroke-width: 2.5; stroke-linecap: round; }
-.ic-earth { fill: var(--_earth); } .ic-land { fill: none; stroke: #0b1322; stroke-width: 2.5; stroke-linecap: round; }
+.ic-earth { fill: var(--_earth); } .ic-land { fill: none; stroke: #0A0A0B; stroke-width: 2.5; stroke-linecap: round; }
 svg.week { width: 100%; height: auto; display: block; margin-top: 6px; }
 .week .night { fill: rgba(255,255,255,.05); }
 .week .sun { fill: var(--_sun); } .week .earth { fill: var(--_earth); }

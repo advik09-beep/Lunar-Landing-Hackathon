@@ -126,6 +126,7 @@ app.innerHTML = [
   `    <span class="verdict-chip out" title="Sunlight and Earth visible together for ${VERDICT_RULE.OUT_PCT}% or less of the stay">${verdictIcon("out",18)} Out</span>`,
   `    <span class="verdict-chip edge" title="Sun or Earth grazes the skyline within ${VERDICT_RULE.EDGE_DEG}° for most of the stay; small position changes matter">${verdictIcon("edge",18)} On the edge</span>`,
   '    <span class="verdict-chip earth-horizon-chip" title="Blue dashed circle: Earth is on the geometric horizon; terrain may block it"><span class="earth-dash-key" aria-hidden="true"></span> Earth on horizon</span>',
+  '    <span id="bright-note" class="bright-note">Bright means a better week.</span>',
   '  </section>',
   '  <section id="overview-view" class="overview-view" aria-label="Sun Earth Moon overview">',
   '    <div class="overview-window">',

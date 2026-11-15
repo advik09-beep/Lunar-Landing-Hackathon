@@ -385,16 +385,16 @@ export const LEARN_CSS = `
 .learn .ex .words h3 { margin-top: 8px; }
 .watch-ctl { display: flex; gap: 10px; align-items: center; margin: 6px 0 10px; max-width: 700px; }
 .watch-ctl input { flex: 1; }
-.watch-ctl .play { padding: 6px 14px; border: 1px solid var(--_accent); border-radius: 8px; background: var(--_accent); color: inherit; font-weight: 650; white-space: nowrap; }
+.watch-ctl .play { padding: 6px 14px; border: 1px solid var(--_accent); border-radius: 8px; background: var(--_accent); color: var(--_on-accent); font-weight: 650; white-space: nowrap; }
 .month-when { font-variant-numeric: tabular-nums; min-width: 4.5em; }
 .sky-panel { margin: 0; } .sky-panel figcaption { margin-top: 4px; } .now-words { color: var(--_muted); margin-left: 6px; }
-.sun-dot { fill: var(--_sun); stroke: #0b1322; stroke-width: 2; } .sun-dot.hidden { fill-opacity: .3; stroke-dasharray: 3 2; stroke: var(--_text); }
+.sun-dot { fill: var(--_sun); stroke: #0A0A0B; stroke-width: 2; } .sun-dot.hidden { fill-opacity: .3; stroke-dasharray: 3 2; stroke: var(--_text); }
 .q-card { padding: 10px 12px; border-radius: 10px; background: rgba(255,255,255,.05); }
 .q-card .q { font-weight: 650; }
 .opts { display: flex; flex-wrap: wrap; gap: 6px; }
 .opts button { padding: 6px 10px; border: 1px solid var(--_border); border-radius: 8px; background: transparent; color: inherit; }
 .opts button.picked { border-color: var(--_text); }
-.opts button.right { background: var(--_accent); border-color: var(--_accent); }
+.opts button.right { background: var(--_accent); border-color: var(--_accent); color: var(--_on-accent); }
 .answer { min-height: 1.4em; font-weight: 650; }
 .photo.card { margin: 0; } .photo.card img { width: 100%; height: auto; border-radius: 8px; display: block; }
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; margin: 8px 0; max-width: 980px; }
@@ -409,8 +409,8 @@ svg.pic { width: 100%; height: auto; display: block; margin: 6px 0; }
 .pic .level { stroke: var(--_muted); stroke-dasharray: 6 4; }
 .pic .ground { fill: var(--_ground); } .pic .groundflat { fill: var(--_ground); }
 .pic .hill, .sky-fig .hill { fill: none; stroke: var(--_horizon); stroke-width: 2.5; }
-.sunpic circle { fill: var(--_sun); stroke: #0b1322; stroke-width: 2; }
-.lab { fill: var(--_text); font-size: 14px; font-weight: 650; paint-order: stroke; stroke: #0b1322; stroke-width: 3px; }
+.sunpic circle { fill: var(--_sun); stroke: #0A0A0B; stroke-width: 2; }
+.lab { fill: var(--_text); font-size: 14px; font-weight: 650; paint-order: stroke; stroke: #0A0A0B; stroke-width: 3px; }
 .lab.small { font-size: 12px; font-weight: 500; fill: var(--_muted); }
 .pair { display: flex; gap: 14px; flex-wrap: wrap; }
 .sky-fig { margin: 0; flex: 1; min-width: 200px; }
