@@ -4,10 +4,18 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | Five requested items COMPLETE — STOPPED | Simulator/template fixes, Explore Earth circle, Educator names, Tour CTA and seven-slide deck committed; builds READY; visual QA pending |
+| Advik + ChatGPT (Lane B) | Borealis background music added; Vercel READY, listening QA pending | Opt-in music button across tabs, 12% volume, older embedded simulator sound remains muted; CC BY 4.0 credit on site and in NOTICE/README |
 | Sheldon (Lane A human) | D35 signed with Advik | 2026-11-15: D29–D35 signed; directed the D35 final look and deck pass (Lane A does the whole pass incl. web shell and deck); reviewing the recoloured site and the seven-page PDF |
 | Claude Code (Lane A) | D35 done (parts 1–4) | Grey theme + Moon-phase verdicts, today's date, deck fixed and recoloured with turning cover Moon, screenshots and PDF redone; stopped |
 | Collaborative presentation | Seven-slide screenshot pass deployed | Separate Vercel project `lunlux-presentation`, production build READY; all six screenshots and wordmark HTTP 200; final human visual QA pending |
+
+## 2026-11-15 — Lane B background music: Borealis by Scott Buckley
+
+- **Requested change:** Replace the old Tour ambient sound experience with quiet background music. The embedded simulator is already permanently muted in LunLux mode (the iframe's sound button is removed and its audio manager starts muted); no fork change was needed.
+- **Website change:** `web/src/main.ts` now provides a visible, accessible Music on/off button in the shared header. `Borealis` by Scott Buckley loops at `audio.volume = 0.12`, begins only after a visitor clicks, starts off on every visit, and pauses when the tab is hidden or page exits. `web/src/style.css` fits the control in the header.
+- **Music source:** Composer-hosted original MP3, `https://www.scottbuckley.com.au/library/wp-content/uploads/2019/09/sb_borealis.mp3`; **not downloaded or committed** to the repository. Official source and CC BY 4.0 terms: `https://www.scottbuckley.com.au/library/borealis/`. Attribution added to `web/src/methodsCredits.ts`, `README.md`, and `NOTICE`.
+- **Verification:** Vercel production build `4df70440a029fd6322715e4562efbf72fe699ffe` reported READY after the code and credits commits. The artist's site serves an audio/mpeg response at the configured source URL. Interactive hearing/volume/cross-origin playback in the deployed browser has **not** yet been manually verified. If the external stream is blocked, choose a self-hosted CC BY copy and retain credits.
+- **Scope:** No scientific data, panel calculation, slide content, or simulator fork was changed by this music request.
 
 Acceptance (both humans): steps 1, 2, 3, 6, 8 PASS; step 4 and 7 pending earlier findings. Signed: D7–D23 (see PLAN), **D24–D28** (title card + tour nav, tour captions, why the south pole, one clock, A/B scenarios + requirements filter). Rule: no status-only pushes.
 Waiting on Sheldon: read the new Educator screens on web/panels.html (level = Educator) and the Learn tab; confirm the two NASA photos and their captions.
