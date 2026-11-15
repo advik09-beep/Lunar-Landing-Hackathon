@@ -211,7 +211,7 @@ function openView(view: View): void {
   activeView = view;
   document.body.dataset.view = view;
   find<HTMLElement>('global-clock').hidden = view === 'overview' || view === 'credits';
-  find<HTMLElement>('verdict-legend').hidden = view !== 'explore' && view !== 'compare';
+  find<HTMLElement>('verdict-legend').hidden = view !== 'explore';
   for (const name of ['overview', 'explore', 'compare', 'horizon', 'researcher', 'planner', 'credits'] as View[]) {
     find<HTMLElement>(name + '-view').hidden = name !== view;
     const button = document.getElementById('nav-' + name);

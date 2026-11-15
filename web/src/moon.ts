@@ -72,7 +72,6 @@ export class LunarScene {
     c.beginPath(); c.moveTo(28,72); c.lineTo(48,112); c.lineTo(68,72); c.closePath(); c.fill(); c.stroke();
     c.beginPath(); c.arc(48,44,34,0,Math.PI*2); c.fillStyle=verdict==='clear'?palette.clear:THEME.bg; c.fill(); c.stroke();
     c.setLineDash([]);
-    if(verdict==='partial') { c.save(); c.beginPath(); c.rect(12,8,36,72); c.clip(); c.beginPath(); c.arc(48,44,31,0,Math.PI*2); c.fillStyle=palette.partial; c.globalAlpha=.35; c.fill(); c.restore(); }
     c.fillStyle=verdict==='clear'?'#0B1322':palette[verdict]; c.font='bold 39px sans-serif'; c.textAlign='center'; c.textBaseline='middle'; c.fillText(symbols[verdict],48,45);
     const texture=new THREE.CanvasTexture(canvas); texture.colorSpace=THREE.SRGBColorSpace; this.pinTextures.set(verdict,texture); return texture;
   }
