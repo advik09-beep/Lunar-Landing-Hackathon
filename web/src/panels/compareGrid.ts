@@ -3,7 +3,7 @@
 // that day, straight from getDaily() (the daily summary). Timeline strip: hourly sunlight /
 // Earth-in-view for the selected site over the same dates, from getTimeline().
 import { V, type Verdict, type Weights, type RankFilter } from "./data";
-import { verdictIcon, createPanelRoot, esc, pct, VERDICT_WORDS, EDGE_WORDS, addDays, whyWeights, WHY_WEIGHTS_CSS, WEIGHT_KEYS } from "./shared";
+import { stayFor, verdictIcon, createPanelRoot, esc, pct, VERDICT_WORDS, EDGE_WORDS, addDays, whyWeights, WHY_WEIGHTS_CSS, WEIGHT_KEYS } from "./shared";
 import type { MountPanel, PanelProps } from "./types";
 import { KID_VERDICT, KID_CSS, kidDate, teacher } from "./kid";
 
@@ -27,6 +27,7 @@ export const mountCompareGrid: MountPanel = (container, props) => {
   let scoreMode: "educator" | "researcher" = props.level ?? "educator"; // v1.3
   let weights: Weights = { ...V.SCORE_DEFAULT_WEIGHTS };
   let rankFilter: RankFilter = "all"; // D21: all sites / candidate sites / historic landings
+  const stayN = () => stayFor(current.stayDays, scoreMode === "researcher"); // D33: Researcher stay length; Educator one week
 
   body.addEventListener("input", (e) => {
     const t = e.target as HTMLInputElement;
@@ -57,14 +58,14 @@ export const mountCompareGrid: MountPanel = (container, props) => {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(current.landingDate)) { body.innerHTML = `<p class="warn">Pick a landing date.</p>`; return; }
     if (!body.innerHTML) body.innerHTML = `<p class="muted">Loading the daily summary…</p>`;
     try {
-      await V.loadDaily();
+      await Promise.all([V.loadDaily(), V.loadDaily(stayN())]);
     } catch (err) {
       if (my === token) body.innerHTML = `<p class="warn">Could not load the daily summary (${esc((err as Error).message)}).</p>`;
       return;
     }
     if (my !== token) return;
     const t0 = performance.now();
-    const daily = (V as unknown as { getDaily(d: string, n: number): Daily }).getDaily(windowStart, COLS);
+    const daily = (V as unknown as { getDaily(d: string, n: number, stay: number): Daily }).getDaily(windowStart, COLS, stayN());
     const sites = V.listSites();
     const terrain = new Map(V.getCoverage().sites.map((c) => [c.siteId, c.terrain]));
     const dates = Array.from({ length: COLS }, (_, i) => addDays(windowStart, i));
@@ -122,7 +123,7 @@ export const mountCompareGrid: MountPanel = (container, props) => {
       </table></div>
       ${strip}
       <section class="score-box" aria-label="Best-site score"></section>
-      <p class="muted small">Each cell summarises a 7-day stay; the strip shows it hour by hour. ${[...terrain.values()].some((t) => t !== "lola") ? "FLAT rows use a flat horizon; other rows use" : "Every site uses"} a terrain horizon from NASA's LOLA elevation maps, for one point per site.</p>`;
+      <p class="muted small">Each cell summarises a ${days}-day stay; the strip shows it hour by hour. ${[...terrain.values()].some((t) => t !== "lola") ? "FLAT rows use a flat horizon; other rows use" : "Every site uses"} a terrain horizon from NASA's LOLA elevation maps, for one point per site.</p>`;
   }
 
   // ---- D32 Educator: the grid in plain words plus one sentence naming the best week ----
@@ -198,7 +199,7 @@ export const mountCompareGrid: MountPanel = (container, props) => {
     const out = body.querySelector(".rank-out");
     if (!out) return;
     let r;
-    try { r = V.getRanking(current.landingDate, scoreMode === "researcher" ? weights : V.SCORE_DEFAULT_WEIGHTS, rankFilter); } catch { out.innerHTML = `<p class="muted">Not available for this date.</p>`; return; }
+    try { r = V.getRanking(current.landingDate, scoreMode === "researcher" ? weights : V.SCORE_DEFAULT_WEIGHTS, rankFilter, stayN()); } catch { out.innerHTML = `<p class="muted">Not available for this date.</p>`; return; }
     const avail = r.ranking.filter((x) => x.available);
     if (!avail.length) { out.innerHTML = `<p class="muted">Not available for this date (outside the data range).</p>`; return; }
     const top = avail[0];
@@ -271,12 +272,13 @@ export const mountCompareGrid: MountPanel = (container, props) => {
       if (next.level && next.level !== scoreMode) { scoreMode = next.level; current = { ...current, level: next.level }; render(); }
       const siteChanged = next.siteId !== undefined && next.siteId !== current.siteId;
       const dateChanged = next.landingDate !== undefined && next.landingDate !== current.landingDate;
+      const stayChanged = next.stayDays !== undefined && next.stayDays !== current.stayDays;
       current = { ...current, ...next };
       if (dateChanged) {
         const i = Math.round((Date.parse(current.landingDate) - Date.parse(windowStart)) / 864e5);
         if (i < 0 || i >= COLS) windowStart = addDays(current.landingDate, -BEFORE); // recentre only if outside
       }
-      if (siteChanged || dateChanged || hourChanged) render();
+      if (siteChanged || dateChanged || hourChanged || stayChanged) render();
     },
     destroy() { token++; host.remove(); },
   };

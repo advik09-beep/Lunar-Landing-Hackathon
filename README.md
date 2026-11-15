@@ -6,11 +6,11 @@
 
 **Live site:** https://lunar-landing-hackathon.vercel.app (desktop browsers)
 
-Pick a lunar landing site and a landing date. LunLux tells you, for the stay, whether the **Sun** (sunlight for power) and **Earth** (a direct line of sight for radio) are above the local terrain skyline, for how long, and what changes if the date slips.
+Pick a lunar landing site and a landing date. LunLux tells you, for the stay (one week; 1, 3, 7 or 14 days in the Researcher view), whether the **Sun** (sunlight for power) and **Earth** (a direct line of sight for radio) are above the local terrain skyline, for how long, and what changes if the date slips.
 
 One switch in the header sets the reading level for the whole site:
 - **Educator:** written so a seven-year-old understands it. Pictures first (sunshine and Earth rings, a week-long day and night strip), one short sentence at a time, everyday words, no degrees. Each section has a small "For the teacher" fold-out with the fuller explanation and one question for the class. The stay is always one week.
-- **Researcher:** angles, margins, every metric, the score formula with adjustable weights, charts across 2026–2029 and downloads, for mission planners and researchers.
+- **Researcher:** angles, margins, every metric, the score formula with adjustable weights, charts across 2026–2029 and downloads, for mission planners and researchers. The stay can be 1, 3, 7 or 14 days; verdicts, metrics, the score, the dates grid, the best stay, the Report and every download follow it.
 
 ## What you can do
 The site has four tabs plus a "Data and methods" link.
@@ -85,7 +85,7 @@ The data are static JSON files in `data/`. There is no backend.
 - Malapert (original point), 2026-11-20 06:00 UTC: Sun and Earth
 - Malapert (original point), 2026-11-17 08:00 UTC: Sun
 
-**Ten check scripts** (run from the repo root; each prints `PASS` or stops with the failure):
+**Eleven check scripts** (run from the repo root; each prints `PASS` or stops with the failure):
 
 | Script | What it proves |
 |---|---|
@@ -99,6 +99,7 @@ The data are static JSON files in `data/`. There is no backend.
 | `node scripts/check_tour.mjs` | The ten solar-system tour captions (D25) and the "Why the south pole?" text (D26): ten stops in order, two sentences each, NASA/JPL sources. Every figure we call ours is recomputed: Venus is the brightest planet from the Moon at about 2 billionths of the Sun's light (JPL Horizons magnitudes), sunlight 1,310–1,415 W/m², signal delay 1.2–1.4 s, one lunar day 29.53 Earth days, and Earth never more than about 11° above level at the candidate sites. |
 | `node scripts/check_d28.mjs` | The mission requirements filter and the A/B scenario comparison (D28): every site's pass/fail and named failing limits match its own numbers. No limits means every site passes, and outside the data the result is "No data", never a guessed pass. The comparison values equal the per-site numbers, the differences point the right way, a scenario compared with itself is "about the same" everywhere, and swapping A and B mirrors every difference. |
 | `node scripts/check_d32.mjs` | The two reading levels (D32): every Educator tour caption has no digits or degrees and at most two short sentences, and says the same facts as the Researcher caption ("a little over one second" = 1.19–1.36 s). The best week equals the highest score of the dates shown. The monthly chart values equal a recount from the hourly data, the daily score equals the hourly score, and every eclipse marked at Malapert is on NASA's 2026–2029 list. The all-sites table has every site and landing date (14,550 rows). The Learn facts hold: the Malapert ridge, Apollo 11's Sun at 87.8° vs Malapert's 5.5°, sunrise to sunrise 29.58–29.63 days, and Earth's small wobble. |
+| `node scripts/check_d33.mjs` | The Researcher stay length (D33): for 1-, 3-, 7- and 14-day stays, every tenth daily row of every site equals a fresh calculation from the hourly data; the ranking, best stay, requirements, A/B comparison, all-sites table, series and monthly scores all use the chosen length; the 7-day results are unchanged. Shorter stays give more Clear-or-Out verdicts (1 day 75%, 7 days 55%, 14 days 29%). No /lib string carries a PROTOTYPE tag or a middle dot. |
 
 **Terrain (all 10 sites):**
 - Built from NASA's LOLA elevation maps (PDS Geosciences).
@@ -149,7 +150,7 @@ All in-app credits are under **Data and methods** on the site.
 ## AI use
 **The code in this project was written with AI coding assistants, directed by the team.** The two team members decided what to build, checked the results and signed off every step. The assistants wrote the code and most of the documentation.
 
-- **Claude Code (Anthropic), with Sheldon (Lane A, "numbers"):** the data download scripts, the data files, everything in `lib/`, the terrain horizon method, the ten check scripts, `data/README.md`, the screen panels inside the site (side card, Compare grid, Stand here, Report and Learn, Planner) and this README. It read the JPL Horizons, PDS and NASA documentation to confirm settings and quoted them, rather than relying on memory.
+- **Claude Code (Anthropic), with Sheldon (Lane A, "numbers"):** the data download scripts, the data files, everything in `lib/`, the terrain horizon method, the eleven check scripts, `data/README.md`, the screen panels inside the site (side card, Compare grid, Stand here, Report and Learn, Planner) and this README. It read the JPL Horizons, PDS and NASA documentation to confirm settings and quoted them, rather than relying on memory.
 - **ChatGPT / Codex (OpenAI), with Advik (Lane B, "screen"):** the web app shell, the tabs and toolbar, the Three.js Moon and its lighting, the embedded Tour, the Data and methods page, and the Vercel deployment.
 - **The humans:**
   - Made every decision (scope, the 10 sites, the verdict numbers, the score weights, which point to use at Malapert), recorded as signed decisions in [`PLAN.md`](PLAN.md).

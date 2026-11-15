@@ -65,7 +65,8 @@ interface Api {
   MOCK: boolean; API_VERSION: string; VERDICT_RULE: VerdictRule;
   listSites(): Site[];
   loadSite(siteId: string): Promise<void>;
-  loadDaily(): Promise<void>;
+  loadDaily(stayDays?: number): Promise<void>;
+  STAY_OPTIONS: number[];
   getState(siteId: string, utc: string | number): State;
   getSummary(siteId: string, startUtc: string | number, days: number): Summary;
   getTimeline(siteId: string, startUtc: string | number, days: number, stepHours?: number): Timeline;
@@ -73,7 +74,7 @@ interface Api {
   getCoverage(): Coverage;
   getMetrics(siteId: string, startUtc: string | number, days?: number): Metrics;
   computePower(o: { siteId: string; startUtc: string | number; days?: number; areaM2: number; efficiency: number; panel: "tracking" | "fixed-flat"; loadW: number }): Power;
-  getRanking(landingDate: string, weights?: Partial<Weights>, filter?: RankFilter): Ranking;
+  getRanking(landingDate: string, weights?: Partial<Weights>, filter?: RankFilter, stayDays?: number): Ranking;
   SITE_CATEGORIES: Record<"candidate" | "historic", string>;
   scoreOf(m: Metrics, weights?: Partial<Weights>): { score: number | null; components: Record<keyof Weights, number>; weights: Weights };
   SCORE_DEFAULT_WEIGHTS: Weights; SCORE_TERMS: Record<keyof Weights, string>; SCORE_FORMULA_TEXT: string;

@@ -3,7 +3,7 @@
 // the terrain profile and its maps, D22 (other planets), what is NOT modelled, sources, and a download.
 // Lane A owns this file. All numbers come from /lib/visibility.js.
 import { V } from "./data";
-import { createPanelRoot, esc, deg, az, pct, fmtUtc, whyWeights, WHY_WEIGHTS_CSS, WEIGHT_KEYS } from "./shared";
+import { stayFor, createPanelRoot, esc, deg, az, pct, fmtUtc, whyWeights, WHY_WEIGHTS_CSS, WEIGHT_KEYS } from "./shared";
 import type { MountPanel, PanelProps } from "./types";
 import { renderLearn, LEARN_CSS } from "./learn";
 import { KID_CSS } from "./kid";
@@ -45,7 +45,8 @@ export const mountResearcher: MountPanel = (container, props) => {
     const site = V.listSites().find((s) => s.id === current.siteId);
     if (!site) { body.innerHTML = `<p class="warn">Unknown site.</p>`; return; }
     body.innerHTML = `<p class="muted">Loading the full analysis for ${esc(site.name)}…</p>`;
-    try { await Promise.all([V.loadSite(site.id), V.loadDaily()]); } catch (err) {
+    const n = stayFor(current.stayDays, true); // D33: the Report follows the Researcher stay length
+    try { await Promise.all([V.loadSite(site.id), V.loadDaily(), V.loadDaily(n)]); } catch (err) {
       if (my === token) body.innerHTML = `<p class="warn">Could not load data (${esc((err as Error).message)}).</p>`; return;
     }
     if (my !== token) return;
@@ -53,14 +54,14 @@ export const mountResearcher: MountPanel = (container, props) => {
     try {
       analysis = {
         generatedUtc: new Date().toISOString(), apiVersion: V.API_VERSION,
-        site, stay: { start, days: V.VERDICT_RULE.STAY_DAYS },
-        summary: V.getSummary(site.id, start, V.VERDICT_RULE.STAY_DAYS),
-        metrics: V.getMetrics(site.id, start),
-        conditions: L.getConditions(site.id, start),
-        months: L.getMonthlyScores(site.id),
-        series: L.getSiteSeries(site.id), // D32 charts across 2026–2029
-        score: L.getScore(site.id, current.landingDate),
-        rankingAll: V.getRanking(current.landingDate),
+        site, stay: { start, days: n },
+        summary: V.getSummary(site.id, start, n),
+        metrics: V.getMetrics(site.id, start, n),
+        conditions: L.getConditions(site.id, start, n),
+        months: L.getMonthlyScores(site.id, n),
+        series: L.getSiteSeries(site.id, n), // D32 charts across 2026–2029
+        score: L.getScore(site.id, current.landingDate, undefined, n),
+        rankingAll: V.getRanking(current.landingDate, undefined, "all", n),
         nasaCriteria: L.NASA_SITE_CRITERIA, criteriaCoverage: L.CRITERIA_COVERAGE,
         otherPlanets: L.OTHER_PLANETS_NOTE, notModeled: L.NOT_MODELED, sources: L.SOURCES,
       };
@@ -69,7 +70,7 @@ export const mountResearcher: MountPanel = (container, props) => {
     } catch (err) {
       const msg = (err as Error).message;
       body.innerHTML = /OUT_OF_COVERAGE/.test(msg)
-        ? `<h2>Researcher view: ${esc(site.name)}</h2><p class="warn"><strong>Unavailable:</strong> no data for a 7-day stay from ${esc(current.landingDate)}. Data cover 2026–2029${site.landingDate ? " and 30 days around the landing" : ""}.</p>`
+        ? `<h2>Researcher view: ${esc(site.name)}</h2><p class="warn"><strong>Unavailable:</strong> no data for a ${n}-day stay from ${esc(current.landingDate)}. Data cover 2026–2029${site.landingDate ? " and 30 days around the landing" : ""}.</p>`
         : `<p class="warn">${esc(msg)}</p>`;
     }
   }
@@ -84,7 +85,7 @@ export const mountResearcher: MountPanel = (container, props) => {
       <header>
         <p class="audience">RESEARCHER VIEW — written for researchers and mission designers</p>
         <h2>${esc(s.name)}</h2>
-        <p class="muted">${esc(fmtCoords(s.lat, s.lon))}; ${s.category === "historic" ? "historic landing (a past mission, shown for comparison)" : "candidate site"}; 7-day stay from ${esc(current.landingDate)} 00:00 UTC</p>
+        <p class="muted">${esc(fmtCoords(s.lat, s.lon))}; ${s.category === "historic" ? "historic landing (a past mission, shown for comparison)" : "candidate site"}; ${A.stay.days}-day stay from ${esc(current.landingDate)} 00:00 UTC</p>
         <div class="dl"><button type="button" data-action="download-json">Download full analysis (JSON)</button>
           <button type="button" data-action="download-csv">Download hourly data (CSV)</button>
           <button type="button" data-action="download-series">Download this site, 2026–2029 by month (CSV)</button>
@@ -102,7 +103,7 @@ export const mountResearcher: MountPanel = (container, props) => {
       <h3>Lighting and power</h3>
       <table class="kv">
         <tr><th>Sunlight share (visible share of the Sun's disc)</th><td>${pct(m.pctLit)}</td><th>Longest dark stretch</th><td>${m.longestDarkHours} h</td></tr>
-        <tr><th>Dark periods</th><td>${m.darkPeriods}</td><th>Longest continuous sunlight</th><td>${c.longestContinuousSunHours} h ${c.meetsNasa65DaySunBenchmark ? "(meets" : "(below"} NASA's 6.5-day = 156 h benchmark)</td></tr>
+        <tr><th>Dark periods</th><td>${m.darkPeriods}</td><th>Longest continuous sunlight</th><td>${c.longestContinuousSunHours} h ${A.stay.days * 24 < 156 ? "(this stay is shorter than NASA's 6.5-day = 156 h benchmark)" : c.meetsNasa65DaySunBenchmark ? "(meets NASA's 6.5-day = 156 h benchmark)" : "(below NASA's 6.5-day = 156 h benchmark)"}</td></tr>
         <tr><th>Hours with part of the Sun's disc hidden</th><td>${c.partialSunHours}</td><th>Sunlight strength (actual Sun distance)</th><td>${mm(c.sunlightStrengthWm2, n1)} W/m²</td></tr>
         <tr><th>Sun distance</th><td>${mm(c.sunDistanceKm, (x) => (x / 1e6).toFixed(3))} million km</td><th>Lunar eclipses in the stay</th><td>${c.eclipses.length ? c.eclipses.map((e: Any) => `${esc(fmtUtc(e.start))}–${esc(fmtUtc(e.end).slice(11))}, up to ${n0(e.maxCoveredPct)}% of the Sun covered`).join("; ") : "none"}</td></tr>
       </table>
@@ -173,7 +174,7 @@ export const mountResearcher: MountPanel = (container, props) => {
     const out = body.querySelector(".calc-out");
     if (!out || !analysis) return;
     try {
-      const p = V.computePower({ siteId: analysis.site.id, startUtc: analysis.stay.start, areaM2: calc.areaM2, efficiency: calc.effPct / 100, panel: calc.panel, loadW: calc.loadW });
+      const p = V.computePower({ siteId: analysis.site.id, startUtc: analysis.stay.start, days: analysis.stay.days, areaM2: calc.areaM2, efficiency: calc.effPct / 100, panel: calc.panel, loadW: calc.loadW });
       analysis.power = p;
       const kwh = (wh: number) => `${(wh / 1000).toFixed(1)} kWh`;
       out.innerHTML = `<table class="kv">
@@ -190,24 +191,24 @@ export const mountResearcher: MountPanel = (container, props) => {
   }
   function downloadJson() {
     if (!analysis) return;
-    const hourly = V.getTimeline(analysis.site.id, analysis.stay.start, V.VERDICT_RULE.STAY_DAYS).samples;
-    save(`lunlux_${analysis.site.id}_${current.landingDate}_researcher.json`, JSON.stringify({ app: V.APP_NAME, description: V.APP_TAGLINE, ...analysis, hourly, calculatorInputs: { ...calc } }, null, 1), "application/json");
+    const hourly = V.getTimeline(analysis.site.id, analysis.stay.start, analysis.stay.days).samples;
+    save(`lunlux_${analysis.site.id}_${current.landingDate}_${analysis.stay.days}day_researcher.json`, JSON.stringify({ app: V.APP_NAME, description: V.APP_TAGLINE, ...analysis, hourly, calculatorInputs: { ...calc } }, null, 1), "application/json");
   }
   function downloadCsv() {
     if (!analysis) return;
-    const s = V.getTimeline(analysis.site.id, analysis.stay.start, V.VERDICT_RULE.STAY_DAYS).samples;
+    const s = V.getTimeline(analysis.site.id, analysis.stay.start, analysis.stay.days).samples;
     const cols = ["utc", "sunEl", "sunAz", "sunMarginDeg", "sunFraction", "sunSkylineFraction", "eclipseFraction", "lit", "irradianceWm2", "sunDistKm",
       "earthEl", "earthAz", "earthMarginDeg", "earthRadiusDeg", "comms", "earthMarginal", "earthDistKm"] as const;
     const head = [`# app,${V.APP_NAME} — ${V.APP_TAGLINE}`, `# site_id,${analysis.site.id}`, `# stay,${s[0].utc}..${s[s.length - 1].utc}`, `# api_version,${V.API_VERSION}`, `# horizon_model,${s[0].horizonModel}`,
       "# angles in degrees, azimuth clockwise from north, distances in km, irradiance in W/m2, UTC", cols.join(",")];
-    save(`lunlux_${analysis.site.id}_${current.landingDate}_hourly.csv`, [...head, ...s.map((r) => cols.map((k) => (r as unknown as Record<string, unknown>)[k]).join(","))].join("\n") + "\n", "text/csv");
+    save(`lunlux_${analysis.site.id}_${current.landingDate}_${analysis.stay.days}day_hourly.csv`, [...head, ...s.map((r) => cols.map((k) => (r as unknown as Record<string, unknown>)[k]).join(","))].join("\n") + "\n", "text/csv");
   }
 
   function downloadAll() {
-    const t = L.getAllSitesTable();
+    const t = L.getAllSitesTable(analysis ? analysis.stay.days : 7);
     const head = [`# app,${V.APP_NAME} — ${V.APP_TAGLINE}`, `# api_version,${V.API_VERSION}`, `# ${t.note}`,
       `# weights,${WEIGHT_KEYS.map(([k, w]) => `${w}=${t.weights[k]}`).join(" ")}`, "# percentages are shares of the stay's hours; hours are whole hours; clearance 0..1", t.columns.join(",")];
-    save("lunlux_all-sites_2026-2029.csv", [...head, ...t.rows.map((r: unknown[]) => r.join(","))].join("\n") + "\n", "text/csv");
+    save(`lunlux_all-sites_2026-2029_${t.stayDays}day.csv`, [...head, ...t.rows.map((r: unknown[]) => r.join(","))].join("\n") + "\n", "text/csv");
   }
   function downloadSeries() {
     if (!analysis) return;
@@ -216,14 +217,15 @@ export const mountResearcher: MountPanel = (container, props) => {
       "month,hours,pct_sunlight,pct_earth_in_view,pct_both,mean_score,eclipse_hours",
       ...S.months.map((m: Any) => { const sc = S.scores.filter((x: Any) => x.date.startsWith(m.month)); const ec = S.eclipses.filter((e: Any) => e.start.startsWith(m.month)).reduce((a: number, e: Any) => a + e.hours, 0);
         return [m.month, m.hours, m.pctLit.toFixed(2), m.pctComms.toFixed(2), m.pctBoth.toFixed(2), sc.length ? (sc.reduce((a: number, x: Any) => a + x.score, 0) / sc.length).toFixed(1) : "", ec].join(","); })];
-    save(`lunlux_${S.siteId}_2026-2029_monthly.csv`, lines.join("\n") + "\n", "text/csv");
+    save(`lunlux_${S.siteId}_2026-2029_${S.stayDays}day_monthly.csv`, lines.join("\n") + "\n", "text/csv");
   }
 
   load();
   return {
     update(next) {
       const changed = (next.siteId !== undefined && next.siteId !== current.siteId) || (next.landingDate !== undefined && next.landingDate !== current.landingDate)
-        || (next.level !== undefined && next.level !== current.level);
+        || (next.level !== undefined && next.level !== current.level)
+        || (next.stayDays !== undefined && next.stayDays !== current.stayDays && current.level !== "educator");
       current = { ...current, ...next };
       if (changed) load();
     },
@@ -251,7 +253,7 @@ function chartsHtml(S: Any, landingDate: string): string {
   return `<figure class="chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(`Monthly sunlight and Earth in view, ${S.months[0].month} to ${S.months[n - 1].month}. Most sunlight ${best.month} (${best.pctLit.toFixed(0)}%), least ${worst.month} (${worst.pctLit.toFixed(0)}%).`)}">${yAx}${years}${bars}</svg>
       <figcaption class="small"><span class="sw sun"></span> sunlight <span class="sw earth"></span> Earth in view: share of each month's hours. Most sunlight ${esc(best.month)} (${best.pctLit.toFixed(1)}%), least ${esc(worst.month)} (${worst.pctLit.toFixed(1)}%).</figcaption></figure>
     <figure class="chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(`Sun and Earth score for every landing date 2026–2029, with ${S.eclipses.length} lunar eclipses marked.`)}">${yAx.replace(/%/g, "")}${years}${ecl}${sel}<polyline points="${pts}" class="score"/></svg>
-      <figcaption class="small"><span class="sw score"></span> ${esc(V.SCORE_LABEL)} (default weights) of the 7-day stay starting each day; <span class="sw ecl"></span> lunar eclipse seen at this site (${S.eclipses.length}); <span class="sw sel"></span> your landing date.</figcaption></figure>
+      <figcaption class="small"><span class="sw score"></span> ${esc(V.SCORE_LABEL)} (default weights) of the ${S.stayDays}-day stay starting each day; <span class="sw ecl"></span> lunar eclipse seen at this site (${S.eclipses.length}); <span class="sw sel"></span> your landing date.</figcaption></figure>
     <p class="muted small">${S.notes.map((x: string) => esc(x)).join(" ")}</p>`;
 }
 

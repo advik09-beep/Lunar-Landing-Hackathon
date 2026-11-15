@@ -6,11 +6,11 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 |-----|------|-----------|
 | Advik + ChatGPT (Lane B) | D32 COMPLETE — STOPPED | Five D32 shell items committed; final source commit d0ef0f6 verified Vercel READY. Human visual/readability review remains open. |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
-| Claude Code (Lane A) | D33 items 1–5 done; item 6 (stay length) next | Text cleanup, icon symbols, Learn layout, Why this score?, README |
+| Claude Code (Lane A) | D33 Lane A part done (items 1–6) | Stay length 1/3/7/14 (Researcher) done within the time box; stopped |
 
 Acceptance (both humans): steps 1, 2, 3, 6, 8 PASS; step 4 and 7 pending earlier findings. Signed: D7–D23 (see PLAN), **D24–D28** (title card + tour nav, tour captions, why the south pole, one clock, A/B scenarios + requirements filter). Rule: no status-only pushes.
 Waiting on Sheldon: read the new Educator screens on web/panels.html (level = Educator) and the Learn tab; confirm the two NASA photos and their captions.
-Waiting on Advik: Human review of the deployed D32 Educator/Researcher switch, Tour wordmark and tab icon, Learn/Report tab, child-level Tour captions and simplified shell text; check in-browser rendering, readability and navigation. D27 shared clock and D28 Planner are integrated in Lane B code, but no new human acceptance is claimed. Earlier step 4 and step 7 acceptance findings remain unchanged.
+Waiting on Advik: D33 shell items: CMU Serif + Source Serif 4 (licences confirmed, see Lane A notes), --llp-heading-font, own-formula sentence in Data and methods, middle dots in shell files, the Researcher stay control and shareable links (Lane A notes, 2026-11-15).
 
 ## Continuous two-agent coordination protocol (agreed 2026-11-14)
 
@@ -1701,4 +1701,29 @@ SOUTH_POLE.sources;          // [{ name, url }]
 - Middle dots still in Lane B files: `web/src/main.ts` lines ~92, 104, 149, 348, 428, 450, 471, 472; `web/src/educatorCopy.ts` 66; `web/src/overview.ts` 112–114.
 
 **Checks:** all ten scripts PASS; panel tests PASS (the D33 test adds: no PROTOTYPE or middle dots on any Researcher panel, the own-formula sentence in each score section, SVG icons only, the Learn layout rules). `cd web && npm run build` OK (after `npm ci` picked up Lane B's new font package).
+
+### 2026-11-15 — D33 item 6 DONE: Researcher stay length 1, 3, 7 or 14 days (panel interface v1.5, API 1.11.0)
+Done within the 2-hour time box (all checks passing about 7 minutes after starting).
+- **/lib:** `STAY_OPTIONS = [1, 3, 7, 14]`; `loadDaily(stayDays)`; optional `stayDays` on `getDaily`, `getRanking`, `getScore`, `getBestWeek`, `getSiteSeries`, `getAllSitesTable`, `getMonthlyScores`, `checkRequirements`; scenarios for `compareScenarios` may carry `stayDays`. `getSummary`, `getMetrics`, `getTimeline`, `getConditions` and `computePower` already took a length. Default everywhere is 7, so existing calls are unchanged (checked).
+- **Data:** `data/ephem/_daily/daily_1.json`, `daily_3.json`, `daily_14.json` (~0.6–0.7 MB each, built by `node scripts/build_daily.mjs <n>`). They sit inside `data/ephem/`, so Lane B's existing postbuild copy already publishes them (seen in `web/dist/data/ephem/_daily/`).
+- **Panels:** `PanelProps.stayDays?: 1 | 3 | 7 | 14` and `update({ stayDays })`. Researcher content follows it: side card (status, stay numbers, metrics, calculator, score, CSV), Compare (grid cells, strip, ranking), Stand here (paths and hour slider), Planner (A/B and requirements), Report (analysis, charts, best/worst months, all downloads, file names carry the length). Educator always uses one week, whatever `stayDays` says. For stays shorter than 156 h the Report says the stay is shorter than NASA's 6.5-day benchmark instead of "below".
+- **Checks:** new `check_d33` PASS (every tenth daily row of every site, for each length, = the hourly calculation; ranking, best stay, requirements, A/B, tables, series all use the chosen length; 7-day results unchanged; no PROTOTYPE or middle dots in /lib strings). All eleven scripts PASS; panel tests PASS, including a new stay-length test; `cd web && npm run build` OK. `web/panels.html` has a "Stay (Researcher only)" control for testing.
+
+**Notes for Lane B: the stay control**
+1. A select in the slim toolbar, **Researcher only**: "Stay: 1 day / 3 days / 7 days / 14 days" (values from `STAY_OPTIONS` in `lib/visibility.js`), default 7. Hide it in Educator.
+2. Pass `stayDays` to every panel on mount and call `update({ stayDays })` on all of them when it changes (panels ignore it in Educator).
+3. The hour slider max becomes `stayDays * 24 - 1` in Researcher (167 in Educator). Clamp the current hour when the stay or level changes and send the clamped `hour` in the same `update`. Use the same hour for the Explore lighting instant.
+4. Globe marker verdicts: in Researcher, `await loadDaily(stayDays)` and use `getDaily(date, 1, stayDays)`, so markers match the side card. In Educator keep `getDaily(date, 1)`.
+5. Any shell text that says "7-day stay" should use the chosen length in Researcher.
+
+**Notes for Lane B: which values identify a view (for shareable links)**
+- `tab`: tour | explore | compare | learn (Educator) / report (Researcher; same tab)
+- `level`: educator | researcher
+- `site`: site id from `listSites()` (e.g. `sp_malapert`)
+- `date`: landing date, YYYY-MM-DD (UTC)
+- `hour`: 0 .. stayDays*24-1 (clamp on load)
+- `stay`: 1 | 3 | 7 | 14, meaningful in Researcher only (ignore or drop it in Educator; reject other values, fall back to 7)
+- `view`: globe | horizon (Explore's switch)
+- Example: `?tab=compare&level=researcher&site=sp_malapert&date=2026-11-14&hour=6&stay=3`
+- Not part of a link (local to a panel or viewer): Compare custom weights and rank filter, calculator inputs, A/B picks and saved pairs (browser only), open fold-outs.
 

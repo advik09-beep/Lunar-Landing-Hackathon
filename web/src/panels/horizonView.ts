@@ -4,7 +4,7 @@
 // chosen hour plus their paths over the 7-day stay from getTimeline. Nothing is calculated here
 // except drawing positions; visibility (lit/comms, margins) comes straight from /lib.
 import { V, type Horizon, type Timeline, type Sample } from "./data";
-import { createPanelRoot, esc, deg, az, fmtUtc, clampHour } from "./shared";
+import { stayFor, createPanelRoot, esc, deg, az, fmtUtc, clampHour } from "./shared";
 import type { MountPanel, PanelProps } from "./types";
 import { KID_CSS, kidDate, kidSun, kidEarth, teacher } from "./kid";
 
@@ -18,7 +18,8 @@ export const mountHorizonView: MountPanel = (container, props) => {
   root.append(body);
 
   let current: PanelProps = { ...props };
-  let hour = clampHour(props.hour, V.VERDICT_RULE.STAY_DAYS * 24); // v1.2: shared hour (local if the shell gives no onHourSelected)
+  const stayN = () => stayFor(current.stayDays, current.level !== "educator"); // D33: Researcher stay length; Educator one week
+  let hour = clampHour(props.hour, stayN() * 24); // v1.2: shared hour (local if the shell gives no onHourSelected)
   let token = 0;
   let data: { horizon: Horizon; tl: Timeline; name: string; yMin: number; yMax: number } | null = null;
 
@@ -58,10 +59,10 @@ export const mountHorizonView: MountPanel = (container, props) => {
     }
     if (my !== token) return;
     let tl: Timeline;
-    try { tl = V.getTimeline(site.id, `${current.landingDate}T00:00:00Z`, V.VERDICT_RULE.STAY_DAYS); } catch (err) {
+    try { tl = V.getTimeline(site.id, `${current.landingDate}T00:00:00Z`, stayN()); } catch (err) {
       const ranges = V.getCoverage().sites.find((c) => c.siteId === site.id)?.ranges ?? [];
       body.innerHTML = `<h2>Stand here: ${esc(site.name)}</h2>
-        <p class="warn"><strong>Unavailable:</strong> no data for a ${V.VERDICT_RULE.STAY_DAYS}-day stay from ${esc(current.landingDate)}.</p>
+        <p class="warn"><strong>Unavailable:</strong> no data for a ${stayN()}-day stay from ${esc(current.landingDate)}.</p>
         <p class="muted">Data covers: ${ranges.map(([a, b]) => `${esc(a.slice(0, 10))} to ${esc(b.slice(0, 10))}`).join("; ")}.</p>`;
       return;
     }
@@ -158,11 +159,11 @@ export const mountHorizonView: MountPanel = (container, props) => {
       </p>
       ${controlsHtml(n, "Time")}
       <ul class="readout kid-readout" aria-live="polite"></ul>
-      <div class="kid">${teacher(`<p>${esc(desc.replace(/ \(0°\)/, ""))}</p><p>Left to right is the compass: north, east, south, west, north. Up is higher in the sky. The Sun and Earth paths cover the ${V.VERDICT_RULE.STAY_DAYS}-day stay from ${esc(current.landingDate)} 00:00 UTC, one point per hour. A body counts as seen only when it is above the skyline; this is possible sunlight or a possible direct line of sight to Earth, not guaranteed power or a guaranteed link.</p>`,
+      <div class="kid">${teacher(`<p>${esc(desc.replace(/ \(0°\)/, ""))}</p><p>Left to right is the compass: north, east, south, west, north. Up is higher in the sky. The Sun and Earth paths cover the ${stayN()}-day stay from ${esc(current.landingDate)} 00:00 UTC, one point per hour. A body counts as seen only when it is above the skyline; this is possible sunlight or a possible direct line of sight to Earth, not guaranteed power or a guaranteed link.</p>`,
         "Why can a hill hide the Sun even in the daytime?")}</div>` : `
       <header>
         <h2>Stand here: ${esc(d.name)}</h2>
-        <p class="muted">Looking all the way around: compass direction left to right (N → E → S → W → N), height above level up and down. ${V.VERDICT_RULE.STAY_DAYS}-day stay from ${esc(current.landingDate)} 00:00 UTC.</p>
+        <p class="muted">Looking all the way around: compass direction left to right (N → E → S → W → N), height above level up and down. ${stayN()}-day stay from ${esc(current.landingDate)} 00:00 UTC.</p>
         <p class="small"><span class="tag" data-model="${d.horizon.model}">${flat ? "FLAT" : "TERRAIN"}</span> ${esc(desc)}</p>
       </header>
       ${panoSvg(false)}
@@ -216,11 +217,13 @@ export const mountHorizonView: MountPanel = (container, props) => {
       const changed = (next.siteId !== undefined && next.siteId !== current.siteId) ||
         (next.landingDate !== undefined && next.landingDate !== current.landingDate);
       const levelChanged = next.level !== undefined && next.level !== current.level;
+      const stayBefore = stayN();
       current = { ...current, ...next };
-      if (levelChanged && !changed && data) { drawStatic(); drawDynamic(); }
-      if (next.hour !== undefined) hour = clampHour(next.hour, V.VERDICT_RULE.STAY_DAYS * 24);
+      const stayMoved = stayN() !== stayBefore;
+      if (levelChanged && !changed && !stayMoved && data) { drawStatic(); drawDynamic(); }
+      if (next.hour !== undefined) hour = clampHour(next.hour, stayN() * 24);
       else if (changed && !current.onHourSelected) hour = 0; // v1.1 behaviour: new site/date starts at hour 1
-      if (changed) load();
+      if (changed || stayMoved) load();
       else if (next.hour !== undefined && data) showHour(hour);
     },
     destroy() { token++; host.remove(); },

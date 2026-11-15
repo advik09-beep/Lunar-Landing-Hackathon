@@ -1,6 +1,6 @@
 // Lane A panels (PLAN D9). Lane B imports mount functions from here.
 export type { PanelProps, PanelHandle, MountPanel } from "./types";
-export const PANEL_INTERFACE_VERSION = "1.4"; // 1.4 (D32): every panel follows level with a seven-year-old Educator view; mountLearn added; planner hides in Educator
+export const PANEL_INTERFACE_VERSION = "1.5"; // 1.5 (D33): optional stayDays 1/3/7/14 for the Researcher view; // 1.4 (D32): every panel follows level with a seven-year-old Educator view; mountLearn added; planner hides in Educator
 export { mountSideCard } from "./sideCard";
 export { mountCompareGrid } from "./compareGrid"; // step 6, includes the timeline strip
 export { mountHorizonView } from "./horizonView"; // step 7, "Stand here"

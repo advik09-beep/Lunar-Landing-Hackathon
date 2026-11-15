@@ -1,7 +1,7 @@
 // D28 planner panel: saved A/B scenario comparison and a mission requirements filter. Lane A owns this file.
 // Numbers and the plain-words differences come from /lib (compareScenarios, checkRequirements).
 import { V } from "./data";
-import { createPanelRoot, esc, markIcon } from "./shared";
+import { createPanelRoot, esc, markIcon, stayFor } from "./shared";
 import type { MountPanel, PanelProps } from "./types";
 
 type Any = any; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -31,6 +31,7 @@ export const mountPlanner: MountPanel = (container, props) => {
     minEarthPct: { on: false, value: 80 }, maxSlopeDeg: { on: false, value: 10 },
   };
   let reqFilter: "all" | "candidate" | "historic" = "all";
+  const stayN = () => stayFor(current.stayDays, true); // D33: the planner is Researcher-only, so it follows the stay length
 
   body.addEventListener("click", (e) => {
     const t = (e.target as HTMLElement).closest<HTMLElement>("[data-action]");
@@ -62,7 +63,7 @@ export const mountPlanner: MountPanel = (container, props) => {
     const opts = (sel: string) => V.listSites().map((s) => `<option value="${s.id}"${s.id === sel ? " selected" : ""}>${esc(s.shortName)}${s.category === "historic" ? " (historic)" : ""}</option>`).join("");
     body.innerHTML = `
       <h2>Compare two scenarios (A/B)</h2>
-      <p class="muted small">Each scenario is a site and a landing date (a 7-day stay from 00:00 UTC). Differences are listed in plain words.</p>
+      <p class="muted small">Each scenario is a site and a landing date (a ${stayN()}-day stay from 00:00 UTC). Differences are listed in plain words.</p>
       <div class="scen">
         ${(["a", "b"] as const).map((k) => `<fieldset><legend>${k.toUpperCase()}</legend>
           <label>Site <select data-scen="${k}" data-field="siteId">${opts((k === "a" ? A : B).siteId)}</select></label>
@@ -74,7 +75,7 @@ export const mountPlanner: MountPanel = (container, props) => {
       <h3>Saved pairs <span class="muted small">(kept in this browser only)</span></h3>
       <div class="saved"></div>
       <h2>Mission requirements</h2>
-      <p class="muted small">Set your limits. Every site is tested for a 7-day stay from ${esc(current.landingDate)}; failing limits are named. The starting numbers are examples to change, not recommendations.</p>
+      <p class="muted small">Set your limits. Every site is tested for a ${stayN()}-day stay from ${esc(current.landingDate)}; failing limits are named. The starting numbers are examples to change, not recommendations.</p>
       <div class="reqs">${Object.entries(REQ).map(([k, q]) => `<label class="req"><input type="checkbox" data-req="${k}" data-part="on"${req[k].on ? " checked" : ""}/>
         <span>${esc(q.label)} ${q.kind === "max" ? "at most" : "at least"}</span>
         <input type="number" step="1" min="0" data-req="${k}" data-part="value" value="${req[k].value}"/> <span>${q.unit}</span></label>`).join("")}</div>
@@ -105,10 +106,10 @@ export const mountPlanner: MountPanel = (container, props) => {
     const my = ++token, out = body.querySelector(".compare-out");
     if (!out) return;
     out.innerHTML = `<p class="muted small">Comparing…</p>`;
-    try { await Promise.all([V.loadSite(A.siteId), V.loadSite(B.siteId), V.loadDaily()]); } catch (err) { out.innerHTML = `<p class="warn">${esc((err as Error).message)}</p>`; return; }
+    try { await Promise.all([V.loadSite(A.siteId), V.loadSite(B.siteId), V.loadDaily(), V.loadDaily(stayN())]); } catch (err) { out.innerHTML = `<p class="warn">${esc((err as Error).message)}</p>`; return; }
     if (my !== token) return;
     try {
-      const c = L.compareScenarios(A, B);
+      const c = L.compareScenarios({ ...A, stayDays: stayN() }, { ...B, stayDays: stayN() });
       const f = (v: number | null, d = 0) => (v === null ? "–" : v.toFixed(d));
       const verdict = (v: string) => (v === "edge" ? "On the edge" : v[0].toUpperCase() + v.slice(1));
       const row = (name: string, va: string, vb: string) => `<tr><th>${esc(name)}</th><td>${esc(va)}</td><td>${esc(vb)}</td></tr>`;
@@ -127,17 +128,17 @@ export const mountPlanner: MountPanel = (container, props) => {
       <p><strong>${esc(c.overall)}</strong></p>${c.notes.map((n: string) => `<p class="muted small">${esc(n)}</p>`).join("")}`;
     } catch (err) {
       const msg = (err as Error).message;
-      out.innerHTML = `<p class="warn">${/OUT_OF_COVERAGE/.test(msg) ? "One of the scenarios has no data for a 7-day stay from that date (data cover 2026–2029 and 30 days around each past landing)." : esc(msg)}</p>`;
+      out.innerHTML = `<p class="warn">${/OUT_OF_COVERAGE/.test(msg) ? "One of the scenarios has no data for a ${stayN()}-day stay from that date (data cover 2026–2029 and 30 days around each past landing)." : esc(msg)}</p>`;
     }
   }
 
   async function renderRequirements() {
     const out = body.querySelector(".req-out");
     if (!out) return;
-    try { await V.loadDaily(); } catch (err) { out.innerHTML = `<p class="warn">${esc((err as Error).message)}</p>`; return; }
+    try { await Promise.all([V.loadDaily(), V.loadDaily(stayN())]); } catch (err) { out.innerHTML = `<p class="warn">${esc((err as Error).message)}</p>`; return; }
     const limits: Record<string, number> = {};
     for (const [k, v] of Object.entries(req)) if (v.on && Number.isFinite(v.value)) limits[k] = v.value;
-    const r = L.checkRequirements(current.landingDate, limits, reqFilter);
+    const r = L.checkRequirements(current.landingDate, limits, reqFilter, stayN());
     out.innerHTML = `<p class="small"><strong>${r.passCount} of ${r.results.length}</strong> sites meet ${Object.keys(limits).length ? "every limit you set" : "your limits (none set: every site passes)"} for a stay from ${esc(current.landingDate)}.</p>
       <ul class="reqlist">${r.results.map((x: Any) => `<li class="${x.pass ? "pass" : "fail"}"><span class="mark" aria-hidden="true">${markIcon(x.pass)}</span>
         <strong>${x.pass ? "PASS" : x.available ? "FAIL" : "NO DATA"}</strong>
@@ -158,7 +159,7 @@ export const mountPlanner: MountPanel = (container, props) => {
   renderRequirements();
   return {
     update(next) {
-      const dateChanged = next.landingDate !== undefined && next.landingDate !== current.landingDate;
+      const dateChanged = (next.landingDate !== undefined && next.landingDate !== current.landingDate) || (next.stayDays !== undefined && next.stayDays !== current.stayDays);
       current = { ...current, ...next };
       host.hidden = current.level === "educator"; host.style.display = host.hidden ? "none" : "";
       if (dateChanged) { paint(); renderRequirements(); renderCompare(); }

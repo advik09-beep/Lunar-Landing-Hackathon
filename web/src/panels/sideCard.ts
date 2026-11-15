@@ -5,7 +5,7 @@
 // All values come from /lib/visibility.js; nothing is calculated here except formatting.
 import { V, type Site, type State, type Summary, type Horizon, type Metrics, type Sample } from "./data";
 import { KID_VERDICT, KID_CSS, kidCategory, kidDate, kidSun, kidEarth, ring, weekStrip, teacher } from "./kid";
-import { verdictIcon, createPanelRoot, esc, deg, az, pct, VERDICT_WORDS, verdictShort, addDays, fmtUtc, clampHour, whyWeights, WHY_WEIGHTS_CSS, WEIGHT_KEYS } from "./shared";
+import { stayFor, verdictIcon, createPanelRoot, esc, deg, az, pct, VERDICT_WORDS, verdictShort, addDays, fmtUtc, clampHour, whyWeights, WHY_WEIGHTS_CSS, WEIGHT_KEYS } from "./shared";
 import type { MountPanel, PanelProps } from "./types";
 
 type Mode = "plain" | "numbers"; // shown as Educator / Researcher
@@ -38,7 +38,7 @@ export const mountSideCard: MountPanel = (container, props) => {
     const t = (e.target as HTMLElement).closest<HTMLElement>("[data-action]");
     if (!t) return;
     const a = t.dataset.action;
-    if (a === "mode-plain" || a === "mode-numbers") { mode = a === "mode-plain" ? "plain" : "numbers"; paint(); renderCalc(); }
+    if (a === "mode-plain" || a === "mode-numbers") { mode = a === "mode-plain" ? "plain" : "numbers"; if (view && stayN() * 24 !== view.samples.length) load(); else { paint(); renderCalc(); } }
     else if (a === "prev-day") current.onDateSelected(addDays(current.landingDate, -1));
     else if (a === "next-day") current.onDateSelected(addDays(current.landingDate, 1));
     else if (a === "csv") downloadCsv();
@@ -54,7 +54,7 @@ export const mountSideCard: MountPanel = (container, props) => {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(current.landingDate)) { body.innerHTML = `<p class="warn">Pick a landing date.</p>`; return; }
     body.innerHTML = `<h2>${esc(site.name)}</h2><p class="muted">Loading Sun and Earth data…</p>`;
     try {
-      await Promise.all([V.loadSite(site.id), V.loadDaily()]); // daily summary: best-site ranking (D17)
+      await Promise.all([V.loadSite(site.id), V.loadDaily(), V.loadDaily(stayN())]); // daily summary: best-site ranking (D17)
     } catch (err) {
       if (my !== token) return;
       body.innerHTML = `<h2>${esc(site.name)}</h2><p class="warn">Could not load data for this site (${esc((err as Error).message)}).</p>`;
@@ -64,10 +64,10 @@ export const mountSideCard: MountPanel = (container, props) => {
     const start = `${current.landingDate}T00:00:00Z`;
     try {
       const state = V.getState(site.id, Date.parse(start) + hourNow() * 3.6e6);
-      const summary = V.getSummary(site.id, start, V.VERDICT_RULE.STAY_DAYS);
+      const summary = V.getSummary(site.id, start, stayN());
       const horizon = V.getHorizon(site.id);
-      const metrics = V.getMetrics(site.id, start, V.VERDICT_RULE.STAY_DAYS);
-      const samples = V.getTimeline(site.id, start, V.VERDICT_RULE.STAY_DAYS).samples; // D32 Educator week strip
+      const metrics = V.getMetrics(site.id, start, stayN());
+      const samples = V.getTimeline(site.id, start, stayN()).samples; // D32 Educator week strip
       view = { site, state, summary, horizon, start, metrics, samples };
       paint();
       renderCalc();
@@ -77,12 +77,13 @@ export const mountSideCard: MountPanel = (container, props) => {
       const ranges = V.getCoverage().sites.find((c) => c.siteId === site.id)?.ranges ?? [];
       body.innerHTML = `
         <h2>${esc(site.name)}</h2>
-        <p class="warn"><strong>Unavailable:</strong> we have no data for a ${V.VERDICT_RULE.STAY_DAYS}-day stay from ${esc(current.landingDate)}.</p>
+        <p class="warn"><strong>Unavailable:</strong> we have no data for a ${stayN()}-day stay from ${esc(current.landingDate)}.</p>
         <p class="muted">Data covers: ${ranges.map(([a, b]) => `${esc(a.slice(0, 10))} to ${esc(b.slice(0, 10))}`).join("; ")}. We never guess outside these dates.</p>`;
     }
   }
 
-  const hourNow = () => clampHour(current.hour, V.VERDICT_RULE.STAY_DAYS * 24);
+  const stayN = () => stayFor(current.stayDays, mode === "numbers"); // D33: Researcher stay length; Educator one week
+  const hourNow = () => clampHour(current.hour, stayN() * 24);
   const atHour = (st: State) => hourNow() === 0
     ? `At the start of the stay (${fmtUtc(st.sampleUtc)})`
     : `On day ${Math.floor(hourNow() / 24) + 1} of the stay (${fmtUtc(st.sampleUtc)})`;
@@ -92,7 +93,7 @@ export const mountSideCard: MountPanel = (container, props) => {
     const { site, state, summary, horizon } = view;
     const w = VERDICT_WORDS[summary.verdict];
     const flat = state.horizonModel === "flat";
-    const days = V.VERDICT_RULE.STAY_DAYS;
+    const days = stayN();
     const coords = `${Math.abs(site.lat).toFixed(5)}°${site.lat < 0 ? "S" : "N"}, ${Math.abs(site.lon).toFixed(5)}°${site.lon < 0 ? "W" : "E"}`;
     const pointNote = site.category === "candidate" ? site.note.split(" (")[0] : "";
     if (mode === "plain") { body.innerHTML = kidCard(); return; } // D32: Educator = seven-year-old card
@@ -248,7 +249,7 @@ export const mountSideCard: MountPanel = (container, props) => {
     // D16 metrics (terrain-aware hourly data).
     function metricsHtml(): string {
       const m = view!.metrics;
-      return `<h3>Power and communication over the ${V.VERDICT_RULE.STAY_DAYS}-day stay</h3>
+      return `<h3>Power and communication over the ${stayN()}-day stay</h3>
         <table class="kv">
           <tr><th>Sunlight share</th><td>${pct(m.pctLit)}</td><th>Earth-in-view share</th><td>${pct(m.pctComms)}</td></tr>
           <tr><th>Longest dark stretch</th><td>${m.longestDarkHours} h</td><th>Longest contact gap</th><td>${m.longestContactGapHours} h</td></tr>
@@ -275,7 +276,7 @@ export const mountSideCard: MountPanel = (container, props) => {
 
     // D17 Researcher: formula + this site's components at default weights.
     function scoreResearcher(): string {
-      const r = V.getRanking(current.landingDate);
+      const r = V.getRanking(current.landingDate, undefined, "all", stayN());
       const me = r.ranking.find((x) => x.siteId === site.id);
       if (!me?.available) return `<h3>${esc(V.SCORE_LABEL)}</h3><p class="muted">Not available for this landing date.</p>`;
       const W = V.SCORE_DEFAULT_WEIGHTS, c = me.components!;
@@ -295,7 +296,7 @@ export const mountSideCard: MountPanel = (container, props) => {
     const out = body.querySelector(".calc-out");
     if (!out || !view) return;
     try {
-      const p = V.computePower({ siteId: view.site.id, startUtc: view.start, days: V.VERDICT_RULE.STAY_DAYS,
+      const p = V.computePower({ siteId: view.site.id, startUtc: view.start, days: stayN(),
         areaM2: calc.areaM2, efficiency: calc.effPct / 100, panel: calc.panel, loadW: calc.loadW });
       const kwh = (wh: number) => `${(wh / 1000).toFixed(1)} kWh`;
       out.innerHTML = `<p class="small"><strong>Estimate</strong> for this ${p.hours}-hour stay:</p>
@@ -313,7 +314,7 @@ export const mountSideCard: MountPanel = (container, props) => {
   function downloadCsv() {
     if (!view) return;
     const { site, start } = view;
-    const tl = V.getTimeline(site.id, start, V.VERDICT_RULE.STAY_DAYS);
+    const tl = V.getTimeline(site.id, start, stayN());
     const s = tl.samples;
     const lines = [
       `# app,${V.APP_NAME} — ${V.APP_TAGLINE}`,
@@ -326,14 +327,14 @@ export const mountSideCard: MountPanel = (container, props) => {
       `# site_source,${csvCell(site.source)}`,
       `# mock,${V.MOCK}`,
       `# api_version,${V.API_VERSION}`,
-      `# stay,${s[0].utc}..${s[s.length - 1].utc} (${V.VERDICT_RULE.STAY_DAYS} days, hourly; azimuth clockwise from north; UTC)`,
+      `# stay,${s[0].utc}..${s[s.length - 1].utc} (${stayN()} days, hourly; azimuth clockwise from north; UTC)`,
       "utc,sun_el_deg,sun_az_deg,sun_margin_deg,earth_el_deg,earth_az_deg,earth_margin_deg,sun_up,earth_in_view,sun_edge,earth_edge",
       ...s.map((r) => [r.utc, r.sunEl, r.sunAz, r.sunMarginDeg, r.earthEl, r.earthAz, r.earthMarginDeg, r.lit, r.comms, r.sunEdge, r.earthEdge].join(",")),
     ];
     const url = URL.createObjectURL(new Blob([lines.join("\n") + "\n"], { type: "text/csv" }));
     const a = document.createElement("a");
     a.href = url;
-    a.download = `lunlux_${site.id}_${current.landingDate}_${V.VERDICT_RULE.STAY_DAYS}day.csv`;
+    a.download = `lunlux_${site.id}_${current.landingDate}_${stayN()}day.csv`;
     root.append(a);
     a.click();
     a.remove();
@@ -347,9 +348,11 @@ export const mountSideCard: MountPanel = (container, props) => {
         (next.landingDate !== undefined && next.landingDate !== current.landingDate);
       const hourChanged = next.hour !== undefined && next.hour !== current.hour;
       const levelChanged = next.level !== undefined && next.level !== current.level;
+      const prevStay = current.stayDays;
       if (next.level) mode = next.level === "researcher" ? "numbers" : "plain";
       current = { ...current, ...next };
-      if (changed) load();
+      const stayChanged = next.stayDays !== undefined && next.stayDays !== prevStay;
+      if (changed || ((levelChanged || stayChanged) && stayN() !== (view?.samples.length ?? 168) / 24)) load();
       else if (levelChanged && view && !hourChanged) { paint(); renderCalc(); }
       else if (hourChanged && view) { view.state = V.getState(view.site.id, Date.parse(view.start) + hourNow() * 3.6e6); paint(); renderCalc(); }
     },

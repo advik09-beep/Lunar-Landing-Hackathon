@@ -107,6 +107,13 @@ export function verdictShort(v: Verdict, model: "flat" | "lola"): string {
   return v === "edge" ? EDGE_WORDS[model] : VERDICT_WORDS[v].short;
 }
 
+/** D33: stay length used by a panel. Researcher content follows the shell's stayDays (1, 3, 7 or 14); Educator is always 7. */
+export function stayFor(stayDays: number | undefined, researcher: boolean): 1 | 3 | 7 | 14 {
+  return researcher && (stayDays === 1 || stayDays === 3 || stayDays === 14) ? stayDays : 7;
+}
+/** "1 day", "3 days", "a week", "2 weeks" style label for headings (Researcher). */
+export const stayWords = (n: number): string => (n === 1 ? "1-day" : `${n}-day`);
+
 /** Clamp a shared hour to the stay: 0 .. hours-1 (whole hours). */
 export function clampHour(h: number | undefined, hours: number): number {
   const n = Math.round(Number(h ?? 0));

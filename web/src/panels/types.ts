@@ -23,11 +23,15 @@ export interface PanelProps {
   /** v1.3, optional: reading level from the shell's single Educator / Researcher switch (D30).
    *  When given, panels follow it and hide their own switches. */
   level?: "educator" | "researcher";
+  /** v1.5 (D33), optional: stay length in days for the Researcher view: 1, 3, 7 or 14 (default 7).
+   *  Panels use it only while they show Researcher content; Educator always uses one week (7 days).
+   *  The shared hour then runs 0 .. stayDays*24-1. */
+  stayDays?: 1 | 3 | 7 | 14;
 }
 
 export interface PanelHandle {
   /** Shell pushes a new selection. Only the fields given change. */
-  update(next: Partial<Pick<PanelProps, "siteId" | "landingDate" | "hour" | "level">>): void;
+  update(next: Partial<Pick<PanelProps, "siteId" | "landingDate" | "hour" | "level" | "stayDays">>): void;
   /** Removes the panel's DOM and listeners. The container itself is left in place. */
   destroy(): void;
 }
