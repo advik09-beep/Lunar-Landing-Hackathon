@@ -46,3 +46,11 @@
 - On the deployment, HTTP 200 for HTML, `/shots/00-cover-tour.png` through `/shots/05-report-researcher.png`, and `/brand/lunlux-wordmark.png`.
 - Production domain: `https://lunlux-presentation-lunlux.vercel.app/` (currently protected by Vercel Authentication; not yet a public presentation submission link).
 - No browser visual verification of screenshot fit or slide 6 footer; no claim of full functionality or public shareability yet.
+
+### 2026-11-15 — D35 deck pass (Lane A, both humans agreed)
+- Slides 2-7 were blank in the live deck because `.page` used `position:relative`, which stacked each slide below the previous one (reproduced in headless Chromium: slide 2 at 899 px, slides 3-7 at 1,677 px). The rule now matches Reveal's slide box (`position:absolute; top:0; left:0; width:100%; height:100%`). Headless Chromium step-through with the arrow keys: all seven slides on screen, no page errors, at 1440x810, 1920x1080, 1366x768, 1280x800, 2560x1440 and 1024x768.
+- D35 colours: near-black, dark grey glass, warm off-white text; only gold (Sun) and blue (Earth) are coloured; moonlight buttons with black text.
+- Cover: "Challenge: Lunar Landing Site Navigator"; a slowly turning 3D Moon (the site's NASA SVS CGI Moon Kit map, three.js) peeking in from the right; a still image in the PDF; credit "Moon map: NASA's Scientific Visualization Studio, CGI Moon Kit".
+- Slide 6: old closing line removed. Slide 7: "Where would you land?" once (the heading).
+- Screenshots 01-05 retaken from the local build at 1440x810, 2x (00 unchanged).
+- `LunLux-demo.pdf` re-exported from `?print-pdf` in headless Chromium: 7 pages, each looked at after rendering with macOS PDFKit. The print view needed a padding fix (Reveal's print CSS drops section padding) and the Sun symbol's glow was removed (it printed as a square).

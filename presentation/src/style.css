@@ -35,7 +35,7 @@ html,body,.reveal { background:var(--deep); }
 .side-panel { display:flex; flex-direction:column; justify-content:center; padding:31px 28px; gap:28px; }
 .side-panel .panel-intro { font-size:27px; line-height:1.22; color:var(--text); margin-bottom:2px; }
 .short-point { display:flex; align-items:center; gap:16px; font-size:26px; line-height:1.24; }
-.point-symbol { display:inline-block; flex:0 0 25px; width:25px; height:25px; border-radius:50%; background:var(--sun); box-shadow:0 0 22px #f2c14e66; }
+.point-symbol { display:inline-block; flex:0 0 25px; width:25px; height:25px; border-radius:50%; background:var(--sun); }
 .terrain-symbol { border-radius:0; box-shadow:none; background:var(--muted); clip-path:polygon(0 100%,29% 46%,53% 77%,79% 9%,100% 100%); }
 .date-symbol { border:3px solid var(--text); background:transparent; box-shadow:none; border-radius:7px; }
 .cover { isolation:isolate; }
@@ -90,3 +90,5 @@ html,body,.reveal { background:var(--deep); }
 .reveal .slides > section { transition-duration:.33s!important; }
 @media(prefers-reduced-motion:reduce) { .reveal .slides > section { transition:none!important; } }
 @media print { .reveal .controls,.reveal .progress { display:none!important; } }
+/* PDF export (?print-pdf): Reveal's print styles drop the slide padding; keep the same layout as on screen. */
+html.reveal-print .reveal .slides .page { padding:62px 82px 82px !important; box-sizing:border-box !important; }
