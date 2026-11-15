@@ -6,7 +6,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 |-----|------|-----------|
 | Lane B lead + ChatGPT (Lane B) | Borealis background music added; Vercel READY, listening QA pending | Opt-in music button across tabs, 12% volume, older embedded simulator sound remains muted; CC BY 4.0 credit on site and in NOTICE/README |
 | Lane A lead (human) | D35 signed with the Lane B lead | 2026-11-15: D29–D35 signed; directed the D35 final look and deck pass (Lane A does the whole pass incl. web shell and deck); reviewing the recoloured site and the seven-page PDF |
-| Claude Code (Lane A) | D36 done (parts 1–3) | Coloured globe pins with spreading and leader lines, larger grid icons, deck slides 6–7 fixed, 02/03 retaken, PDF re-exported; stopped |
+| Claude Code (Lane A) | D37 done (parts 1–2) | Pins on true spots, verdict colours everywhere, Safari slider fix, names removed, deck relabelled with starfield, shots and PDF redone; stopped |
 | Collaborative presentation | Seven-slide screenshot pass deployed | Separate Vercel project `lunlux-presentation`, production build READY; all six screenshots and wordmark HTTP 200; final human visual QA pending |
 
 ## 2026-11-15 — Lane B background music: Borealis by Scott Buckley
@@ -1948,4 +1948,18 @@ Done within the 2-hour time box (all checks passing about 7 minutes after starti
   - PDF re-exported: 7 pages, each looked at. All seven slides show when stepping with the arrow keys, no page errors.
 - **Checks:** all twelve scripts PASS, panel tests PASS, web build and presentation build OK.
 - **Not retaken:** 01, 04 and 05 (not asked). Screenshot 04 still shows the smaller grid icons from before Part 2.
+
+### 2026-11-15 — D37 final site and deck pass: Lane A DONE (Lane B not editing)
+- **Pins:** back on their true spots; D36 spreading and leader lines removed; pin colours and label placement kept.
+- **Verdict colours wherever a verdict appears** (green Clear/Partial with the grey phase inside, coral Out, violet On the edge): Compare grid and legend, Explore chips, side card, Learn ten places. The Educator line now reads "Green is good, coral is hard, violet is tricky."
+- **Slider bug, cause confirmed in WebKit:**
+  - On the old build, the first end-to-end drag worked. WebKit then threw "Attempt to use history.replaceState() more than 100 times per 10 seconds", the error escaped the slider handler, and the hour label and address froze (stuck at hour 42 for every later pass).
+  - Fix: the address bar updates at most every 300 ms, with a final update, inside try/catch.
+  - Proof: dragging the hour slider end to end 20 times in WebKit and 10 in Chromium, with no errors; the label followed every pass and the address settled on the final hour.
+- **Names:** removed from every tracked text file. `check_d34` scans 84 files; the GitHub account name remains only inside repository URLs. The PDF's only match is the "View the code" link URL.
+- **Deck:**
+  - The site's starfield drifts behind every slide (a still frame in the PDF).
+  - NASA demo-outline labels and the requested titles; slide 6 lists three achievements and three hurdles, each verified in the repo (sources in the slide notes); slide 7 adds "Next: pick any spot on the Moon and get its real terrain horizon."
+  - Screenshots 01–05 retaken; PDF 7 pages, each looked at.
+- **Checks:** all twelve scripts, panel tests, web and presentation builds pass.
 

@@ -5,16 +5,17 @@
   --edge:rgba(242,238,230,.16); --text:#F2EEE6; --muted:#A6A29B;
   --moon:#E8E4DA; --on-moon:#0A0A0B; --sun:#F2C14E; --earth:#5AA9E6;
 }
-html,body,.reveal { background:var(--deep); }
+html,body,.reveal-viewport { background:var(--deep) !important; } /* Reveal paints its viewport light by default */
+.reveal { background:transparent; }
+/* D37: the site's drifting starfield behind every slide (a still frame in the PDF). */
+.deck-starfield { position:fixed; inset:0; z-index:0; pointer-events:none; display:block; opacity:.65; }
+.reveal { position:relative; z-index:1; }
 .reveal { color:var(--text); font-family:"Source Serif 4",serif; font-size:25px; }
 .reveal .slides { text-align:left; }
 .reveal .slides .page {
   position:absolute; top:0; left:0; width:100%; box-sizing:border-box; height:100%; overflow:hidden; /* match Reveal's own slide box; position:relative put slides 2-7 below the screen */
   padding:62px 82px 82px;
-  background:
-    radial-gradient(circle at 18% 23%,rgba(242,238,230,.28) 0 1px,transparent 2px) 0 0/109px 95px,
-    radial-gradient(circle at 80% 70%,rgba(242,238,230,.22) 0 1px,transparent 2px) 0 0/173px 137px,
-    radial-gradient(ellipse at 83% 10%,#232326 0%,#151517 37%,#0A0A0B 77%);
+  background: radial-gradient(ellipse at 83% 10%, rgba(40,40,44,.45) 0%, rgba(20,20,22,.25) 37%, rgba(10,10,11,0) 77%);
 }
 .reveal h1,.reveal h2,.reveal h3 { font-family:"CMU Serif",serif; font-weight:400; text-transform:none; color:var(--text); letter-spacing:-.034em; margin:0; }
 .reveal h2 { font-size:67px; line-height:1.07; max-width:1210px; margin:23px 0 26px; }
@@ -43,13 +44,8 @@ html,body,.reveal { background:var(--deep); }
 /* D35 cover Moon: the site's NASA SVS map on a slowly turning 3D sphere, peeking in from the right edge. */
 .cover-moon { position:absolute; z-index:-1; top:20px; right:-300px; width:720px; height:720px; pointer-events:none; }
 .cover-moon canvas, .cover-moon img { display:block; width:100%; height:100%; }
-.reveal .cover .challenge { font-size:22px; color:var(--text); letter-spacing:.04em; text-transform:none; margin-top:10px; }
-.reveal .slides .page.cover {
-  background-image:linear-gradient(95deg,#0A0A0B 0%,#0A0A0B 32%,rgba(10,10,11,.86) 52%,rgba(10,10,11,.72) 100%),url("/shots/00-cover-tour.png");
-  background-size:cover,128% auto;
-  background-position:center,center 73%;
-  background-repeat:no-repeat;
-}
+.reveal .cover .challenge { font-size:24px; color:var(--text); letter-spacing:.02em; text-transform:none; margin-top:12px; }
+.reveal .slides .page.cover { background: linear-gradient(95deg, rgba(10,10,11,.55) 0%, rgba(10,10,11,.25) 45%, rgba(10,10,11,0) 70%); }
 .cover-panel { position:relative; margin-top:65px; width:800px; max-width:100%; padding:28px 40px 34px 0; }
 .reveal .cover .kicker { color:var(--muted); font-size:24px; }
 .reveal .cover h1 { margin:17px 0 18px; }
@@ -77,12 +73,20 @@ html,body,.reveal { background:var(--deep); }
 .audience-top p { color:var(--muted); font-size:18px; }
 .audience-card .screenshot-frame { flex:1; min-height:0; }
 .audience-card img { object-fit:contain; }
-/* D36: the two panels fill the slide, with larger text. */
+/* D36/D37: two panels fill the slide; three short facts each. */
 .reflection-slide .twocol { display:grid; grid-template-columns:1fr 1fr; gap:32px; margin-top:34px; height:520px; }
-.reflection-slide .twocol article { display:flex; flex-direction:column; justify-content:flex-start; padding:64px 52px 48px; }
+.reflection-slide .twocol article { display:flex; flex-direction:column; justify-content:flex-start; padding:40px 44px 36px; }
 .reflection-slide .tag { font-size:20px; }
 .reflection-slide h3 { margin:24px 0 24px; font-size:50px; line-height:1.1; }
 .reflection-slide .twocol p { font-size:35px; line-height:1.3; color:var(--text); }
+.reflection-slide .facts { margin:22px 0 0; padding-left:28px; display:grid; gap:22px; }
+.reflection-slide .facts li { font-size:27px; line-height:1.3; color:var(--text); }
+.reveal .data-slide h2 { font-size:56px; margin:18px 0 18px; }
+.reveal .data-slide .stats { margin-top:30px; }
+.reveal .data-slide .stats article { min-height:250px; }
+.reveal .data-slide .source { margin-top:24px; }
+.reveal .next-line { font-size:24px; color:var(--muted); margin:-12px 0 0; }
+.reveal .demo-slide .visual-split { margin-top:20px; height:470px; }
 .reveal .demo-links { gap:20px; }
 .reveal .demo-links .link-button { display:block; box-sizing:border-box; width:100%; padding:17px 21px; border-radius:9px; color:var(--on-moon); background:var(--moon); text-align:center; text-decoration:none; font-size:25px; font-weight:600; }
 .reveal .demo-links .link-button.secondary { background:transparent; color:var(--text); border:1px solid var(--text); }
@@ -95,3 +99,5 @@ html,body,.reveal { background:var(--deep); }
 @media print { .reveal .controls,.reveal .progress { display:none!important; } }
 /* PDF export (?print-pdf): Reveal's print styles drop the slide padding; keep the same layout as on screen. */
 html.reveal-print .reveal .slides .page { padding:62px 82px 82px !important; box-sizing:border-box !important; }
+html.print-stars .reveal .slides .page { background-color:var(--deep); background-image:var(--print-stars) !important; background-size:cover !important; background-position:center !important; }
+html.print-stars .reveal .slides .page.cover { background-image:linear-gradient(95deg, rgba(10,10,11,.55) 0%, rgba(10,10,11,.25) 45%, rgba(10,10,11,0) 70%), var(--print-stars) !important; background-size:100% 100%, cover !important; background-position:center !important; }
