@@ -152,7 +152,7 @@ body[data-reading-level="educator"] #credits-view {
 /* Explore: sub-Earth point and its data-driven zero-elevation great circle. */
 .earth-horizon-chip { color:var(--llp-earth); }
 .earth-dash-key { display:inline-block; width:28px; border-top:3px dashed var(--llp-earth); }
-.earth-overhead-label { cursor:pointer; pointer-events:auto; font:inherit; }
+.moon-site-label.earth-overhead-label { cursor:pointer; pointer-events:auto; }
 .earth-overhead-label:focus-visible { outline:2px solid var(--llp-earth); outline-offset:3px; }
 .earth-explanation { position:absolute; z-index:6; right:12px; top:12px; width:min(310px, 50%); padding:16px; border:1px solid var(--llp-earth); border-radius:10px; background:var(--llp-glass); backdrop-filter:blur(var(--llp-glass-blur)); color:var(--llp-text); box-shadow:0 12px 28px #0009; font-size:.9rem; line-height:1.4; }
 .earth-explanation p { margin:8px 0 12px; color:var(--llp-muted); }
