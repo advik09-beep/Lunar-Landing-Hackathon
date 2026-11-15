@@ -34,8 +34,11 @@ question for all Creative Commons imagery.
 2. For NASA's unusually strict third-party OSI language, obtain event guidance
    for CC BY 4.0 textures if required; the publisher's own reuse license is
    explicit and attribution is present, but it is not an OSI software license.
-3. Screenshots and remaining bundled media in the simulator fork have not been
-   audited for third-party content. No final legal/permission sign-off is claimed.
+3. Five old upstream showcase screenshots in the simulator fork's
+   `docs/screenshots/` and their README display references were removed
+   (fork commits `15ea9ac` and `80a1383` through `dc804ff`) to eliminate
+   unverified legacy imagery. This is not an audit of every possible
+   non-screenshot asset, and no final legal/permission sign-off is claimed.
 
 **Current gate: NOT CLEARED FOR SUBMISSION.** This does **not** mean the
 code or textures are necessarily infringing; it means the evidence is not
