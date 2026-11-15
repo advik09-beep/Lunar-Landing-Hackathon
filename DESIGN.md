@@ -159,3 +159,9 @@ The same values are exported as `THEME` from `web/src/panels/shared.ts` for code
 - Educator: "Why these weights?" becomes **"Why this score?"**, answered in words a seven-year-old understands. Researcher keeps "Why these weights?" with one line per weight.
 - Stay length (Researcher only): 1, 3, 7 or 14 days; Educator always uses one week.
 
+## Pins, grid icons and deck polish (D36, both humans, 2026-11-15)
+- **Globe pins only** are coloured: a solid body with a dark outline (`#0A0A0B`) and the grey Moon-phase icon inside a dark disc. Green `#4FBF7A` for Clear / Great week and Partial / Okay week (the phase inside tells them apart), coral `#F28B82` for Out / Hard week, violet `#B48CF0` for On the edge / Tricky week, grey `#A6A29B` for no data. The Explore legend chips use the same colours, so the legend matches the pins.
+- Pins that overlap on screen are spread apart around their shared centre, each with a thin leader line back to its true spot.
+- Everything else stays black and grey (panels, the Compare grid, the side card). Gold is only the Sun, blue only Earth.
+- The Compare grid's phase icons are larger, so Out / Hard (dark disc) and On the edge / Tricky (dashed ring with dot) are easy to tell apart.
+

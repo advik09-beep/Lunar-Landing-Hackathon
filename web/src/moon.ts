@@ -28,6 +28,8 @@ type Marker = {
   site: MoonSite;
   object: THREE.Sprite;
   halo: THREE.Sprite;
+  anchor: THREE.Vector3;   // true pin position (D36)
+  leader: THREE.Line;      // thin line from the true spot to a spread-out pin (D36)
   normal: THREE.Vector3;
 };
 
@@ -67,28 +69,33 @@ export class LunarScene {
     const cached = this.pinTextures.get(verdict); if (cached) return cached;
     const canvas = document.createElement('canvas'); canvas.width=96; canvas.height=128;
     const c=canvas.getContext('2d')!;
-    // D35: a dark grey pin holding the verdict's grey Moon phase (same shapes as verdictIcon in the panels).
-    c.strokeStyle=THEME.muted; c.fillStyle=THEME.bg; c.lineWidth=4;
-    c.beginPath(); c.moveTo(28,72); c.lineTo(48,112); c.lineTo(68,72); c.closePath(); c.fill(); c.stroke();
-    c.beginPath(); c.arc(48,44,34,0,Math.PI*2); c.fill(); c.stroke();
+    // D36: a solid coloured body with a dark outline (green Clear/Partial, coral Out, violet On the edge),
+    // holding the grey Moon-phase icon on a dark disc, so the verdict reads on the lit and the dark Moon.
+    const body = verdict === 'clear' || verdict === 'partial' ? THEME.pinGood : verdict === 'out' ? THEME.pinOut : verdict === 'edge' ? THEME.pinEdge : THEME.pinNone;
+    c.lineJoin='round'; c.strokeStyle=THEME.pinInk; c.fillStyle=body; c.lineWidth=6;
+    c.beginPath(); c.moveTo(25,70); c.lineTo(48,114); c.lineTo(71,70); c.closePath(); c.fill(); c.stroke();
+    c.beginPath(); c.arc(48,44,38,0,Math.PI*2); c.fill(); c.stroke();
+    c.fillStyle=body; c.fillRect(30,66,36,10); // join head and tip without an inner seam
+    c.fillStyle=THEME.bg; c.beginPath(); c.arc(48,44,27,0,Math.PI*2); c.fill();
+    c.strokeStyle=THEME.pinInk; c.lineWidth=2; c.stroke();
     c.save(); c.translate(48,44);
     if (verdict === 'clear') {
-      c.fillStyle=palette.clear; c.beginPath(); c.arc(0,0,23,0,Math.PI*2); c.fill();
+      c.fillStyle=palette.clear; c.beginPath(); c.arc(0,0,20,0,Math.PI*2); c.fill();
     } else if (verdict === 'partial') {
-      c.fillStyle=THEME.outFill; c.beginPath(); c.arc(0,0,22,0,Math.PI*2); c.fill();
-      c.strokeStyle=palette.partial; c.lineWidth=4; c.stroke();
-      c.fillStyle=palette.partial; c.beginPath(); c.arc(0,0,22,-Math.PI/2,Math.PI/2); c.closePath(); c.fill();
+      c.fillStyle=THEME.outFill; c.beginPath(); c.arc(0,0,19,0,Math.PI*2); c.fill();
+      c.strokeStyle=palette.partial; c.lineWidth=3.5; c.stroke();
+      c.fillStyle=palette.partial; c.beginPath(); c.arc(0,0,19,-Math.PI/2,Math.PI/2); c.closePath(); c.fill();
     } else if (verdict === 'out') {
       c.fillStyle=THEME.outFill; c.strokeStyle=palette.out; c.lineWidth=3;
-      c.beginPath(); c.arc(0,0,22,0,Math.PI*2); c.fill(); c.stroke();
+      c.beginPath(); c.arc(0,0,19,0,Math.PI*2); c.fill(); c.stroke();
     } else if (verdict === 'edge') {
-      c.strokeStyle=palette.edge; c.lineWidth=4; c.setLineDash([7,6]);
-      c.beginPath(); c.arc(0,0,21,0,Math.PI*2); c.stroke(); c.setLineDash([]);
-      c.fillStyle=palette.edge; c.beginPath(); c.arc(0,0,6,0,Math.PI*2); c.fill();
+      c.strokeStyle=palette.edge; c.lineWidth=3.5; c.setLineDash([6,5]);
+      c.beginPath(); c.arc(0,0,18,0,Math.PI*2); c.stroke(); c.setLineDash([]);
+      c.fillStyle=palette.edge; c.beginPath(); c.arc(0,0,5,0,Math.PI*2); c.fill();
     } else {
-      c.strokeStyle=palette.unavailable; c.lineWidth=4;
-      c.beginPath(); c.arc(0,0,21,0,Math.PI*2); c.stroke();
-      c.beginPath(); c.moveTo(-9,0); c.lineTo(9,0); c.stroke();
+      c.strokeStyle=palette.unavailable; c.lineWidth=3.5;
+      c.beginPath(); c.arc(0,0,18,0,Math.PI*2); c.stroke();
+      c.beginPath(); c.moveTo(-8,0); c.lineTo(8,0); c.stroke();
     }
     c.restore();
     const texture=new THREE.CanvasTexture(canvas); texture.colorSpace=THREE.SRGBColorSpace; this.pinTextures.set(verdict,texture); return texture;
@@ -251,7 +258,8 @@ export class LunarScene {
     for (const site of sites) {
       if (!Number.isFinite(site.lat) || !Number.isFinite(site.lon)) continue;
       const normal = spherePoint(site.lat, site.lon);
-      const marker = new THREE.Sprite(new THREE.SpriteMaterial({ map:this.pinTexture('unavailable'), transparent:true, depthWrite:false }));
+      const marker = new THREE.Sprite(new THREE.SpriteMaterial({ map:this.pinTexture('unavailable'), transparent:true, depthWrite:false, depthTest:false }));
+      marker.renderOrder = 3;
       marker.scale.set(.105,.14,1);
       marker.center.set(.5,.12);
       marker.position.copy(normal).multiplyScalar(1.035);
@@ -259,15 +267,18 @@ export class LunarScene {
       // Same billboard, anchor, size and position: ring stays concentric with the pin head
       // from every camera angle, including the closely spaced south-pole sites.
       const halo = new THREE.Sprite(new THREE.SpriteMaterial({
-        map: this.selectionTexture, transparent: true, opacity: .85, depthWrite: false,
+        map: this.selectionTexture, transparent: true, opacity: .85, depthWrite: false, depthTest: false,
       }));
       halo.position.copy(marker.position);
       halo.center.copy(marker.center);
       halo.scale.copy(marker.scale);
       halo.renderOrder = 1;
       halo.visible = false; // only the selected site has a ring
-      this.scene.add(halo, marker);
-      this.markers.push({ site, object: marker, halo, normal });
+      const leader = new THREE.Line(new THREE.BufferGeometry().setFromPoints([normal.clone().multiplyScalar(1.004), marker.position.clone()]),
+        new THREE.LineBasicMaterial({ color: 0xF2EEE6, transparent: true, opacity: .9, depthTest: false }));
+      leader.visible = false; leader.renderOrder = 2;
+      this.scene.add(halo, marker, leader);
+      this.markers.push({ site, object: marker, halo, normal, anchor: marker.position.clone(), leader });
     }
 
     this.onPointerDown = (e) => { this.downPosition = { x: e.clientX, y: e.clientY }; this.targetCamera = null; };
@@ -308,7 +319,7 @@ export class LunarScene {
     if (!bounds.width || !bounds.height) return null;
     this.pointer.set((e.clientX - bounds.left) / bounds.width * 2 - 1, -(e.clientY - bounds.top) / bounds.height * 2 + 1);
     this.raycaster.setFromCamera(this.pointer, this.camera);
-    const hits = this.raycaster.intersectObjects(this.markers.map(m => m.object));
+    const hits = this.raycaster.intersectObjects(this.markers.filter(m => m.object.visible).map(m => m.object)); // D36: only pins on the near side
     const nearest = hits[0];
     // Prevent clicking markers that are currently behind the Moon.
     if (nearest) {
@@ -472,9 +483,61 @@ export class LunarScene {
     }
     this.controls.update();
     this.inspectionLight.position.copy(this.camera.position);
+    this.spreadPins();
     this.updateMapLabels();
     this.renderer.render(this.scene, this.camera);
   };
+
+  /** D36: pins that overlap on screen are spread around their shared centre, with thin leader lines back
+   *  to their true spots. Screen-space only: each pin keeps its depth, so hit-testing still works. */
+  private spreadPins(): void {
+    const h = Math.max(1, this.container.clientHeight), w = Math.max(1, this.container.clientWidth);
+    const toPx = (v: THREE.Vector3) => { const p = v.clone().project(this.camera); return { x: (p.x + 1) * w / 2, y: (1 - p.y) * h / 2, z: p.z }; };
+    const tanHalf = Math.tan(THREE.MathUtils.degToRad(this.camera.fov) / 2);
+    const items = this.markers.map((m) => {
+      const facing = m.normal.dot(this.camera.position.clone().sub(m.anchor).normalize()) > 0.05;
+      const px = toPx(m.anchor);
+      const pxPerUnit = (h / 2) / (this.camera.position.distanceTo(m.anchor) * tanHalf);
+      const head = m.object.scale.x * pxPerUnit * 0.8; // pin head diameter on screen
+      // the head centre sits above the tip by about 0.6 of the sprite height
+      return { m, facing, x: px.x, y: px.y - m.object.scale.y * pxPerUnit * 0.6, z: px.z, head, tipX: px.x, tipY: px.y };
+    });
+    const vis = items.filter((i) => i.facing);
+    for (const it of items) {
+      it.m.object.position.copy(it.m.anchor); it.m.halo.position.copy(it.m.anchor); it.m.leader.visible = false;
+      it.m.object.visible = it.facing; // pins draw on top of the globe (no depth test), so hide the far side here
+      it.m.halo.visible = it.facing && it.m.site.id === this.selected;
+    }
+    // Push overlapping pin heads apart a little at a time; each pin also feels a weak pull back to its true spot.
+    const pos = vis.map((v) => ({ x: v.x, y: v.y }));
+    for (let iter = 0; iter < 60; iter++) {
+      let moved = false;
+      for (let i = 0; i < vis.length; i++) for (let j = i + 1; j < vis.length; j++) {
+        // A whole pin (head and tip) is taller than wide, so keep pins apart in an ellipse 1.15 heads wide, 1.75 heads tall.
+        const hd = Math.max(vis[i].head, vis[j].head), ax = hd * 1.15, ay = hd * 1.75;
+        let dx = pos[j].x - pos[i].x, dy = pos[j].y - pos[i].y;
+        let n = Math.hypot(dx / ax, dy / ay);
+        if (n >= 1) continue;
+        if (n < 0.001) { dx = Math.cos(i + j) * ax * 0.1; dy = Math.sin(i + j) * ay * 0.1; n = 0.1; }
+        const f = (1 - n) / n / 2; // move each half the way to the ellipse edge
+        pos[i].x -= dx * f; pos[i].y -= dy * f; pos[j].x += dx * f; pos[j].y += dy * f;
+        moved = true;
+      }
+      for (let i = 0; i < vis.length; i++) { pos[i].x += (vis[i].x - pos[i].x) * 0.01; pos[i].y += (vis[i].y - pos[i].y) * 0.01; }
+      if (!moved) break;
+    }
+    vis.forEach((v, i) => {
+      const dx = pos[i].x - v.x, dy = pos[i].y - v.y;
+      if (Math.hypot(dx, dy) < 2) return;
+      const sx = v.tipX + dx, sy = v.tipY + dy;
+      const world = new THREE.Vector3((sx / w) * 2 - 1, 1 - (sy / h) * 2, v.z).unproject(this.camera);
+      v.m.object.position.copy(world); v.m.halo.position.copy(world);
+      const attr = v.m.leader.geometry.attributes.position as THREE.BufferAttribute;
+      const tip = v.m.normal.clone().multiplyScalar(1.004);
+      attr.setXYZ(0, tip.x, tip.y, tip.z); attr.setXYZ(1, world.x, world.y, world.z); attr.needsUpdate = true;
+      v.m.leader.visible = true;
+    });
+  }
 
   destroy(): void {
     this.selectedNameLabel.remove();

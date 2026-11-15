@@ -37,6 +37,8 @@ export const THEME = Object.freeze({
   glass: "rgba(28, 28, 30, 0.90)", glassBlur: "14px",
   divider: "rgba(242, 238, 230, 0.16)",
   horizon: "#E8E2D0", ground: "#262626", groundLine: "#3A3A3A", sky: "#121214",
+  // D36: globe pin bodies only (and the matching Explore legend chips). Nothing else uses these.
+  pinGood: "#4FBF7A", pinOut: "#F28B82", pinEdge: "#B48CF0", pinNone: "#A6A29B", pinInk: "#0A0A0B",
 });
 
 const BASE_CSS = `

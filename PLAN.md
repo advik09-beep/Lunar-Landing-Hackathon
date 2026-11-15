@@ -307,6 +307,20 @@ and researchers get the numbers behind them.
   after the recolour; the PDF re-exported and checked page by page.
   (4) README eclipse row and AI-use section; STATUS Sheldon row.
 
+- D36 Pins, grid icons and deck polish (both humans, 2026-11-15). Lane B is
+  not editing. (1) Globe pins get solid coloured bodies with a dark outline,
+  keeping the Moon-phase icon inside: green for Great / Clear and Okay /
+  Partial, coral for Hard / Out, violet for Tricky / On the edge, each
+  checked against the lit and the dark Moon; the Explore legend chips use
+  the same colours; overlapping pins are spread apart with thin leader
+  lines to their true spots (time box 45 minutes, else smaller pins).
+  Everything else stays black and grey; gold is only the Sun, blue only
+  Earth. (2) Larger phase icons in the Compare grid so Hard and Tricky
+  are easy to tell apart. (3) Deck, exactly seven slides: slide 6 panels
+  and text enlarged to fill the slide; slide 7 caption no longer overlaps
+  the chart; screenshots 02 and 03 retaken; the PDF re-exported and
+  checked page by page.
+
 ## Settled earlier (do not reopen without both humans)
 - 10 fixed sites: 3 Apollo, Chandrayaan-3, IM-1, IM-2, 4 south pole
   representative points.
