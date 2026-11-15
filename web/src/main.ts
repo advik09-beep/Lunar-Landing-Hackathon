@@ -77,6 +77,7 @@ const verdictNames: Record<Verdict, string> = {
 };
 
 app.innerHTML = [
+  '<p class="small-screen-note" role="note">LunLux is built for a computer screen. Please open it on a laptop or desktop.</p>',
   '<main class="app-shell">',
   '  <header class="topbar">',
   '    <div class="brand"><span class="brand-kicker">NASA SPACE APPS 2026</span><img class="brand-wordmark" src="/brand/lunlux-wordmark.png" alt="LunLux" width="1934" height="495"><span class="brand-subtitle">Sunlight and Earth contact for lunar landing sites</span></div>',

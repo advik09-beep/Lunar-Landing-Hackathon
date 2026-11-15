@@ -120,3 +120,10 @@ body[data-view="overview"] .site-footer { display:none; }
 .moon-site-label.selected { border-bottom:2px solid var(--llp-link); }
 .moon-site-label.hovered { border-bottom:2px solid var(--llp-muted); }
 .moon-site-label.earth-overhead-label { color:var(--llp-earth); border-bottom:2px solid var(--llp-earth); }
+
+/* D33: desktop-only project; small screens get a clear message, not a broken layout. */
+.small-screen-note { display:none; }
+@media (max-width:959px) {
+  .app-shell { display:none !important; }
+  .small-screen-note { display:block; margin:18vh auto 0; max-width:32ch; padding:24px; color:var(--llp-text); background:var(--llp-glass); border-radius:12px; font-size:1.1rem; text-align:center; }
+}

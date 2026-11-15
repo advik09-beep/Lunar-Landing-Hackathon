@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D33 6/10 — globe labels | Items 1–5 Vercel READY; Earth-overhead marker and site labels; build pending |
+| Advik + ChatGPT (Lane B) | D33 7/10 — small screens | Items 1–6 Vercel READY; desktop-only note at small viewport; build pending |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | D33 Lane A part done (items 1–6) | Stay length 1/3/7/14 (Researcher) done within the time box; stopped |
 
@@ -1758,3 +1758,8 @@ Done within the 2-hour time box (all checks passing about 7 minutes after starti
 - Item 5 Vercel `dpl_8rZ9QCdV7qLDPFxPhs8Pt4ifyZyS` READY for `c9d96ee`.
 - Moon now places a blue marker where Earth is directly overhead, using `getSceneState().earth.dir` in Moon-fixed coordinates; label reads `Earth overhead`. A permanent selected-site name and hover-site names follow their projected pins, hidden when behind the globe.
 - Build pending before item 7.
+
+### 2026-11-15 — Lane B D33 item 7: small-screen message
+- Item 6 production build `dpl_9SrXqoTk5izqFi53ToEcYSdBkf7X` READY for `810b0de`.
+- At widths under 960px, replace the desktop-only shell with one short message: `LunLux is built for a computer screen. Please open it on a laptop or desktop.` Existing desktop layout unchanged.
+- Item 7 build pending.
