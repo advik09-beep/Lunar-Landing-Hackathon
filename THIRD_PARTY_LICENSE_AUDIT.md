@@ -1,5 +1,46 @@
 # LunLux third-party licensing audit — 2026-11-15
 
+## Follow-up source and permissions review — 2026-11-15 (latest finding)
+
+**The earlier blanket "unknown stars/asteroids/ephemerides" warning is now narrowed.**
+Repository source inspection identified the actual generation scripts, input URLs,
+and shipped cache metadata in the separately deployed simulator fork:
+
+| Shipped item | Source found | Evidence and license/terms assessment |
+|---|---|---|
+| `public/data/stars.json` | Yale Bright Star Catalog (v5), `bsc5-short.json` conversion published at [brettonw/YaleBrightStarCatalog](https://github.com/brettonw/YaleBrightStarCatalog); script `scripts/build-stars.js` | [Repository LICENSE](https://github.com/brettonw/YaleBrightStarCatalog/blob/master/LICENSE) is MIT, Copyright (c) 2016 Bretton Wade. Script converts equatorial coordinates into simulation-frame vectors and synthesizes colors. The original Yale catalog is acknowledged; no assertion of ownership over original observations. |
+| `public/data/asteroids.bin`, `asteroids.json` | [NASA/JPL Small-Body Database Query API](https://ssd-api.jpl.nasa.gov/doc/sbdb_query.html); `scripts/build-asteroids.js` | Asteroid element cache; source API, numerical transforms and `generatedAt` appear in code/metadata. NASA/JPL data origin verified at source-code level, **not** independently re-downloaded or byte-for-byte reproduced. |
+| `public/ephemeris/*.bin`, `index.json` | [NASA/JPL Horizons API](https://ssd-api.jpl.nasa.gov/doc/horizons.html); `scripts/generate-horizons-cache.js` | 28 body/spacecraft vector cache 2020–2035, with `generatedAt` and body-specific sampling metadata. Source and generation method identified, **not** a byte-for-byte regenerated cache check. |
+| `public/textures/` (12 remaining) | [Solar System Scope texture pack](https://www.solarsystemscope.com/textures/) | Publisher expressly allows sharing, adapting and commercial use under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/); link, creator credit and change-context statement already included in the fork's `NOTICE`. **CC BY is not an OSI-approved software license**; 2026 Space Apps rules explicitly mention OSI for third-party solution materials. This is a competition-interpretation question, not a finding of absent copyright permission. |
+| Original simulator software | [OzAILabs/SolarSystemSimulator README](https://github.com/OzAILabs/SolarSystemSimulator) | Upstream explicitly states `## License\n\nMIT`, but no complete standalone grant/copyright notice is in the upstream tree. The fork preserves source/author attribution and this statement. **Permission documentation remains incomplete; do not present the fork as independently relicensed or fully verified.** |
+
+**Concrete documentation fixes completed:** fork `NOTICE`/README and LunLux
+`NOTICE`/README now credit the star catalog including MIT copyright/license,
+JPL SBDB Query API and JPL Horizons. These changes did not alter binaries,
+third-party licensing claims, scientific data or application behavior.
+
+**Rules cross-check:** [2026 NASA Space Apps terms](https://www.spaceappschallenge.org/legal/)
+require adequate rights and citations for non-NASA materials and refer to OSI
+for open source. A [2026 Space Apps Navigator clarification](https://github.com/nasa/spaceapps/discussions/1947)
+indicates licensed stock music may be used where the license allows the public
+submission; this is consistent with the already credited Scott Buckley
+`Borealis` CC BY 4.0 music, but does not conclusively decide the OSI-language
+question for all Creative Commons imagery.
+
+**Still requires definitive resolution or explicit risk acceptance:**
+1. Obtain the upstream simulator rights-holder's complete MIT license/copyright
+   grant or a written reuse confirmation, *or replace/remove the embedded
+   simulator rather than claiming its software license is verified*.
+2. For NASA's unusually strict third-party OSI language, obtain event guidance
+   for CC BY 4.0 textures if required; the publisher's own reuse license is
+   explicit and attribution is present, but it is not an OSI software license.
+3. Screenshots and remaining bundled media in the simulator fork have not been
+   audited for third-party content. No final legal/permission sign-off is claimed.
+
+**Current gate: NOT CLEARED FOR SUBMISSION.** This does **not** mean the
+code or textures are necessarily infringing; it means the evidence is not
+yet sufficient for an unqualified compliance assertion.
+
 ## D34 texture remediation update — 2026-11-15 (supersedes historical texture findings below)
 
 **Six texture issues resolved in the current fork, NOT overall licensing clearance.** The inventory below documents the original 18 upstream textures; only the 12 Solar System Scope CC BY 4.0 textures remain in `advik09-beep/SolarSystemSimulator` on `master`. Commit [aa00c53](https://github.com/advik09-beep/SolarSystemSimulator/commit/aa00c533d27eef482f589cd63d47d415159af599) deleted `pluto.jpg`, `europa.png`, `io.jpg`, `ganymede.jpg`, `callisto.jpg`, and `titan.jpg` and set the corresponding default scene templates to `texturePath: null`. Follow-up commit [bc1c78f](https://github.com/advik09-beep/SolarSystemSimulator/commit/bc1c78f0a2c5ae9d524f647e18b378b628b956f8) set the six remaining real-time mode templates in `src/data/realTimeOrbits.ts` to `texturePath: null`; the texture downloader no longer includes the six filenames. Pluto, Io, Europa, Ganymede, Callisto and Titan remain orbiting plain-colored spheres, not removed bodies.
