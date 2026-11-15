@@ -109,9 +109,9 @@ export class OverviewScene {
       this.render();
     });
 
-    this.scene.add(this.makeLabel('SUN · illustrative', sunPos.clone().add(new THREE.Vector3(0,-1.28,0)), 1.55));
-    this.scene.add(this.makeLabel('EARTH · not to scale', this.earth.position.clone().add(new THREE.Vector3(0,-1.08,0)), 1.8));
-    this.moonLabel = this.makeLabel('MOON · click to explore', this.moon.position.clone().add(new THREE.Vector3(0,-.79,0)), 2.05);
+    this.scene.add(this.makeLabel('SUN; illustrative', sunPos.clone().add(new THREE.Vector3(0,-1.28,0)), 1.55));
+    this.scene.add(this.makeLabel('EARTH; not to scale', this.earth.position.clone().add(new THREE.Vector3(0,-1.08,0)), 1.8));
+    this.moonLabel = this.makeLabel('MOON; click to explore', this.moon.position.clone().add(new THREE.Vector3(0,-.79,0)), 2.05);
     this.scene.add(this.moonLabel);
 
     this.onDown = (e) => { this.down = { x:e.clientX, y:e.clientY }; };

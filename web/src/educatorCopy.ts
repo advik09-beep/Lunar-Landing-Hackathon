@@ -63,7 +63,7 @@ export function syncShellCopy(level: ReadingLevel): void {
   put('#reset-view', 'Whole Moon', 'Reset view');
   put('#polar-view', 'South pole', 'South pole view');
   put('#enter-explore', 'Explore the Moon', 'Explore the Moon and landing sites');
-  put('.site-footer', 'Our facts come from NASA. We check each hour.', 'NASA/JPL Horizons · NASA LRO LOLA · Hourly data');
+  put('.site-footer', 'Our facts come from NASA. We check each hour.', 'NASA/JPL Horizons; NASA LRO LOLA; Hourly data');
   put('#date-prev', '← 7 days', '−7');
   put('#date-next', '7 days →', '+7');
   put('#credits-view > h2', 'Where do our facts come from?', 'LunLux — Credits and sources');

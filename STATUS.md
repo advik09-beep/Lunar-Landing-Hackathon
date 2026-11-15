@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D33 3/10 — Tour caption | Items 1–2 Vercel READY; bottom-left translucent caption with stronger blur; build pending |
+| Advik + ChatGPT (Lane B) | D33 4/10 — copy | Items 1–3 Vercel READY; shell separators cleared; checking build |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | D33 Lane A part done (items 1–6) | Stay length 1/3/7/14 (Researcher) done within the time box; stopped |
 
@@ -1743,3 +1743,8 @@ Done within the 2-hour time box (all checks passing about 7 minutes after starti
 - Item 2 Vercel `dpl_BnqT6awjNLaHHoU9P3jDGMGpEy6R` READY for `136cd61`.
 - Caption repositioned to Tour title's bottom-left area, roughly 52% alpha with 26px blur, no border. The simulator remains full-bleed.
 - Item 3 build pending.
+
+### 2026-11-15 — Lane B D33 item 4: shell separators and labels
+- Item 3 Vercel build `dpl_7Dmg1CyEtLnoshzgyU4PmECR2WDT` READY for `b8c53ee`.
+- Removed middle-dot separators from visible shell copy in `main.ts`, `educatorCopy.ts` and `overview.ts` (semicolons/spacing). Verified no shell PROTOTYPE text tags present in these files. Did not touch Lane A `/lib` or panel files.
+- Item 4 deployment pending.

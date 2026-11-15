@@ -91,7 +91,7 @@ app.innerHTML = [
   '  <section id="global-clock" class="global-clock" aria-label="Landing site and time" hidden>',
   '    <label class="toolbar-site" for="site-picker">Site <select id="site-picker" aria-label="Landing site"></select></label>',
   '    <div class="toolbar-date"><button id="date-prev" type="button" aria-label="Move landing date seven days earlier">−7</button><label class="sr-only" for="landing-date">Landing date UTC</label><input id="landing-date" type="date" value="2026-11-14" aria-label="Landing date UTC"><button id="date-next" type="button" aria-label="Move landing date seven days later">+7</button></div>',
-  '    <label class="toolbar-hour" for="hour-slider">Inspect <input id="hour-slider" type="range" min="0" max="167" value="0" step="1" aria-label="Moment inspected within the seven-day stay"><output id="hour-output" for="hour-slider">Day 1 · 00:00 UTC</output></label>',
+  '    <label class="toolbar-hour" for="hour-slider">Inspect <input id="hour-slider" type="range" min="0" max="167" value="0" step="1" aria-label="Moment inspected within the seven-day stay"><output id="hour-output" for="hour-slider">Day 1  00:00 UTC</output></label>',
   '    <details class="clock-tip"><summary aria-label="About the date and inspection time">ⓘ</summary><p>The 7-day stay starts at 00:00 UTC on the landing date. The slider chooses the moment you inspect within that stay; it does not move the landing time. Hourly data.<br><br>Drag to turn the Moon; scroll to zoom. The Moon stays fixed while the Sun and Earth move around it. A faint light shows the night side; it is a visual aid, not sunlight. The globe is smooth; local terrain appears in Horizon.<br><br><span id="lighting-status" class="lighting-status" role="status" aria-live="polite">Loading sunlight for the chosen moment…</span></p></details>',
   '    <p id="data-status" class="sr-only" role="status" aria-live="polite">Loading conditions…</p>',
   '  </section>',
@@ -103,7 +103,7 @@ app.innerHTML = [
   '  </section>',
   '  <section id="overview-view" class="overview-view" aria-label="Sun Earth Moon overview">',
   '    <div class="overview-window">',
-  '      <div class="overview-caption"><strong id="overview-source">THE SUN · EARTH · MOON</strong><span id="overview-note">Illustrative sizes, positions and motion — not to scale; not ephemeris geometry</span></div>',
+  '      <div class="overview-caption"><strong id="overview-source">THE SUN; EARTH; MOON</strong><span id="overview-note">Illustrative sizes, positions and motion — not to scale; not ephemeris geometry</span></div>',
   '      <p id="overview-mission-message" class="overview-mission-message">Of everything in the solar system, the Sun determines the sunlight available for a lunar lander\'s potential power, while Earth determines when a direct radio link is geometrically possible. Other planets: their gravity is already in our numbers. JPL planetary ephemerides include their gravitational effects; their light is negligible compared with sunlight. Radio from other planets is not modeled.</p>',
   '      <div id="overview-stage" class="overview-stage" aria-label="Solar system overview visualization"></div>',
   '      <div id="tour-science-caption" class="tour-science-caption" hidden aria-live="polite"></div>',
@@ -148,7 +148,7 @@ app.innerHTML = [
   '    <h3>Implementation and limitations</h3>',
   '    <p>Moon-fixed Sun lighting uses verified hourly JPL Horizons scene data. Earth position and terrain visibility remain available in the Stand here horizon view. The globe is smooth; local terrain appears in Horizon. A faint light shows the night side as a visual aid, not sunlight. The moving stars are decorative, not an observed lunar sky. Any future borrowed assets must be added here with attribution and license before release.</p>',
   '  </section>',
-  '  <footer class="site-footer">NASA/JPL Horizons · NASA LRO LOLA · Hourly data</footer>',
+  '  <footer class="site-footer">NASA/JPL Horizons; NASA LRO LOLA; Hourly data</footer>',
   '</main>',
 ].join('\n');
 
@@ -330,7 +330,7 @@ function setLandingDate(date: string): void {
   if (dataReady) {
     try {
       daily = getDaily(selectedDate, 1) as DailyResult;
-      status.textContent = readingLevel === 'educator' ? 'Showing the week that starts on your day.' : '7-day stay starting ' + formatUtc(selectedDate + 'T00:00:00Z') + ' · hourly NASA/JPL Horizons data';
+      status.textContent = readingLevel === 'educator' ? 'Showing the week that starts on your day.' : '7-day stay starting ' + formatUtc(selectedDate + 'T00:00:00Z') + '; hourly NASA/JPL Horizons data';
     } catch (error) {
       daily = null;
       status.textContent = 'Conditions unavailable for the selected date.';
@@ -347,7 +347,7 @@ function renderClockHour(): void {
   const hour = selectedHour % 24;
   const simpleTime = hour === 0 ? 'midnight' : hour === 12 ? 'noon' :
     hour < 12 ? hour + ' in the morning' : hour < 18 ? (hour - 12) + ' in the afternoon' : (hour - 12) + ' at night';
-  hourOutput.textContent = readingLevel === 'educator' ? 'Day ' + day + ' · ' + simpleTime : 'Day ' + day + ' · ' + utc.slice(11) + ' UTC';
+  hourOutput.textContent = readingLevel === 'educator' ? 'Day ' + day + '  ' + simpleTime : 'Day ' + day + '  ' + utc.slice(11) + ' UTC';
   hourOutput.title = readingLevel === 'educator' ? 'The time you are looking at on day ' + day + '.' : formatUtc(new Date(Date.parse(selectedDate + 'T00:00:00Z') + selectedHour * 3600000).toISOString());
 }
 
@@ -427,7 +427,7 @@ if (embedUrl) {
       const sources = document.createElement('p');
       sources.append('Sources: ');
       for (const [index, source] of stop.sources.entries()) {
-        if (index) sources.append(' · ');
+        if (index) sources.append('; ');
         const a = document.createElement('a');
         a.href = source.url;
         a.textContent = source.name;
@@ -449,7 +449,7 @@ if (embedUrl) {
         for (const source of SOUTH_POLE.sources) {
           const a = document.createElement('a');
           a.href = source.url;
-          a.textContent = source.name + ' · ';
+          a.textContent = source.name + '; ';
           a.target = '_blank';
           a.rel = 'noopener noreferrer';
           details.append(a);
@@ -470,8 +470,8 @@ if (embedUrl) {
   };
   window.addEventListener('message', onSimulatorMessage);
   disposeOverviewMessages = () => window.removeEventListener('message', onSimulatorMessage);
-  find<HTMLElement>('overview-source').textContent = 'SOLAR SYSTEM · OzAILabs simulator';
-  find<HTMLElement>('overview-note').textContent = 'Illustrative solar system · not to scale';
+  find<HTMLElement>('overview-source').textContent = 'SOLAR SYSTEM; OzAILabs simulator';
+  find<HTMLElement>('overview-note').textContent = 'Illustrative solar system; not to scale';
   find<HTMLElement>('overview-disclaimer').textContent =
     'The selected UTC inspection time is sent to the simulator. Its planetary orbits are illustrative, not validated historical ephemerides; Explore and Stand here use JPL Horizons data.';
 } else {
