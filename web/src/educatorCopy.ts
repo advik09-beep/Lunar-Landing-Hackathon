@@ -22,14 +22,22 @@ export function syncTourSources(level: ReadingLevel): void {
   if (pole) pole.hidden = kid;
 }
 
-let creditState: { original: HTMLElement[]; intro: HTMLParagraphElement; notes: HTMLDetailsElement } | null = null;
+let creditState: { original: HTMLElement[]; intro: HTMLDivElement; notes: HTMLDetailsElement } | null = null;
 function syncCredits(kid: boolean): void {
   const credits = document.querySelector<HTMLElement>('#credits-view');
   if (!credits) return;
   if (!creditState) {
     const original = Array.from(credits.children).slice(1) as HTMLElement[];
-    const intro = document.createElement('p');
-    intro.textContent = 'Our Moon facts and pictures come from NASA. Grown-ups can read where each one came from.';
+    const intro = document.createElement('div');
+    intro.className = 'kid-sources-list';
+    intro.innerHTML = `<p>We check where our Moon facts come from.</p>
+      <ul>
+        <li>NASA tells us where the Sun and Earth are.</li>
+        <li>NASA maps show the hills on the Moon.</li>
+        <li>NASA pictures help us learn about space.</li>
+        <li>Our team made the score. It is not a NASA rule.</li>
+        <li>We name the people who made the tools and pictures.</li>
+      </ul>`;
     const notes = document.createElement('details');
     notes.className = 'educator-credits';
     const summary = document.createElement('summary');

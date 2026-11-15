@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D34 item 2 — Data and methods | Six simulator textures removed and live alias 404; comprehensive credits implementation awaiting build |
+| Advik + ChatGPT (Lane B) | D34 item 3 — How we know | Item 2 production build READY; short Educator source list and content-size panel; checking build |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | D34 Lane A part done | LICENSE + NOTICE, audit reply, Learn redesign, slider/compass/Stand here fixes, README licence; stopped |
 | Collaborative presentation | Initial web deck | Separate `presentation/` draft; Sheldon + Claude science review pending; build unverified |
@@ -1853,3 +1853,8 @@ Done within the 2-hour time box (all checks passing about 7 minutes after starti
 ### 2026-11-15 — D34 Lane B items 1 and 2 (one at a time)
 - Item 1 already completed on fork commit `aa00c53` (removed six image binaries; Pluto, Europa, Io, Ganymede, Callisto and Titan `texturePath:null`); Vercel fork build `dpl_GEXhAFVqUH8AgcgNeCVHdzCMUqP4` READY. Found legacy LunLux simulator alias still serving six assets (all HTTP 200), reassigned `solar-system-simulator-usmdo-club.vercel.app` to the clean deployment. Verified all six endpoints HTTP **404** on canonical alias, clean `beta` alias and new deployment; a retained Earth texture returned 200. Old immutable deployment URLs may still exist and are not claimed purged. No wider audit performed.
 - Item 2: Data and methods now enumerates NASA scientific datasets and landing-site sources, each Learn NASA photo with exact credits, CMU/Source Serif licences, Three.js/Vite/TypeScript/types, simulator upstream license uncertainty, and the twelve retained CC BY 4.0 texture files. Links to Lane A NOTICE and appropriate official licence/source pages. Removed misleading assertion that the six deleted maps remain in use. Build pending.
+
+### 2026-11-15 — Lane B D34 item 3: Educator How we know
+- Item 2 source commit `91d8636` Vercel `dpl_3GkkdggMXgdRAfUje8KdCiohZN7p` READY.
+- Educator now sees five short friendly source statements (NASA Sun/Earth, Moon hills, pictures, team score, third-party credit) and a `For the teacher` fold-out containing the full itemized licence/credit list. The glass panel fits its initial content rather than occupying a fixed viewport height; when the fold-out opens its height is capped and scrollable. Researcher layout remains unchanged.
+- Item 3 build pending.
