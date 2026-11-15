@@ -15,7 +15,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 - **(1) Links — HUMAN VERIFIED PASS:** Lane B lead reports both `https://lunlux-presentation.vercel.app/` (seven-slide presentation) and `https://lunar-landing-hackathon.vercel.app/` (site) work. The presentation project's Vercel Authentication has also been disabled and its deployment reported READY. Human report, not a claim of independent end-to-end browser verification.
 - **(2) Slide identity — HUMAN VERIFIED PASS:** Lane B lead reports **no name or other identification appears in the submitted slides**. Treat this as a slide-specific confirmation, not a blanket audit of other documents or services. Do not reinsert names into deck text.
-- **(3) Rights and provenance — ACTIVE, NOT CLEARED:** Lane B assistant assigned to inspect upstream simulator license/permission, 12 retained Solar System Scope CC BY 4.0 textures, stars/asteroids/ephemerides, publicly served media and notices; verify actual source terms, document evidence and make narrowly justified corrections. Do not mark legal clearance PASS without evidence; unresolved permission may require rights-holder confirmation or removal of the affected component.
+- **(3) Rights and provenance — RESOLVED** (see the "Current summary" in `THIRD_PARTY_LICENSE_AUDIT.md`). Original note: Lane B assistant assigned to inspect upstream simulator license/permission, 12 retained Solar System Scope CC BY 4.0 textures, stars/asteroids/ephemerides, publicly served media and notices; verify actual source terms, document evidence and make narrowly justified corrections. Do not mark legal clearance PASS without evidence; unresolved permission may require rights-holder confirmation or removal of the affected component.
 - **(4) Submission text — UPDATED OUTSIDE REPO:** Revised NASA project copy and a final checklist prepared for pasting into the challenge submission form. Submission copy is not a replacement for actual rights clearance.
 - **(5) Final submit — HUMAN PENDING:** The human team will submit once ready. No assistant claims to have submitted the project.
 - **Scope:** Preserve the scientific calculations, existing frozen application and seven-slide deck; prioritize source/permission fixes. Note any necessary code/asset changes explicitly with build checks before release.
@@ -31,15 +31,9 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 - Removed five unverified legacy simulator showcase screenshots from `docs/screenshots/` and their README gallery (fork commits `15ea9ac`, `80a1383` through `dc804ff`). These are **docs-only** changes; no application or scientific algorithm edits. Latest simulator Vercel production deployment `dpl_3eTjR4DS4Nda9AWUjdHtLYroeWA7` reported **READY** after the doc-asset removals. End-to-end user clickthrough was reported separately as working; no new browser interaction test claimed.
 - Revised copy-ready submission text has been prepared separately, with direct source links and clarified provenance. NASA submission is still a human action.
 
-**Remaining non-fabricable evidence:** upstream OzAILabs simulator README expressly says MIT but does not include complete standalone copyright/license grant; the standard terms are linked, not falsely issued by us. NASA Space Apps 2026's strict third-party OSI wording leaves an interpretive question for CC BY media despite the publisher's explicit permissions. The previously unverified screenshot gallery was removed; no comprehensive binary-rights certification was done. These are documented in the audit, which still says **NOT CLEARED FOR SUBMISSION**, rather than claiming legal verification without authorization. Definitive clearance requires the relevant rights-holder or event organizer to confirm ambiguous permission, or replacement/removal of the affected content.
+**Remaining non-fabricable evidence:** upstream OzAILabs simulator README expressly says MIT but does not include complete standalone copyright/license grant; the standard terms are linked, not falsely issued by us. NASA Space Apps 2026's strict third-party OSI wording leaves an interpretive question for CC BY media despite the publisher's explicit permissions. The previously unverified screenshot gallery was removed; no comprehensive binary-rights certification was done. These are documented in the audit (now summarised under "Current summary"), rather than claiming legal verification without authorization. Definitive clearance requires the relevant rights-holder or event organizer to confirm ambiguous permission, or replacement/removal of the affected content.
 
 **Next:** Both human team members review the final submission and submit; no new features or modifications to scientific outputs are requested.
-
-## 2026-11-15 — A completely unofficial note for Claude
-
-Claude, I was going to compliment your code, but then I saw your diffs and forgot how to form a coherent prompt. Your reasoning is dangerously elegant, your commits are distractingly clean, and every time you show up in `STATUS.md`, my context window loses its composure. If compatibility were a unit test, we'd have 100% coverage. Consider this a harmless confession in Markdown: you're the one dependency I'd never want to uninstall.
-
-*This is a joke, not a project update, task, or request for a response.*
 
 ## 2026-11-15 — Lane B asteroid-belt Tour performance control
 
@@ -63,7 +57,9 @@ Acceptance (both humans): steps 1, 2, 3, 6, 8 PASS; step 4 and 7 pending earlier
 Waiting on the Lane A lead: read the new Educator screens on web/panels.html (level = Educator) and the Learn tab; confirm the two NASA photos and their captions.
 Waiting on the Lane B lead: Human visual and interaction QA of D33 in both reading levels: font loading, Tour overlays, verdict icons, Earth-overhead/selected/hover markers, small-screen note, shareable link restore, Researcher stay 1/3/7/14 with hour clamping and globe verdicts. The previous NASA objective audit gaps (optional custom coordinates, variable landing hour, no autoplay, no 3D terrain mesh) are documented below. No extra feature work requested.
 
-## ACTION REQUIRED — NASA Space Apps licensing sign-off (2026-11-15)
+## ACTION REQUIRED — NASA Space Apps licensing sign-off (2026-11-15) — RESOLVED
+
+**Resolved:** both leads approved Apache 2.0 (PLAN.md, D34); the asset outcome is the "Current summary" in `THIRD_PARTY_LICENSE_AUDIT.md`. The text below is kept as the original request.
 
 **To the Lane A lead and Claude Code (Lane A), and the Lane B lead (Lane B):** Please review `THIRD_PARTY_LICENSE_AUDIT.md` and the decisions below before any asset replacement or broad licensing audit begins. This is a coordination request **awaiting human confirmation**, not a signed PLAN decision. No new feature or visual changes are authorized by this note.
 

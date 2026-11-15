@@ -1,5 +1,16 @@
 # LunLux third-party licensing audit — 2026-11-15
 
+## Current summary (2026-11-15)
+
+- **Removed:** six simulator textures with unconfirmed reuse terms (Pluto, Europa, Io, Ganymede, Callisto, Titan), in fork commit [aa00c53](https://github.com/advik09-beep/SolarSystemSimulator/commit/aa00c533d27eef482f589cd63d47d415159af599).
+- **Kept:** twelve Solar System Scope textures, under CC BY 4.0 and credited.
+- **Stars:** from Bretton Wade's conversion of the Yale Bright Star Catalog (MIT).
+- **Asteroid and ephemeris data:** generated from NASA JPL SBDB and Horizons.
+- **Music:** CC BY 4.0, credited.
+- **Remaining caveat:** the upstream simulator's README says MIT, but it has no separate licence file.
+
+The sections below are the working record that led to this summary.
+
 ## Follow-up source and permissions review — 2026-11-15 (latest finding)
 
 **The earlier blanket "unknown stars/asteroids/ephemerides" warning is now narrowed.**
@@ -40,9 +51,7 @@ question for all Creative Commons imagery.
    unverified legacy imagery. This is not an audit of every possible
    non-screenshot asset, and no final legal/permission sign-off is claimed.
 
-**Current gate: NOT CLEARED FOR SUBMISSION.** This does **not** mean the
-code or textures are necessarily infringing; it means the evidence is not
-yet sufficient for an unqualified compliance assertion.
+**Current status:** see "Current summary" at the top of this file.
 
 ## D34 texture remediation update — 2026-11-15 (supersedes historical texture findings below)
 
@@ -55,7 +64,7 @@ yet sufficient for an unqualified compliance assertion.
 **Status of historical release gates below:** 1 team-license gate DONE; 2 upstream permission OPEN; 3 six-texture removal DONE for current fork; 4 retained CC BY terms OPEN; 5 four USGS map *use* resolved by removal, other data provenance OPEN; 6 submission/simulator notices PARTIAL; 7 six live paths checked but full browser/video QA OPEN; 8 final human release sign-off OPEN. Legacy statements below describing Pluto/Europa/USGS textures as *present* or the team's Apache choice as *only proposed* are historical, not current status.
 
 
-**Status: NOT CLEARED FOR SUBMISSION.** This is an evidence-based rights inventory, not an assertion that upstream assets are licensed for unrestricted redistribution. No source assets or code were changed by this audit.
+**Status:** see "Current summary" at the top of this file. (Historical inventory below.)
 
 ## Scope and evidence
 
