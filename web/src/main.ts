@@ -46,7 +46,23 @@ const dateOrigin = '2026-11-14';
 let selectedDate = dateOrigin;
 let selectedSite = sites[0].id;
 let readingLevel: 'educator' | 'researcher' = 'educator';
-let selectedHour = 0; // 0–167, hourly samples within the seven-day landing stay
+let selectedHour = 0; // 0–167 for the Educator week; D33 Researcher length is wired at item 10.
+const linkParams = new URLSearchParams(window.location.search);
+const linkedSite = linkParams.get('site');
+if (linkedSite && sites.some(s => s.id === linkedSite)) selectedSite = linkedSite;
+const linkedDate = linkParams.get('date');
+if (linkedDate && /^\\d{4}-\\d{2}-\\d{2}$/.test(linkedDate)) {
+  const time = Date.parse(linkedDate + 'T00:00:00Z');
+  if (Number.isFinite(time) && new Date(time).toISOString().slice(0, 10) === linkedDate &&
+      time >= Date.UTC(2026,0,1) && time <= Date.UTC(2029,11,24)) selectedDate = linkedDate;
+}
+const linkedLevel = linkParams.get('level');
+if (linkedLevel === 'educator' || linkedLevel === 'researcher') readingLevel = linkedLevel;
+else if (linkParams.get('tab') === 'report') readingLevel = 'researcher';
+const linkedHour = Number(linkParams.get('hour'));
+if (linkParams.has('hour') && Number.isInteger(linkedHour)) selectedHour = Math.max(0, Math.min(167, linkedHour));
+const linkedTab = linkParams.get('tab');
+const linkedExplore = linkParams.get('view') === 'horizon' ? 'horizon' : 'globe';
 let daily: DailyResult | null = null;
 let moon: LunarScene | null = null;
 let overview: OverviewScene | null = null;
@@ -165,6 +181,7 @@ const sitePicker = find<HTMLSelectElement>('site-picker');
 const status = find<HTMLParagraphElement>('data-status');
 const lightingStatus = find<HTMLElement>('lighting-status');
 const select = find<HTMLInputElement>('landing-date');
+select.value = selectedDate;
 const hourSlider = find<HTMLInputElement>('hour-slider');
 const hourOutput = find<HTMLOutputElement>('hour-output');
 const DATE_MIN = Date.UTC(2026, 0, 1);
@@ -193,7 +210,20 @@ let researcherView: PanelHandle | null = null;
 let plannerView: PanelHandle | null = null;
 type View = 'overview' | 'explore' | 'compare' | 'horizon' | 'researcher' | 'planner' | 'credits';
 let activeView: View = 'overview';
-let exploreMode: 'globe' | 'horizon' = 'globe';
+let exploreMode: 'globe' | 'horizon' = linkedExplore;
+function syncShareLink(): void {
+  const url = new URL(window.location.href);
+  const tab = activeView === 'overview' ? 'tour' :
+    activeView === 'researcher' ? (readingLevel === 'educator' ? 'learn' : 'report') :
+    activeView === 'credits' ? 'methods' : activeView;
+  url.searchParams.set('tab', tab);
+  url.searchParams.set('level', readingLevel);
+  url.searchParams.set('site', selectedSite);
+  url.searchParams.set('date', selectedDate);
+  url.searchParams.set('hour', String(selectedHour));
+  url.searchParams.set('view', exploreMode);
+  history.replaceState(history.state, '', url.pathname + url.search + url.hash);
+}
 function setExploreMode(mode: 'globe' | 'horizon'): void {
   exploreMode = mode;
   find<HTMLElement>('moon-stage').closest<HTMLElement>('.moon-window')!.hidden = mode !== 'globe';
@@ -202,6 +232,7 @@ function setExploreMode(mode: 'globe' | 'horizon'): void {
   find<HTMLElement>('horizon-mode').setAttribute('aria-pressed', String(mode === 'horizon'));
   moon?.setVisible(activeView === 'explore' && mode === 'globe');
   if (activeView === 'explore') updateAllPanels();
+  syncShareLink();
 }
 find<HTMLElement>('explore-view').querySelector('.scene-column')!.append(find<HTMLElement>('horizon-view'));
 find<HTMLElement>('globe-mode').addEventListener('click', () => setExploreMode('globe'));
@@ -245,6 +276,7 @@ function openView(view: View): void {
     else if (view !== 'overview' && simulatorFrame.isConnected) simulatorFrame.remove();
   }
   overview?.setVisible(view === 'overview');
+  syncShareLink();
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
@@ -281,6 +313,7 @@ function chooseSite(id: string): void {
   moon?.focusSite(id);
   updateButtons();
   updateAllPanels();
+  syncShareLink();
 }
 
 function updateDaily(): void {
@@ -325,6 +358,7 @@ function setLandingDate(date: string): void {
   if (!Number.isFinite(timestamp)) return;
   selectedDate = new Date(timestamp).toISOString().slice(0, 10);
   select.value = selectedDate;
+  syncShareLink();
   renderClockHour();
   syncOverviewClock();
   updateAllPanels();
@@ -358,6 +392,7 @@ function setHour(value: number): void {
   const hour = Math.max(0, Math.min(167, Math.round(value)));
   if (!Number.isFinite(hour)) return;
   selectedHour = hour;
+  syncShareLink();
   renderClockHour();
   syncOverviewClock();
   clearTimeout(panelUpdateTimer);
@@ -534,14 +569,22 @@ for (const level of ['educator','researcher'] as const) {
     syncReadingLevelUI();
     refreshTourCaptionLanguage();
     syncTourSources(readingLevel);
+    syncShareLink();
     for (const name of ['educator','researcher']) find<HTMLElement>('level-' + name).setAttribute('aria-pressed', String(name === level));
     for (const panel of [sideCard,compareGrid,horizonView,researcherView,plannerView]) panel?.update({level});
     updateAllPanels();
   });
 }
+for (const name of ['educator','researcher'] as const) {
+  find<HTMLElement>('level-' + name).setAttribute('aria-pressed', String(name === readingLevel));
+}
 syncReadingLevelUI();
 updateButtons();
-openView('overview');
+const initialView: View = linkedTab === 'explore' ? 'explore' :
+  linkedTab === 'compare' ? 'compare' :
+  linkedTab === 'learn' || linkedTab === 'report' ? 'researcher' :
+  linkedTab === 'methods' ? 'credits' : 'overview';
+openView(initialView);
 
 async function initializeData(): Promise<void> {
   try {

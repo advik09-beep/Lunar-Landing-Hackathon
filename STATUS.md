@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D33 7/10 — small screens | Items 1–6 Vercel READY; desktop-only note at small viewport; build pending |
+| Advik + ChatGPT (Lane B) | D33 8/10 — share links | Items 1–7 Vercel READY; URL parameters restore site/date/hour/level/tab/view; build pending |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | D33 Lane A part done (items 1–6) | Stay length 1/3/7/14 (Researcher) done within the time box; stopped |
 
@@ -1763,3 +1763,9 @@ Done within the 2-hour time box (all checks passing about 7 minutes after starti
 - Item 6 production build `dpl_9SrXqoTk5izqFi53ToEcYSdBkf7X` READY for `810b0de`.
 - At widths under 960px, replace the desktop-only shell with one short message: `LunLux is built for a computer screen. Please open it on a laptop or desktop.` Existing desktop layout unchanged.
 - Item 7 build pending.
+
+### 2026-11-15 — Lane B D33 item 8: shareable state links
+- Item 7 Vercel `dpl_9JRYrWaBAToVRNKgmgrLPJoq5fSU` READY for `e153b9d`.
+- URL query parameters now preserve site, ISO date, hour, Educator/Researcher level, active tab and Globe/Horizon choice. Validated site IDs, calendar dates and hour ranges on load; deep links restore panel and switches, and ongoing choices replace the current URL without adding slider history entries.
+- URL stays omitted until item 10 adds the Researcher stay-length control. Browser-level QA remains separate from build validation.
+- Item 8 build pending.
