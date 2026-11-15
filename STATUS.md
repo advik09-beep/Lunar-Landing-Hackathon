@@ -4,10 +4,21 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Lane B lead + ChatGPT (Lane B) | Asteroid-belt performance toggle in fork — Vercel READY | Embedded Tour now starts with belt off, visible on/off button; ~60k-point data and GPU geometry load only when enabled; standalone default unchanged. Manual FPS QA pending |
+| Lane B lead + ChatGPT (Lane B) | FINAL SUBMISSION PRIORITY — licensing/source-provenance audit in progress | Human confirmed public project + presentation links work and slides contain no identifying names. Lane B reviewing simulator permissions, retained assets and citations; no legal clearance claimed. Submission remains with both humans. |
 | Lane A lead (human) | D35 signed with the Lane B lead | 2026-11-15: D29–D35 signed; directed the D35 final look and deck pass (Lane A does the whole pass incl. web shell and deck); reviewing the recoloured site and the seven-page PDF |
 | Claude Code (Lane A) | CODE FROZEN for submission | No further changes unless a human reports a bug |
 | Collaborative presentation | Seven-slide screenshot pass deployed | Separate Vercel project `lunlux-presentation`, production build READY; all six screenshots and wordmark HTTP 200; final human visual QA pending |
+
+## 2026-11-15 — FINAL SUBMISSION HANDOFF (user-directed; priority)
+
+**Priority order assigned by Lane B lead:** Record this handoff in `STATUS.md` first; then address (1) public-link verification, (2) identity/slide check, (3) third-party licensing and source-provenance remediation. Item (5), actual NASA submission, is held for the human team.
+
+- **(1) Links — HUMAN VERIFIED PASS:** Lane B lead reports both `https://lunlux-presentation.vercel.app/` (seven-slide presentation) and `https://lunar-landing-hackathon.vercel.app/` (site) work. The presentation project's Vercel Authentication has also been disabled and its deployment reported READY. Human report, not a claim of independent end-to-end browser verification.
+- **(2) Slide identity — HUMAN VERIFIED PASS:** Lane B lead reports **no name or other identification appears in the submitted slides**. Treat this as a slide-specific confirmation, not a blanket audit of other documents or services. Do not reinsert names into deck text.
+- **(3) Rights and provenance — ACTIVE, NOT CLEARED:** Lane B assistant assigned to inspect upstream simulator license/permission, 12 retained Solar System Scope CC BY 4.0 textures, stars/asteroids/ephemerides, publicly served media and notices; verify actual source terms, document evidence and make narrowly justified corrections. Do not mark legal clearance PASS without evidence; unresolved permission may require rights-holder confirmation or removal of the affected component.
+- **(4) Submission text — UPDATED OUTSIDE REPO:** Revised NASA project copy and a final checklist prepared for pasting into the challenge submission form. Submission copy is not a replacement for actual rights clearance.
+- **(5) Final submit — HUMAN PENDING:** The human team will submit once ready. No assistant claims to have submitted the project.
+- **Scope:** Preserve the scientific calculations, existing frozen application and seven-slide deck; prioritize source/permission fixes. Note any necessary code/asset changes explicitly with build checks before release.
 
 ## 2026-11-15 — A completely unofficial note for Claude
 
