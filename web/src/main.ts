@@ -75,7 +75,7 @@ app.innerHTML = [
   '<main class="app-shell">',
   '  <header class="topbar">',
   '    <div class="brand"><span class="brand-kicker">NASA SPACE APPS 2026</span><img class="brand-wordmark" src="/brand/lunlux-wordmark.png" alt="LunLux" width="1934" height="495"><span class="brand-subtitle">Sunlight and Earth contact for lunar landing sites</span></div>',
-  '    <nav class="primary-nav" aria-label="Main navigation"><button id="nav-overview" type="button" class="nav-active" aria-pressed="true">Tour</button><button id="nav-explore" type="button" aria-pressed="false">Explore</button><button id="nav-compare" type="button" aria-pressed="false">Compare</button><button id="nav-researcher" type="button" aria-pressed="false">Report</button></nav>',
+  '    <nav class="primary-nav" aria-label="Main navigation"><button id="nav-overview" type="button" class="nav-active" aria-pressed="true">Tour</button><button id="nav-explore" type="button" aria-pressed="false">Explore</button><button id="nav-compare" type="button" aria-pressed="false">Compare</button><button id="nav-researcher" type="button" aria-pressed="false">Learn</button></nav>',
   '    <div class="header-tools"><div class="reading-level" role="group" aria-label="Reading level"><button id="level-educator" aria-pressed="true" type="button">Educator</button><button id="level-researcher" aria-pressed="false" type="button">Researcher</button></div><button id="nav-credits" class="methods-link" type="button" aria-pressed="false">Data and methods</button></div>',
   '  </header>',
   '  <section class="intro-block">',
@@ -124,7 +124,7 @@ app.innerHTML = [
   '  </section>',
   '  <section id="compare-view" class="panel-view" aria-label="Compare landing dates" hidden><div id="compare-mount"></div></section>',
   '  <section id="horizon-view" class="panel-view" aria-label="Stand here horizon panorama" hidden><div id="horizon-mount"></div></section>',
-  '  <section id="researcher-view" class="panel-view researcher-view" aria-label="Researcher analysis" hidden><div id="researcher-mount"></div></section>',
+  '  <section id="researcher-view" class="panel-view researcher-view" aria-label="Learn about the Moon" hidden><div id="researcher-mount"></div></section>',
   '  <section id="planner-view" class="panel-view planner-view" aria-label="Planner: A/B scenarios and mission requirements" hidden><div id="planner-mount"></div></section>',
   '  <section id="credits-view" class="panel-view credits-view" aria-label="Project credits" hidden>',
   '    <h2>LunLux — Credits and sources</h2>',
@@ -227,7 +227,7 @@ function openView(view: View): void {
     button?.classList.toggle('nav-active', name === view);
     button?.setAttribute('aria-pressed', String(name === view));
   }
-  if (view === 'compare') find<HTMLElement>('planner-view').hidden = false;
+  if (view === 'compare') find<HTMLElement>('planner-view').hidden = readingLevel === 'educator';
   updateAllPanels();
   setExploreMode(exploreMode);
   if (enteringExplore) moon?.focusSite(selectedSite);
@@ -495,14 +495,23 @@ find<HTMLElement>('compare-view').append(find<HTMLElement>('planner-view'));
 for (const name of ['overview', 'explore', 'compare', 'horizon', 'researcher', 'planner', 'credits'] as View[]) {
   if (name !== 'overview') document.getElementById('nav-' + name)?.addEventListener('click', () => openView(name));
 }
+function syncReadingLevelUI(): void {
+  const isEducator = readingLevel === 'educator';
+  find<HTMLButtonElement>('nav-researcher').textContent = isEducator ? 'Learn' : 'Report';
+  find<HTMLElement>('researcher-view').setAttribute('aria-label', isEducator ? 'Learn about the Moon' : 'Researcher report');
+  find<HTMLElement>('planner-view').hidden = activeView !== 'compare' || isEducator;
+  document.body.dataset.readingLevel = readingLevel;
+}
 for (const level of ['educator','researcher'] as const) {
   find<HTMLButtonElement>('level-' + level).addEventListener('click', () => {
     readingLevel = level;
+    syncReadingLevelUI();
     for (const name of ['educator','researcher']) find<HTMLElement>('level-' + name).setAttribute('aria-pressed', String(name === level));
     for (const panel of [sideCard,compareGrid,horizonView,researcherView,plannerView]) panel?.update({level});
     updateAllPanels();
   });
 }
+syncReadingLevelUI();
 updateButtons();
 openView('overview');
 

@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D32 item 2/5 — headings | Item 1 Vercel READY; Urbanist heading imports and license; checking Vercel build |
+| Advik + ChatGPT (Lane B) | D32 item 3/5 — mode labels | Items 1–2 Vercel READY; Learn / Report mode labels and levels; checking build |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | D32 Lane A part done | Seven-year-old Educator screens, Learn / Report, kid tour captions, best week, all-sites download; stopped |
 
@@ -1647,3 +1647,9 @@ SOUTH_POLE.sources;          // [{ name, url }]
 - Added self-hosted Urbanist 400/600 via `@fontsource/urbanist` 5.3.0 and the shared `--llp-heading-font` variable; heading-only CSS leaves body copy and numbers unchanged.
 - Checked the font license against Fontsource and npm: **SIL OFL 1.1**, copyright 2021 The Urbanist Project Authors. Credits link to the notice and license.
 - Build status for item 2: pending Vercel verification before tab-label work.
+
+### 2026-11-14 — Lane B D32 item 3: mode labels and panel level
+- Item 2 Vercel deployment `dpl_36HTm3YaHocjrNjupyQwSN1dQWme` READY for `84d3d53`.
+- Fourth tab is **Learn** in Educator, **Report** in Researcher; the tab's accessible label updates too.
+- Confirmed `currentPanelProps()` passes `level` at mount for side card, Compare, Horizon, Learn/Report and Planner; `updatePanel` passes `level` for all, and switch calls `panel.update({level})`. The planner shell stays hidden in Educator.
+- Build status for item 3: pending Vercel verification before adapting the Tour captions.
