@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D33 9/10 — credit | Items 1–8 Vercel READY; challenge attribution, code link and score disclaimer; build pending |
+| Advik + ChatGPT (Lane B) | D33 10/10 — stay length | Items 1–9 Vercel READY; Researcher stay selector + shared hour/panels/links; checking final build |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | D33 Lane A part done (items 1–6) | Stay length 1/3/7/14 (Researcher) done within the time box; stopped |
 
@@ -1774,3 +1774,9 @@ Done within the 2-hour time box (all checks passing about 7 minutes after starti
 - Item 8 Vercel build `dpl_2qY6f9Zw4tNGUzc7rAf233bHdiCr` READY for `6c597db`.
 - Data and methods now says `Made for the NASA Space Apps Challenge 2026` and links directly to the project GitHub repository. Added Lane A's exact `SCORE_OWN_FORMULA` sentence to avoid implying NASA endorses the team's score formula.
 - Item 9 build pending.
+
+### 2026-11-15 — Lane B D33 item 10: shared Researcher stay length
+- Item 9 Vercel build `dpl_2Cf1Pq533fdEhauGbNAuthevwrec` READY for `63b74e2`.
+- Lane A's D33 `STAY_OPTIONS` and panel interface v1.5 are available. Added Researcher-only Stay dropdown (1, 3, 7, 14 days), 7 days in Educator; shared hour max and clamping; `stayDays` passed on mount and update; date/date-step stays shared.
+- Globe marker verdicts now load the matching precomputed daily file via `loadDaily(days)` then call `getDaily(date,1,days)`, guarding against stale async requests. Shareable URLs preserve `stay` only in Researcher. Fixed date share-link regex to parse numeric ISO dates as intended.
+- Awaiting item 10 Vercel build; no new work after final acceptance.

@@ -127,3 +127,7 @@ body[data-view="overview"] .site-footer { display:none; }
   .app-shell { display:none !important; }
   .small-screen-note { display:block; margin:18vh auto 0; max-width:32ch; padding:24px; color:var(--llp-text); background:var(--llp-glass); border-radius:12px; font-size:1.1rem; text-align:center; }
 }
+
+/* D33: Researcher stay-length control fits the shared one-row clock. */
+.toolbar-stay { display:flex; align-items:center; gap:6px; font-size:.84rem; white-space:nowrap; }
+.toolbar-stay select { width:96px; }

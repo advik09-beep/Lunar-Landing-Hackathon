@@ -333,7 +333,7 @@ export class LunarScene {
     this.earthOverheadLabel.hidden = true;
   }
 
-  setVerdicts(values: Map<string, Verdict>): void {
+  setVerdicts(values: Map<string, Verdict>, stayDays = 7): void {
     const descriptions: string[] = [];
     for (const m of this.markers) {
       const verdict = values.get(m.site.id) ?? 'unavailable';
@@ -345,7 +345,7 @@ export class LunarScene {
       m.halo.material.opacity = m.site.id === this.selected ? .85 : .40;
     }
     // Also expose marker meaning to assistive technology, not only colors.
-    this.renderer.domElement.setAttribute('aria-label', '3D Moon markers by seven-day landing verdict: ' + descriptions.join('; '));
+    this.renderer.domElement.setAttribute('aria-label', '3D Moon markers by ' + stayDays + '-day landing verdict: ' + descriptions.join('; '));
   }
 
   private setPoleCallouts(visible:boolean): void {

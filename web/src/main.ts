@@ -4,7 +4,7 @@ import '@fontsource/source-serif-4/600.css';
 import '@fontsource/source-serif-4/700.css';
 import './style.css';
 import { syncShellCopy, syncTourSources } from './educatorCopy';
-import { listSites, loadDaily, getDaily, loadScene, getSceneState, MOCK, VERDICT_RULE, TOUR_STOPS, SOUTH_POLE, SCORE_OWN_FORMULA } from '../../lib/visibility.js';
+import { listSites, loadDaily, getDaily, loadScene, getSceneState, MOCK, VERDICT_RULE, TOUR_STOPS, SOUTH_POLE, SCORE_OWN_FORMULA, STAY_OPTIONS } from '../../lib/visibility.js';
 import { LunarScene, type MoonSite, type Verdict, type SceneState } from './moon';
 import { OverviewScene } from './overview';
 import { mountStarfield } from './starfield';
@@ -46,12 +46,14 @@ const dateOrigin = '2026-11-14';
 let selectedDate = dateOrigin;
 let selectedSite = sites[0].id;
 let readingLevel: 'educator' | 'researcher' = 'educator';
-let selectedHour = 0; // 0–167 for the Educator week; D33 Researcher length is wired at item 10.
+type StayDays = 1 | 3 | 7 | 14;
+let stayDays: StayDays = 7;
+let selectedHour = 0; // Chosen hour within the active stay (0–167 in Educator).
 const linkParams = new URLSearchParams(window.location.search);
 const linkedSite = linkParams.get('site');
 if (linkedSite && sites.some(s => s.id === linkedSite)) selectedSite = linkedSite;
 const linkedDate = linkParams.get('date');
-if (linkedDate && /^\\d{4}-\\d{2}-\\d{2}$/.test(linkedDate)) {
+if (linkedDate && /^\d{4}-\d{2}-\d{2}$/.test(linkedDate)) {
   const time = Date.parse(linkedDate + 'T00:00:00Z');
   if (Number.isFinite(time) && new Date(time).toISOString().slice(0, 10) === linkedDate &&
       time >= Date.UTC(2026,0,1) && time <= Date.UTC(2029,11,24)) selectedDate = linkedDate;
@@ -59,8 +61,11 @@ if (linkedDate && /^\\d{4}-\\d{2}-\\d{2}$/.test(linkedDate)) {
 const linkedLevel = linkParams.get('level');
 if (linkedLevel === 'educator' || linkedLevel === 'researcher') readingLevel = linkedLevel;
 else if (linkParams.get('tab') === 'report') readingLevel = 'researcher';
+const linkedStay = Number(linkParams.get('stay'));
+if (readingLevel === 'researcher' && linkParams.has('stay') && STAY_OPTIONS.includes(linkedStay)) stayDays = linkedStay as StayDays;
+const activeStayDays = (): StayDays => readingLevel === 'researcher' ? stayDays : 7;
 const linkedHour = Number(linkParams.get('hour'));
-if (linkParams.has('hour') && Number.isInteger(linkedHour)) selectedHour = Math.max(0, Math.min(167, linkedHour));
+if (linkParams.has('hour') && Number.isInteger(linkedHour)) selectedHour = Math.max(0, Math.min(activeStayDays()*24 - 1, linkedHour));
 const linkedTab = linkParams.get('tab');
 const linkedExplore = linkParams.get('view') === 'horizon' ? 'horizon' : 'globe';
 let daily: DailyResult | null = null;
@@ -109,6 +114,7 @@ app.innerHTML = [
   '  <section id="global-clock" class="global-clock" aria-label="Landing site and time" hidden>',
   '    <label class="toolbar-site" for="site-picker">Site <select id="site-picker" aria-label="Landing site"></select></label>',
   '    <div class="toolbar-date"><button id="date-prev" type="button" aria-label="Move landing date seven days earlier">−7</button><label class="sr-only" for="landing-date">Landing date UTC</label><input id="landing-date" type="date" value="2026-11-14" aria-label="Landing date UTC"><button id="date-next" type="button" aria-label="Move landing date seven days later">+7</button></div>',
+  '    <label id="stay-control" class="toolbar-stay" for="stay-days" hidden>Stay <select id="stay-days" aria-label="Length of stay"><option value="1">1 day</option><option value="3">3 days</option><option value="7">7 days</option><option value="14">14 days</option></select></label>',
   '    <label class="toolbar-hour" for="hour-slider">Inspect <input id="hour-slider" type="range" min="0" max="167" value="0" step="1" aria-label="Moment inspected within the seven-day stay"><output id="hour-output" for="hour-slider">Day 1  00:00 UTC</output></label>',
   '    <details class="clock-tip"><summary aria-label="About the date and inspection time">ⓘ</summary><p>The 7-day stay starts at 00:00 UTC on the landing date. The slider chooses the moment you inspect within that stay; it does not move the landing time. Hourly data.<br><br>Drag to turn the Moon; scroll to zoom. The Moon stays fixed while the Sun and Earth move around it. A faint light shows the night side; it is a visual aid, not sunlight. The globe is smooth; local terrain appears in Horizon.<br><br><span id="lighting-status" class="lighting-status" role="status" aria-live="polite">Loading sunlight for the chosen moment…</span></p></details>',
   '    <p id="data-status" class="sr-only" role="status" aria-live="polite">Loading conditions…</p>',
@@ -184,6 +190,8 @@ const status = find<HTMLParagraphElement>('data-status');
 const lightingStatus = find<HTMLElement>('lighting-status');
 const select = find<HTMLInputElement>('landing-date');
 select.value = selectedDate;
+const stayPicker = find<HTMLSelectElement>('stay-days');
+stayPicker.value = String(stayDays);
 const hourSlider = find<HTMLInputElement>('hour-slider');
 const hourOutput = find<HTMLOutputElement>('hour-output');
 const DATE_MIN = Date.UTC(2026, 0, 1);
@@ -224,6 +232,8 @@ function syncShareLink(): void {
   url.searchParams.set('date', selectedDate);
   url.searchParams.set('hour', String(selectedHour));
   url.searchParams.set('view', exploreMode);
+  if (readingLevel === 'researcher') url.searchParams.set('stay', String(stayDays));
+  else url.searchParams.delete('stay');
   history.replaceState(history.state, '', url.pathname + url.search + url.hash);
 }
 function setExploreMode(mode: 'globe' | 'horizon'): void {
@@ -285,7 +295,7 @@ function openView(view: View): void {
 // Only visible views receive expensive data updates. Panels keep their own state.
 const panelSelections = new WeakMap<PanelHandle, string>();
 function updatePanel(panel: PanelHandle, wholeStay = false): void {
-  const props = { siteId: selectedSite, landingDate: selectedDate, level: readingLevel, ...(wholeStay ? {} : {hour:selectedHour}) };
+  const props = { siteId: selectedSite, landingDate: selectedDate, level: readingLevel, stayDays: activeStayDays(), ...(wholeStay ? {} : {hour:selectedHour}) };
   const key = JSON.stringify(props);
   if (panelSelections.get(panel) !== key) { panel.update(props); panelSelections.set(panel,key); }
 }
@@ -330,7 +340,7 @@ function updateDaily(): void {
     colors.set(site.id, verdict);
 
   }
-  moon?.setVerdicts(colors);
+  moon?.setVerdicts(colors, activeStayDays());
   updateButtons();
 }
 
@@ -365,16 +375,7 @@ function setLandingDate(date: string): void {
   syncOverviewClock();
   updateAllPanels();
   updateSceneLighting();
-  if (dataReady) {
-    try {
-      daily = getDaily(selectedDate, 1) as DailyResult;
-      status.textContent = readingLevel === 'educator' ? 'Showing the week that starts on your day.' : '7-day stay starting ' + formatUtc(selectedDate + 'T00:00:00Z') + '; hourly NASA/JPL Horizons data';
-    } catch (error) {
-      daily = null;
-      status.textContent = 'Conditions unavailable for the selected date.';
-    }
-    updateDaily();
-  }
+  void refreshDaily();
 }
 
 function renderClockHour(): void {
@@ -391,7 +392,7 @@ function renderClockHour(): void {
 
 let panelUpdateTimer = 0;
 function setHour(value: number): void {
-  const hour = Math.max(0, Math.min(167, Math.round(value)));
+  const hour = Math.max(0, Math.min(activeStayDays()*24 - 1, Math.round(value)));
   if (!Number.isFinite(hour)) return;
   selectedHour = hour;
   syncShareLink();
@@ -402,7 +403,26 @@ function setHour(value: number): void {
   updateSceneLighting();
 }
 
-let dataReady = false;
+let dailyRequestToken = 0;
+async function refreshDaily(): Promise<void> {
+  const token = ++dailyRequestToken;
+  const days = activeStayDays();
+  daily = null;
+  status.textContent = readingLevel === 'educator' ? 'Checking this week.' : 'Loading landing-site conditions…';
+  try {
+    await loadDaily(days);
+    if (token !== dailyRequestToken) return;
+    daily = getDaily(selectedDate, 1, days) as DailyResult;
+    status.textContent = readingLevel === 'educator' ? 'Showing the week that starts on your day.' : days + '-day stay starting ' + formatUtc(selectedDate + 'T00:00:00Z') + '; hourly NASA/JPL Horizons data';
+  } catch (error) {
+    if (token !== dailyRequestToken) return;
+    daily = null;
+    status.textContent = 'Conditions unavailable for the selected date and stay length.';
+    status.dataset.state = 'unavailable';
+  }
+  updateDaily();
+}
+
 select.addEventListener('change', () => setLandingDate(select.value));
 hourSlider.addEventListener('input', () => setHour(Number(hourSlider.value)));
 for (const [id, offset] of [['date-prev', -7], ['date-next', 7]] as Array<[string, number]>) {
@@ -538,7 +558,7 @@ try {
   console.warn('WebGL lunar scene unavailable:', error);
 }
 function currentPanelProps() {
-  return { siteId: selectedSite, landingDate: selectedDate, hour: selectedHour, level: readingLevel,
+  return { siteId: selectedSite, landingDate: selectedDate, hour: selectedHour, level: readingLevel, stayDays: activeStayDays(),
     onHourSelected: setHour, onSiteSelected: chooseSite, onDateSelected: setLandingDate,
     onOpenView: (view: 'compare' | 'horizon') => openView(view) };
 }
@@ -562,19 +582,42 @@ function syncReadingLevelUI(): void {
   find<HTMLElement>('researcher-view').setAttribute('aria-label', isEducator ? 'Learn about the Moon' : 'Researcher report');
   find<HTMLElement>('planner-view').hidden = activeView !== 'compare' || isEducator;
   document.body.dataset.readingLevel = readingLevel;
+  find<HTMLElement>('stay-control').hidden = isEducator;
+  stayPicker.value = String(stayDays);
+  hourSlider.max = String(activeStayDays()*24 - 1);
   syncShellCopy(readingLevel);
   renderClockHour();
 }
+function applyStayLength(): void {
+  const days = activeStayDays();
+  find<HTMLElement>('stay-control').hidden = readingLevel !== 'researcher';
+  stayPicker.value = String(stayDays);
+  hourSlider.max = String(days*24 - 1);
+  selectedHour = Math.min(selectedHour, days*24 - 1);
+  renderClockHour();
+  syncOverviewClock();
+  updateSceneLighting();
+  for (const panel of [sideCard,compareGrid,horizonView,researcherView,plannerView]) panel?.update({stayDays:days,hour:selectedHour,level:readingLevel});
+  updateAllPanels();
+  void refreshDaily();
+  syncShareLink();
+}
+stayPicker.addEventListener('change', () => {
+  const value = Number(stayPicker.value);
+  if (!STAY_OPTIONS.includes(value)) return;
+  stayDays = value as StayDays;
+  applyStayLength();
+});
 for (const level of ['educator','researcher'] as const) {
   find<HTMLButtonElement>('level-' + level).addEventListener('click', () => {
     readingLevel = level;
+    selectedHour = Math.min(selectedHour, activeStayDays()*24 - 1);
     syncReadingLevelUI();
     refreshTourCaptionLanguage();
     syncTourSources(readingLevel);
     syncShareLink();
     for (const name of ['educator','researcher']) find<HTMLElement>('level-' + name).setAttribute('aria-pressed', String(name === level));
-    for (const panel of [sideCard,compareGrid,horizonView,researcherView,plannerView]) panel?.update({level});
-    updateAllPanels();
+    applyStayLength();
   });
 }
 for (const name of ['educator','researcher'] as const) {
@@ -588,17 +631,7 @@ const initialView: View = linkedTab === 'explore' ? 'explore' :
   linkedTab === 'methods' ? 'credits' : 'overview';
 openView(initialView);
 
-async function initializeData(): Promise<void> {
-  try {
-    await loadDaily();
-    dataReady = true;
-    setLandingDate(selectedDate);
-  } catch (error) {
-    status.textContent = 'Conditions could not be loaded. Please refresh to try again.';
-    status.dataset.state = 'error';
-  }
-}
-void initializeData();
+void refreshDaily();
 
 async function initializeSceneLighting(): Promise<void> {
   try {
