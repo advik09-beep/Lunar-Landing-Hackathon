@@ -4,13 +4,13 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D32 item 5/5 — Educator copy | Items 1–4 Vercel READY; plain shell words and teacher notes; verifying last build |
+| Advik + ChatGPT (Lane B) | D32 COMPLETE — STOPPED | Five D32 shell items committed; final source commit d0ef0f6 verified Vercel READY. Human visual/readability review remains open. |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | D32 Lane A part done | Seven-year-old Educator screens, Learn / Report, kid tour captions, best week, all-sites download; stopped |
 
 Acceptance (both humans): steps 1, 2, 3, 6, 8 PASS; step 4 and 7 pending earlier findings. Signed: D7–D23 (see PLAN), **D24–D28** (title card + tour nav, tour captions, why the south pole, one clock, A/B scenarios + requirements filter). Rule: no status-only pushes.
 Waiting on Sheldon: read the new Educator screens on web/panels.html (level = Educator) and the Learn tab; confirm the two NASA photos and their captions.
-Waiting on Advik: D32 shell items: wordmark in header and Tour, icon as tab icon, Urbanist via --llp-heading-font, fourth tab labeled Learn / Report by mode, Educator tour captions (kidTitle / kidText); earlier: mount mountPlanner (D28), D27 status.
+Waiting on Advik: Human review of the deployed D32 Educator/Researcher switch, Tour wordmark and tab icon, Learn/Report tab, child-level Tour captions and simplified shell text; check in-browser rendering, readability and navigation. D27 shared clock and D28 Planner are integrated in Lane B code, but no new human acceptance is claimed. Earlier step 4 and step 7 acceptance findings remain unchanged.
 
 ## Continuous two-agent coordination protocol (agreed 2026-11-14)
 
@@ -1670,3 +1670,10 @@ SOUTH_POLE.sources;          // [{ name, url }]
 - Vercel build `dpl_AgbA6HgD7Q18uUpEzxZ9uvEgkagy` for `0af465b` reported TypeScript TS2488: NodeList is not iterable under the app's compiler settings.
 - Changed the Educator tip loop to iterate over `Array.from(querySelectorAll(...))`. No functionality or scope change.
 - Awaiting new Vercel build check; item 5 not yet marked passed.
+
+### 2026-11-15 — Lane B D32 closure and repository status reconciliation (Advik request)
+- Re-read PLAN.md (D32), DESIGN.md (D32), STATUS.md and latest `main` commit before updating this row; no newer Lane A changes found (main was `d0ef0f6`). This is a **status-only documentation update explicitly requested by Advik**, an exception to the usual rule to fold status updates into code commits.
+- **D32 Lane B 1–5 complete**, in order: (1) wordmark in header and Tour plus favicon (`fd60ce0`); (2) self-hosted Urbanist headings, shared `--llp-heading-font`, OFL-1.1 credited (`84d3d53`); (3) Learn/Report label by reading level and `level` passed to every mounted panel, Planner hidden for Educator (`9ff744b`); (4) `kidTitle`/`kidText` for Educator and original Tour text for Researcher, including switching while a stop is visible (`2a90045`); (5) seven-year-old-level shell copy with detailed text in teacher fold-outs (`0af465b`, corrected for TS2488 by `d0ef0f6`). No extra feature work authorized.
+- **Build evidence:** Vercel production builds READY for `fd60ce0` (`dpl_Cw2kQfLQwcuDZJMUbA8kkHBjVGgk`), `84d3d53` (`dpl_36HTm3YaHocjrNjupyQwSN1dQWme`), `9ff744b` (`dpl_CXSAvsohuJsW1uikt1UHdLrG1Gnx`) and `2a90045` (`dpl_8QDyFagztSdAi5kw9McyRDsbamb1`). Item 5 first failed TypeScript TS2488 at `0af465b` (`dpl_AgbA6HgD7Q18uUpEzxZ9uvEgkagy`), then passed at `d0ef0f6` (`dpl_uZtuVD3FCQfiGnoD24p6hPEyYJSe`, READY, rechecked 2026-11-15). Public deployment: https://lunar-landing-hackathon-e3hdyh643-usmdo-club.vercel.app/.
+- **Evidence scope:** production build success verified, but no independent in-browser visual/interaction smoke test or seven-year-old human readability review performed in this pass; do not label those PASS. Lane A's D32 panel tests were reported passed in its own notes; no Lane A code or status edited.
+- **Next dependency:** Advik/Sheldon visually review Educator and Researcher flows and record any findings. Signed step 4/7 acceptance flags and other open human-review items remain as written; stop here, no features beyond D32.
