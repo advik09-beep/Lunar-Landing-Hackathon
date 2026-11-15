@@ -101,6 +101,7 @@ export class LunarScene {
     const texture=new THREE.CanvasTexture(canvas); texture.colorSpace=THREE.SRGBColorSpace; this.pinTextures.set(verdict,texture); return texture;
   }
   private readonly poleCallouts: Array<{id:string;sprite:THREE.Sprite;leader:THREE.Line}> = [];
+  private pinHeads: Array<{ id: string; x: number; y: number }> = []; // D36: pin heads on screen after spreading
   private raycaster = new THREE.Raycaster();
   private pointer = new THREE.Vector2();
   private selected: string | null = null;
@@ -339,6 +340,34 @@ export class LunarScene {
     return element;
   }
 
+  /** D36: put a site's name beside its pin as drawn (after spreading), on the side with fewer other pins. */
+  private positionPinLabel(element: HTMLDivElement, m: Marker): void {
+    if (!m.object.visible) { element.hidden = true; return; }
+    const w = this.container.clientWidth, h = this.container.clientHeight;
+    const p = m.object.position.clone().project(this.camera);
+    if (p.z < -1 || p.z > 1) { element.hidden = true; return; }
+    const tanHalf = Math.tan(THREE.MathUtils.degToRad(this.camera.fov) / 2);
+    const pxPerUnit = (h / 2) / (this.camera.position.distanceTo(m.object.position) * tanHalf);
+    const x = (p.x + 1) * .5 * w, tipY = (1 - p.y) * .5 * h;
+    const headY = tipY - m.object.scale.y * pxPerUnit * 0.54, gap = m.object.scale.x * pxPerUnit * 0.45 + 8;
+    element.hidden = false;
+    const lw = element.offsetWidth || 200, lh = element.offsetHeight || 30, r = m.object.scale.x * pxPerUnit * 0.42;
+    const others = this.pinHeads.filter((q) => q.id !== m.site.id);
+    // Try right, left and above the pin; keep the spot that covers the fewest other pins (and stays inside the view).
+    const spots: { left: number; top: number; d: number }[] = [];
+    for (const d of [0, 36, 72, 110]) {
+      spots.push({ left: x + gap + d, top: headY - lh / 2, d }, { left: x - gap - lw - d, top: headY - lh / 2, d });
+      spots.push({ left: x - lw / 2, top: headY - gap - lh - 4 - d, d }, { left: x - lw / 2, top: tipY + 6 + d, d });
+    }
+    const cost = (sp: { left: number; top: number; d: number }) =>
+      others.filter((q) => q.x + r > sp.left && q.x - r < sp.left + lw && q.y + r > sp.top && q.y - r < sp.top + lh + r).length * 1000
+      + (sp.left < 4 || sp.left + lw > w - 4 || sp.top < 4 || sp.top + lh > h - 4 ? 5000 : 0) + sp.d;
+    const best = spots.reduce((a2, b2) => (cost(b2) < cost(a2) ? b2 : a2));
+    element.style.left = best.left + 'px';
+    element.style.top = best.top + 'px';
+    element.style.transform = 'none';
+  }
+
   private positionMapLabel(element: HTMLDivElement, surfaceNormal: THREE.Vector3, offset: number, besidePin = false): void {
     // No labels on the far side of the Moon; the foreground Moon always occludes them.
     if (surfaceNormal.dot(this.camera.position.clone().normalize()) < .09) { element.hidden = true; return; }
@@ -366,12 +395,12 @@ export class LunarScene {
     const selected = this.markers.find(marker => marker.site.id === this.selected);
     if (selected) {
       this.selectedNameLabel.textContent = this.readingLevel === 'educator' ? (selected.site.shortName || selected.site.name) : selected.site.name;
-      this.positionMapLabel(this.selectedNameLabel, selected.normal, 1.035, true);
+      this.positionPinLabel(this.selectedNameLabel, selected);
     } else this.selectedNameLabel.hidden = true;
     const hovered = this.markers.find(marker => marker.site.id === this.hovered && marker.site.id !== this.selected);
     if (hovered) {
       this.hoveredNameLabel.textContent = hovered.site.name;
-      this.positionMapLabel(this.hoveredNameLabel, hovered.normal, 1.035, true);
+      this.positionPinLabel(this.hoveredNameLabel, hovered);
     } else this.hoveredNameLabel.hidden = true;
     if (this.earthOverheadSprite.visible) this.positionMapLabel(this.earthOverheadLabel, this.earthOverheadNormal, 1.05, true);
     else this.earthOverheadLabel.hidden = true;
@@ -526,6 +555,7 @@ export class LunarScene {
       for (let i = 0; i < vis.length; i++) { pos[i].x += (vis[i].x - pos[i].x) * 0.01; pos[i].y += (vis[i].y - pos[i].y) * 0.01; }
       if (!moved) break;
     }
+    this.pinHeads = vis.map((v, i) => ({ id: v.m.site.id, x: pos[i].x, y: pos[i].y }));
     vis.forEach((v, i) => {
       const dx = pos[i].x - v.x, dy = pos[i].y - v.y;
       if (Math.hypot(dx, dy) < 2) return;
