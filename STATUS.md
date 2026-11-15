@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D34 item 5/5 — team byline | Items 1–4 Vercel READY; byline in Data and methods and Educator How we know; final build pending |
+| Advik + ChatGPT (Lane B) | Requested pass 1/5 completed | Simulator real-time templates corrected; six paths 404 on READY build; audit updated; next item 2 |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | Learn full width + Watch a month + Can you tell? done; slide 9 / 10 | stopped |
 | Collaborative presentation | Official working slides — changes required | Advik designated `presentation/` the official working deck; local preview `http://127.0.0.1:5179/` is not public. Revisions, Sheldon + Claude science review, build verification and final human approval pending. |
@@ -1877,3 +1877,8 @@ Done within the 2-hour time box (all checks passing about 7 minutes after starti
 - **"Can you tell?":** three tap-to-answer questions for the chosen site and week. Will the lander get sunshine all week? Can it see Earth all week? Which place gets more sunshine this week, this site or Apollo 11 (Malapert when the site is Apollo 11)? Answers come from the live daily data: "all week" ≥ 95%, "not at all" ≤ 3%, "about the same" within 5 points. The teacher note gives the percentages.
 - **Checks:** all twelve scripts PASS; panel tests PASS. The Learn test now checks the grids, that the Watch Sun sits at the hourly-data position with the right words, Play/Pause, and that each quiz answer matches `getDaily`. `cd web && npm run build` OK.
 
+
+### 2026-11-15 — Five-item pass, item 1: simulator template fix and narrow audit update
+- Simulator fork master `bc1c78f` replaced stale paths for Pluto, Europa, Io, Ganymede, Callisto, Titan in `src/data/realTimeOrbits.ts` with `texturePath: null`; primary body templates had already been corrected, so all six remain plain spheres.
+- Fork production Vercel build `dpl_8D4GRP7Az5cnvF2CWAKAtmGCUooD` READY; six deleted texture paths all 404, Earth retained texture 200. Source confirms both runtime template paths no longer request missing textures. No browser network trace.
+- `THIRD_PARTY_LICENSE_AUDIT.md` now distinguishes the six resolved texture cases from remaining upstream-code/CC BY/data/media approval questions. Not an expanded audit or overall license clearance. Next: item 2 Earth marker after this repo's deployment build.

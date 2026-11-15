@@ -1,5 +1,16 @@
 # LunLux third-party licensing audit — 2026-11-15
 
+## D34 texture remediation update — 2026-11-15 (supersedes historical texture findings below)
+
+**Six texture issues resolved in the current fork, NOT overall licensing clearance.** The inventory below documents the original 18 upstream textures; only the 12 Solar System Scope CC BY 4.0 textures remain in `advik09-beep/SolarSystemSimulator` on `master`. Commit [aa00c53](https://github.com/advik09-beep/SolarSystemSimulator/commit/aa00c533d27eef482f589cd63d47d415159af599) deleted `pluto.jpg`, `europa.png`, `io.jpg`, `ganymede.jpg`, `callisto.jpg`, and `titan.jpg` and set the corresponding default scene templates to `texturePath: null`. Follow-up commit [bc1c78f](https://github.com/advik09-beep/SolarSystemSimulator/commit/bc1c78f0a2c5ae9d524f647e18b378b628b956f8) set the six remaining real-time mode templates in `src/data/realTimeOrbits.ts` to `texturePath: null`; the texture downloader no longer includes the six filenames. Pluto, Io, Europa, Ganymede, Callisto and Titan remain orbiting plain-colored spheres, not removed bodies.
+
+**Build and delivery evidence:** the corrected simulator fork Vercel deployment `dpl_8D4GRP7Az5cnvF2CWAKAtmGCUooD` is READY. All six removed `/textures/...` URLs return HTTP 404 on that deployment; `/textures/earth_day.jpg` returns HTTP 200 as a control. The current code's two body template sets no longer reference the six deleted file paths; a live browser network trace has not been run. Older immutable builds may still serve historic assets, and are not claimed purged.
+
+**Still open (no wider audit conducted here):** the upstream simulator's incomplete MIT grant/copyright notice; attribution, permitted use and change notices for 12 retained Solar System Scope CC BY 4.0 maps; separate review of stars, asteroids, ephemerides, screenshots/other shipped content if required; accuracy of the simulator's own credit notices and final submitted media; and final human browser/rights sign-off. PLAN D34 approved Apache-2.0 for *original LunLux team code and text* and root LICENSE/NOTICE exist, but do not relicense the simulator.
+
+**Status of historical release gates below:** 1 team-license gate DONE; 2 upstream permission OPEN; 3 six-texture removal DONE for current fork; 4 retained CC BY terms OPEN; 5 four USGS map *use* resolved by removal, other data provenance OPEN; 6 submission/simulator notices PARTIAL; 7 six live paths checked but full browser/video QA OPEN; 8 final human release sign-off OPEN. Legacy statements below describing Pluto/Europa/USGS textures as *present* or the team's Apache choice as *only proposed* are historical, not current status.
+
+
 **Status: NOT CLEARED FOR SUBMISSION.** This is an evidence-based rights inventory, not an assertion that upstream assets are licensed for unrestricted redistribution. No source assets or code were changed by this audit.
 
 ## Scope and evidence
