@@ -4,10 +4,19 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Lane B lead + ChatGPT (Lane B) | Borealis background music added; Vercel READY, listening QA pending | Opt-in music button across tabs, 12% volume, older embedded simulator sound remains muted; CC BY 4.0 credit on site and in NOTICE/README |
+| Lane B lead + ChatGPT (Lane B) | Asteroid-belt performance toggle in fork — Vercel READY | Embedded Tour now starts with belt off, visible on/off button; ~60k-point data and GPU geometry load only when enabled; standalone default unchanged. Manual FPS QA pending |
 | Lane A lead (human) | D35 signed with the Lane B lead | 2026-11-15: D29–D35 signed; directed the D35 final look and deck pass (Lane A does the whole pass incl. web shell and deck); reviewing the recoloured site and the seven-page PDF |
 | Claude Code (Lane A) | CODE FROZEN for submission | No further changes unless a human reports a bug |
 | Collaborative presentation | Seven-slide screenshot pass deployed | Separate Vercel project `lunlux-presentation`, production build READY; all six screenshots and wordmark HTTP 200; final human visual QA pending |
+
+## 2026-11-15 — Lane B asteroid-belt Tour performance control
+
+- **User-reported issue:** The dense asteroid belt between Mars and Jupiter was lowering frame rate in the embedded solar-system Tour.
+- **Fork-only implementation:** `advik09-beep/SolarSystemSimulator` commit `2cf59dd63ae08f6467eceb3813e49a7d38999a95` (`master`), changes to `src/main.ts`, `src/rendering/SceneManager.ts`, `index.html`.
+- **Behavior:** In `?lunarEmbed=1` mode, the asteroid belt starts **off**. An accessible fixed upper-right `Asteroid belt: Off/On` button controls the existing `renderConfig.showAsteroidBelt` property. Standalone simulator continues starting with belt **on** and its pre-existing settings checkbox still works.
+- **Performance path:** AsteroidSwarm's ~60,000-point orbital-element dataset is **not fetched or converted into GPU geometry until the belt is enabled**. Turning it off hides the `THREE.Points` draw call and skips per-frame orbital-clock updates. If the user switches it off during an asynchronous load, the completed load respects the latest visibility setting.
+- **Build evidence:** Vercel project `solar-system-simulator` production deployment `dpl_A43Du2xQdtyLmzoV4pax3dnkTeRy` for commit `2cf59dd` reported **READY** (TypeScript + Vite build). Real-world FPS gain and visual interaction with the embedded button **not yet manually measured**; user should check Tour in a browser.
+- **Scope:** No scientific calculations, main LunLux website files, or presentation deck modified. Live embedded Tour uses the updated fork when its Vercel deployment resolves to this production version.
 
 ## 2026-11-15 — Lane B background music: Borealis by Scott Buckley
 
