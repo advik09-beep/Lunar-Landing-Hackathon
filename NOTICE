@@ -86,6 +86,16 @@ https://www.nasa.gov/nasa-brand-center/images-and-media/
      commit aa00c53 (those bodies are drawn untextured). Remaining open
      items are tracked in THIRD_PARTY_LICENSE_AUDIT.md.
 
+4a. Background music (LunLux website)
+   - "Borealis" by Scott Buckley — released under Creative Commons
+     Attribution 4.0 International (CC BY 4.0).
+     https://www.scottbuckley.com.au/library/borealis/
+     https://creativecommons.org/licenses/by/4.0/
+   - The original audio is streamed from the composer's website only when
+     the visitor enables music. The playback level is 12% and the song loops.
+     The music is not included in this repository and is not licensed under
+     our Apache License.
+
 5. npm packages (installed at build time, not stored in this repository)
    The presentation (presentation/) also uses reveal.js 6.0 (MIT),
    https://revealjs.com/ , three 0.181 (MIT) for the turning cover Moon,
