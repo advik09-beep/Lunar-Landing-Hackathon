@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D33 5/10 — icons | Items 1–4 Vercel READY; reused Lane A icon SVGs on chips and matched drawn pin symbols; build pending |
+| Advik + ChatGPT (Lane B) | D33 6/10 — globe labels | Items 1–5 Vercel READY; Earth-overhead marker and site labels; build pending |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | D33 Lane A part done (items 1–6) | Stay length 1/3/7/14 (Researcher) done within the time box; stopped |
 
@@ -1753,3 +1753,8 @@ Done within the 2-hour time box (all checks passing about 7 minutes after starti
 - Item 4 Vercel build `dpl_9K1ugfHwejYJBrABdqFaXbTDceWG` READY for `a3b774c`.
 - Legend chips now render `verdictIcon()` SVG from Lane A's `panels/shared.ts` and keep word labels; shell forwards the theme variables used by those SVGs. 3D pin canvas textures draw the same four symbolic shapes directly, replacing platform-dependent text glyphs.
 - Build pending before item 6.
+
+### 2026-11-15 — Lane B D33 item 6: Earth-overhead location and site-name labels
+- Item 5 Vercel `dpl_8rZ9QCdV7qLDPFxPhs8Pt4ifyZyS` READY for `c9d96ee`.
+- Moon now places a blue marker where Earth is directly overhead, using `getSceneState().earth.dir` in Moon-fixed coordinates; label reads `Earth overhead`. A permanent selected-site name and hover-site names follow their projected pins, hidden when behind the globe.
+- Build pending before item 7.

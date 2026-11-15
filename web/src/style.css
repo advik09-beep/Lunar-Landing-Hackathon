@@ -114,3 +114,9 @@ body[data-view="overview"] .site-footer { display:none; }
 .tour-info { position:absolute; z-index:9; bottom:24px; right:24px; }
 .tour-info p { top:auto; bottom:32px; }
 .moon-prompt { font-size:1.1rem; font-weight:600; color:var(--llp-text); }
+
+/* D33: site-name callouts stay anchored to 3D Moon coordinates. */
+.moon-site-label { position:absolute; z-index:3; transform:translate(-50%,-100%); pointer-events:none; padding:4px 8px; border-radius:6px; background:var(--llp-glass); backdrop-filter:blur(var(--llp-glass-blur)); -webkit-backdrop-filter:blur(var(--llp-glass-blur)); color:var(--llp-text); font-size:.75rem; max-width:230px; text-align:center; line-height:1.2; }
+.moon-site-label.selected { border-bottom:2px solid var(--llp-link); }
+.moon-site-label.hovered { border-bottom:2px solid var(--llp-muted); }
+.moon-site-label.earth-overhead-label { color:var(--llp-earth); border-bottom:2px solid var(--llp-earth); }

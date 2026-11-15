@@ -105,6 +105,11 @@ export class LunarScene {
   private pointer = new THREE.Vector2();
   private selected: string | null = null;
   private hovered: string | null = null;
+  private selectedNameLabel!: HTMLDivElement;
+  private hoveredNameLabel!: HTMLDivElement;
+  private earthOverheadLabel!: HTMLDivElement;
+  private earthOverheadSprite!: THREE.Sprite;
+  private earthOverheadNormal = new THREE.Vector3();
   private targetCamera: THREE.Vector3 | null = null;
   private targetFocus: THREE.Vector3 | null = null;
   private animationFrame = 0;
@@ -132,6 +137,10 @@ export class LunarScene {
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.5;
     this.container.appendChild(this.renderer.domElement);
+    this.selectedNameLabel = this.createMapLabel('moon-site-label selected');
+    this.hoveredNameLabel = this.createMapLabel('moon-site-label hovered');
+    this.earthOverheadLabel = this.createMapLabel('moon-site-label earth-overhead-label');
+    this.earthOverheadLabel.textContent = 'Earth overhead';
 
     // Transparent canvas lets the shared moving starfield continue behind the Moon.
     this.renderer.setClearColor(0x000000, 0);
@@ -180,6 +189,21 @@ export class LunarScene {
       new THREE.MeshBasicMaterial({ color: 0x9ab4db, transparent: true, opacity: 0.035, side: THREE.BackSide, depthWrite: false }),
     );
     this.scene.add(atmosphere);
+
+    // The sub-Earth point is where Earth would be directly overhead from the lunar surface.
+    // Its Moon-fixed direction comes from the same time-dependent JPL scene as lighting.
+    const earthCanvas = document.createElement('canvas'); earthCanvas.width = 64; earthCanvas.height = 64;
+    const earthContext = earthCanvas.getContext('2d')!;
+    earthContext.fillStyle = THEME.earth;
+    earthContext.beginPath(); earthContext.arc(32,32,19,0,Math.PI*2); earthContext.fill();
+    earthContext.strokeStyle = '#ECF2FF'; earthContext.lineWidth = 4;
+    earthContext.beginPath(); earthContext.arc(32,32,19,0,Math.PI*2); earthContext.stroke();
+    const earthTexture = new THREE.CanvasTexture(earthCanvas);
+    earthTexture.colorSpace = THREE.SRGBColorSpace;
+    this.earthOverheadSprite = new THREE.Sprite(new THREE.SpriteMaterial({map:earthTexture,transparent:true,depthWrite:false}));
+    this.earthOverheadSprite.scale.set(.12,.12,1);
+    this.earthOverheadSprite.visible = false;
+    this.scene.add(this.earthOverheadSprite);
 
     const gridMaterial = new THREE.LineBasicMaterial({ color: 0x7692bb, transparent: true, opacity: 0.19 });
     for (const lat of [-60, -30, 0, 30, 60]) {
@@ -254,6 +278,39 @@ export class LunarScene {
     return null;
   }
 
+  private createMapLabel(className: string): HTMLDivElement {
+    const element = document.createElement('div');
+    element.className = className;
+    element.hidden = true;
+    this.container.append(element);
+    return element;
+  }
+
+  private positionMapLabel(element: HTMLDivElement, surfaceNormal: THREE.Vector3, offset: number): void {
+    // No labels on the far side of the Moon; the foreground Moon always occludes them.
+    if (surfaceNormal.dot(this.camera.position.clone().normalize()) < .09) { element.hidden = true; return; }
+    const position = surfaceNormal.clone().multiplyScalar(offset).project(this.camera);
+    if (position.z < -1 || position.z > 1) { element.hidden = true; return; }
+    element.style.left = ((position.x + 1) * .5 * this.container.clientWidth) + 'px';
+    element.style.top = ((1 - position.y) * .5 * this.container.clientHeight) + 'px';
+    element.hidden = false;
+  }
+
+  private updateMapLabels(): void {
+    const selected = this.markers.find(marker => marker.site.id === this.selected);
+    if (selected) {
+      this.selectedNameLabel.textContent = selected.site.name;
+      this.positionMapLabel(this.selectedNameLabel, selected.normal, 1.14);
+    } else this.selectedNameLabel.hidden = true;
+    const hovered = this.markers.find(marker => marker.site.id === this.hovered && marker.site.id !== this.selected);
+    if (hovered) {
+      this.hoveredNameLabel.textContent = hovered.site.name;
+      this.positionMapLabel(this.hoveredNameLabel, hovered.normal, 1.14);
+    } else this.hoveredNameLabel.hidden = true;
+    if (this.earthOverheadSprite.visible) this.positionMapLabel(this.earthOverheadLabel, this.earthOverheadNormal, 1.14);
+    else this.earthOverheadLabel.hidden = true;
+  }
+
   setSceneState(state: SceneState): void {
     if ([state.sun.dir, state.earth.dir].some(v => v.length !== 3 || !v.every(Number.isFinite))) {
       throw new Error('Invalid Moon-fixed direction vectors from scene data');
@@ -263,13 +320,17 @@ export class LunarScene {
     this.sunLight.position.copy(sun).multiplyScalar(10);
     this.sunLight.intensity = 3.2;
     this.ambientLight.intensity = 0.14;
-
+    this.earthOverheadNormal.copy(toThree(state.earth.dir)).normalize();
+    this.earthOverheadSprite.position.copy(this.earthOverheadNormal).multiplyScalar(1.05);
+    this.earthOverheadSprite.visible = true;
   }
 
   clearSceneState(): void {
     // Never retain a previous date's lighting when data are unavailable.
     this.sunLight.intensity = 0;
     this.ambientLight.intensity = 0.32; // neutral inspection light, not ephemeris
+    this.earthOverheadSprite.visible = false;
+    this.earthOverheadLabel.hidden = true;
   }
 
   setVerdicts(values: Map<string, Verdict>): void {
@@ -347,10 +408,14 @@ export class LunarScene {
     }
     this.controls.update();
     this.inspectionLight.position.copy(this.camera.position);
+    this.updateMapLabels();
     this.renderer.render(this.scene, this.camera);
   };
 
   destroy(): void {
+    this.selectedNameLabel.remove();
+    this.hoveredNameLabel.remove();
+    this.earthOverheadLabel.remove();
     for (const texture of this.pinTextures.values()) texture.dispose();
     this.pinTextures.clear();
     this.selectionTexture.dispose();
