@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D34 item 4 — globe pin label | Items 1–3 verified Vercel READY; side-aligned selected label; checking build |
+| Advik + ChatGPT (Lane B) | D34 item 5/5 — team byline | Items 1–4 Vercel READY; byline in Data and methods and Educator How we know; final build pending |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | D34 Lane A part done | LICENSE + NOTICE, audit reply, Learn redesign, slider/compass/Stand here fixes, README licence; stopped |
 | Collaborative presentation | Initial web deck | Separate `presentation/` draft; Sheldon + Claude science review pending; build unverified |
@@ -1863,3 +1863,8 @@ Done within the 2-hour time box (all checks passing about 7 minutes after starti
 - Item 3 source commit `cff8258`, Vercel `dpl_4RVjmt4guSFaz4bVD5oDbQAWzqmW` READY.
 - Changed 3D selected/hover label projection to the actual pin origin at Moon radius 1.035 (instead of radial offset 1.14). Applied 22px side offset, vertical centering and a left-side flip near the canvas edge to keep text beside rather than over the selected pin.
 - Item 4 build pending; no browser-level visual claim.
+
+### 2026-11-15 — Lane B D34 item 5: authorship byline; cleanup stopped
+- Item 4 commit `80062b1`, Vercel `dpl_Bo8afBdGcRSrcaQNS1Ee8qZ4MQHZ` READY.
+- The Data and methods project credit line now includes the exact words `by Sheldon Spence and Advik Chaudhary`. The Educator How we know display also names both contributors, rather than burying the attribution in the teacher details.
+- This is the final requested D34 source change. Item 5 deployment verification is pending. No wider third-party rights audit or further texture modifications were started.

@@ -159,7 +159,7 @@ app.innerHTML = [
   '    <h2>LunLux — Credits and sources</h2>',
   '    <p>Made for the NASA Space Apps Challenge 2026. <a href="https://github.com/advik09-beep/Lunar-Landing-Hackathon" target="_blank" rel="noopener noreferrer">View the code on GitHub</a>.</p>',
   '    <p>' + SCORE_OWN_FORMULA + '</p>',
-  '    <p><strong>LunLux</strong> — Sunlight and Earth contact for lunar landing sites.</p><p>We distinguish scientific data from visual illustration. The Moon image is aesthetic imagery; it is not used to calculate landing-site visibility.</p>',
+  '    <p><strong>LunLux</strong> — Sunlight and Earth contact for lunar landing sites; by Sheldon Spence and Advik Chaudhary.</p><p>We distinguish scientific data from visual illustration. The Moon image is aesthetic imagery; it is not used to calculate landing-site visibility.</p>',
   ...methodsCredits(sites),
   '  </section>',
   '  <footer class="site-footer">NASA/JPL Horizons; NASA LRO LOLA; Hourly data</footer>',
