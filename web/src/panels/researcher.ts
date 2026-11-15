@@ -218,7 +218,7 @@ function profileSvg(h: number[]): string {
 }
 
 const CSS = `
-.card { padding: var(--_pad); border: 1px solid var(--_border); border-radius: 14px; background: var(--_bg); line-height: 1.45; }
+.card { padding: var(--_pad); border: 0; border-radius: 14px; background: var(--_glass); backdrop-filter: blur(var(--_glass-blur)); -webkit-backdrop-filter: blur(var(--_glass-blur)); line-height: 1.45; }
 .audience { margin: 0 0 4px; font-size: var(--_fs-xs); font-weight: 700; letter-spacing: .08em; color: var(--_link); }
 h2 { margin: 0 0 4px; font-size: var(--_fs-lg); }
 h3 { margin: 20px 0 6px; font-size: 1rem; border-top: 1px solid var(--_border); padding-top: 12px; }

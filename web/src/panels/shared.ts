@@ -29,7 +29,10 @@ export const THEME = Object.freeze({
   out: "#94A3B8",       // verdict Out: slate grey
   edge: "#B48CF0",      // verdict On the edge: violet
   text: "#ECF2FF", muted: "#A8BBD3", warn: "#F28B82", link: "#9CC6FF",
-  bg: "#132138", page: "#091322", border: "#344B69", accent: "#2F5D9A", focus: "#9CC6FF",
+  bg: "#132138", page: "#091322", border: "#344B69", focus: "#9CC6FF",
+  accent: "#4F46B8",    // D31: indigo for selected controls, kept distinct from Earth blue (white text on it 6.45:1)
+  glass: "rgba(19, 33, 56, 0.90)", glassBlur: "14px", // D31 glass panels: at 0.90 every text colour passes 4.5:1 even over white
+  divider: "rgba(168, 187, 211, 0.18)",
   horizon: "#E8E2D0", ground: "#2A2620", groundLine: "#4A443A", sky: "#0D1A2E",
 });
 
@@ -45,6 +48,7 @@ const BASE_CSS = `
   --_accent: var(--llp-accent, ${THEME.accent}); --_focus: var(--llp-focus, ${THEME.focus});
   --_horizon: var(--llp-horizon, ${THEME.horizon}); --_ground: var(--llp-ground, ${THEME.ground});
   --_ground-line: var(--llp-ground-line, ${THEME.groundLine}); --_sky: var(--llp-sky, ${THEME.sky});
+  --_glass: var(--llp-glass, ${THEME.glass}); --_glass-blur: var(--llp-glass-blur, ${THEME.glassBlur}); --_divider: var(--llp-divider, ${THEME.divider});
   /* D30 type and spacing scale */
   --_fs-xs: .75rem; --_fs-sm: .84rem; --_fs-md: .95rem; --_fs-lg: 1.1rem; --_pad: 12px 14px; --_gap: 8px;
   color: var(--_text);

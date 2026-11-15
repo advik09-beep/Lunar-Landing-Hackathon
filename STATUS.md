@@ -6,7 +6,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 |-----|------|-----------|
 | Advik + ChatGPT (Lane B) | D30 presentation pass COMPLETE — STOPPED | Tour / Explore / Compare / Report; desktop verified, TypeScript and production build PASS |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
-| Claude Code (Lane A) | D30 Lane A part done | Panels follow the D30 theme, short names, Historic tag, interface v1.3 (shared reading level); stopped |
+| Claude Code (Lane A) | D31 Lane A part done | Glass panels, flat sections, hollow Partial, full-width grid; stopped |
 
 Acceptance (both humans): steps 1, 2, 3, 6, 8 PASS; step 4 and 7 pending earlier findings. Signed: D7–D23 (see PLAN), **D24–D28** (title card + tour nav, tour captions, why the south pole, one clock, A/B scenarios + requirements filter). Rule: no status-only pushes.
 Waiting on Sheldon: review the revised captions, the south-pole one-liner and the D28 planner on web/panels.html.
@@ -1548,4 +1548,18 @@ SOUTH_POLE.sources;          // [{ name, url }]
   - **Lane B:** pass `level` from your single header switch when mounting, and call `update({ level })` on every panel when it changes.
 - **Bug caught before committing:** the bulk colour replacement had also rewritten the theme definitions into self-references (`--_sun: var(--_sun)`), which would have left the colours undefined. The theme test caught it and it was restored.
 - **Checks:** all nine check scripts PASS. Panel tests PASS, including the new v1.3/theme/plain-language test; the original D16 panel test was retired, since the D17 test replaces it. `/web` build OK.
+
+### 2026-11-14 — D31 second presentation pass: recorded; Lane A panel part DONE
+- **D31 recorded in PLAN.md.** Lane B brief added to DESIGN.md → "Presentation pass" → "Second pass (D31)": full-screen Tour with the title bottom-left over a gradient, the "Click on the Moon" prompt, the Moon on the starfield opening on the whole Moon turned to the site with a labeled night-side fill light, the ring centred on its pin, one legend-chip style (none on Compare), plain words instead of "MOON-FIXED VIEW" / "no terrain mesh" / raw timestamps.
+- **Glass panels:**
+  - Every Lane A panel uses `background: rgba(19, 33, 56, 0.90)` with `backdrop-filter: blur(14px)` and no border. **One variable** for the shell: `--llp-glass` (and `--llp-glass-blur`, `--llp-divider`).
+  - **Why 0.90:** over pure white behind the glass, every text colour still passes 4.5 : 1 (worst: violet 4.53, slate 4.67, Earth blue 4.71, muted 6.11). At 0.86 violet drops to 3.96 and at 0.78 to 2.99.
+- **Accent:** indigo `#4F46B8` for selected controls, distinct from Earth blue `#5AA9E6`; white text on it is 6.45 : 1.
+- **Flat sections, no nested boxes:**
+  - The side card verdict is a line with a round symbol between thin dividers.
+  - The side card score box, the grid's score box and the planner's A/B fieldsets are sections under a divider.
+- **Verdicts:** Clear solid green, **Partial hollow green outline**, Out slate grey, On the edge violet with a dashed ring. The DESIGN.md colour list is updated.
+- **Dates grid:** full panel width (fixed-width site column, stretching day columns).
+- **"Hour by hour" note:** now one line, "Top half: sunlight. Bottom half: Earth in view. Outline: your stay; dashed line: the chosen hour."
+- **Checks:** all nine check scripts PASS. Panel tests PASS, with the theme test extended for D31 (hollow Partial, glass + no border + one variable, indigo accent, no nested boxes, full-width grid, one-line note). `/web` build OK.
 

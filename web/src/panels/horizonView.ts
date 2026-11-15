@@ -220,7 +220,7 @@ function readout(name: string, el: number, azDeg: number, margin: number, visibl
 }
 
 const CSS = `
-.card { padding: var(--_pad); border: 1px solid var(--_border); border-radius: 14px; background: var(--_bg); line-height: 1.45; }
+.card { padding: var(--_pad); border: 0; border-radius: 14px; background: var(--_glass); backdrop-filter: blur(var(--_glass-blur)); -webkit-backdrop-filter: blur(var(--_glass-blur)); line-height: 1.45; }
 h2 { margin: 0 0 4px; font-size: var(--_fs-lg); }
 p { margin: 6px 0; }
 .small { font-size: var(--_fs-sm); }

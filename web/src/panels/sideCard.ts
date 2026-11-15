@@ -342,7 +342,7 @@ function earthNote(st: State): string {
 }
 
 const CSS = `
-.card { padding: var(--_pad); border: 1px solid var(--_border); border-radius: 14px; background: var(--_bg); line-height: 1.5; }
+.card { padding: var(--_pad); border: 0; border-radius: 14px; background: var(--_glass); backdrop-filter: blur(var(--_glass-blur)); -webkit-backdrop-filter: blur(var(--_glass-blur)); line-height: 1.5; }
 h2 { margin: 0 0 4px; font-size: var(--_fs-lg); }
 h3 { margin: 18px 0 6px; font-size: .95rem; }
 p { margin: 6px 0; }
@@ -350,13 +350,13 @@ p { margin: 6px 0; }
 .switch { display: inline-flex; margin: 12px 0; border: 1px solid var(--_border); border-radius: 999px; overflow: hidden; }
 .switch button { padding: 6px 16px; border: 0; background: transparent; color: inherit; }
 .switch button[aria-pressed="true"] { background: var(--_accent); font-weight: 650; }
-.verdict { display: flex; gap: 12px; align-items: center; padding: 10px 14px; border-radius: 10px; border: 2px solid; }
-.verdict .symbol { font-size: 1.6rem; line-height: 1; }
+.verdict { display: flex; gap: 12px; align-items: center; padding: 10px 0; border-top: 1px solid var(--_divider); border-bottom: 1px solid var(--_divider); }
+.verdict .symbol { display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; border-radius: 50%; font-size: 1.1rem; line-height: 1; color: #0b1322; border: 2px solid transparent; }
 .verdict strong { font-size: 1.15rem; }
-.verdict[data-verdict="clear"] { border-color: var(--_clear); background: rgba(79,191,122,.12); }
-.verdict[data-verdict="partial"] { border-color: var(--_partial); background: linear-gradient(90deg, rgba(79,191,122,.18) 50%, transparent 50%); }
-.verdict[data-verdict="out"] { border-color: var(--_out); background: rgba(148,163,184,.10); }
-.verdict[data-verdict="edge"] { border-color: var(--_edge); background: rgba(180,140,240,.12); border-style: dashed; }
+.verdict[data-verdict="clear"] .symbol { background: var(--_clear); }
+.verdict[data-verdict="partial"] .symbol { background: transparent; border-color: var(--_partial); color: var(--_partial); }
+.verdict[data-verdict="out"] .symbol { background: var(--_out); }
+.verdict[data-verdict="edge"] .symbol { background: var(--_edge); border: 2px dashed #0b1322; }
 .tag { display: inline-block; padding: 1px 7px; margin-right: 4px; border-radius: 6px; font-size: .72rem; font-weight: 700; letter-spacing: .06em; border: 1px solid currentColor; }
 .tag[data-model="flat"] { color: var(--_muted); }
 .tag[data-model="lola"] { color: var(--_clear); }
@@ -373,7 +373,7 @@ thead th { color: var(--_muted); font-weight: 600; }
 .days button, .csv { padding: 6px 12px; border: 1px solid var(--_border); border-radius: 8px; background: transparent; color: inherit; }
 .csv { margin-top: 10px; }
 .exits { display: flex; gap: 8px; margin-top: 10px; }
-.score { margin-top: 14px; padding: 10px 14px; border: 1px solid var(--_border); border-radius: 10px; }
+.score { margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--_divider); }
 .score .big { font-size: 1.05rem; }
 .tag.cat[data-cat="historic"] { color: var(--_muted); }
 .tag.cat[data-cat="candidate"] { color: var(--_link); }

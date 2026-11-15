@@ -75,13 +75,13 @@ Plain-language brief for the app shell (Lane B builds the structure; both lanes 
 | Sun | `#F2C14E` gold | the Sun and sunlight, **only** | 9.6 : 1 |
 | Earth | `#5AA9E6` blue | Earth and contact, **only** | 6.3 : 1 |
 | Clear | `#4FBF7A` green, solid | verdict ✓ Clear | 7.0 : 1 |
-| Partial | `#4FBF7A` green, **half-filled outline** | verdict ◐ Partial (never yellow) | 7.0 : 1 |
+| Partial | `#4FBF7A` green, **hollow outline** (D31) | verdict ◐ Partial (never yellow) | 7.0 : 1 |
 | Out | `#94A3B8` slate grey | verdict ✕ Out | 6.3 : 1 |
 | On the edge | `#B48CF0` violet, dashed outline | verdict ⚠ On the edge | 6.1 : 1 |
 | Text / muted | `#ECF2FF` / `#A8BBD3` | body text / secondary text | 14.4 / 8.2 : 1 |
 | Warning | `#F28B82` coral | real warnings only (e.g. "Unavailable") | 6.8 : 1 |
 | Link | `#9CC6FF` | links | 9.2 : 1 |
-| Card / border / accent | `#132138` / `#344B69` / `#2F5D9A` | surfaces, lines, selected buttons (decorative; text on the accent is 5.9 : 1) | — |
+| Card / divider / accent | `#132138` / `rgba(168,187,211,0.18)` / `#4F46B8` indigo (D31) | surfaces, thin dividers, selected controls; the accent is indigo so it never reads as Earth blue (white text on it 6.45 : 1) | — |
 
 Dark text (`#0B1322`) on the verdict fills is 7.0 : 1 or better. The panels use these as defaults through CSS variables. The shell can set the same variables once on a parent element, and the panels then follow:
 
@@ -90,7 +90,8 @@ Dark text (`#0B1322`) on the verdict fills is 7.0 : 1 or better. The panels use 
   --llp-sun: #F2C14E; --llp-earth: #5AA9E6;
   --llp-clear: #4FBF7A; --llp-partial: #4FBF7A; --llp-out: #94A3B8; --llp-edge: #B48CF0;
   --llp-text: #ECF2FF; --llp-muted: #A8BBD3; --llp-warn: #F28B82; --llp-link: #9CC6FF;
-  --llp-bg: #132138; --llp-border: #344B69; --llp-accent: #2F5D9A; --llp-focus: #9CC6FF;
+  --llp-bg: #132138; --llp-border: #344B69; --llp-accent: #4F46B8; --llp-focus: #9CC6FF;
+  --llp-glass: rgba(19, 33, 56, 0.90); --llp-glass-blur: 14px; --llp-divider: rgba(168, 187, 211, 0.18);
 }
 ```
 The same values are exported as `THEME` from `web/src/panels/shared.ts` for code that draws (e.g. globe pins).
@@ -103,4 +104,32 @@ The same values are exported as `THEME` from `web/src/panels/shared.ts` for code
 - **Short site names** (`shortName` from `listSites()`, e.g. "Apollo 11", "Malapert") appear in lists and grids; the full name stays in the card.
 - No TERRAIN tag on grid rows (every site has terrain). Historic sites are tagged **"Historic"**.
 - **One reading-level switch:** panel interface v1.3 adds `level?: "educator" | "researcher"` to the props and `update({ level })`. With a single Educator / Researcher switch in the shell header, pass `level` when mounting and call `update({ level })` on every panel when it changes. The panels then hide their own switches. The Researcher panel (Report tab) and the planner are always the full view.
+
+### Second pass (D31, both humans, 2026-11-14): full-screen scenes, glass panels
+**Look:** full-screen scenes with no boxes; panels are glass floating over the scene; the blue accent for controls is indigo `#4F46B8`, kept distinct from Earth blue `#5AA9E6`.
+
+**Lane B builds:**
+- **Tour** fills the window edge to edge, with no bordered card. The title sits bottom-left over the scene, with a soft dark gradient behind the text so it stays readable.
+- **The tour's final stop** shows a clear prompt: **"Click on the Moon"**.
+- **Explore:**
+  - The Moon sits directly on the starfield, with no box, header strip or caption lines.
+  - It opens on the **whole Moon, turned to the selected site**.
+  - A faint fill light on the night side means it's never a black disc. Label that light as a visual aid (e.g. in the info tip: "a faint light shows the night side; it is not sunlight").
+- **The selected-site ring is centred on its pin.**
+- **Legend chips** all share one style, and none looks like an active filter (no highlighted or pressed chip). No shell chips on Compare, because the dates grid has its own legend.
+- **Plain words:** replace "MOON-FIXED VIEW", "no terrain mesh" and raw timestamps with plain words, and move the details into the info tip. For example:
+  - "The Moon is shown from a fixed viewpoint; the Sun and Earth move around it."
+  - "The globe is smooth; mountains and craters are in the Horizon view."
+  - "Monday 14 Nov 2026, 06:00 UTC" instead of "2026-11-14T06:00:00Z".
+
+**Glass panels** (Lane A panels already do this; the shell should match):
+- Background `rgba(19, 33, 56, 0.90)` with `backdrop-filter: blur(14px)`, rounded corners, **no borders**.
+- At 0.90 opacity every text colour still passes 4.5 : 1, even if pure white sits behind the glass (worst case: violet 4.53 : 1, muted text 6.11 : 1). At lower opacity small text can fail over the bright Moon, so keep 0.90 or higher.
+- One variable sets it for every panel: `--llp-glass` (plus `--llp-glass-blur`). Set it once on a parent element.
+
+**Flat inside:** no boxes inside panels. Sections are separated by spacing and thin dividers (`--llp-divider`).
+- The verdict is a line with a round symbol: Clear solid green, Partial hollow green ring, Out grey, On the edge violet with a dashed ring.
+- The score is a section under a divider, not a box.
+
+**Dates grid:** uses the full width of its panel (columns stretch; site names in a fixed first column).
 

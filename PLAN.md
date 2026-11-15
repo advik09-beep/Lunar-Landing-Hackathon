@@ -205,6 +205,22 @@ and researchers get the numbers behind them.
   and one shell-wide Educator / Researcher switch (panel interface v1.3).
   Details: DESIGN.md, "Presentation pass".
 
+- D31 Second presentation pass (both humans, 2026-11-14): full-screen
+  scenes with no boxes, glass panels, a blue accent kept distinct from
+  Earth blue. Lane B: the Tour fills the window edge to edge with the
+  title bottom-left over a soft gradient; the tour's final stop says
+  "Click on the Moon"; Explore puts the Moon directly on the starfield
+  (no box, header strip or caption lines), opening on the whole Moon
+  turned to the selected site with a faint night-side fill light
+  labeled as a visual aid; the selected-site ring is centred on its pin;
+  all legend chips share one style and none looks like an active filter,
+  with no shell chips on Compare; "MOON-FIXED VIEW", "no terrain mesh"
+  and raw timestamps become plain words, details in the info tip.
+  Lane A: glass panels (translucent with blur, opaque enough to pass
+  contrast, one shell variable, no borders); flatten nested cards;
+  Partial becomes a hollow green outline; the dates grid uses the full
+  width; one short "Hour by hour" line. Details: DESIGN.md.
+
 ## Settled earlier (do not reopen without both humans)
 - 10 fixed sites: 3 Apollo, Chandrayaan-3, IM-1, IM-2, 4 south pole
   representative points.

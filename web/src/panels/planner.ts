@@ -165,14 +165,14 @@ export const mountPlanner: MountPanel = (container, props) => {
 };
 
 const CSS = `
-.card { padding: var(--_pad); border: 1px solid var(--_border); border-radius: 14px; background: var(--_bg); line-height: 1.45; }
+.card { padding: var(--_pad); border: 0; border-radius: 14px; background: var(--_glass); backdrop-filter: blur(var(--_glass-blur)); -webkit-backdrop-filter: blur(var(--_glass-blur)); line-height: 1.45; }
 h2 { margin: 0 0 4px; font-size: 1.15rem; }
 h2:not(:first-child) { margin-top: 22px; border-top: 1px solid var(--_border); padding-top: 14px; }
 h3 { margin: 14px 0 4px; font-size: .95rem; }
 p { margin: 6px 0; }
 .small { font-size: var(--_fs-sm); }
 .scen { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-fieldset { border: 1px solid var(--_border); border-radius: 10px; padding: 8px 10px; display: grid; gap: 6px; font-size: .85rem; }
+fieldset { border: 0; border-top: 1px solid var(--_divider); border-radius: 0; padding: 8px 0; display: grid; gap: 6px; font-size: .85rem; }
 legend { font-weight: 700; padding: 0 4px; }
 label { display: grid; gap: 3px; color: var(--_muted); }
 select, input { font: inherit; padding: 4px 6px; border-radius: 6px; border: 1px solid var(--_border); background: transparent; color: var(--_text); }

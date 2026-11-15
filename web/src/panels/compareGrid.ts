@@ -112,7 +112,7 @@ export const mountCompareGrid: MountPanel = (container, props) => {
         <span class="muted">${esc(dates[0])} to ${esc(dates[COLS - 1])}</span>
         <button type="button" data-action="later">${SHIFT} days later ▶</button>
       </nav>
-      <div class="scroll"><table class="grid">
+      <div class="scroll"><table class="grid"><colgroup><col class="sitecol"/></colgroup>
         <thead><tr><th scope="col" class="corner">Site</th>${head}</tr></thead>
         <tbody>${rows}</tbody>
       </table></div>
@@ -204,7 +204,7 @@ export const mountCompareGrid: MountPanel = (container, props) => {
     } catch { summary = `No data for a ${days}-day stay from ${esc(current.landingDate)}.`; }
     return `
       <h3>Hour by hour: ${esc(site.shortName)}</h3>
-      <p class="muted small">Top half filled = sunlight; bottom half filled = Earth in view; both = full bar; neither = empty. Hatched = no data. The outlined block is the selected stay; the dashed line is the selected hour.</p>
+      <p class="muted small">Top half: sunlight. Bottom half: Earth in view. Outline: your stay; dashed line: the chosen hour.</p>
       <svg class="strip" viewBox="0 0 ${W} ${Hh + 18}" role="img" aria-label="${esc(`Hourly sunlight and Earth in view for ${site.name}, ${dates[0]} to ${dates[dates.length - 1]}. ${summary}`)}">
         <defs><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" class="nodata-bg"/><line x1="0" y1="0" x2="0" y2="6" class="hatch"/></pattern></defs>
         <rect x="0" y="0" width="${W}" height="${Hh}" class="bg"/>
@@ -236,7 +236,7 @@ export const mountCompareGrid: MountPanel = (container, props) => {
 };
 
 const CSS = `
-.card { padding: var(--_pad); border: 1px solid var(--_border); border-radius: 14px; background: var(--_bg); line-height: 1.45; }
+.card { padding: var(--_pad); border: 0; border-radius: 14px; background: var(--_glass); backdrop-filter: blur(var(--_glass-blur)); -webkit-backdrop-filter: blur(var(--_glass-blur)); line-height: 1.45; }
 h2 { margin: 0 0 4px; font-size: var(--_fs-lg); }
 h3 { margin: 18px 0 4px; font-size: .95rem; }
 p { margin: 6px 0; }
@@ -245,21 +245,22 @@ p { margin: 6px 0; }
 .window { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 8px 0; font-size: .85rem; }
 .window button { padding: 5px 10px; border: 1px solid var(--_border); border-radius: 8px; background: transparent; color: inherit; }
 .scroll { overflow-x: auto; }
-table.grid { border-collapse: separate; border-spacing: 2px; font-size: .78rem; }
+table.grid { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 2px; font-size: .78rem; }
+.grid col.sitecol { width: 9.5rem; }
 .grid th, .grid td { padding: 0; text-align: center; }
-.grid thead th button { width: 26px; padding: 2px 0; border: 0; background: transparent; color: var(--_muted); font-size: .72rem; white-space: nowrap; }
+.grid thead th button { width: 100%; padding: 2px 0; border: 0; background: transparent; color: var(--_muted); font-size: .72rem; white-space: nowrap; }
 .grid thead th.sel button { color: var(--_text); font-weight: 700; text-decoration: underline; }
-.grid th[scope="row"] { text-align: left; padding-right: 8px; white-space: nowrap; position: sticky; left: 0; background: var(--_bg); }
+.grid th[scope="row"] { text-align: left; padding-right: 8px; white-space: nowrap; position: sticky; left: 0; background: transparent; overflow: hidden; text-overflow: ellipsis; }
 .grid th[scope="row"] button { border: 0; background: transparent; color: inherit; padding: 2px 0; text-align: left; font-size: .8rem; max-width: 230px; overflow: hidden; text-overflow: ellipsis; vertical-align: middle; }
 .grid tr.selrow th[scope="row"] button { font-weight: 700; }
 .corner { text-align: left; color: var(--_muted); font-weight: 500; }
-.v { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 5px; border: 1px solid transparent; color: #0b1322; font-weight: 700; font-size: .85rem; line-height: 1; padding: 0; }
+.v { display: inline-flex; align-items: center; justify-content: center; width: 100%; max-width: 34px; height: 24px; border-radius: 5px; border: 1px solid transparent; color: #0b1322; font-weight: 700; font-size: .85rem; line-height: 1; padding: 0; }
 button.v { cursor: pointer; }
 .v[data-verdict="clear"] { background: var(--_clear); }
-.v[data-verdict="partial"] { background: linear-gradient(90deg, var(--_partial) 50%, transparent 50%); border: 2px solid var(--_partial); color: var(--_text); }
+.v[data-verdict="partial"] { background: transparent; border: 2px solid var(--_partial); color: var(--_partial); }
 .v[data-verdict="out"] { background: var(--_out); }
 .v[data-verdict="edge"] { background: var(--_edge); border: 1px dashed #0b1322; }
-.v.na, td.na span { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; color: var(--_muted); background: transparent; border: 1px dashed var(--_border); border-radius: 5px; }
+.v.na, td.na span { display: inline-flex; align-items: center; justify-content: center; width: 100%; max-width: 34px; height: 24px; color: var(--_muted); background: transparent; border: 1px dashed var(--_border); border-radius: 5px; }
 td.selcell .v, td.selcell span { outline: 3px solid var(--_text); outline-offset: 1px; }
 .tag { display: inline-block; padding: 0 5px; border-radius: 5px; font-size: .62rem; font-weight: 700; letter-spacing: .05em; border: 1px solid currentColor; vertical-align: middle; }
 .tag[data-model="flat"] { color: var(--_muted); }
@@ -269,7 +270,7 @@ svg.strip { width: 100%; height: auto; display: block; }
 .filter select { font: inherit; padding: 2px 6px; border-radius: 6px; border: 1px solid var(--_border); background: transparent; color: inherit; }
 .cmp { font-size: .75rem; color: var(--_muted); font-style: italic; }
 .tag.hist { color: var(--_muted); }
-.score-box { margin-top: 16px; padding: 10px 14px; border: 1px solid var(--_border); border-radius: 10px; }
+.score-box { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--_divider); }
 .score-box .big { font-size: 1.02rem; }
 .proto { display: inline-block; padding: 0 6px; border-radius: 5px; font-size: .68rem; letter-spacing: .06em; border: 1px dashed var(--_muted); color: var(--_muted); vertical-align: middle; }
 .switch { display: inline-flex; margin: 6px 0; border: 1px solid var(--_border); border-radius: 999px; overflow: hidden; }
