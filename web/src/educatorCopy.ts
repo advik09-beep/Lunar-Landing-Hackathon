@@ -108,7 +108,7 @@ export function syncShellCopy(level: ReadingLevel): void {
   aria('side-card-mount', 'What happens at this place', 'Site conditions and Educator Researcher details');
   aria('date-prev', 'Go back one week', 'Move landing date seven days earlier');
   aria('date-next', 'Go forward one week', 'Move landing date seven days later');
-  for (const tip of document.querySelectorAll<HTMLElement>('.clock-tip > summary')) {
+  for (const tip of Array.from(document.querySelectorAll<HTMLElement>('.clock-tip > summary'))) {
     tip.setAttribute('aria-label', kid ? 'For the teacher' : tip.closest('.tour-info') ?
       'About the solar system scene' : 'About the date and inspection time');
   }

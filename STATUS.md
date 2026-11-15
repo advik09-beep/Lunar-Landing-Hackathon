@@ -1665,3 +1665,8 @@ SOUTH_POLE.sources;          // [{ name, url }]
 - Educator Tour instructions, navigation, toolbar, day/hour display, site picker groups, view controls, verdict legend, tooltips and footer now use short everyday words and avoid raw timestamps and degree labels. Researcher retains its original labels and UTC clock.
 - Detailed Tour sources and original Credits references/license notices remain accessible under `For the teacher` in Educator; Researcher retains full sources.
 - Build status for item 5: pending Vercel verification before marking D32 complete.
+
+### 2026-11-14 — Lane B D32 item 5: TypeScript build fix
+- Vercel build `dpl_AgbA6HgD7Q18uUpEzxZ9uvEgkagy` for `0af465b` reported TypeScript TS2488: NodeList is not iterable under the app's compiler settings.
+- Changed the Educator tip loop to iterate over `Array.from(querySelectorAll(...))`. No functionality or scope change.
+- Awaiting new Vercel build check; item 5 not yet marked passed.
