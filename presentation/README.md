@@ -1,6 +1,8 @@
 # LunLux — animated web presentation
 
-A standalone Reveal.js + Vite presentation. This is a **collaborative draft**, separate from production LunLux (`web/`).
+A standalone Reveal.js + Vite presentation. **This is the official LunLux presentation working deck, designated by Advik; it still needs changes and has not received final approval.** It is separate from production LunLux (`web/`).
+
+**Local preview link (on the computer running Vite only):** `http://127.0.0.1:5179/`. This is a loopback address, **not a public URL**; opening it on GitHub or another person's device will not show the slides unless that device is running the presentation server on port 5179. GitHub source: `presentation/index.html`. A publicly shareable presentation link requires a separate deployment.
 
 **Development:** `cd presentation && npm install && npm run dev`.
 

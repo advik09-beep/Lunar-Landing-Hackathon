@@ -7,7 +7,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 | Advik + ChatGPT (Lane B) | D34 item 5/5 — team byline | Items 1–4 Vercel READY; byline in Data and methods and Educator How we know; final build pending |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | Learn full width + Watch a month + Can you tell? done; slide 9 / 10 | stopped |
-| Collaborative presentation | Initial web deck | Separate `presentation/` draft; Sheldon + Claude science review pending; build unverified |
+| Collaborative presentation | Official working slides — changes required | Advik designated `presentation/` the official working deck; local preview `http://127.0.0.1:5179/` is not public. Revisions, Sheldon + Claude science review, build verification and final human approval pending. |
 
 Acceptance (both humans): steps 1, 2, 3, 6, 8 PASS; step 4 and 7 pending earlier findings. Signed: D7–D23 (see PLAN), **D24–D28** (title card + tour nav, tour captions, why the south pole, one clock, A/B scenarios + requirements filter). Rule: no status-only pushes.
 Waiting on Sheldon: read the new Educator screens on web/panels.html (level = Educator) and the Learn tab; confirm the two NASA photos and their captions.

@@ -1,5 +1,7 @@
 # LunLux presentation — shared board
-**2026-11-15 — Initial scaffold, not yet signed off**
+**2026-11-15 — Official working slide deck; changes required before final approval**
+
+**Designated by Advik:** the deck in `presentation/` is the **official LunLux slides (working version)**. Local-only preview: `http://127.0.0.1:5179/`. This is not a public GitHub or Vercel link; it works only where the local dev server is running. **Do not call the slides final or submission-ready:** user requests revisions; scientific review, build verification, and both humans' final sign-off remain pending.
 
 | Who | Focus | Status |
 |---|---|---|
