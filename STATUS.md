@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D30 presentation pass COMPLETE — STOPPED | Tour / Explore / Compare / Report; desktop verified, TypeScript and production build PASS |
+| Advik + ChatGPT (Lane B) | D31 item 1 — in progress; built | Edge-to-edge Tour scene without card; bottom-left title over a soft dark gradient. |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | D31 Lane A part done | Glass panels, flat sections, hollow Partial, full-width grid; stopped |
 
@@ -541,6 +541,11 @@ Second task, only after the copy passes and with Advik's authorization: Step 4 T
 ### 2026-11-14 — D30 presentation pass, structure verification
 - Desktop verification complete; remove residual Explore/Compare page overflow and clarify Reset view camera action. Presentation pass complete; stop here.
 - Files: web/src/main.ts, web/src/style.css. TypeScript and Vite/postbuild executed: PASS. Production at https://lunar-landing-hackathon.vercel.app verified in a desktop browser: Tour title and moving simulator, four-tab navigation, all 10 API-backed site options, shared date/hour and Educator/Researcher controls, Globe/Horizon, Compare grid plus planner, Report and methods; no browser console warnings/errors. All eight preceding Vercel builds READY. Final overflow/camera-label refinement built successfully; deployment check follows. Scientific APIs and Lane A panels unchanged.
+
+
+### 2026-11-14 — D31 second presentation pass, item 1
+- Edge-to-edge Tour scene without card; bottom-left title over a soft dark gradient.
+- Files: web/src/style.css. TypeScript and Vite/postbuild executed: PASS. Production: https://lunar-landing-hackathon.vercel.app . Each prior item's Vercel deployment checked READY before continuing; this commit's deployment check follows. Scientific APIs and Lane A panels unchanged.
 
 ## Lane A
 

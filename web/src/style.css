@@ -56,12 +56,12 @@ p { margin:8px 0; }
 .verdict-chip.partial { background:linear-gradient(90deg,#4FBF7A22 50%,transparent 50%); color:var(--llp-partial); border-color:var(--llp-partial); }
 .verdict-chip.out { color:var(--llp-out); border-color:var(--llp-out); }
 .verdict-chip.edge { color:var(--llp-edge); border:1px dashed var(--llp-edge); }
-.overview-view { margin:24px 0 0; }
-.overview-window { position:relative; height:calc(100dvh - 136px); min-height:480px; border:1px solid var(--llp-border); border-radius:8px; overflow:hidden; background:#060d17; }
-.overview-stage { position:absolute; inset:0 0 0 28%; height:100%; width:72%; }
+.overview-view { position:fixed; inset:0; margin:0; z-index:0; }
+.overview-window { position:absolute; inset:0; height:100%; border:0; border-radius:0; overflow:hidden; background:#060d17; }
+.overview-stage { position:absolute; inset:0; height:100%; width:100%; }
 .overview-stage canvas,.overview-stage iframe { display:block; width:100%; height:100%; border:0; }
 .overview-caption,.overview-mission-message,.overview-footer { display:none; }
-.overview-title-card { position:absolute; z-index:8; inset:0 auto 0 0; width:36%; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; text-align:left; padding:32px; gap:16px; background:linear-gradient(90deg,#091322fa,#091322e8 75%,#09132200); }
+.overview-title-card { position:absolute; z-index:8; left:0; bottom:0; width:min(640px,60%); display:flex; flex-direction:column; align-items:flex-start; text-align:left; padding:96px 64px 56px 32px; gap:16px; background:radial-gradient(ellipse at bottom left,#091322f5 15%,#091322d0 45%,#09132200 75%); }
 .overview-title-card h2 { font-size:3rem; font-weight:400; letter-spacing:-.07em; margin:0; }
 .overview-title-card p { margin:0; max-width:31ch; }
 .overview-title-subtitle { font-size:1.1rem; line-height:1.4; }
@@ -105,3 +105,6 @@ p { margin:8px 0; }
 .site-footer { display:flex; justify-content:flex-end; margin:8px 0; font-size:.75rem; color:var(--llp-muted); }
 ::-webkit-scrollbar { width:7px; height:7px; }
 ::-webkit-scrollbar-thumb { background:var(--llp-border); border-radius:8px; }
+
+body[data-view="overview"] .topbar { position:relative; z-index:20; border-bottom-color:transparent; background:linear-gradient(#091322b0,transparent); }
+body[data-view="overview"] .site-footer { display:none; }
