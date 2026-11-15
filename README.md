@@ -2,7 +2,7 @@
 
 **Sunlight and Earth contact for lunar landing sites**
 
-**NASA Space Apps Challenge 2026, by Sheldon Spence and Advik Chaudhary**
+**NASA Space Apps Challenge 2026, by the LunLux team**
 
 **Live site:** https://lunar-landing-hackathon.vercel.app (desktop browsers)
 
@@ -79,7 +79,7 @@ The data are static JSON files in `data/`. There is no backend.
 - Every Horizons setting was confirmed in the Horizons manual and API documentation and checked against the header of the actual output. The details, with quotes, are in [`data/README.md`](data/README.md).
 - **Coverage:** every hour of 2026–2029 for all 10 sites, plus 30 days around each past landing.
 
-**Hand-checks (a human, not a script):** Sheldon queried the Horizons web app by hand at seven site/time/body combinations, and all seven matched our files to six decimals:
+**Hand-checks (a human, not a script):** The Lane A lead queried the Horizons web app by hand at seven site/time/body combinations, and all seven matched our files to six decimals:
 - Apollo 11, 2026-11-14 12:00 UTC: Sun and Earth
 - IM-1, 2026-11-17 08:00 UTC: Sun and Earth
 - Malapert (original point), 2026-11-20 06:00 UTC: Sun and Earth
@@ -186,8 +186,8 @@ All in-app credits are under **Data and methods** on the site.
 - **In conversation, too:** Claude (Anthropic) and ChatGPT (OpenAI) were also used in chat for planning, reviewing work, writing the instructions given to the coding assistants, and checking results.
 - **On-screen text:** the assistants wrote most of the text on screen; the team reviewed it.
 - **Slide deck:** both assistants worked on the presentation in `presentation/`.
-- **Claude Code (Anthropic), with Sheldon (Lane A, "numbers"):** the data download scripts, the data files, everything in `lib/`, the terrain horizon method, the twelve check scripts, `data/README.md`, the screen panels inside the site (side card, Compare grid, Stand here, Report and Learn, Planner), the final colour pass across the whole site and deck (D35), and this README. It read the JPL Horizons, PDS and NASA documentation to confirm settings and quoted them, rather than relying on memory.
-- **ChatGPT / Codex (OpenAI), with Advik (Lane B, "screen"):** the web app shell, the tabs and toolbar, the Three.js Moon and its lighting, the embedded Tour, the Data and methods page, and the Vercel deployment.
+- **Claude Code (Anthropic), with the Lane A lead ("numbers"):** the data download scripts, the data files, everything in `lib/`, the terrain horizon method, the twelve check scripts, `data/README.md`, the screen panels inside the site (side card, Compare grid, Stand here, Report and Learn, Planner), the final colour pass across the whole site and deck (D35), and this README. It read the JPL Horizons, PDS and NASA documentation to confirm settings and quoted them, rather than relying on memory.
+- **ChatGPT / Codex (OpenAI), with the Lane B lead ("screen"):** the web app shell, the tabs and toolbar, the Three.js Moon and its lighting, the embedded Tour, the Data and methods page, and the Vercel deployment.
 - **The humans:**
   - Made every decision (scope, the 10 sites, the verdict numbers, the score weights, which point to use at Malapert), recorded as signed decisions in [`PLAN.md`](PLAN.md).
   - Approved each step before the next one started.

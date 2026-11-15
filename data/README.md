@@ -58,7 +58,7 @@ What the docs say:
 What it means for us (our own calculation, not a doc statement): after 2027-02-08 a UTC time could be off by at most about one second, if a leap second is added that Horizons doesn't know about yet. The Sun moves about 360° per 29.5 days across the lunar sky, about 0.00014° per second of time. So the angle error is about 0.0002° at most, far below our 0.1° tolerance and below the 0.0005° storage rounding. **No action needed; the data is usable through 2029.**
 
 ## Checks run (2026-11-14)
-- **Hand-checks:** 7 of 7 values from the Horizons web app (Sheldon) match our first 7-day files to six decimals. The six planned rows are apollo11 2026-11-14 12:00, im1 2026-11-17 08:00 and sp_malapert 2026-11-20 06:00, each Sun and Earth. The seventh is sp_malapert Sun 2026-11-17 08:00.
+- **Hand-checks:** 7 of 7 values from the Horizons web app (the Lane A lead) match our first 7-day files to six decimals. The six planned rows are apollo11 2026-11-14 12:00, im1 2026-11-17 08:00 and sp_malapert 2026-11-20 06:00, each Sun and Earth. The seventh is sp_malapert Sun 2026-11-17 08:00.
 - **Regression:** `scripts/check_ephem.mjs` re-reads the same 7 rows from the widened files: 7/7 within 0.0005° (max difference 0.000431°, which is the 3-decimal rounding). PASS.
 - **Apollo 11 landing:** at the landing hour (1969-07-20 20:00 UTC) the Sun is at azimuth 88.804°, elevation 10.553°: low in the east.
 - **Earth:** high (> 30°) at the Apollo sites, within 10° of the horizon at the four south-pole sites.
@@ -109,7 +109,7 @@ What it means for us (our own calculation, not a doc statement): after 2027-02-0
 - **Output header:** `Target pole/equ : MOON_ME {East-longitude positive}`, `Target radii : 1737.4, 1737.4, 1737.4 km` (a sphere, so planetodetic = planetocentric latitude). Longitudes are output 0–360°E; `getSceneState` returns −180..180°E. The site queries print `MEAN_ME (high precision)` for the observer frame. The checks below show the two agree to within 0.007°.
 - **Caveat (manual):** the sub-points are "not exactly the same as the 'nearest point' for a non-spherical target shape". The Moon here is a sphere, so this doesn't apply.
 - **Checks (`scripts/check_scene.mjs`):**
-  - Sun/Earth elevations implied at a site match Sheldon's three hand-checked site/hours within 0.0034°.
+  - Sun/Earth elevations implied at a site match the Lane A lead's three hand-checked site/hours within 0.0034°.
   - They match our site files for all 10 sites (every 6th hour 2026–2029, 58,440 site-hours) within 0.0007° (Sun) / 0.0065° (Earth).
   - The angle between the two directions equals Horizons' S-T-O within 0.006°.
   - At all 49 full moons in 2026–2029 the sub-solar and sub-Earth points are within 5.0° of each other.

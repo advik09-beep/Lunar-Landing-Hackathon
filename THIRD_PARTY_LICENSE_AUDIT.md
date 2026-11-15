@@ -62,7 +62,7 @@
 
 ## Open-source licensing decision
 
-**Recommended: Apache License 2.0 for the original LunLux team-created code**, because it is OSI-approved and matches NASA's stated default. This is a **proposal, not an agreement on behalf of both contributors**. Both Advik and Sheldon must explicitly approve the grant of rights in their original contributions before adding a project-wide `LICENSE`. The license must exclude third-party data, NASA imagery, font files, the upstream simulator, and independently licensed textures. Record a third-party NOTICE / attribution file when approved.
+**Recommended: Apache License 2.0 for the original LunLux team-created code**, because it is OSI-approved and matches NASA's stated default. This is a **proposal, not an agreement on behalf of both contributors**. Both both leads must explicitly approve the grant of rights in their original contributions before adding a project-wide `LICENSE`. The license must exclude third-party data, NASA imagery, font files, the upstream simulator, and independently licensed textures. Record a third-party NOTICE / attribution file when approved.
 
 A blanket Apache 2.0 license **must not** be placed on the simulator fork as though it owns OzAILabs' original code or third-party textures. The upstream README's one-word `MIT` statement is insufficient to establish complete copyright attribution and license terms without further verification.
 
@@ -89,4 +89,4 @@ A blanket Apache 2.0 license **must not** be placed on the simulator fork as tho
 
 ## Coordination handoff — pending sign-off (2026-11-15)
 
-This audit is a **proposed remediation plan**, not a license grant or proof of NASA compliance. See the STATUS.md “ACTION REQUIRED” section for the exact sign-off wording. Sheldon and Advik must separately consent to Apache-2.0 for their original contributions; Claude Code should review scientific-data provenance and Lane A impact. **Do not begin texture replacement or the complete rights audit until both humans approve.** The existing Pluto/Europa files remain unresolved, and a source README saying “MIT” is not a substitute for a verified complete grant.
+This audit is a **proposed remediation plan**, not a license grant or proof of NASA compliance. See the STATUS.md “ACTION REQUIRED” section for the exact sign-off wording. both leads must separately consent to Apache-2.0 for their original contributions; Claude Code should review scientific-data provenance and Lane A impact. **Do not begin texture replacement or the complete rights audit until both humans approve.** The existing Pluto/Europa files remain unresolved, and a source README saying “MIT” is not a substitute for a verified complete grant.

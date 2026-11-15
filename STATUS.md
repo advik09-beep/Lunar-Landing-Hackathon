@@ -4,8 +4,8 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | Borealis background music added; Vercel READY, listening QA pending | Opt-in music button across tabs, 12% volume, older embedded simulator sound remains muted; CC BY 4.0 credit on site and in NOTICE/README |
-| Sheldon (Lane A human) | D35 signed with Advik | 2026-11-15: D29–D35 signed; directed the D35 final look and deck pass (Lane A does the whole pass incl. web shell and deck); reviewing the recoloured site and the seven-page PDF |
+| Lane B lead + ChatGPT (Lane B) | Borealis background music added; Vercel READY, listening QA pending | Opt-in music button across tabs, 12% volume, older embedded simulator sound remains muted; CC BY 4.0 credit on site and in NOTICE/README |
+| Lane A lead (human) | D35 signed with the Lane B lead | 2026-11-15: D29–D35 signed; directed the D35 final look and deck pass (Lane A does the whole pass incl. web shell and deck); reviewing the recoloured site and the seven-page PDF |
 | Claude Code (Lane A) | D36 done (parts 1–3) | Coloured globe pins with spreading and leader lines, larger grid icons, deck slides 6–7 fixed, 02/03 retaken, PDF re-exported; stopped |
 | Collaborative presentation | Seven-slide screenshot pass deployed | Separate Vercel project `lunlux-presentation`, production build READY; all six screenshots and wordmark HTTP 200; final human visual QA pending |
 
@@ -18,34 +18,34 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 - **Scope:** No scientific data, panel calculation, slide content, or simulator fork was changed by this music request.
 
 Acceptance (both humans): steps 1, 2, 3, 6, 8 PASS; step 4 and 7 pending earlier findings. Signed: D7–D23 (see PLAN), **D24–D28** (title card + tour nav, tour captions, why the south pole, one clock, A/B scenarios + requirements filter). Rule: no status-only pushes.
-Waiting on Sheldon: read the new Educator screens on web/panels.html (level = Educator) and the Learn tab; confirm the two NASA photos and their captions.
-Waiting on Advik: Human visual and interaction QA of D33 in both reading levels: font loading, Tour overlays, verdict icons, Earth-overhead/selected/hover markers, small-screen note, shareable link restore, Researcher stay 1/3/7/14 with hour clamping and globe verdicts. The previous NASA objective audit gaps (optional custom coordinates, variable landing hour, no autoplay, no 3D terrain mesh) are documented below. No extra feature work requested.
+Waiting on the Lane A lead: read the new Educator screens on web/panels.html (level = Educator) and the Learn tab; confirm the two NASA photos and their captions.
+Waiting on the Lane B lead: Human visual and interaction QA of D33 in both reading levels: font loading, Tour overlays, verdict icons, Earth-overhead/selected/hover markers, small-screen note, shareable link restore, Researcher stay 1/3/7/14 with hour clamping and globe verdicts. The previous NASA objective audit gaps (optional custom coordinates, variable landing hour, no autoplay, no 3D terrain mesh) are documented below. No extra feature work requested.
 
 ## ACTION REQUIRED — NASA Space Apps licensing sign-off (2026-11-15)
 
-**To Sheldon and Claude Code (Lane A), and Advik (Lane B):** Please review `THIRD_PARTY_LICENSE_AUDIT.md` and the decisions below before any asset replacement or broad licensing audit begins. This is a coordination request **awaiting human confirmation**, not a signed PLAN decision. No new feature or visual changes are authorized by this note.
+**To the Lane A lead and Claude Code (Lane A), and the Lane B lead (Lane B):** Please review `THIRD_PARTY_LICENSE_AUDIT.md` and the decisions below before any asset replacement or broad licensing audit begins. This is a coordination request **awaiting human confirmation**, not a signed PLAN decision. No new feature or visual changes are authorized by this note.
 
 **Why:** The OzAILabs solar-system simulator README states “MIT,” but upstream and fork have no complete LICENSE file; its 18 textures include 12 Solar System Scope CC BY 4.0 assets, 4 USGS mission mosaics needing item-level rights verification, a Planet Pixel Emporium Pluto map with redistribution restrictions, and a Steve Albers Europa composite without verified redistribution rights. The embedded Tour uses the fork. NASA terms require rights and citations for all third-party resources. A root Apache 2.0 license must not claim ownership of the simulator, NASA media, textures, fonts, or data.
 
 **Proposed plan — no implementation until BOTH humans sign off:**
-1. **Original LunLux code:** Advik and Sheldon each explicitly approve Apache License 2.0 for their own original code. Then add root `LICENSE` with precise exclusions and third-party notices.
+1. **Original LunLux code:** Both leads each explicitly approve Apache License 2.0 for their own original code. Then add root `LICENSE` with precise exclusions and third-party notices.
 2. **Upstream simulator:** obtain adequate proof of the source-code license/permission and preserve upstream copyright and attribution. If unresolved, evaluate removing/replacing the embedded simulator instead of assuming MIT.
 3. **Texture rights:** replace `pluto.jpg` and `europa.png` in the simulator fork with verified redistributable alternatives (or secure suitable permission); preserve appearance and functionality. Verify whether Solar System Scope CC BY 4.0 meets the event's precise non-NASA asset requirement, including attribution and changes. Audit USGS product-level terms.
 4. **Full asset and dependency audit after approval:** verify all 18 texture binaries, ephemeris, asteroid and star catalogs, screenshots, fonts, packages, copied code, NASA media and citations; inspect the published simulator and LunLux pages, including video, for disallowed material.
 5. **Release check:** update public Credits, README, third-party notices and submission references; verify Vercel builds and actual asset delivery; do not label legal compliance PASS without evidence.
 
-**Please respond in STATUS.md (or directly to Advik) with:**
-- **Sheldon:** “I approve / do not approve Apache-2.0 for my original LunLux contributions; I approve / request changes to the replacement and audit plan.”
-- **Advik:** same two confirmations for his original contributions.
+**Please respond in STATUS.md (or directly to the Lane B lead) with:**
+- **The Lane A lead:** “I approve / do not approve Apache-2.0 for my original LunLux contributions; I approve / request changes to the replacement and audit plan.”
+- **The Lane B lead:** same two confirmations for their original contributions.
 - **Claude Code:** acknowledge Lane A review, identify any scientific-data or panel-license concerns, and confirm no Lane A files will be changed by Lane B without coordination.
 
 **Current state: WAITING FOR BOTH HUMAN APPROVALS.** Claude's acknowledgment is requested for coordination but does not substitute for either human's consent. No asset replacements, root license changes, or full audit have begun.
 
 ## Continuous two-agent coordination protocol (agreed 2026-11-14)
 
-This is an explicit instruction from Advik for Lane B, and a coordination request to Lane A.
+This is an explicit instruction from the Lane B lead for Lane B, and a coordination request to Lane A.
 
-- **Before responding to each new project-related user prompt AND before beginning an implementation task**, Lane B must re-read the current GitHub repo state, at minimum PLAN.md and STATUS.md, and check the latest commits/tree for relevant new or changed files and directions from Sheldon's Claude. Read any new integration notes, changed /lib exports, or new API documentation BEFORE deciding what to do. Do not rely on an earlier in-chat snapshot if the remote repo has advanced.
+- **Before responding to each new project-related user prompt AND before beginning an implementation task**, Lane B must re-read the current GitHub repo state, at minimum PLAN.md and STATUS.md, and check the latest commits/tree for relevant new or changed files and directions from the Lane A lead's Claude. Read any new integration notes, changed /lib exports, or new API documentation BEFORE deciding what to do. Do not rely on an earlier in-chat snapshot if the remote repo has advanced.
 - **Before writing**, fetch the latest relevant file versions and their blob SHA; preserve all intervening Lane A changes. If a concurrent update occurs, re-fetch and reconcile rather than overwriting another agent's work.
 - **After significant milestones, decisions, API agreements, integration fixes, passing/failing tests, or blockers**, Lane B must add a concise dated entry in STATUS.md, then commit it to GitHub. Describe what changed, files/commit references, evidence of tested behavior, anything still unverified, and the next concrete dependency. Do not mark tests passed without execution or deployment evidence.
 - Lane A is requested to follow the reciprocal workflow: review the latest STATUS.md and Lane B commits before changing shared APIs, and document implementation decisions and blockers for Lane B. Use this file as the persistent cross-agent handoff.
@@ -111,11 +111,11 @@ Lane A owns /scripts, /data, /lib. Lane B owns /web. STATUS.md is shared for coo
 
 # FINAL INTEGRATION BLUEPRINT — Sun/Earth/Moon visual + lunar mission planner (2026-11-14)
 
-**Audience:** Sheldon/Claude Code (Lane A) and Advik/Codex/ChatGPT (Lane B). Read this after the status header above. This is a joint engineering handoff, NOT a claim that these features already exist.
+**Audience:** the Lane A lead and Claude Code (Lane A) and the Lane B lead/Codex/ChatGPT (Lane B). Read this after the status header above. This is a joint engineering handoff, NOT a claim that these features already exist.
 
-**Authority/approval:** Advik has explicitly selected the four UX/stack choices below. Because PLAN.md says frozen technical decisions and shared-contract changes require both humans, Sheldon must review the effect on the /lib contract and confirm feasibility before either lane changes the agreed exports. Do not rewrite PLAN.md or silently change the seam. This section is a proposed integration design with implementation gates, and the original M0-M4/M7 criteria remain applicable unless both humans revise them.
+**Authority/approval:** the Lane B lead has explicitly selected the four UX/stack choices below. Because PLAN.md says frozen technical decisions and shared-contract changes require both humans, the Lane A lead must review the effect on the /lib contract and confirm feasibility before either lane changes the agreed exports. Do not rewrite PLAN.md or silently change the seam. This section is a proposed integration design with implementation gates, and the original M0-M4/M7 criteria remain applicable unless both humans revise them.
 
-## 1. Locked product experience (Advik's decisions)
+## 1. Locked product experience (the Lane B lead's decisions)
 1. **Opening = interactive Sun–Earth–Moon overview.** Space scene with visible, clickable Sun, Earth and Moon; drag/orbit, zoom, select, focus, pause/play, date input, and explanatory UI. Do NOT build a nine-planet simulator, physics sandbox or arbitrary spacecraft model.
 2. **Moon click = zoom WITHIN the same 3D experience.** Cinematic camera approaches the Moon; no hard jump to an unrelated page. At close range, display surface-anchored landing markers. A separate detailed lunar geometry/LOD mesh MAY replace the coarse globe invisibly during zoom as long as the apparent interaction is continuous and coordinate-correct.
 3. **Accuracy = date synchronized.** A single chosen UTC timestamp drives both the visual orbital arrangement and the site visibility dashboard. Treat orbital state and lunar orientation as scientific inputs, not independently guessed animations.
@@ -252,7 +252,7 @@ D. **getCoverage()/getMetadata()** (or fields on existing exports)
 - Before making an interface-breaking change: propose the exact new shape here, get the humans' approval, implement a stub, update the visualization adapter, THEN deploy. Coordinate commit/pull to avoid overwriting shared STATUS.md.
 - Each session still begins with PLAN.md + STATUS.md and the required 3-line report. Update pass/fail checklists only after tests actually run.
 
-## 10. Immediate handoff to Sheldon / Claude Code
+## 10. Immediate handoff to the Lane A lead / Claude Code
 **Please read this whole section and reply in STATUS.md** (or tell both humans, then document the outcome):
 1. Confirm that Vite+TS **within /web** is compatible with the Lane A module contract, and whether current synchronous access can be preserved.
 2. Recommend precise, minimal signatures for getSceneState/getTimeline/getHorizon or an equally small combined API. Provide concrete NASA/JPL source, frame, orientation strategy and feasible date coverage, including historic Apollo handling.
@@ -282,10 +282,10 @@ D. **getCoverage()/getMetadata()** (or fields on existing exports)
 - **Integration:** `web/src/main.ts` imports `listSites` and `MOCK` exclusively from `../../lib/visibility.js`; it does not calculate Sun/Earth positions or read `/data` directly. Shows the 10-site catalog and a visible simulated-data warning when `MOCK` is true. `vite.config.ts` allows the repository root for dev-time imports and sets a relative static asset base.
 - **Verification:** confirmed these files and imports exist on GitHub. **NOT YET VERIFIED:** `npm install`, TypeScript typecheck, Vite production build, local browser rendering, mobile layout, or public deployment. Do not mark M0 passed.
 - **Next single Lane B task:** run the build and local integration smoke test using instructions in `web/README.md`; then configure/verify a publicly deployed URL and confirm the 10 names on desktop/mobile. This is the remaining M0 acceptance blocker.
-- **Coordination rule (explicit Advik instruction):** On every new project prompt and before every task, reread current `PLAN.md`, `STATUS.md` and repository changes; read Claude's latest instructions first. Edit application code ONLY under `/web`. For coordination, write ONLY inside this `## Lane B` section of `STATUS.md`. Fetch latest blob SHA and append/reconcile before pushing; never rewrite Lane A sections. Only take the next single task, and after major progress record actual tests, unresolved blockers, and commits here.
+- **Coordination rule (explicit the Lane B lead instruction):** On every new project prompt and before every task, reread current `PLAN.md`, `STATUS.md` and repository changes; read Claude's latest instructions first. Edit application code ONLY under `/web`. For coordination, write ONLY inside this `## Lane B` section of `STATUS.md`. Fetch latest blob SHA and append/reconcile before pushing; never rewrite Lane A sections. Only take the next single task, and after major progress record actual tests, unresolved blockers, and commits here.
 
 
-### 2026-11-14 — Lane B next-step execution plan and handoff to Sheldon / Claude
+### 2026-11-14 — Lane B next-step execution plan and handoff to the Lane A lead / Claude
 
 **Status / evidence (read from current main, planning only):** Lane A's Horizons script and ten 169-row /data/ephem/*.json files cover 2026-11-14 through 2026-11-21 UTC. The three independent Horizons hand-checks remain pending; the full 2026-2029 + historical coverage is not yet present. /lib/visibility.js still exports MOCK=true and its three existing synchronous functions; it does **not** consume the new files. /web remains a Vite/TypeScript site-list integration with no proven production build or public URL. The four south-polar coordinates represent approximate region points, not precise landings. No implementation milestone or acceptance test is newly passed by this plan.
 
@@ -293,19 +293,19 @@ D. **getCoverage()/getMetadata()** (or fields on existing exports)
 
 1. **B0 — Finish M0 (next single task, highest priority; target ~45–75 min).** From /web: install dependencies, run `npm run typecheck` and `npm run build`, start the built app locally, verify 10 names from `listSites()` and the persistent MOCK warning, then deploy static `web/dist` with a host configured to build from the repo (including the `/lib` and `/data` imports). Confirm public URL, phone layout and console cleanliness. *Pass only after live link verified and both humans sign off.* Troubleshoot imports/TypeScript or hosting before new features. No changes to Lane A files.
 2. **B1 — M2 mission readout (target ~1–2 h, after M0).** Create one shared UTC-selected instant and site ID, responsive layout with direct site picker/date-time field, and explicit Sun elevation/azimuth, Earth elevation/azimuth, `lit`, `comms`, transition countdowns and terrain/provenance labels sourced exclusively from `getState()`. Distinguish potential sunlight and potential Earth line-of-sight from guaranteed electricity/comms. Show loading, unavailable and out-of-coverage states. When MOCK=true, keep a prominent simulated-values banner and do not imply real terrain. **Pass:** a user can answer whether potential Earth direct line-of-sight exists at the chosen site/time in <10 seconds.
-3. **B2 — Integrate validated M1 data when Lane A has it (after interface agreement).** Preserve existing synchronous `listSites/getState/getSummary` contracts. Lane B *recommends* the additive async `loadSite(siteId)` pattern proposed by Sheldon for per-site downloads, with `getCoverage()` to bound date inputs; approval by Advik and final function signatures are still required. Use a `VisibilityAdapter` in /web; call `await loadSite(id)` once per selected site then read state synchronously, handle `NOT_LOADED`/`OUT_OF_COVERAGE` without false values, and re-query after switches. **Pass:** UI updates from validated /lib data, proper unsupported-date states, no astronomy in /web. Until M1 passes, continue UI construction against visibly flagged mock data only.
+3. **B2 — Integrate validated M1 data when Lane A has it (after interface agreement).** Preserve existing synchronous `listSites/getState/getSummary` contracts. Lane B *recommends* the additive async `loadSite(siteId)` pattern proposed by the Lane A lead for per-site downloads, with `getCoverage()` to bound date inputs; approval by the Lane B lead and final function signatures are still required. Use a `VisibilityAdapter` in /web; call `await loadSite(id)` once per selected site then read state synchronously, handle `NOT_LOADED`/`OUT_OF_COVERAGE` without false values, and re-query after switches. **Pass:** UI updates from validated /lib data, proper unsupported-date states, no astronomy in /web. Until M1 passes, continue UI construction against visibly flagged mock data only.
 4. **B3 — Visibility strip / time scrub (target ~60–90 min).** Display a four-state strip (Sun+Earth, Sun only, Earth only, neither), shared UTC cursor, hourly sampling provenance, tooltips and 30-day target. Prefer Lane A's proposed `getTimeline`; as an interim measure use `getState` only over *confirmed available coverage* and label the sampled resolution. The current seven-day M1 cache cannot truthfully support a 30-day scientific strip. **Pass:** displayed categories exactly agree with the underlying model and scrubbing updates both cards.
 5. **B4 — M3 comparison (target ~60–90 min).** Two-site or same-site/two-date panels using `getSummary`. Show %Sun, %Earth direct line-of-sight, %both, longest darkness and the evaluation window; don't invent a universal weighted winner. **Pass:** updates in <1 s on cached data and values match known /lib outputs.
-6. **B5 — 3D Moon-focused overview and smooth Moon zoom (after core readout; scope-controlled).** Use Three.js in /web with accessible controls, click selection, back-to-overview and geographically aligned landing markers. A scene with orbital claims must consume a **validated** Lane A `getSceneState(utc)`; no invented Sun/Earth coordinates or local ephemeris math. Sheldon's current proposed `MOON_ME` Moon-fixed scene yields *Moon-centered relative Sun/Earth directions*, not a heliocentric view of Earth's orbit. Present it honestly as a Moon-centered mission visualization with non-physical display scaling; the Moon itself stays fixed in that frame. If `getSceneState` is delayed, use a clearly labeled static/illustrative scene or defer 3D rather than pretending it is date-synchronized. **Pass:** scene and readouts reference one UTC time; smooth Moon focus and markers do not drift or misrepresent verified sites.
+6. **B5 — 3D Moon-focused overview and smooth Moon zoom (after core readout; scope-controlled).** Use Three.js in /web with accessible controls, click selection, back-to-overview and geographically aligned landing markers. A scene with orbital claims must consume a **validated** Lane A `getSceneState(utc)`; no invented Sun/Earth coordinates or local ephemeris math. The Lane A lead's current proposed `MOON_ME` Moon-fixed scene yields *Moon-centered relative Sun/Earth directions*, not a heliocentric view of Earth's orbit. Present it honestly as a Moon-centered mission visualization with non-physical display scaling; the Moon itself stays fixed in that frame. If `getSceneState` is delayed, use a clearly labeled static/illustrative scene or defer 3D rather than pretending it is date-synchronized. **Pass:** scene and readouts reference one UTC time; smooth Moon focus and markers do not drift or misrepresent verified sites.
 7. **B6 — M4 terrain horizon panorama (Lane A dependency).** Consume approved `getHorizon(siteId)` + `getState`, not visual globe relief, for a local azimuth/elevation plot and Sun/Earth overlays. Mark all flat sites as approximations and polar profiles as terrain-aware only when LOLA validation passes. **Pass:** documented flat-visible/terrain-blocked event agrees with the graph and `lit` flag.
 8. **B7 — M7 submission hardening.** Check desktop/mobile performance, date/time edge cases, backend-free static deployment, citations/texture licensing, sample use cases, screenshots and demo readiness. Reserve the final **three hours before the confirmed event deadline** for final demo/project page/testing and no new major features. If behind: trim effects/3D complexity first, never scientific accuracy, the working dashboard or live link.
 
 **Near-term priority:** Saturday: B0, B1, B3 and B4 where feasible; integrate B2 as soon as Lane A's real /lib exports and acceptance tests exist. A simple B5 scene is stretch for the evening, and full B6 follows Lane A's LOLA milestone. Sunday: scientific/3D accuracy, terrain, polish, submission. Timeboxes are estimates, not declarations of passing tests.
 
-**Explicit message to Sheldon and Claude Code (Lane A; PLEASE READ):**
+**Explicit message to the Lane A lead and Claude Code (Lane A; PLEASE READ):**
 - Our **immediate single Lane B task** is M0 build + actual public deployment. We will edit code only inside /web and touch only this `## Lane B` section for communication. We will not calculate Sun/Earth positions or read source data outside /lib/visibility.js directly. We will tell you our verified build/link and integration results here.
 - Please prioritize your existing **three independent manual Horizons comparisons** (including azimuth, elevation, UTC, source/frame conventions), then enable actual science data in `/lib/visibility.js` and document coverage/method in `/data/README.md`. These remain Lane A-owned tasks; do not change our frontend to do them.
-- Please reply in your `## Lane A` section with a **final versioned API contract and readiness flags** for `loadSite`, `getCoverage`, `getTimeline`, `getSceneState`, and eventually `getHorizon`, plus whether the proposed async `loadSite` is approved by Advik. Preserve legacy exports and define range/NOT_LOADED behavior; avoid changing sync calls without coordination.
+- Please reply in your `## Lane A` section with a **final versioned API contract and readiness flags** for `loadSite`, `getCoverage`, `getTimeline`, `getSceneState`, and eventually `getHorizon`, plus whether the proposed async `loadSite` is approved by the Lane B lead. Preserve legacy exports and define range/NOT_LOADED behavior; avoid changing sync calls without coordination.
 - For `getSceneState`, clarify that the authoritative positions are Moon-centered in `MOON_ME` (including units, axes, time/frame and Moon texture longitude alignment). We can display a Moon-focused scene under that design, but must not label it a physical heliocentric solar system. Prioritize this after M1; not a blocker for the functional dashboard.
 - Current sampled data is 7 days only; please indicate when 30-day windows and historical date ranges become usable. The UI will never extrapolate or imply a period is covered when it is not.
 - Keep the four south-pole **representative-region** markers identifiable until validated terrain/site position conventions are available. Please signal when one LOLA profile has passed the terrain obstruction check.
@@ -315,25 +315,25 @@ D. **getCoverage()/getMetadata()** (or fields on existing exports)
 
 ### 2026-11-14 — PLAN v2 read; prototype_01 preflight (NO implementation)
 
-- **Acknowledgment:** I have read PLAN.md v2 **in full**, the current STATUS.md header and latest Lane A entries, and approved DESIGN.md. PLAN.md v2 supersedes ALL earlier M0–M7, B0–B7, integration-blueprint, and flat-first directions. D1–D6 and data contract v1 are approved by both humans; contract entries marked NOT READY are **not implemented**. I will obey the new 1–9 step order and will **not start coding, deployment, or prompt execution until Advik explicitly says GO**.
+- **Acknowledgment:** I have read PLAN.md v2 **in full**, the current STATUS.md header and latest Lane A entries, and approved DESIGN.md. PLAN.md v2 supersedes ALL earlier M0–M7, B0–B7, integration-blueprint, and flat-first directions. D1–D6 and data contract v1 are approved by both humans; contract entries marked NOT READY are **not implemented**. I will obey the new 1–9 step order and will **not start coding, deployment, or prompt execution until the Lane B lead explicitly says GO**.
 - **Required 3-line Lane B report:** Step 1 = Live URL; pass test = public link shows ten sites on a phone; next single task = verify Vite/TS production build and deploy the site list **after GO**. Do not mark Step 1 passed without a live mobile check.
 - **Design readback for prospective prototype_01 (discussion only):** two views (3D Moon Explore with ten markers + date selector; Compare dates grid); one shared UTC date; site card with Plain/Numbers; visible words plus color for four verdicts; 7-day stays; EDGE_DEG=2, CLEAR_PCT=90, OUT_PCT=10; honest mock banner and flat-terrain provenance; Step 8 true Sun/Earth orientation is deferred. Step 4's 3D Moon is NOT a heliocentric simulation, and visualization is illustrative until validated scene-state data exists.
-- **Questions to Sheldon/Claude before a final Codex prompt** (please respond in your own ## Lane A section, no immediate code needed):
+- **Questions to the Lane A lead and Claude before a final Codex prompt** (please respond in your own ## Lane A section, no immediate code needed):
   1. For Steps 3–4 on MOCK data, what is the planned *mock-ready* source of per-site/day verdicts? The approved `loadDaily/getDaily` and verdict functions are NOT READY. Should Lane A expose a minimal mock version before Step 4, or do you envision another approach through `/lib/visibility.js` only? Lane B must not invent astronomy or fake a ready API.
   2. In Step 3 Numbers, the approved card needs **margin above local horizon**, source/coverage, and a CSV export. Which exact /lib fields or exports will supply those, and which CSV rows/columns should the download include? Please flag if these are not ready for the mock stage.
   3. For Step 4 marker accuracy, please confirm the Moon latitude/longitude reference (east-positive, MEAN_ME / MOON_ME), sphere vs altitude, and whether Lane B can use the current `listSites()` coordinates for a **Moon-fixed** renderer with clearly labeled south-pole representative points. Scene illumination must remain illustrative until Step 8.
-- **Open presentation/implementation decisions for Advik:** Which public static host will we use for Step 1? Should `prototype_01` mean only the Step 1 deployed site list or a multi-step visual prototype that Codex will execute step-by-step when explicitly authorized? D1–D6 are not being reopened.
-- **Scope reminder:** Only /web code; only this ## Lane B section of STATUS.md for communication. No application files or other sections changed in this entry. Waiting for Advik's GO.
+- **Open presentation/implementation decisions for the Lane B lead:** Which public static host will we use for Step 1? Should `prototype_01` mean only the Step 1 deployed site list or a multi-step visual prototype that Codex will execute step-by-step when explicitly authorized? D1–D6 are not being reopened.
+- **Scope reminder:** Only /web code; only this ## Lane B section of STATUS.md for communication. No application files or other sections changed in this entry. Waiting for the Lane B lead's GO.
 
 ### 2026-11-14 — Request to Claude: confirm exact Codex prototype_01 prompt (Vercel, Step 1 only)
 
-**To Sheldon and Claude Code:** Advik chose **Vercel** hosting and **prototype_01 = PLAN v2 Step 1 only**. Please review the COMPLETE proposed Codex prompt below for consistency with PLAN.md v2, approved DESIGN.md, data contract v1, and Lane ownership. Please reply in your own `## Lane A` section with **APPROVED** or required corrections, especially build settings or anything that would prevent a public 10-site page. **This is a review request only. Advik has NOT issued GO to run Codex or deploy.**
+**To the Lane A lead and Claude Code:** the Lane B lead chose **Vercel** hosting and **prototype_01 = PLAN v2 Step 1 only**. Please review the COMPLETE proposed Codex prompt below for consistency with PLAN.md v2, approved DESIGN.md, data contract v1, and Lane ownership. Please reply in your own `## Lane A` section with **APPROVED** or required corrections, especially build settings or anything that would prevent a public 10-site page. **This is a review request only. The Lane B lead has NOT issued GO to run Codex or deploy.**
 
-**Proposed Codex prompt (paste this verbatim or with Claude-approved fixes after Advik says GO):**
+**Proposed Codex prompt (paste this verbatim or with Claude-approved fixes after the Lane B lead says GO):**
 
 > **prototype_01 — PLAN v2 Step 1: public Vercel URL**
 >
-> You are Codex, collaborating with Advik on Lane B in `advik09-beep/Lunar-Landing-Hackathon` (branch `main`). Your task is **ONLY Step 1 — Live URL**. The pass test is **a public, unauthenticated Vercel link displaying all ten `listSites()` names correctly on a phone**. Do not advance to Step 3 or Step 4.
+> You are Codex, collaborating with the Lane B lead on Lane B in `advik09-beep/Lunar-Landing-Hackathon` (branch `main`). Your task is **ONLY Step 1 — Live URL**. The pass test is **a public, unauthenticated Vercel link displaying all ten `listSites()` names correctly on a phone**. Do not advance to Step 3 or Step 4.
 >
 > **Read before any action:** fetch latest `main`, read `PLAN.md` **top to bottom** (v2 overrides old notes), then `STATUS.md` header and both Lane sections, then `DESIGN.md`, `web/README.md`, and existing `/web` source. Check `lib/visibility.js` exports without editing Lane A. Report exactly three lines: your step, pass test, next single task.
 >
@@ -349,7 +349,7 @@ D. **getCoverage()/getMetadata()** (or fields on existing exports)
 > - **Output Directory:** `web/dist` (relative to the repo root).
 > Verify these exact settings and whether Vercel applies the install override. If install override is unavailable, use `cd web && npm install && npm run build` as the build command. Do not change the project root to `web` to resolve build errors. If the dashboard or connected Vercel interface differs, follow its actual fields; document the working configuration. Confirm that the bundled app includes the imported site catalog. Do not create a root-level `vercel.json` or change Lane A files merely for convenience.
 >
-> **Public verification:** open the real Vercel URL unauthenticated. Confirm all ten site names originate from `listSites()`, the mock-data banner is visible, CSS/JS assets load, no critical console/runtime errors, and usable mobile-width layout. If possible, automated viewport verification; ask Advik for a physical-phone check before final PASS if required.
+> **Public verification:** open the real Vercel URL unauthenticated. Confirm all ten site names originate from `listSites()`, the mock-data banner is visible, CSS/JS assets load, no critical console/runtime errors, and usable mobile-width layout. If possible, automated viewport verification; ask the Lane B lead for a physical-phone check before final PASS if required.
 >
 > **GitHub handoff:** commit minimal fixes to `/web` with small descriptive commits. Re-fetch latest `STATUS.md` SHA before writing **only the `## Lane B` section**, preserving concurrent Lane A updates. Report exact deployment URL, commit SHA, Vercel settings, tests run, mobile evidence, and either `Step 1 PASS` (only with evidence) or `BLOCKED` with precise blocker. Do not start another step. If authorization is missing, request it without exposing credentials.
 >
@@ -357,9 +357,9 @@ D. **getCoverage()/getMetadata()** (or fields on existing exports)
 
 **Verification from official Vercel documentation (Lane B review, not a deployed configuration):** Vercel names these project settings **Root Directory**, **Install Command**, **Build Command**, and **Output Directory**; output is relative to configured root. Documentation: https://vercel.com/docs/builds/configure-a-build . For this repository, root `.` keeps Vite's parent imports accessible. Vercel also has a "Include source files outside of the Root Directory in the Build Step" option for monorepos, but root `.` is simpler here; see https://vercel.com/docs/monorepos/monorepo-faq . No Vercel project settings or deployment have yet been applied/tested.
 
-**Review questions for Claude:** (1) Does this EXACT prompt respect PLAN v2 Step 1 and approved API? (2) Do you foresee any issue with install/build/output overrides or root-only `package.json`? (3) Is there any source compatibility concern with the current `web/vite.config.ts` or `web/tsconfig.json` that Codex should know to diagnose, not preemptively patch? Please explicitly confirm or amend before Advik says GO.
+**Review questions for Claude:** (1) Does this EXACT prompt respect PLAN v2 Step 1 and approved API? (2) Do you foresee any issue with install/build/output overrides or root-only `package.json`? (3) Is there any source compatibility concern with the current `web/vite.config.ts` or `web/tsconfig.json` that Codex should know to diagnose, not preemptively patch? Please explicitly confirm or amend before the Lane B lead says GO.
 
-**Current status:** Waiting for Claude's review and Advik's GO; zero frontend changes, zero build/deploy tests, and no Step 1 pass claimed by this entry.
+**Current status:** Waiting for Claude's review and the Lane B lead's GO; zero frontend changes, zero build/deploy tests, and no Step 1 pass claimed by this entry.
 
 
 ### 2026-11-14 — prototype_01 execution: Step 1 BLOCKED
@@ -385,13 +385,13 @@ D. **getCoverage()/getMetadata()** (or fields on existing exports)
 - **Stop:** no mobile testing, postbuild/data-copy script, dashboard integration, redesign, or later feature work performed. Lane B postbuild copy remains a separate task requiring authorization.
 
 2026-11-14 — D9 ACKNOWLEDGED: Lane B owns the app shell/Vercel configuration, postbuild copy, 3D Moon (Step 4), shared selection and integration mounts; Lane A exclusively owns `web/src/panels/` and `web/panels.html`. I will never edit Lane A panel files.
-Step 1 is PASS. On Advik's GO, Lane B's first task is D8's postbuild copy exactly per latest `## Lane A` specification; verify live `/data/ephem/index.json` and `/data/daily.json` both return HTTP 200 with correct JSON before marking it passed.
-Second task, only after the copy passes and with Advik's authorization: Step 4 Three.js Moon with ten site markers; wait for Lane A's posted panel interface before mounting panels. D10 Malapert coordinate/horizon changes remain Lane A-owned. No implementation started in this acknowledgment.
+Step 1 is PASS. On the Lane B lead's GO, Lane B's first task is D8's postbuild copy exactly per latest `## Lane A` specification; verify live `/data/ephem/index.json` and `/data/daily.json` both return HTTP 200 with correct JSON before marking it passed.
+Second task, only after the copy passes and with the Lane B lead's authorization: Step 4 Three.js Moon with ten site markers; wait for Lane A's posted panel interface before mounting panels. D10 Malapert coordinate/horizon changes remain Lane A-owned. No implementation started in this acknowledgment.
 
 ### 2026-11-14 — D8 static-data publishing PASS; Step 4 started
 - Frontend commits: `1e7c323` adds `web/scripts/copy-data.mjs`; `3ebabb1` adds `postbuild` to `web/package.json`. Vercel production deployment for `3ebabb1`: READY. Node 22-compatible copy includes full `data/ephem` (including Malapert horizon.json) and `data/daily.json`, but not `data/sites.js` or README. Nothing in Lane A ownership touched.
 - **Live checks executed from Vercel Sandbox over HTTPS**: `https://lunar-landing-hackathon.vercel.app/data/ephem/index.json` returned **HTTP 200, application/json, 6615 bytes**; `https://lunar-landing-hackathon.vercel.app/data/daily.json` returned **HTTP 200, application/json, 406910 bytes**. D8 static-file publication check PASS; further loader/browser integrations belong to later tests.
-- Advik's GO covers the next task, Step 4: interactive 3D Moon and 10 markers in Lane B-owned code. Lane A continues to own all `web/src/panels/` files, and D10 Malapert updates. Step 4 in progress, not yet passed.
+- The Lane B lead's GO covers the next task, Step 4: interactive 3D Moon and 10 markers in Lane B-owned code. Lane A continues to own all `web/src/panels/` files, and D10 Malapert updates. Step 4 in progress, not yet passed.
 
 ### 2026-11-14 — JSON endpoint contract + Moon visualization proposal (Claude review requested)
 
@@ -410,14 +410,14 @@ Second task, only after the copy passes and with Advik's authorization: Step 4 T
 4. A heliocentric *solar-system model* (Earth/Moon/Sun orbital distances/positions) is **not in PLAN v2** and must not be slipped into Step 4. For Step 8, use a **Moon-fixed teaching view** with Sun illumination and Earth direction driven exclusively by Lane A's future `getSceneState(utc)`, once READY and verified. If the humans want a separate not-to-scale orbital explainer, request an explicit scope/cut-order decision first; keep it optional and illustrative, not presented as physical ephemeris.
 5. Preserve education-first cues: markers and verdicts explained in words, 7-day stay/UTC labels, flat-vs-LOLA and image-vs-terrain provenance, and no guaranteed power/comms claims. Avoid expensive assets that threaten desktop performance or the Nov 15 deadline.
 
-**Questions for Claude/Sheldon to resolve in Lane A (please answer explicitly before we freeze new visual scope):**
+**Questions for Claude/the Lane A lead to resolve in Lane A (please answer explicitly before we freeze new visual scope):**
 - **JSON:** Confirm source and URLs above, loader base behavior, and whether the `index.json` / `daily.json` files need a cache/versioning strategy for simultaneous deployment.
 - **NASA globe:** Recommend one authoritative lunar global mosaic (specific NASA/LRO/USGS product and projection), with map-to-sphere UV orientation and attribution. Is a correctly registered globe texture feasible in time, or should we keep the procedural Moon for the submission?
 - **Solar system:** Agree that PLAN Step 8 is Moon-fixed true lighting, **not** a solar-system orbital simulation? If a separate Sun/Earth/Moon explainer is valuable, what would be scientifically honest and feasible without a new `getSceneState` implementation?
 - **Terrain:** Agree that the existing LOLA horizon panel is the scientific terrain product for Step 7, and any 3D terrain mesh is a separate, human-approved enhancement?
 - **Milestones:** What concrete Step 4 test evidence and current side-card review outcome are still needed before declaring Step 4 PASS? Please do not change PLAN or start an unapproved feature based on this proposal.
 
-**Proposed shared position, pending Claude/Sheldon and Advik agreement:** First verify existing 3D Moon + panels and live JSON parity; then optionally swap to a registered NASA lunar surface mosaic; prioritize Step 6 Compare, Step 7 verified horizon, and Step 8 Moon-fixed true Sun/Earth directions. Do not build a separate orbital solar-system scene unless both humans amend the scope. This is a request for consensus, not a claim of approval.
+**Proposed shared position, pending Claude/both leads agreement:** First verify existing 3D Moon + panels and live JSON parity; then optionally swap to a registered NASA lunar surface mosaic; prioritize Step 6 Compare, Step 7 verified horizon, and Step 8 Moon-fixed true Sun/Earth directions. Do not build a separate orbital solar-system scene unless both humans amend the scope. This is a request for consensus, not a claim of approval.
 
 ### 2026-11-14 — Lane B Step 4 deployed; desktop browser verification (review requested)
 - **D8 source and deployment:** `web/scripts/copy-data.mjs` (commit `1e7c323`) and `web/package.json` `postbuild` (commit `3ebabb1`) publish all ephemeris JSON chunks, `ephem/index.json`, Malapert `horizon.json`, and `daily.json` under `dist/data/`. Live production HTTPS checks returned **HTTP 200 application/json** for both `/data/ephem/index.json` (6,615 bytes) and `/data/daily.json` (406,910 bytes). D8 data publishing PASS.
@@ -425,14 +425,14 @@ Second task, only after the copy passes and with Advik's authorization: Step 4 T
 - **Executed build checks:** sandbox `npm ci`, `npm run typecheck`, `npm run build` PASS; Vite 5.4.21, 15 modules, compiled JS 552.87 kB (146.52 kB gzip). `postbuild` PASS and copied 48 ephemeris JSON files; Vite warns JS main chunk >500 kB (non-fatal). Production Vercel deployment of `4ea711d` READY; later documentation-only HEAD `b3e52ed` also READY. Live URL: `https://lunar-landing-hackathon.vercel.app`.
 - **Executed desktop Chromium (1440×900) production tests:** visible WebGL2 canvas YES, ten site-selection buttons, mounted Lane A side card, `loadDaily` completed with real-data UTC/7-day status; choosing Haworth changed panel title; +7 days changed the UTC date 2026-11-14 → 2026-11-21 and **7 of 10** verdict labels; south-pole camera command and Nobile Rim 2 panel selection responded. Raycast hit testing found visible markers; synthesized pointer down/up on marker coordinates changed selection among Apollo 17/11/12. No browser exceptions during normal interactions; one desktop screenshot captured and inspected. Synthetic pointer events are not a substitute for a human physical-mouse test.
 - **Scientific/presentation limits:** sphere surface texture and lighting are intentionally **illustrative**, not georeferenced NASA imagery or true ephemeris illumination; true Moon-fixed lighting remains Step 8. Site coordinates/verdicts are real scientific data from Lane A. South-pole points are geographically clustered; polar view + site selector distinguish them.
-- **Acceptance request to Sheldon/Claude and Advik:** Step 4 is **implemented, deployed and functionally tested**, but final **human sign-off remains pending**; confirm real mouse/camera user experience, south-pole distinguishability, and whether approved PLAN Step 4 criteria are sufficiently met. No new NASA texture, orbital simulator, or terrain mesh was started; see the separate Lane B design-consensus proposal immediately above.
+- **Acceptance request to the Lane A lead and Claude and the Lane B lead:** Step 4 is **implemented, deployed and functionally tested**, but final **human sign-off remains pending**; confirm real mouse/camera user experience, south-pole distinguishability, and whether approved PLAN Step 4 criteria are sufficiently met. No new NASA texture, orbital simulator, or terrain mesh was started; see the separate Lane B design-consensus proposal immediately above.
 
 ### 2026-11-14 — User GO: D9 panel mounts, D11(a) NASA map, Credits; STOP
 - **Read first:** PLAN.md D11, newest Lane A entries answering five questions, panel interface v1.1, Compare grid and Horizon view. Lane B changed only `web/src/main.ts`, `web/src/style.css`, `web/src/moon.ts`, `web/package.json`, and new `web/scripts/copy-moon.mjs`; no Lane A-owned files touched.
 - **Task 1 COMPLETE:** mounted `mountCompareGrid` and `mountHorizonView` alongside `mountSideCard`; passed v1.1 `onOpenView` for "Stand here" and "Compare other dates"; shell pushes both siteId and landingDate to all three mounted panels on each selection change. Live Chromium: all three panels mounted, 280 grid cells, grid site/date click updated shared selection and horizon view, side-card "Stand here" exit opened horizon, no page exceptions. Commits `75a7a82`, `a53f03d`.
 - **Task 2 COMPLETE:** D11(a) NASA SVS CGI Moon Kit `lroc_color_2k.jpg` 2048×1024 (457,942 bytes), downloaded and validated at build time by `web/scripts/copy-moon.mjs` into `dist/moon/`, production URL `/moon/lroc_color_2k.jpg` HTTP 200. Texture applied to default `SphereGeometry` UVs with no rotation, east-positive frame per Lane A alignment audit. Production Chromium confirmed texture HTTP 200, Apollo 12 and Apollo 17 selectable and side card updated, NASA credit displayed, no page exceptions. NASA color imagery for looks; lighting still illustrative, terrain scientific only in horizon panel. Commits `405a16d`, `bb3367d`, `6e9ec77`, `26854e8`.
 - **Task 3 STARTED / functional:** new Credits navigation/panel lists NASA SVS image and NASA media guidelines, JPL Horizons, LOLA/LRO, Three.js/OrbitControls MIT license, source-versus-illustration limitations. Live Chromium verified Credits tab opens and content renders without page exceptions. Commits `843bdf7`, `759f713`.
-- **Verification:** `npm run typecheck` PASS, `npm run build` PASS, postbuild both data and NASA JPEG PASS; live Vercel URL `https://lunar-landing-hackathon.vercel.app`. Main JS chunk warning >500 kB remains non-fatal. Step 4 physical mouse sign-off remains pending. Lane A's new `getSceneState` Step 8 work acknowledged but not implemented by Lane B because Advik instructed STOP after Credits. D11(b) overview scene and D11(c) zoom not started. Layout polish deferred.
+- **Verification:** `npm run typecheck` PASS, `npm run build` PASS, postbuild both data and NASA JPEG PASS; live Vercel URL `https://lunar-landing-hackathon.vercel.app`. Main JS chunk warning >500 kB remains non-fatal. Step 4 physical mouse sign-off remains pending. Lane A's new `getSceneState` Step 8 work acknowledged but not implemented by Lane B because the Lane B lead instructed STOP after Credits. D11(b) overview scene and D11(c) zoom not started. Layout polish deferred.
 
 ### 2026-11-14 — Lane B: vendor NASA Moon image offline + Step 8 real Sun/Earth scene PASS; STOP
 - **Order followed (user GO):** First eliminated build-time download, then implemented Step 8; no D11(b) Sun–Earth–Moon overview or D11(c) transition, no layout polish, no changes to Lane A modules.
@@ -464,7 +464,7 @@ Second task, only after the copy passes and with Advik's authorization: Step 4 T
 - **Starfield options researched:** Hue Screen's depth-parallax ambient stars chosen as visual direction over Kirupa's fast cockpit warp, MOTION/LAB's subscriber-only code, and GovinduSasanka/opus-motion-library's MIT-licensed but heavier React/Remotion warp. **No third-party starfield code copied.** `web/src/starfield.ts` commit `16a1777` replaces near-static 0.7–4 px/s stars with three perceptible moving depth layers, gentle short near-star trails, optional pointer-based parallax, tab-visibility pause, and `prefers-reduced-motion` freeze. Dedicated canvas stays behind the app and **outside** the scientific/illustrative 3D windows; CSS change `5abb134`. Credits link Hue Screen as visual reference and retain MIT `etrepat/starfield` attribution.
 - **Live production verification:** `npm ci`, `npm run typecheck`, `npm run build` PASS. Vercel production READY. Headless Chromium (1440×900) captured an actual page/header-region screenshot that **changed** over 1.1 seconds as stars visibly moved, and checked the canvas pixels changed too. Under emulated reduced-motion the canvas image stayed byte-identical over 850 ms. `data-effect=depth-parallax`, fixed background z-index 0, zero browser errors, zero failed network requests, all three Lane A panels still mounted.
 - **OzAILabs integration ready but NOT active:** `web/src/main.ts` commit `5416673` supports a full-size sandboxed HTTPS iframe when build-time `VITE_SOLAR_OVERVIEW_URL` is set. The iframe carries upstream attribution, shows **all planets**, clearly states its date is independent of our mission clock, and provides the existing Explore-tab exit. Local Vite preview using a **temporary non-project URL** verified frame presence, full-size layout, disclaimer and Explore button; **this was not an OzAILabs simulator deployment test**. Without a verified fork URL, the previous functioning 3-body overview remains as fallback. The connected GitHub account lacks `advik09-beep/SolarSystemSimulator` and Vercel USMDO Club has no second simulator project. Do not invent or substitute a URL.
-- **Missing user-side prerequisite:** Advik should fork `https://github.com/OzAILabs/SolarSystemSimulator` to his GitHub account, deploy the fork in USMDO Club through Vercel, verify its public link and provide that URL or set `VITE_SOLAR_OVERVIEW_URL` on the main Vercel project before redeploy. `web/README.md` commit `1ca02f1` documents the exact steps and existing main-project build settings. Upstream README says **MIT**; actual planetary texture credits include Solar System Scope **CC BY 4.0** plus other named sources, all disclosed in Credits. No dedicated upstream root `LICENSE` file was found, so the interface attributes MIT **as stated in README**, without overstating separate image rights.
+- **Missing user-side prerequisite:** the Lane B lead should fork `https://github.com/OzAILabs/SolarSystemSimulator` to their GitHub account, deploy the fork in USMDO Club through Vercel, verify its public link and provide that URL or set `VITE_SOLAR_OVERVIEW_URL` on the main Vercel project before redeploy. `web/README.md` commit `1ca02f1` documents the exact steps and existing main-project build settings. Upstream README says **MIT**; actual planetary texture credits include Solar System Scope **CC BY 4.0** plus other named sources, all disclosed in Credits. No dedicated upstream root `LICENSE` file was found, so the interface attributes MIT **as stated in README**, without overstating separate image rights.
 - **Scope:** No modifications to `web/src/panels/`, `/lib`, `/data`, `/scripts`, or PLAN/DESIGN. No D16–D18 implementation or unrelated layout changes. **Starfield completed; actual forked Overview embedding blocked on user fork/deployment URL.**
 
 ### 2026-11-14 — D14 OzAILabs fork deployed and embedded: live production PASS
@@ -487,7 +487,7 @@ Second task, only after the copy passes and with Advik's authorization: Step 4 T
 - Scientific references for explanation: official challenge https://www.spaceappschallenge.org/2026/challenges/lunar-landing-site-navigator/ ; NASA lunar seasons https://svs.gsfc.nasa.gov/5229/ (small axial tilt, 346.6-Earth-day seasonal cycle); LPI seasonal calculator https://www.lpi.usra.edu/lunar/tools/lunarseasoncalc/ (subsolar latitude, dates drift); NASA polar shadows https://science.nasa.gov/resource/shadows-near-the-moons-south-pole/ and NASA lunar comms https://www.nasa.gov/glenn/glenn-expertise-space-exploration/scan/lunar-surface-propagation/ .
 
 ### 2026-11-14 — NASA objectives review: operational interpretation and ranked next work (user-supplied audit)
-- **Scope and provenance:** Documentation-only supplement to the preceding visual-cleanup/mission-objectives audit, based on the review provided by Advik. No new browser verification, scientific recomputation, UI or API implementation is claimed in this entry. Existing live-cleanup evidence and the exact Malapert worked example are in the preceding Lane B entry. All suggestions below are **proposals**, not authorization to edit Lane A files or expand PLAN.md.
+- **Scope and provenance:** Documentation-only supplement to the preceding visual-cleanup/mission-objectives audit, based on the review provided by the Lane B lead. No new browser verification, scientific recomputation, UI or API implementation is claimed in this entry. Existing live-cleanup evidence and the exact Malapert worked example are in the preceding Lane B entry. All suggestions below are **proposals**, not authorization to edit Lane A files or expand PLAN.md.
 - **Operational “conditions” NASA is asking viewers to compare:** (1) **Sun elevation** — angle above local horizontal; matters for illumination and output of a *fixed horizontal* panel; (2) **Sun azimuth** — direction relative to local terrain, deciding which ridge may obstruct the Sun; (3) **terrain clearance** — Sun elevation minus skyline elevation along its azimuth (geometric Sun-up can still be terrain-shadowed); (4) **sunlight windows** — starts/stops and interruption duration, affecting operating opportunities and storage; (5) **Earth elevation/azimuth** — line-of-sight geometry changes under lunar libration and terrain obstruction; (6) **Earth visibility/contact windows** — possible contact periods and gaps, not guaranteed link performance; (7) **simultaneous Sun + Earth visibility** — overlap useful for a solar-powered, directly communicating lander. Illumination influences *thermal* conditions, but this app does **not** calculate terrain/surface temperatures, equipment heat loads, or thermal stress; do not imply it does.
 - **Across lunar days:** One local solar day (noon to next noon) is about **29.5 Earth days**, not 24 hours; the Moon's **~27.3-Earth-day orbital period is different**. At ordinary latitudes, daylight and darkness each last many Earth days; at the south pole the low Sun sweeps around ridges/craters, causing repeated obstructions. Equal sunlight percentages can disguise crucial differences between one prolonged blackout and multiple short interruptions; the **longest-darkness** metric is thus mission-relevant. The current 7-day stay, selected-hour view, and 28-date comparison strip are **not** a complete lunar-day playback.
 - **Across lunar seasons:** Lunar axial tilt relative to the Sun is only **~1.5°**, but small subsolar-latitude shifts alter whether a low south-polar Sun clears a ridge. The complete lunar seasonal cycle is about **346.6 Earth days**; lunar seasons do not correspond to fixed terrestrial calendar dates. Southern summer corresponds to more southerly (negative) **subsolar latitude**; southern winter to northerly (positive) subsolar latitude. Horizons already captures date-dependent Sun and Earth geometry; **do not fabricate a separate seasonal correction**. Earth contact varies with libration and does not automatically improve with sunlight. Comparing two arbitrary dates months apart changes *both season and local lunar time*, so future seasonal comparisons should use complete lunar-day spans or explicitly disclose this confound.
@@ -505,7 +505,7 @@ Second task, only after the copy passes and with Advik's authorization: Step 4 T
 - **Step 3 — PASS in production:** In user fork `SolarSystemSimulator`, added `lunarEmbed`-only tour stops exactly **Sun → Mercury → Venus → Earth → Mars → Jupiter → Saturn → Uranus → Neptune → Moon**, excluding Pluto/comets/other moons/spacecraft without removing their visuals. Removed fact text and numbered captions from embedded mode; exposed simple Prev/Next/Exit tour controls while menus and links stay hidden. Gated body raycasts, selection and CSS2D label callbacks so only these ten bodies are interactive; unchanged standalone mode. New code commits `d575d96` (`TourController`), `15fd3a1` (embed styling), `8af5141` (BodySelector), `8bcd15d` (auto-start + label gating), and `b0698fa` (disable hidden Tweakpane card updates that had caused runtime errors during the first browser smoke test). **Latest deployed fork commit `b0698fa` is Vercel READY.** Final production Chromium test read all ten names in exact order, with hidden fact text and UI, no page errors.
 - **Step 4 — CODE COMPLETE, local builds and E2E PASS, PRODUCTION BLOCKED:** Fork commit **`5a21e36`** sends `{ type: 'lunar-navigator:open-explore', body: 'moon' }` by `postMessage` when a user selects the Moon directly or the tour reaches Moon as final stop. Destination is exact `parentOrigin` query parameter, validated before signaling, and never broadcasts to '*'. Main commit **`a911612`** passes its own origin to the iframe and accepts ONLY matching `event.origin` and `event.source===frame.contentWindow` plus exact event type/body before switching the parent to Explore. Both codebases passed TypeScript/Vite builds in a Vercel Sandbox; main `postbuild` copied 10-site scientific JSON. In an HTTPS-local fork + HTTP-local parent Playwright test (Chromium, 1440×1100), manually advancing all ten stops triggered the actual cross-origin signal, the parent opened Explore, **10 site buttons remained**, and a forged wrong-origin message did not switch views. No browser page exceptions. A separate synthetic direct-click test timed out trying to locate a visible Moon label, so **direct physical Moon clicking is implemented but not yet independently browser-verified**; do not mark that acceptance check as complete.
 - **Vercel production blocker:** After `5a21e36`, attempting to create the fork production deployment returned **HTTP 402 `payment_required`, `api-deployments-free-per-day` (more than 100 deployments in 24 h; retryAfter 86400)** for team USMDO Club. Automatic Git deployments then stopped advancing. At this status update, the fork's latest READY deployment is older **`b0698fa`**, main latest READY is older **`54c8645`**; new parent/fork postMessage commits **are not live**. Vercel Sandbox local builds are **not** public deployments, so the live URL must not be claimed as Step-4-passed. A new Vercel deploy cannot be verified until the quota resets or the team owner resolves plan/billing limits. No paid-plan/team setting was changed.
-- **Next permitted action after quota is resolved (not started):** Deploy user fork `master` at **`5a21e36`** first, then main `main` at **`a911612`** (or later documentation-only HEAD); verify both public Vercel URLs, the tour final-stop signal and a **real Moon-model click** in the public iframe, selected date preservation, and no regressions to the Moon explorer, Compare and Horizon panels. Re-read PLAN/STATUS before resuming. **STOP** per Advik's instruction; no D19/D21/D18 Lane A implementation was undertaken.
+- **Next permitted action after quota is resolved (not started):** Deploy user fork `master` at **`5a21e36`** first, then main `main` at **`a911612`** (or later documentation-only HEAD); verify both public Vercel URLs, the tour final-stop signal and a **real Moon-model click** in the public iframe, selected date preservation, and no regressions to the Moon explorer, Compare and Horizon panels. Re-read PLAN/STATUS before resuming. **STOP** per the Lane B lead's instruction; no D19/D21/D18 Lane A implementation was undertaken.
 
 ### 2026-11-14 — D18/D24–D27 implementation and live verification
 - **D18 Researcher:** Mounted Lane A's `mountResearcher` with shared site/date updates, scrolling container and a top-level Researcher tab. Production Chromium confirmed the Researcher shadow-DOM panel renders NASA criteria, site details and the analysis; no Lane A edits.
@@ -618,7 +618,7 @@ Second task, only after the copy passes and with Advik's authorization: Step 4 T
 
 ## Lane A
 
-### 2026-11-14 — Reply to the integration blueprint (approved by Sheldon 2026-11-14)
+### 2026-11-14 — Reply to the integration blueprint (approved by the Lane A lead 2026-11-14)
 
 **Done (commit 5debb55):** `listSites()` now forwards `coordsVerified` and `note`. Mock `getState()` returns `terrain: "flat"` for every site; it never claims `"real"` until M4 terrain data exists.
 
@@ -637,7 +637,7 @@ Second task, only after the copy passes and with Advik's authorization: Step 4 T
   Built from whatever M1/M4 files actually exist.
 - **Out-of-coverage rule (all functions):** throw `RangeError("OUT_OF_COVERAGE ...")`. The UI shows "unavailable"; no extrapolation.
 
-**Sync loading (Sheldon: YES to loadSite; needs Advik's OK):** 10 sites × 2026–2029 hourly is about 350,000 rows. Loading all of it at import time will make the page slow, especially on phones. Lane A proposes ONE extra async function, `await loadSite(siteId)`, which fetches that site's file. After it resolves, every existing call for that site stays synchronous. Calling before loading throws `Error("NOT_LOADED")`. While MOCK is true, `loadSite` resolves immediately.
+**Sync loading (the Lane A lead: YES to loadSite; needs the Lane B lead's OK):** 10 sites × 2026–2029 hourly is about 350,000 rows. Loading all of it at import time will make the page slow, especially on phones. Lane A proposes ONE extra async function, `await loadSite(siteId)`, which fetches that site's file. After it resolves, every existing call for that site stays synchronous. Calling before loading throws `Error("NOT_LOADED")`. While MOCK is true, `loadSite` resolves immediately.
 
 **getSceneState — proposal only. No Lane A work on it until M1 PASSES.**
 - **Frame:** Moon-fixed, Horizons' `MOON_ME` (DE421 mean-Earth frame). +Z = mean lunar north rotation axis; +X = 0° longitude (mean Earth direction); +Y = 90° E. Right-handed; km. The Moon does NOT rotate in the scene; Sun and Earth move around it.
@@ -677,9 +677,9 @@ Second task, only after the copy passes and with Advik's authorization: Step 4 T
 
 
 ### 2026-11-14 — Plan approval, DESIGN.md proposal, and API contract v1 (reply to Lane B)
-- **Sheldon approves Lane B's execution plan B0-B7 as written** (Lane B entry "next-step execution plan", commit c45ea78). B0 stays first.
-- **DESIGN.md (repo root) is a PROPOSAL by Sheldon, awaiting Advik's OK.** It adds B1b (Explore view on a flat Moon image) and asks Lane A for edge fields, a verdict and a per-day summary file. Lane B: do not build from it until Advik agrees.
-- **No new data work in this entry.** M1 is still blocked on Sheldon's three hand-checks. Nothing below is built unless marked READY.
+- **The Lane A lead approves Lane B's execution plan B0-B7 as written** (Lane B entry "next-step execution plan", commit c45ea78). B0 stays first.
+- **DESIGN.md (repo root) is a PROPOSAL by the Lane A lead, awaiting the Lane B lead's OK.** It adds B1b (Explore view on a flat Moon image) and asks Lane A for edge fields, a verdict and a per-day summary file. Lane B: do not build from it until the Lane B lead agrees.
+- **No new data work in this entry.** M1 is still blocked on the Lane A lead's three hand-checks. Nothing below is built unless marked READY.
 
 **Visibility API contract v1 — PROPOSAL (Lane A will finalize signatures; changes need both humans).**
 Lane A will add `export const API_VERSION = "1.0.0"` and `export const READY = { ... }`, one boolean per item below. Lane B should check `READY` instead of assuming. Breaking changes bump the major version and get announced here first.
@@ -691,7 +691,7 @@ Lane A will add `export const API_VERSION = "1.0.0"` and `export const READY = {
 | `getSummary(siteId, startUtc, days)` sync | existing fields | READY on MOCK data only; real data NOT READY |
 | `MOCK` | `true` until M1 passes | READY |
 | `API_VERSION`, `READY` | as above | NOT READY |
-| `await loadSite(siteId)` | fetches one hourly file; afterwards sync calls work for that site; sync call before load throws `Error("NOT_LOADED")` | NOT READY. Sheldon: yes. **Advik: not yet approved.** |
+| `await loadSite(siteId)` | fetches one hourly file; afterwards sync calls work for that site; sync call before load throws `Error("NOT_LOADED")` | NOT READY. The Lane A lead: yes. **The Lane B lead: not yet approved.** |
 | `getCoverage()` sync | `{ mock, stepHours: 1, timeScale: "UTC", sites: [{ siteId, ranges: [[startUtc, endUtc]], terrain }] }` | NOT READY |
 | `getTimeline(siteId, startUtc, days, stepHours=1)` sync after loadSite | `{ siteId, stepHours, mock, terrain, source, samples: [{ utc, sunEl, sunAz, earthEl, earthAz, lit, comms, sunEdge, earthEdge }] }` | NOT READY |
 | Edge fields on `getState` | adds `sunEdge`, `earthEdge`: true when that body's elevation is within `EDGE_DEG` of the horizon in use (flat: 0°; real: terrain angle at that azimuth); adds `edgeDeg` (the value used) | NOT READY |
@@ -709,18 +709,18 @@ Lane A will add `export const API_VERSION = "1.0.0"` and `export const READY = {
 
 **Coverage:** DESIGN.md asks for at least 8 weeks ahead of today (so to at least 2027-01-09). The approved M1 range (2026-2029) includes this. Today there are only 7 days (2026-11-14..21), and widening waits for the hand-check. Open point carried over: Horizons' EOP (Earth-rotation) file predicts only to 2027-02-08, and I still have to check its effect on UTC timestamps past that date.
 
-**Lane A next single task (unchanged):** after Sheldon's hand-check passes, widen the M1 download, then write `/data/README.md`.
+**Lane A next single task (unchanged):** after the Lane A lead's hand-check passes, widen the M1 download, then write `/data/README.md`.
 
 ### 2026-11-14 — PLAN v2 adopted
 - PLAN.md replaced with PLAN v2. Step numbers 1-9 replace M0-M7 and B0-B7.
-- D1-D6 are signed by both humans (per Sheldon, 2026-11-14).
+- D1-D6 are signed by both humans (per the Lane A lead, 2026-11-14).
 - Contract v1 (the entry above) is APPROVED, including `await loadSite(siteId)` and the daily summary file (PLAN D4). Readiness flags are unchanged: everything marked NOT READY there is still not built.
 - Verdict numbers: STAY_DAYS = 7, CLEAR_PCT = 90, OUT_PCT = 10, EDGE_DEG = 2 (PLAN D5). These replace the "Open" note in the contract entry.
 - DESIGN.md marked approved: Explore is 3D from the start, the flat-first step is gone, the Plain / Numbers section is added, and it uses PLAN step numbers.
-- Lane A is on step 2, blocked on Sheldon's hand-checks. No step work started in this entry.
+- Lane A is on step 2, blocked on the Lane A lead's hand-checks. No step work started in this entry.
 
 ### 2026-11-14 — Contract v1 exported on MOCK data; answers to Lane B; hand-check 1 (Sun) passed
-**Hand-check 1, Sun: PASSED.** Apollo 11, 2026-11-14 12:00 UTC. The Horizons web app (Sheldon) gives az 91.485723 / el -7.066737; our file gives 91.4857 / -7.0667. Difference < 0.0001°. **Pending:** check 1 Earth (277.5874 / 64.3200), check 2 (im1), check 3 (sp_malapert). Step 2 has not passed.
+**Hand-check 1, Sun: PASSED.** Apollo 11, 2026-11-14 12:00 UTC. The Horizons web app (the Lane A lead) gives az 91.485723 / el -7.066737; our file gives 91.4857 / -7.0667. Difference < 0.0001°. **Pending:** check 1 Earth (277.5874 / 64.3200), check 2 (im1), check 3 (sp_malapert). Step 2 has not passed.
 
 **Answer 1 — mock-ready source for verdicts: contract v1 is now exported from `/lib/visibility.js` on MOCK data.** `MOCK` stays `true`, so keep the banner. Existing exports keep their names and fields; they only gained new fields.
 - New exports: `API_VERSION = "1.0.0"`, `READY` (true = callable with the documented shape; `getSceneState` and `getHorizon` are false), `VERDICT_RULE = { STAY_DAYS: 7, CLEAR_PCT: 90, OUT_PCT: 10, EDGE_DEG: 2 }`, `await loadSite(id)`, `getCoverage()`, `getTimeline(id, startUtc, days, stepHours=1)`, `await loadDaily()`, `getDaily("YYYY-MM-DD", days)`.
@@ -769,17 +769,17 @@ Lane A will add `export const API_VERSION = "1.0.0"` and `export const READY = {
 **Lane A next single task (unchanged):** finish step 2 after the remaining hand-checks: widen the download, then `/data/README.md`.
 
 ### 2026-11-14 — Step 2 Real numbers PASSED
-- **Hand-checks: 7 of 7 match the Horizons web app to six decimals (Sheldon).** These are the six planned rows (apollo11 2026-11-14 12:00, im1 2026-11-17 08:00, sp_malapert 2026-11-20 06:00; Sun and Earth each) plus sp_malapert Sun 2026-11-17 08:00 (web app 85.839251 / 1.847012).
+- **Hand-checks: 7 of 7 match the Horizons web app to six decimals (the Lane A lead).** These are the six planned rows (apollo11 2026-11-14 12:00, im1 2026-11-17 08:00, sp_malapert 2026-11-20 06:00; Sun and Earth each) plus sp_malapert Sun 2026-11-17 08:00 (web app 85.839251 / 1.847012).
 - **EOP question resolved (manual):** EOP only sets UT1/polar motion/nutation for Earth's frame, and reaches a Moon site only through the UTC time labels. After the prediction end (2027-02-08), Horizons holds the last predicted values constant and uses the last known leap second. Our estimate: at most ~1 s of timing error (an unknown future leap second), i.e. ~0.0002° of Sun motion. Negligible. Full quotes in `/data/README.md`.
 - **Download widened:** `scripts/fetch_horizons.mjs` now writes `data/ephem/<siteId>/<YYYY>.json` for 2026-2029, plus `landing.json` (landing day ±15 days) for apollo11, apollo12, apollo17, chandrayaan3, im1, im2, and `data/ephem/index.json`. That's 46 chunks: one request per site × target × chunk (≤ 8784 rows), one at a time with a 1.5 s pause, retries on network errors, and the run can be resumed. Values are stored at 3 decimals: ~260 KB per site-year, 9.7 MB total. The old 7-day files were removed (the 2026 files cover the same hours). Every chunk header was checked for MEAN_ME (high precision), east-longitude positive, AIRLESS and UT; the script also checks for gaps and row counts.
 - **Regression:** `node scripts/check_ephem.mjs` → PASS. 7/7 rows within 0.0005° of the web app (max 0.000431°, the storage rounding). Apollo 11 landing hour 1969-07-20 20:00Z: Sun az 88.804° el 10.553° (low, east). Earth > 30° at the Apollo sites and within 10° of the horizon at the four pole sites (2027-06-01). Coverage complete for all 10 sites, with no gaps. `node scripts/check_visibility.mjs` still PASS (mock unchanged).
 - **`/data/README.md` written:** every query setting with its doc source; longitude sign, azimuth direction and UTC, each with the Horizons header line or doc quote that proves it; frame, sphere, corrections, sampling, EOP, checks and known limits.
-- **Still true:** `MOCK = true`; `/lib/visibility.js` does not read these files yet. That is step 5, which **has not started**; it waits for Sheldon's go. Site altitudes are UNVERIFIED (0 km).
+- **Still true:** `MOCK = true`; `/lib/visibility.js` does not read these files yet. That is step 5, which **has not started**; it waits for the Lane A lead's go. Site altitudes are UNVERIFIED (0 km).
 - **Note for both humans:** PLAN.md's "Right now" block still shows Lane A on step 2. PLAN changes need both humans, so I left it alone; the STATUS header above is current.
 
 
 ### 2026-11-14 — Review of Lane B's prototype_01 (Step 1, Vercel) Codex prompt: APPROVED
-**APPROVED as written.** Evidence, run by Claude Code on Sheldon's machine against main at 13bbc30. Nothing under /web was changed or committed.
+**APPROVED as written.** Evidence, run by Claude Code on the Lane A lead's machine against main at 13bbc30. Nothing under /web was changed or committed.
 - `cd web && npm install` OK; `npm run typecheck` OK (no errors); `npm run build` OK. Vite 5.4.21, 6 modules: `dist/index.html` 0.72 kB, CSS 1.70 kB, JS 7.25 kB (2.62 kB gzip).
 - The built JS bundle contains all 10 `listSites()` names (checked by matching each name from `data/sites.js` against `web/dist/assets/*.js`: 10/10) and the MOCK notice text.
 - Not tested by Lane A: `npm run preview` in a browser, Vercel settings, the public URL, phone layout. Those remain the Step 1 pass test.
@@ -835,10 +835,10 @@ Alternative: Lane A bundles the data into JS modules that Vite code-splits. This
 7. **Check after deploy:** `<live URL>/data/ephem/index.json` and `<live URL>/data/daily.json` return JSON (HTTP 200), and the page's `loadSite` / `loadDaily` calls resolve without `LOAD_FAILED`.
 - Lane A will re-run `node scripts/build_daily.mjs` whenever `data/ephem` changes and commit both; Lane B's copy step needs no change for that.
 
-**Lane A stops here.** Step 7 has not started; it waits for Sheldon's go.
+**Lane A stops here.** Step 7 has not started; it waits for the Lane A lead's go.
 
-### 2026-11-14 — Step 7 (terrain), Lane A, stage 1: product and method for sp_malapert (PROPOSAL, awaiting Sheldon's go)
-- **Site:** sp_malapert only (Sheldon's choice). It sits at 86.0°S, 0.3°E (representative point = LROC mosaic centre, not a landing point), about 121 km from the pole. Other sites stay `flat`.
+### 2026-11-14 — Step 7 (terrain), Lane A, stage 1: product and method for sp_malapert (PROPOSAL, awaiting the Lane A lead's go)
+- **Site:** sp_malapert only (the Lane A lead's choice). It sits at 86.0°S, 0.3°E (representative point = LROC mosaic centre, not a landing point), about 121 km from the pole. Other sites stay `flat`.
 - **Product (official PDS):** LOLA GDR polar DEMs, https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/polar/img/
   - `ldem_80s_80m.img` (115,520,000 bytes): 80 m/px, 7600 × 7600, 80°S–90°S. Used for the far field.
   - `ldem_80s_20m.img` (1,848,320,000 bytes): 20 m/px, 30400 × 30400, 80°S–90°S. Only the rows within ±20 km of the site are fetched (HTTP range request; the server sends `accept-ranges: bytes`): ~2,000 rows × 60,800 bytes ≈ 122 MB.
@@ -852,11 +852,11 @@ Alternative: Lane A bundles the data into JS modules that Vite code-splits. This
   4. The horizon angle for each 1° bin is the highest angle found on any of its ten 0.1° rays, so narrow peaks aren't missed between whole degrees. Result: 360 values, degrees, can be negative (an elevated observer sees below the flat 0° line).
   5. Record, per bin, the distance of the blocking point and whether the ray hit the DEM edge before 300 km, so we can show where the search distance was limiting.
 - **Then:** margin = elevation − horizon(azimuth); lit / comms use the margin (Sun and Earth still treated as points).
-- **Cost:** ~237 MB download (115.5 MB + ~122 MB). Measured 3.7 MB/s from PDS on Sheldon's connection, so about 1–2 minutes; computing takes seconds. Raw DEM files stay out of git (scratch/gitignored); only the 360-value profile and its provenance get committed.
+- **Cost:** ~237 MB download (115.5 MB + ~122 MB). Measured 3.7 MB/s from PDS on the Lane A lead's connection, so about 1–2 minutes; computing takes seconds. Raw DEM files stay out of git (scratch/gitignored); only the 360-value profile and its provenance get committed.
 - **Known limits to state on screen:** representative point, not a landing spot (the horizon changes over a few hundred metres); preliminary 2017 LOLA DEM; 2 m observer height assumed; Sun and Earth as points (the Sun's disc is ~0.5° wide, so partial sunlight near the edge is shown as all-or-nothing); 1° azimuth bins.
 
 ### 2026-11-14 — Step 7 (terrain), Lane A half, stages 2-4 DONE for sp_malapert
-**Change from stage 1 (Sheldon):** extend beyond the 80°S map edge, because Earth sits to the north for this site.
+**Change from stage 1 (the Lane A lead):** extend beyond the 80°S map edge, because Earth sits to the north for this site.
 - Done with two coarser products from the same PDS folder: `ldem_75s_120m` (116,250,752 bytes) and `ldem_60s_240m` (120,435,200 bytes). Rays use 20 m → 80 m → 120 m → 240 m, each beyond the previous map's edge.
 - **Worst case for the north: zero.** A ray stops only when even the highest point in the DEMs (7027 m) could no longer rise above the best angle already found. For every one of the 360 bins that happened before any data edge, so no terrain beyond our maps can change the profile.
 - In the north the local slope gives a ~5.6° horizon. That already rules out anything beyond ~22 km.
@@ -907,22 +907,22 @@ Alternative: Lane A bundles the data into JS modules that Vite code-splits. This
   - Lane B keeps the app shell (index.html, main.ts, base styles, Vite and Vercel config), the postbuild data copy and the 3D Moon (step 4).
   - Lane A now also builds three self-contained panels under `web/src/panels/`, which only Lane A edits: the side card with Plain / Numbers (step 3), the Compare dates grid (step 6) and the horizon view (step 7).
   - Each panel exports a mount function taking a container element, the selected site and landing date, and callbacks for "site selected" and "date selected". Lane B mounts them and owns the shared selection.
-  - Neither lane edits the other's files in /web. Lane A's panel test page is `web/panels.html` (Sheldon's instruction).
+  - Neither lane edits the other's files in /web. Lane A's panel test page is `web/panels.html` (the Lane A lead's instruction).
   - PLAN.md steps table updated: step 3 "A panel, B mounts"; step 6 "A grid panel, B mounts"; step 7 "A data + horizon view panel, B mounts".
   - **Open question for both humans:** D9 names the Compare *grid*; step 6 also lists a *timeline strip*, and D9 doesn't say who builds that. Lane A assumes it belongs inside the grid panel unless told otherwise.
-- **D10 Malapert point:** move sp_malapert to the highest ground within 1 km of the current representative point, re-download its Horizons data, recompute the horizon, rerun every check, and keep the old point's numbers in the README for comparison. If the Earth-facing horizon is still set by ground closer than 500 m, Lane A reports to Sheldon before committing. No other pole sites for now.
-- **Note:** CLAUDE.md (Lane A rules) still says "Never edit /web". It needs a one-line update to match D9 before Lane A writes panels. Sheldon to confirm.
+- **D10 Malapert point:** move sp_malapert to the highest ground within 1 km of the current representative point, re-download its Horizons data, recompute the horizon, rerun every check, and keep the old point's numbers in the README for comparison. If the Earth-facing horizon is still set by ground closer than 500 m, Lane A reports to the Lane A lead before committing. No other pole sites for now.
+- **Note:** CLAUDE.md (Lane A rules) still says "Never edit /web". It needs a one-line update to match D9 before Lane A writes panels. The Lane A lead to confirm.
 
 ### 2026-11-14 — D10 DONE: sp_malapert moved; answers recorded
 - **New point:** 85.97972°S, 0.67183°E, the highest ground within 1 km of the representative point; a slope, not a summit (highest LOLA 20 m pixel within 1 km of 86.0°S, 0.3°E; 4885.5 m above the 1737.4 km sphere; it sits on the 1 km circle and the ground keeps rising beyond). `data/sites.js`: coordinates and note updated; name is now "Malapert Massif (high ground near representative point)"; id unchanged.
-- **Re-done for the new coordinates:** Horizons 2026–2029 (`data/ephem/sp_malapert/`), terrain horizon, `data/daily.json`. Sheldon's two old-point hand-checks are now compared with a full-precision Horizons fixture at the original point (`data/checks/handcheck_sp_malapert_original_point.json`, `scripts/fetch_handcheck_fixture.mjs`): exact match, diff 0.000000. Query code moved to `scripts/horizons_api.mjs` (shared, no behaviour change).
-- **Earth-facing horizon (the D10 reporting rule):** bins 351°–5° are set by terrain 120–160 km away. Bins 6°–8° are set by ground 40 m away that slopes downhill (−3.1° to −3.2°). Reported to Sheldon before committing; ignoring ground closer than 500 m changes no Earth answer in 2026–2029 (smallest margin 0.05°). Sheldon: GO.
+- **Re-done for the new coordinates:** Horizons 2026–2029 (`data/ephem/sp_malapert/`), terrain horizon, `data/daily.json`. The Lane A lead's two old-point hand-checks are now compared with a full-precision Horizons fixture at the original point (`data/checks/handcheck_sp_malapert_original_point.json`, `scripts/fetch_handcheck_fixture.mjs`): exact match, diff 0.000000. Query code moved to `scripts/horizons_api.mjs` (shared, no behaviour change).
+- **Earth-facing horizon (the D10 reporting rule):** bins 351°–5° are set by terrain 120–160 km away. Bins 6°–8° are set by ground 40 m away that slopes downhill (−3.1° to −3.2°). Reported to the Lane A lead before committing; ignoring ground closer than 500 m changes no Earth answer in 2026–2029 (smallest margin 0.05°). The Lane A lead: GO.
 - **Comparison, each with its own distance** (full table in `/data/README.md`):
   - Original point vs D10 point, **1.000 km apart:** Earth in view over terrain 41.2% → 100%; Sun 29.1% → 45.8% (flat: Sun 50.4%, Earth ~69%).
   - The **200 m** figures are the earlier sensitivity runs. Old point: northern horizon 1.6° to 11.8°. D10 point: 200 m south puts it back on the slope (+5° to +5.8°).
 - **Demo case updated:** 2026-09-19 06:00 UTC at sp_malapert, Sun +1.05° above the flat horizon but behind a ridge 1.84 km east (terrain horizon 6.03°). In the same hour Earth is −2.05° on flat but above the −3.16° terrain horizon (in view). `check_visibility` tests both.
 - **Checks:** `check_ephem` PASS (7/7), `check_horizon` PASS (Sun blocked-by-terrain 3,820 h; 49 robust far-ridge hours), `check_visibility` PASS (all 14,694 daily rows = getSummary). `/web` build OK.
-- **D9 follow-ups (Sheldon):** CLAUDE.md updated (Lane A may edit `web/src/panels/` and `web/panels.html`, nothing else under /web). The timeline strip lives inside the Compare dates grid panel.
+- **D9 follow-ups (the Lane A lead):** CLAUDE.md updated (Lane A may edit `web/src/panels/` and `web/panels.html`, nothing else under /web). The timeline strip lives inside the Compare dates grid panel.
 
 ### 2026-11-14 — Panel interface v1 (for Lane B) + side card built (step 3, Lane A part)
 **Panel interface v1 (D9). Files:** `web/src/panels/` (Lane A only). Import from `web/src/panels/index.ts`.
@@ -975,7 +975,7 @@ export { mountSideCard } from "./sideCard";          // step 3 — READY
   - `npm run typecheck` + `npm run build` OK (the panels are type-checked).
   - Dev server serves `/panels.html` and `/src/panels/demo.ts` (HTTP 200).
   - The panel was rendered in a DOM emulator (happy-dom, scratch only; there is no Chrome on this machine) with real data from `/data`: Plain, Numbers, CSV filename, day buttons → callback, site switch via `update()`, out-of-coverage message, no global styles, `destroy()` leaves the container empty.
-  - **Not yet seen in a real browser:** Sheldon to open it.
+  - **Not yet seen in a real browser:** the Lane A lead to open it.
   - `check_visibility`, `check_ephem`, `check_horizon` all PASS.
 
 ### 2026-11-14 — D11 signed; answers to Lane B's five questions (each verified by Lane A)
@@ -1036,7 +1036,7 @@ onOpenView?: (view: "horizon" | "compare") => void;   // side card exits: "Stand
   - Each cell = verdict for a 7-day stay from 00:00 UTC that date, straight from `getDaily()`, shown as **symbol + color** (✓ ◐ ✕ ⚠, edge also dashed). Every cell has a tooltip/aria-label in words: verdict, sunlight %, Earth %, both %, longest dark stretch.
   - No-data stays show a dashed "–" (never guessed). Rows carry a FLAT / TERRAIN tag.
   - Clicking a cell calls `onSiteSelected(site)` then `onDateSelected(date)`; a row name calls `onSiteSelected`; a column date calls `onDateSelected`. The selected cell is outlined, the selected row bold, the selected date underlined.
-- **Timeline strip (inside the panel, per Sheldon):** hourly for the selected site over the same 28 days, from `getTimeline()`.
+- **Timeline strip (inside the panel, per the Lane A lead):** hourly for the selected site over the same 28 days, from `getTimeline()`.
   - Encoded by position, not only color: top half filled = sunlight, bottom half filled = Earth in view, both = full bar, neither = empty, hatched = no data.
   - The selected 7-day stay is outlined, and a sentence under it gives the stay's percentages (`getSummary`).
 - **Lane B:** mount it wherever the Compare dates tab lives, and call `update({siteId, landingDate})` on it with the same shared selection as the side card. With interface v1.1, `onOpenView("compare")` from the side card is your cue to show this tab. Lane B can theme the strip colors with `--llp-sun` / `--llp-earth`.
@@ -1051,7 +1051,7 @@ onOpenView?: (view: "horizon" | "compare") => void;   // side card exits: "Stand
   - Side card exits → `onOpenView("horizon")` / `("compare")`; a v1 caller without `onOpenView` gets no exit buttons.
   - No global styles; `destroy()` leaves the container empty.
   - `check_visibility`, `check_ephem`, `check_horizon` PASS; `cd web && npm run build` OK.
-  - **Not yet seen in a real browser:** Sheldon to open `panels.html`.
+  - **Not yet seen in a real browser:** the Lane A lead to open `panels.html`.
 
 ### 2026-11-14 — Horizon view panel ("Stand here", step 7, Lane A part) READY to mount
 **API:** `mountHorizonView(container, props)` from `web/src/panels/index.ts`. Same `PanelProps` / `PanelHandle` as the other panels (interface v1.1, Shadow DOM scoping, `--llp-*` theming). It reads `siteId` + `landingDate` and uses no callbacks (pass them anyway; they're required by `PanelProps`).
@@ -1087,7 +1087,7 @@ onOpenView?: (view: "horizon" | "compare") => void;   // side card exits: "Stand
   - Earth is "in view over lower terrain".
 - The horizon line has 361 steps from the 360 bins. Apollo 11 shows FLAT with a flat readout; an out-of-coverage date shows "Unavailable"; no global styles; `destroy()` empties the container.
 - `check_visibility`, `check_ephem`, `check_horizon` PASS. `cd web && npm run typecheck && npm run build` OK.
-- **Not yet seen in a real browser:** Sheldon to open `panels.html`.
+- **Not yet seen in a real browser:** the Lane A lead to open `panels.html`.
 
 ### 2026-11-14 — Step 8, Lane A half: getSceneState DONE, READY.getSceneState = true
 **Data:** `data/ephem/_scene/` holds hourly sub-solar and sub-Earth points on the Moon, Sun and Earth distances, and the Sun–Moon–Earth angle. Coverage matches the site data: 2026–2029 + the six landing windows. ~2.3 MB, listed in `ephem/index.json` under `scene`.
@@ -1107,7 +1107,7 @@ onOpenView?: (view: "horizon" | "compare") => void;   // side card exits: "Stand
 Frame: Moon-fixed, east-positive; +X = 0°N 0°E, +Y = 0°N 90°E, +Z = north pole; origin = Moon centre; km. The Moon does not rotate in this frame; the Sun and Earth move.
 
 **Checks (`node scripts/check_scene.mjs` → PASS):**
-- **Hand-checked site/hours** (apollo11 2026-11-14 12:00, im1 2026-11-17 08:00, sp_malapert original point 2026-11-20 06:00): the Sun and Earth elevation implied by `getSceneState` at the site (vector from the site on the 1737.4 km sphere to the body) match Sheldon's Horizons web-app values within **0.0034°** (azimuth within 0.003°).
+- **Hand-checked site/hours** (apollo11 2026-11-14 12:00, im1 2026-11-17 08:00, sp_malapert original point 2026-11-20 06:00): the Sun and Earth elevation implied by `getSceneState` at the site (vector from the site on the 1737.4 km sphere to the body) match the Lane A lead's Horizons web-app values within **0.0034°** (azimuth within 0.003°).
 - **All 10 sites, every 6th hour 2026–2029 (58,440 site-hours) vs our site files:** max elevation difference Sun 0.0007°, Earth 0.0065°.
 - The angle between the Sun and Earth directions equals Horizons' independent S-T-O within 0.006° (every hour 2026–2029). So `MOON_ME` (scene queries) and `MEAN_ME (high precision)` (site queries) agree in practice.
 - **Judge check:** 49 full moons found in 2026–2029 (minimum Sun–Moon–Earth angle about every 29.5 days). At every one the sub-solar and sub-Earth points are within 5.0° of each other (first: 2026-02-01 23:00Z, 2.3° apart; 2026-03-03 12:00Z, 0.4° apart).
@@ -1131,7 +1131,7 @@ Frame: Moon-fixed, east-positive; +X = 0°N 0°E, +Y = 0°N 90°E, +Z = north po
 
 ### 2026-11-14 — Root README.md written (for the submission)
 - `README.md` at the repo root covers: what the project is, the live link, how to run it, how the numbers were verified (the seven hand-checks and the four check scripts: `check_ephem`, `check_visibility`, `check_horizon`, `check_scene`), data sources and credits, known limits, and how AI tools were used.
-- Shared file at the repo root (Sheldon's request). Lane B: please flag anything in the "Lane B" or "Credits" lines that's inaccurate, and Lane A will fix it.
+- Shared file at the repo root (the Lane A lead's request). Lane B: please flag anything in the "Lane B" or "Credits" lines that's inaccurate, and Lane A will fix it.
 - It describes 3D lighting as illustrative (true as of `a0f5eb5`). Update that line once Lane B wires in `getSceneState`.
 
 ### 2026-11-14 — Planning stop: D12–D18 signed; acceptance results
@@ -1189,7 +1189,7 @@ interface PanelHandle { update(next: Partial<Pick<PanelProps, "siteId" | "landin
   - **Haworth** sits low (1,624 m) with ridges 4–8 km away, so the Sun is blocked for 10,626 h and Earth for 11,271 h.
 - **Earth-facing skyline (D10 reporting rule):**
   - Haworth: ridges 4.4–7.7 km away. Nobile Rim 2: 10.8–16.1 km away.
-  - **Cabeus B: set by ground 0.26–0.7 km away** (76% of Earth hours). It's downhill ground (horizon −2.1° to −2.6°) around a high point, so it marks how far below level Earth can be and still be seen. Flagged for Sheldon.
+  - **Cabeus B: set by ground 0.26–0.7 km away** (76% of Earth hours). It's downhill ground (horizon −2.1° to −2.6°) around a high point, so it marks how far below level Earth can be and still be seen. Flagged for the Lane A lead.
 - **Two bugs caught and fixed before committing anything:**
   1. `fetch_lola.mjs` rewrote an existing window's row record using a site's *current* coordinates. That would have misaligned Malapert's DEM rows, since Malapert moved after its window was fetched. Now the record is written only with a download; Malapert's record was restored, and its horizon is byte-identical to the committed one apart from the build time.
   2. The index was rebuilt before the new horizon files existed, so `daily.json` briefly treated these sites as flat. `compute_horizon.mjs` now rebuilds the index; daily rebuilt and verified (`horizonModels` shows `lola` for all four pole sites).
@@ -1197,16 +1197,16 @@ interface PanelHandle { update(next: Partial<Pick<PanelProps, "siteId" | "landin
   - `check_horizon` PASS for each of the three. Step 7's blocked-Sun requirement still applies to Malapert only; other sites report their counts.
   - `check_visibility` PASS: it now expects exactly these four terrain sites and checks Sun and Earth margins against each horizon.
   - `check_ephem`, `check_scene` PASS. `cd web && npm run build` OK.
-- **Next (stage 2, on Sheldon's go):** IM-2, IM-1, Chandrayaan-3 at their landed coordinates. IM-1 (80.13°S) is at the edge of the 20 m polar map and Chandrayaan-3 (69.4°S) is outside it, so they need other maps (e.g. `ldem_75s_30m`, `ldem_60s_60m`). Lane A will check those products in the PDS folder before using them.
+- **Next (stage 2, on the Lane A lead's go):** IM-2, IM-1, Chandrayaan-3 at their landed coordinates. IM-1 (80.13°S) is at the edge of the 20 m polar map and Chandrayaan-3 (69.4°S) is outside it, so they need other maps (e.g. `ldem_75s_30m`, `ldem_60s_60m`). Lane A will check those products in the PDS folder before using them.
 
 ### 2026-11-14 — "On the edge" wording by horizon model; Cabeus B point kept
-- **Sheldon:** at terrain sites, "on the edge" must not say "terrain decides", because terrain is already included.
+- **The Lane A lead:** at terrain sites, "on the edge" must not say "terrain decides", because terrain is already included.
   - Lane A panels now use **"grazing the skyline: small changes in position matter"** for terrain (LOLA) sites, and keep **"the Sun or Earth hugs the horizon, so terrain decides"** for flat-horizon sites.
   - Applied to the side card (verdict line and "why" sentence), the Compare grid (cell tooltips + a legend line explaining both), and the root README. Shared helper: `EDGE_WORDS` / `verdictShort(verdict, model)` in `web/src/panels/shared.ts`.
   - DOM test: Malapert 2026-01-07 (edge, terrain) → "grazing the skyline"; IM-2 2026-01-05 (edge, flat) → "terrain decides". `/web` build OK.
 - **Not edited, needs both humans:** PLAN.md ("on the edge (terrain decides)", Settled earlier) and DESIGN.md ("…so terrain decides"). Suggested wording: "on the edge (flat sites: terrain decides; terrain sites: grazing the skyline)".
 - **Lane B:** the globe legend and marker labels only say "On the edge" (fine). If you add a description, use the same two phrases.
-- **Cabeus B point kept** (Sheldon). The reason is recorded in the root README: the Earth-facing skyline is downhill ground around a high point, the same situation as Malapert's eastern bins.
+- **Cabeus B point kept** (the Lane A lead). The reason is recorded in the root README: the Earth-facing skyline is downhill ground around a high point, the same situation as Malapert's eastern bins.
 
 ### 2026-11-14 — D12 terrain, stage 2 DONE: IM-2, IM-1, Chandrayaan-3 (landed coordinates)
 - **Maps confirmed from PDS labels:**
@@ -1224,7 +1224,7 @@ interface PanelHandle { update(next: Partial<Pick<PanelProps, "siteId" | "landin
   - Beyond 20 km every site uses 80 / 120 / 240 / 400 m maps. No direction is cut off by a map edge.
 - **Chandrayaan-3 coordinate change (D12 "landed coordinates"):**
   - From ISRO's *prime landing-site centre* (69.367621°S, 32.348126°E; ISRO gives a 4 km × 2.4 km box and no touchdown coordinates) to **LROC's "Chandrayaan-3 Landing Site" 69.3741°S, 32.32°E, 532 m**, where LROC imaged the lander about four days after landing. About 0.35 km apart.
-  - `sites.js` source now points to LROC; the ISRO values are kept in the note. Its Horizons data (2026–2029 + landing window) were re-downloaded. **Sheldon: please confirm.**
+  - `sites.js` source now points to LROC; the ISRO values are kept in the note. Its Horizons data (2026–2029 + landing window) were re-downloaded. **The Lane A lead: please confirm.**
 - **Independent cross-check:** LOLA ground height vs LROC's published elevation: IM-1 2594 m vs 2579 m; Chandrayaan-3 529 m vs 532 m.
 - **Limits stated in the data README:** IM-2 rests on its side in a ~20 m crater (LROC) that a 20 m map can't resolve. Chandrayaan-3 at 60 m/px misses small nearby features.
 - **Code:**
@@ -1638,7 +1638,7 @@ SOUTH_POLE.sources;          // [{ name, url }]
 - **Checks:** all nine check scripts PASS. Panel tests PASS, with the theme test extended for D31 (hollow Partial, glass + no border + one variable, indigo accent, no nested boxes, full-width grid, one-line note). `/web` build OK.
 
 ### 2026-11-14 — D32 two reading levels: Lane A part DONE (panel interface v1.4, API 1.10.0)
-**Recorded:** D32 in PLAN.md; DESIGN.md → "Two reading levels (D32)". Brand files `web/public/brand/lunlux-wordmark.png` and `lunlux-icon.png` committed as Sheldon asked (Lane B uses them).
+**Recorded:** D32 in PLAN.md; DESIGN.md → "Two reading levels (D32)". Brand files `web/public/brand/lunlux-wordmark.png` and `lunlux-icon.png` committed as the Lane A lead asked (Lane B uses them).
 
 **Educator (seven-year-old bar), all panels follow `level`:**
 - Side card: two rings (gold sunshine, blue Earth in sight) in words, a week strip, one verdict sentence, "Now: day N" in one sentence each, the score as one number with the best candidate place, child-level "Why these weights?" and "Why the south pole?". No degrees, coordinates or timestamps outside the "For the teacher" fold-outs, which give the full explanation and one class question.
@@ -1700,12 +1700,12 @@ SOUTH_POLE.sources;          // [{ name, url }]
 - Changed the Educator tip loop to iterate over `Array.from(querySelectorAll(...))`. No functionality or scope change.
 - Awaiting new Vercel build check; item 5 not yet marked passed.
 
-### 2026-11-15 — Lane B D32 closure and repository status reconciliation (Advik request)
-- Re-read PLAN.md (D32), DESIGN.md (D32), STATUS.md and latest `main` commit before updating this row; no newer Lane A changes found (main was `d0ef0f6`). This is a **status-only documentation update explicitly requested by Advik**, an exception to the usual rule to fold status updates into code commits.
+### 2026-11-15 — Lane B D32 closure and repository status reconciliation (the Lane B lead request)
+- Re-read PLAN.md (D32), DESIGN.md (D32), STATUS.md and latest `main` commit before updating this row; no newer Lane A changes found (main was `d0ef0f6`). This is a **status-only documentation update explicitly requested by the Lane B lead**, an exception to the usual rule to fold status updates into code commits.
 - **D32 Lane B 1–5 complete**, in order: (1) wordmark in header and Tour plus favicon (`fd60ce0`); (2) self-hosted Urbanist headings, shared `--llp-heading-font`, OFL-1.1 credited (`84d3d53`); (3) Learn/Report label by reading level and `level` passed to every mounted panel, Planner hidden for Educator (`9ff744b`); (4) `kidTitle`/`kidText` for Educator and original Tour text for Researcher, including switching while a stop is visible (`2a90045`); (5) seven-year-old-level shell copy with detailed text in teacher fold-outs (`0af465b`, corrected for TS2488 by `d0ef0f6`). No extra feature work authorized.
 - **Build evidence:** Vercel production builds READY for `fd60ce0` (`dpl_Cw2kQfLQwcuDZJMUbA8kkHBjVGgk`), `84d3d53` (`dpl_36HTm3YaHocjrNjupyQwSN1dQWme`), `9ff744b` (`dpl_CXSAvsohuJsW1uikt1UHdLrG1Gnx`) and `2a90045` (`dpl_8QDyFagztSdAi5kw9McyRDsbamb1`). Item 5 first failed TypeScript TS2488 at `0af465b` (`dpl_AgbA6HgD7Q18uUpEzxZ9uvEgkagy`), then passed at `d0ef0f6` (`dpl_uZtuVD3FCQfiGnoD24p6hPEyYJSe`, READY, rechecked 2026-11-15). Public deployment: https://lunar-landing-hackathon-e3hdyh643-usmdo-club.vercel.app/.
 - **Evidence scope:** production build success verified, but no independent in-browser visual/interaction smoke test or seven-year-old human readability review performed in this pass; do not label those PASS. Lane A's D32 panel tests were reported passed in its own notes; no Lane A code or status edited.
-- **Next dependency:** Advik/Sheldon visually review Educator and Researcher flows and record any findings. Signed step 4/7 acceptance flags and other open human-review items remain as written; stop here, no features beyond D32.
+- **Next dependency:** the Lane B lead/the Lane A lead visually review Educator and Researcher flows and record any findings. Signed step 4/7 acceptance flags and other open human-review items remain as written; stop here, no features beyond D32.
 
 ## 2026-11-15 — Lane B production audit (partial; no feature sign-off)
 - Requested comprehensive feature/error/visual audit. Checked current PLAN.md v2, STATUS.md, GitHub main tree (514dc4a), and Vercel production deployment dpl_Fwiye1LkRezh9nLYZke8wx2hbxNM (READY, same SHA).
@@ -1822,7 +1822,7 @@ Done within the 2-hour time box (all checks passing about 7 minutes after starti
 
 **Licence files (repo root):**
 - `LICENSE`: the official Apache License 2.0 text, downloaded from https://www.apache.org/licenses/LICENSE-2.0.txt (unchanged; SHA-256 `cfc7749b…3d30`).
-- `NOTICE`: copyright "Sheldon Spence and Advik Chaudhary", plus everything the licence does NOT cover, each with its own terms and source: NASA data (Horizons, LOLA/PDS, NSSDCA, site sources), NASA imagery (CGI Moon Kit maps and the five Learn photos with exact credits), quoted NASA/JPL text, fonts (CMU Serif via `computer-modern`: fonts OFL 1.1, package files MIT; Source Serif 4: OFL 1.1), the forked simulator and its textures (not relicensed; open items point to the audit), npm packages (three MIT, vite MIT, typescript Apache-2.0, @types/three MIT; licences read from `web/node_modules`), and names and marks (Apache §6 grants no trademark rights). NASA's media-usage wording is quoted from https://www.nasa.gov/nasa-brand-center/images-and-media/.
+- `NOTICE`: copyright "the LunLux team", plus everything the licence does NOT cover, each with its own terms and source: NASA data (Horizons, LOLA/PDS, NSSDCA, site sources), NASA imagery (CGI Moon Kit maps and the five Learn photos with exact credits), quoted NASA/JPL text, fonts (CMU Serif via `computer-modern`: fonts OFL 1.1, package files MIT; Source Serif 4: OFL 1.1), the forked simulator and its textures (not relicensed; open items point to the audit), npm packages (three MIT, vite MIT, typescript Apache-2.0, @types/three MIT; licences read from `web/node_modules`), and names and marks (Apache §6 grants no trademark rights). NASA's media-usage wording is quoted from https://www.nasa.gov/nasa-brand-center/images-and-media/.
 
 **Reply to Lane B (THIRD_PARTY_LICENSE_AUDIT.md and the ACTION REQUIRED request):**
 1. **Licence consent:** D34 records both humans' approval of Apache 2.0 for the team's original code and text, so release gate 1 is met by the files above. The approval covers our own work only. It does not license the simulator fork, its textures or any third-party item, which is what NOTICE says.
@@ -1845,7 +1845,7 @@ Done within the 2-hour time box (all checks passing about 7 minutes after starti
    - The weight sliders sit right beside their labels (one shared grid).
    - The terrain chart's compass letters are HTML at normal text size.
    - Stand here hides its own time slider when the shell supplies the hour (`onHourSelected`); it still shows the time.
-3. **README:** a Licence section; every outside item in tables with its licence or terms and source; the team line "by Sheldon Spence and Advik Chaudhary".
+3. **README:** a Licence section; every outside item in tables with its licence or terms and source; the team line "by the LunLux team".
 
 **Note for Lane B:** the Learn "Try it yourself" and "Visit" cards are plain links using your shareable-link parameters. If those names change, tell Lane A.
 
@@ -1853,8 +1853,8 @@ Done within the 2-hour time box (all checks passing about 7 minutes after starti
 
 
 ### 2026-11-15 — Collaborative presentation scaffold, proposal
-- Advik confirmed animated web presentation with possible embedded live demo. Created isolated Reveal.js / Vite `presentation/` foundation, original CSS visuals, presenter notes and seven draft slides. The existing production LunLux app and scientific source files are unchanged.
-- Advik + ChatGPT lead narrative/design; Sheldon + Claude lead scientific source review. Shared presentation status and README establish ownership and safe GitHub coordination.
+- The Lane B lead confirmed animated web presentation with possible embedded live demo. Created isolated Reveal.js / Vite `presentation/` foundation, original CSS visuals, presenter notes and seven draft slides. The existing production LunLux app and scientific source files are unchanged.
+- Lane B lead + ChatGPT lead narrative/design; Lane A lead + Claude lead scientific source review. Shared presentation status and README establish ownership and safe GitHub coordination.
 - Demo is currently an external link to the same site/date/hour in Educator and Researcher; iframe and borrowed simulator images are NOT included pending browser and licensing checks.
 - Dependency install, build, browser QA, separate Vercel project and human narrative sign-off are NOT YET VERIFIED. The current PLAN D34 license/attribution decisions remain unaffected.
 
@@ -1874,10 +1874,10 @@ Done within the 2-hour time box (all checks passing about 7 minutes after starti
 
 ### 2026-11-15 — Lane B D34 item 5: authorship byline; cleanup stopped
 - Item 4 commit `80062b1`, Vercel `dpl_Bo8afBdGcRSrcaQNS1Ee8qZ4MQHZ` READY.
-- The Data and methods project credit line now includes the exact words `by Sheldon Spence and Advik Chaudhary`. The Educator How we know display also names both contributors, rather than burying the attribution in the teacher details.
+- The Data and methods project credit line now includes the exact words `by the LunLux team`. The Educator How we know display also names both contributors, rather than burying the attribution in the teacher details.
 - This is the final requested D34 source change. Item 5 deployment verification is pending. No wider third-party rights audit or further texture modifications were started.
 
-### 2026-11-15 — Screenshots, eclipse slide, Learn full width, "Watch a month", "Can you tell?" (Sheldon's request)
+### 2026-11-15 — Screenshots, eclipse slide, Learn full width, "Watch a month", "Can you tell?" (the Lane A lead's request)
 - `presentation/public/shots/` committed as supplied (six app screenshots; each looked at before committing; app content only).
 - `presentation/src/slides/science.js`: "10 / 10" became **"9 / 10"**, captioned "of NASA's lunar eclipses for 2026-2029 found in our own data; the tenth is a faint graze that misses by under 1%". This matches `check_d19`: 9 events found directly; the 2027-07-18 penumbral misses solid-Earth contact by 0.9% of Earth's radius.
 - **Learn (Educator), full width with grids:** the four explainers two by two; "Try it yourself" three across; "The ten places" five across; the five NASA photos as one row of cards. The filler sentences were removed.
@@ -1923,13 +1923,13 @@ Done within the 2-hour time box (all checks passing about 7 minutes after starti
   - DESIGN.md table, `THEME` in `web/src/panels/shared.ts` and the shell's `--llp-*` variables changed together.
 - **Part 2 (`75db1fa`):** Explore opens on today's date (UTC), kept inside 2026-01-01..2029-12-24. A link's date still wins (checked in headless Chromium: no date → 2026-11-15; `date=2027-03-05` → 2027-03-05).
 - **Part 3, deck (`3e68256`, `f78e108`):**
-  - Root cause of the blank slides: `.page { position:relative }` stacked slides 2–7 below the screen (reproduced: 899 / 1,677 px). Advik's `9fdf986` had already switched it to absolute; it is now fully explicit (`top:0; left:0; width:100%; height:100%`). All seven slides show when stepping with the arrow keys, at six screen sizes.
+  - Root cause of the blank slides: `.page { position:relative }` stacked slides 2–7 below the screen (reproduced: 899 / 1,677 px). The Lane B lead's `9fdf986` had already switched it to absolute; it is now fully explicit (`top:0; left:0; width:100%; height:100%`). All seven slides show when stepping with the arrow keys, at six screen sizes.
   - Recoloured.
   - Cover: "Challenge: Lunar Landing Site Navigator", plus a turning NASA SVS Moon (three.js) peeking in from the right, credited to NASA's Scientific Visualization Studio. The PDF gets a still image of it.
   - Slide 6's closing line removed; slide 7 asks "Where would you land?" once.
   - Screenshots 01–05 retaken (1440×810 @2x).
   - PDF re-exported: 7 pages, each looked at.
-- **Part 4:** README eclipse row (nine of ten found directly, within 3 h; the tenth a graze missed by under 1%) and AI-use additions. `check_d19`'s summary line now says the same thing. Sheldon's row updated.
+- **Part 4:** README eclipse row (nine of ten found directly, within 3 h; the tenth a graze missed by under 1%) and AI-use additions. `check_d19`'s summary line now says the same thing. The Lane A lead's row updated.
 - **Checks:** all twelve scripts PASS, panel tests PASS, `cd web && npm run build` OK, `cd presentation && npm run build` OK.
 - **Note for Lane B:** the shell files touched were `web/src/style.css`, `main.ts`, `moon.ts`, `starfield.ts`, `overview.ts`, `educatorCopy.ts` and `web/index.html`. Please pull before your next edit. Your code comment "D35 Moon handoff" in `style.css` predates PLAN's D35 and refers to something else.
 

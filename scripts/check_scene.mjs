@@ -1,6 +1,6 @@
 // Step 8 checks for getSceneState (Moon-fixed Sun/Earth directions + distances).
 // 1. Hand-check rows: the Sun and Earth elevation/azimuth IMPLIED by getSceneState at a site must
-//    match the Horizons web-app values Sheldon read (site-topocentric quantity 4) within TOL_DEG.
+//    match the Horizons web-app values the Lane A lead read (site-topocentric quantity 4) within TOL_DEG.
 // 2. Same comparison against our hourly site files for all 10 sites, every 6th hour, 2026-2029.
 // 3. The Sun-Earth angle between the two directions equals Horizons' S-T-O (quantity 24).
 // 4. Judge check: near each full moon (S-T-O minimum) the sub-solar and sub-Earth points are close together.
@@ -32,7 +32,7 @@ ok(V.getSceneState("2026-11-14T12:30:00Z").sampleUtc === "2026-11-14T12:00:00Z",
 try { V.getSceneState("2030-01-01T00:00:00Z"); ok(false, "out of coverage throws"); } catch (e) { ok(/OUT_OF_COVERAGE/.test(e.message), "out of coverage throws OUT_OF_COVERAGE"); }
 ok(!!V.getSceneState("1969-07-20T20:00:00Z"), "Apollo 11 landing window covered");
 
-// 1. Hand-check rows (Horizons web app, Sheldon 2026-11-14). sp_malapert rows are at its ORIGINAL point.
+// 1. Hand-check rows (Horizons web app, the Lane A lead 2026-11-14). sp_malapert rows are at its ORIGINAL point.
 const HAND = [
   ["apollo11", 0.67408, 23.47297, "2026-11-14T12:00:00Z", { sun: [91.485723, -7.066737], earth: [277.587391, 64.319993] }],
   ["im1", -80.13, 1.44, "2026-11-17T08:00:00Z", { sun: [84.925818, 2.457328], earth: [352.877147, 9.295239] }],

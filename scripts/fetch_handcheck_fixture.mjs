@@ -1,5 +1,5 @@
 // Saves Horizons values at sp_malapert's ORIGINAL point (86.0S, 0.3E, before D10 moved the site)
-// for the window holding Sheldon's two sp_malapert hand-checks, at full Horizons precision.
+// for the window holding the Lane A lead's two sp_malapert hand-checks, at full Horizons precision.
 // scripts/check_ephem.mjs compares the hand-check values against this file, so the
 // regression stays exact even though data/ephem/sp_malapert/ now uses the D10 point.
 // Usage: node scripts/fetch_handcheck_fixture.mjs

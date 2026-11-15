@@ -1,6 +1,6 @@
 # LunLux — animated web presentation
 
-A standalone Reveal.js + Vite presentation. **This is the official LunLux presentation working deck, designated by Advik; it still needs changes and has not received final approval.** It is separate from production LunLux (`web/`).
+A standalone Reveal.js + Vite presentation. **This is the official LunLux presentation working deck, designated by the Lane B lead; it still needs changes and has not received final approval.** It is separate from production LunLux (`web/`).
 
 **Local preview link (on the computer running Vite only):** `http://127.0.0.1:5179/`. This is a loopback address, **not a public URL**; opening it on GitHub or another person's device will not show the slides unless that device is running the presentation server on port 5179. GitHub source: `presentation/index.html`. The separately deployed presentation is `https://lunlux-presentation-lunlux.vercel.app/` (currently protected by Vercel Authentication; access is not yet publicly verified).
 
@@ -11,8 +11,8 @@ A standalone Reveal.js + Vite presentation. **This is the official LunLux presen
 **Deployment:** separate Vercel project `lunlux-presentation` connected to this GitHub repo, Root Directory `presentation/`, Vite build output `dist/`. The deployed build is READY and screenshot/wordmark URLs returned 200; browser visual QA is still pending. Production LunLux app deployment remains a different Vercel project.
 
 ## Collaboration contract
-- Advik and ChatGPT lead `src/slides/story.js` (narrative) and `src/style.css` (presentation design).
-- Sheldon and Claude lead `src/slides/science.js` (methods, verified numbers, citations).
+- The Lane B lead and ChatGPT lead `src/slides/story.js` (narrative) and `src/style.css` (presentation design).
+- The Lane A lead and Claude lead `src/slides/science.js` (methods, verified numbers, citations).
 - `src/slides/demo.js` and `PRESENTATION_STATUS.md` are shared. Agree before modifying shared files.
 - Each agent must read current `../PLAN.md`, `../STATUS.md`, this README, and presentation status before working. Check latest commits; use small commits and branches when overlapping edits.
 - Both humans approve slide claims, narrative, visuals and final delivery. Neither assistant modifies production `web/`, `lib/`, `data/`, `scripts/` from this presentation workflow.

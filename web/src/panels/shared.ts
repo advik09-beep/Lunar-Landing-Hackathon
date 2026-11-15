@@ -106,7 +106,7 @@ export function markIcon(pass: boolean, size = 16): string {
     : `<svg class="vi" data-icon="fail" width="${size}" height="${size}" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="8" style="fill:var(--_out-fill);stroke:var(--_out)" stroke-width="1.3"/><path d="M6.8 6.8l6.4 6.4M13.2 6.8l-6.4 6.4" style="stroke:var(--_text)" stroke-width="2" stroke-linecap="round"/></svg>`;
 }
 
-/** "On the edge" means different things by horizon model (Sheldon, 2026-11-14):
+/** "On the edge" means different things by horizon model (Lane A lead, 2026-11-14):
  *  flat sites: terrain isn't modelled, so terrain decides; terrain sites: terrain is already included,
  *  so the body is grazing the skyline and small changes in position matter. */
 export const EDGE_WORDS = {

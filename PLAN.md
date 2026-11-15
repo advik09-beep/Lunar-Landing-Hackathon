@@ -11,10 +11,10 @@ Order of work, in full:
 lighting -> 9 Submit. Details in "The steps" below.
 
 ## Start here if you know nothing about this project
-- This is a two-person hackathon team: Sheldon and Advik. Submission is
+- This is a two-person hackathon team: the Lane A lead and the Lane B lead. Submission is
   due Sunday Nov 15, 11:59 PM local.
-- Two AI tools write the code. Claude Code works with Sheldon on the
-  numbers (Lane A). ChatGPT works with Advik on the screen (Lane B).
+- Two AI tools write the code. Claude Code works with the Lane A lead on the
+  numbers (Lane A). ChatGPT works with the Lane B lead on the screen (Lane B).
 - THIS FILE WINS. If STATUS.md, DESIGN.md or any older note disagrees
   with it, follow this file and flag the conflict.
 - STATUS.md is the live log and the "who is doing what" board.
@@ -280,7 +280,7 @@ and researchers get the numbers behind them.
   labels, terrain-chart compass letters at normal size, and Stand here
   hides its own time slider when the shell supplies the hour; (3) README
   Licence section with every outside item and its licence; (4) README
-  team line "by Sheldon Spence and Advik Chaudhary".
+  team line naming the team (names later removed under D37).
 
 - D35 Final look and deck pass (both humans, 2026-11-15). Lane A does this
   whole pass, including the web shell files and presentation/; Lane B is
@@ -305,7 +305,7 @@ and researchers get the numbers behind them.
   Scientific Visualization Studio; slide 6 loses its old closing line;
   slide 7 says "Where would you land?" once; screenshots 01-05 retaken
   after the recolour; the PDF re-exported and checked page by page.
-  (4) README eclipse row and AI-use section; STATUS Sheldon row.
+  (4) README eclipse row and AI-use section; STATUS Lane A lead row.
 
 - D36 Pins, grid icons and deck polish (both humans, 2026-11-15). Lane B is
   not editing. (1) Globe pins get solid coloured bodies with a dark outline,
@@ -399,7 +399,7 @@ your own lane has passed.
   panel test page web/panels.html). Lane B edits the rest of /web.
   Each writes only in its own section of STATUS.md (D9).
 - The STATUS.md header is the live board: one row per person/AI plus
-  "Waiting on Sheldon: ..." and "Waiting on Advik: ...". Anyone may
+  "Waiting on the Lane A lead: ..." and "Waiting on the Lane B lead: ...". Anyone may
   update their own row there.
 - Never mark a test passed without running it. Label proposals as
   proposals. Changes to anything in this file need both humans.

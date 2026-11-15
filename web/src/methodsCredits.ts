@@ -15,7 +15,7 @@ export function methodsCredits(sites: CitedSite[]): string[] {
     .map(site => sourceItem(site.shortName, "Site coordinates and mission history are factual source data",
       url(site.source!, "official or cited landing-site source")));
   return [
-    '    <p class="rights-intro">Original LunLux code and text: Apache License 2.0, copyright 2026 Sheldon Spence and Advik Chaudhary. External data, images, fonts and software keep their own terms. Attribution does not imply NASA endorsement.</p>',
+    '    <p class="rights-intro">Original LunLux code and text: Apache License 2.0, copyright 2026 the LunLux team. External data, images, fonts and software keep their own terms. Attribution does not imply NASA endorsement.</p>',
     '    <p class="rights-intro">This is a readable summary of the project ' +
       url("https://github.com/advik09-beep/Lunar-Landing-Hackathon/blob/main/NOTICE", "third-party NOTICE") +
       ' and ' + url("https://github.com/advik09-beep/Lunar-Landing-Hackathon/blob/main/LICENSE", "Apache 2.0 LICENSE") +
@@ -91,7 +91,7 @@ export function methodsCredits(sites: CitedSite[]): string[] {
     '<h3>Attribution and marks</h3><ul class="rights-list">',
     sourceItem("NASA names, marks and insignia", "NASA's use rules apply; NASA endorsement is not implied",
       url("https://www.nasa.gov/nasa-brand-center/", "NASA Brand Center")),
-    '<li><strong>LunLux wordmark and icon</strong><span>Team-created branding, as recorded in NOTICE; Apache 2.0 grants no trademark rights. Team original code and text are credited to Sheldon Spence and Advik Chaudhary.</span></li>',
+    '<li><strong>LunLux wordmark and icon</strong><span>Team-created branding, as recorded in NOTICE; Apache 2.0 grants no trademark rights. Team original code and text are credited to the LunLux team.</span></li>',
     '<li><strong>Other visual references</strong><span>Starfield styling was discussed with reference to ' +
       url("https://www.huescreen.com/starfield/", "Hue Screen Starfield") + ' and ' +
       url("https://github.com/etrepat/starfield", "etrepat/starfield (MIT)") +

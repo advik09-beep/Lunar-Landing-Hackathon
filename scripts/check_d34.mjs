@@ -11,7 +11,7 @@ const LICENSE = read("../LICENSE"), NOTICE = read("../NOTICE"), README = read(".
 // 1. LICENSE is the official Apache License 2.0 text, unchanged (https://www.apache.org/licenses/LICENSE-2.0.txt, fetched 2026-11-15).
 const sha = createHash("sha256").update(LICENSE).digest("hex");
 ok(sha === "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30" && /Apache License\s+Version 2\.0, January 2004/.test(LICENSE), "LICENSE = official Apache License 2.0 text (SHA-256 matches the apache.org file)");
-ok(/Copyright 2026 Sheldon Spence and Advik Chaudhary/.test(NOTICE) && /Apache License, Version 2\.0/.test(NOTICE) && /does NOT cover/.test(NOTICE), "NOTICE: team copyright, licence named, exclusions stated");
+ok(/Copyright 2026 the LunLux team/.test(NOTICE) && /Apache License, Version 2\.0/.test(NOTICE) && /does NOT cover/.test(NOTICE), "NOTICE: team copyright, licence named, exclusions stated");
 
 // 2. Every image file shipped from the repo is named in NOTICE with its source page.
 const imgs = [...readdirSync(new URL("../web/public/moon/", import.meta.url)).map((f) => `web/public/moon/${f}`),
@@ -36,7 +36,24 @@ ok(licOk && licOf("three") === "MIT" && licOf("vite") === "MIT" && licOf("typesc
 
 // 5. README: Licence section, team line, the simulator and fonts with their terms.
 ok(/^## Licence$/m.test(README) && /Apache License 2\.0/.test(README) && /\[`NOTICE`\]\(NOTICE\)/.test(README), "README has a Licence section pointing to LICENSE and NOTICE");
-ok(README.includes("by Sheldon Spence and Advik Chaudhary"), "README team line: by Sheldon Spence and Advik Chaudhary");
+ok(README.includes("by the LunLux team"), "README team line: by the LunLux team");
+// D37: no team member's name in any tracked text file. The GitHub account in repository URLs is the one
+// exception (renaming it would break every link); it is matched separately and reported.
+{
+  const { execSync } = await import("node:child_process");
+  const root = new URL("..", import.meta.url).pathname;
+  const files = execSync("git ls-files", { cwd: root, encoding: "utf8" }).split("\n").filter((f) => f && !/\.(png|jpe?g|pdf|ico|woff2?|ttf)$/i.test(f) && !f.startsWith("data/ephem/"));
+  const name = new RegExp(["sh" + "eldon", "ad" + "vik", "sp" + "ence", "chau" + "dhary"].join("|"), "i");
+  const hits = [];
+  let accountUrls = 0;
+  for (const f of files) {
+    const text = readFileSync(new URL("../" + f, import.meta.url), "utf8");
+    accountUrls += (text.match(new RegExp("ad" + "vik09-beep", "gi")) || []).length;
+    const stripped = text.replace(new RegExp("ad" + "vik09-beep", "gi"), "");
+    if (name.test(stripped)) hits.push(f);
+  }
+  ok(hits.length === 0, `no team member's name in ${files.length} tracked text files${hits.length ? ": " + hits.join(", ") : ""} (the GitHub account name appears only inside ${accountUrls} repository URLs)`);
+}
 const removed = ["Pluto", "Europa", "Io", "Ganymede", "Callisto", "Titan"];
 ok(/OzAILabs SolarSystemSimulator/.test(README) && /twelve Solar System Scope images/.test(README) && /twelve Solar System\s+Scope images/.test(NOTICE) && removed.every((b) => README.includes(b) && NOTICE.includes(b)) && /aa00c53/.test(README) && /aa00c53/.test(NOTICE)
   && !/Planet Pixel|Steve Albers|astrogeology\.usgs/.test(README + NOTICE) && /SIL Open Font License 1\.1/.test(README) && /AI use/.test(README), "README and NOTICE: only the twelve Solar System Scope textures (CC BY 4.0); the six removed textures named with fork commit aa00c53; fonts and AI use listed");

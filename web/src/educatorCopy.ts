@@ -30,7 +30,7 @@ function syncCredits(kid: boolean): void {
     const original = Array.from(credits.children).slice(1) as HTMLElement[];
     const intro = document.createElement('div');
     intro.className = 'kid-sources-list';
-    intro.innerHTML = `<p class="credits-byline">LunLux by Sheldon Spence and Advik Chaudhary.</p>
+    intro.innerHTML = `<p class="credits-byline">LunLux, by the LunLux team.</p>
       <p>We check where our Moon facts come from.</p>
       <ul>
         <li>NASA tells us where the Sun and Earth are.</li>

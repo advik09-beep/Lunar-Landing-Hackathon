@@ -1,5 +1,5 @@
 // Regression check for the step 2 data in data/ephem/.
-// Compares the files with the 7 values Sheldon read from the JPL Horizons web app
+// Compares the files with the 7 values the Lane A lead read from the JPL Horizons web app
 // (2026-11-14; all 7 matched our first 7-day files to six decimals), then runs the
 // PLAN step 2 sanity checks and a coverage check.
 // Usage: node scripts/check_ephem.mjs   -> prints PASS or exits 1.
@@ -24,7 +24,7 @@ function at(siteId, utc) {
 let fails = 0, maxDiff = 0;
 const ok = (c, m) => { if (!c) { console.error("FAIL:", m); fails++; } };
 
-// Horizons web app values (Sheldon's hand-checks, 2026-11-14).
+// Horizons web app values (the Lane A lead's hand-checks, 2026-11-14).
 const HAND = [
   ["apollo11", "2026-11-14T12:00:00Z", "sun", 91.485723, -7.066737],
   ["apollo11", "2026-11-14T12:00:00Z", "earth", 277.587391, 64.319993],

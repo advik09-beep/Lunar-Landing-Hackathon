@@ -165,3 +165,10 @@ The same values are exported as `THEME` from `web/src/panels/shared.ts` for code
 - Everything else stays black and grey (panels, the Compare grid, the side card). Gold is only the Sun, blue only Earth.
 - The Compare grid's phase icons are larger, so Out / Hard (dark disc) and On the edge / Tricky (dashed ring with dot) are easy to tell apart.
 
+## Final site and deck pass (D37, both humans, 2026-11-15)
+- **Pins stay on their true spots.** D36's spreading and leader lines are removed. The pin colours and the label placement (a site's name sits beside its pin, in the spot that covers the fewest other pins) stay.
+- **Verdict colours wherever a verdict appears**, matching the pins: green `#4FBF7A` for Clear / Great week and Partial / Okay week (the grey Moon phase inside tells them apart), coral `#F28B82` for Out / Hard week, violet `#B48CF0` for On the edge / Tricky week, each a coloured ring with a dark outline around the phase. Used in the Compare grid and its legend, the Explore chips, the side card and the Learn tab's ten places. Gold is still only the Sun and blue only Earth; everything else stays black and grey. This replaces D35's "nothing else is coloured" for verdicts.
+- The Educator legend line now reads "Green is good, coral is hard, violet is tricky." (was "Bright means a better week.").
+- **Address bar:** updated at most every 300 ms (with a final update) and guarded, so dragging a slider can never trip Safari's limit on history updates.
+- **Names:** no team member's name appears on the site, in the deck or in the repository's text files. The team is "the LunLux team"; the leads are "the Lane A lead" and "the Lane B lead".
+
