@@ -2,31 +2,34 @@
 
 **Sunlight and Earth contact for lunar landing sites**
 
-**NASA Space Apps Challenge 2026 · team of two (Sheldon and Advik)**
+**NASA Space Apps Challenge 2026, team of two (Sheldon and Advik)**
 
 **Live site:** https://lunar-landing-hackathon.vercel.app (desktop browsers)
 
-Pick a lunar landing site and a landing date. The tool tells you, for a 7-day stay, whether the **Sun** (sunlight for power) and **Earth** (a direct line of sight for radio) are above the local horizon, for how long, and what changes if the date slips.
+Pick a lunar landing site and a landing date. LunLux tells you, for the stay, whether the **Sun** (sunlight for power) and **Earth** (a direct line of sight for radio) are above the local terrain skyline, for how long, and what changes if the date slips.
 
-It has two reading levels:
-- **Educator:** written so a seven-year-old understands it: pictures first (sunshine and Earth rings, a week-long day and night strip), one short sentence at a time, no degrees. Each section has a small "For the teacher" fold-out with the fuller explanation and a question for the class.
-- **Researcher:** angles, margins, every metric, charts across 2026–2029, sources and downloads, for mission planners and researchers.
+One switch in the header sets the reading level for the whole site:
+- **Educator:** written so a seven-year-old understands it. Pictures first (sunshine and Earth rings, a week-long day and night strip), one short sentence at a time, everyday words, no degrees. Each section has a small "For the teacher" fold-out with the fuller explanation and one question for the class. The stay is always one week.
+- **Researcher:** angles, margins, every metric, the score formula with adjustable weights, charts across 2026–2029 and downloads, for mission planners and researchers.
 
 ## What you can do
-- **Explore in 3D:** a Moon globe (NASA imagery) with 10 sites, each colored *and* labeled by verdict for the chosen landing date: ✓ Clear, ◐ Partial, ✕ Out, ⚠ On the edge (grazing the skyline, so small changes in position matter).
-- **Side card:** for one site and date: verdict, Sun and Earth status, the terrain horizon model and its map, sources and coverage, and a CSV of the 168 hourly values.
-- **Compare dates:** a grid of sites × landing dates, plus an hour-by-hour strip showing when the Sun and Earth are in view.
-- **Researcher tab:** a full analysis of one site and stay, written for researchers and mission designers:
-  - NASA's landing-region criteria and how we cover each, lighting and power with the calculator, communications geometry with signal delay, lunar season and time of day, eclipses, best and worst months, the terrain profile with its maps and local slope, and the score formula.
-  - A note on other planets, a list of what is NOT modelled, and all sources.
-  - Downloadable as JSON (full analysis) or CSV (hourly).
-- **Learn (Educator) / Report (Researcher):** Learn is a picture report for children built from our data (a real ridge hiding the Sun, the low polar Sun, two-week days and nights, Earth staying in one spot) plus two NASA photos with their credits. Report adds charts across 2026–2029 (monthly sunlight and Earth in view, the daily score with lunar eclipses marked) and a download of every site and landing date.
-- **Planner (Researcher view):**
-  - Compare two scenarios (site + landing date) side by side, with the differences in plain words. Pairs can be saved in your browser and downloaded.
-  - A mission requirements filter: set limits such as longest blackout, longest gap without Earth, minimum sunlight or Earth-in-view share, and steepest slope. Every site shows PASS or FAIL with the failing limit named.
-- **Stand here:** a 360° horizon panorama with the Sun and Earth paths over the stay. Every site uses a real terrain horizon from NASA's LOLA laser altimeter, so you can see the Sun blocked by a ridge.
+The site has four tabs plus a "Data and methods" link.
 
-The 10 sites are either **candidate sites** (possible future landing points: four from NASA's Artemis III candidate regions, Peak near Cabeus B, Haworth, Malapert Massif, Nobile Rim 2) or **historic landings** (Apollo 11, 12 and 17, Chandrayaan-3, Intuitive Machines IM-1 and IM-2), shown as comparisons for educators. The ranking can be filtered to all sites, candidates, or historic landings.
+- **Tour:** a solar-system tour (an embedded, separately deployed fork of an open-source simulator) with one caption per stop answering "What does this body do to a lander on the Moon?". Captions come in an Educator and a Researcher version, with the same facts and sources. The last stop says "Click on the Moon" and opens Explore.
+- **Explore:** a 3D Moon (NASA imagery) lit from the real Sun direction for the chosen date and hour, with 10 site pins marked by verdict symbol and colour. Next to it, a side card, which can switch to the horizon view ("Stand here"):
+  - **Side card, Educator:** a verdict sentence, the rings, the week strip, what the Sun and Earth are doing now, the score with "Why this score?", and "Why the south pole?".
+  - **Side card, Researcher:** Sun and Earth elevation, azimuth, skyline height, margin and next change; stay percentages; power and comms metrics; a power calculator; the score formula; sources; an hourly CSV.
+  - **Stand here:** a 360° horizon panorama from NASA LOLA terrain, with the Sun and Earth paths over the stay and the chosen hour. You can see the Sun blocked by a ridge.
+- **Compare:** a grid of sites × landing dates, each cell a verdict.
+  - Educator: the grid plus one sentence naming the best week in the four weeks shown.
+  - Researcher: also an hour-by-hour strip, the score ranking with six adjustable weights, a two-scenario (A/B) comparison with the differences in plain words, and a mission requirements filter (PASS or FAIL per site, failing limits named).
+- **Learn (Educator) / Report (Researcher):**
+  - Learn: a picture report from our data (a real ridge hiding the Sun, the low polar Sun, two-week days and nights, Earth staying in one spot) and two NASA photos with their exact credits.
+  - Report: a full analysis of one site and stay (NASA's landing-region criteria and how we cover each, lighting and power, communications geometry with signal delay, lunar season and time of day, eclipses, best and worst months, terrain profile, maps and local slope, the score, other planets, what is NOT modelled, sources), charts across 2026–2029 (monthly sunlight and Earth in view; the daily score with lunar eclipses marked), and downloads: the full analysis (JSON), hourly data (CSV), this site by month (CSV) and every site and landing date (CSV).
+
+The 10 sites are either **candidate sites** (possible future landing points from four of NASA's Artemis III candidate regions: Peak near Cabeus B, Haworth, Malapert Massif, Nobile Rim 2) or **historic landings** (Apollo 11, 12 and 17, Chandrayaan-3, Intuitive Machines IM-1 and IM-2), shown as comparisons. The ranking can be filtered to all sites, candidates, or historic landings.
+
+Verdicts are always shown with a word and a drawn symbol, never colour alone: Clear (filled green circle with a tick), Partial (hollow green ring), Out (grey circle with a cross), On the edge (violet circle with a dashed ring).
 
 **Verdict rule** (signed by both team members, shown on screen):
 - *On the edge:* the Sun or Earth is within 2° of the terrain skyline more than half the stay. It is grazing the skyline, so small changes in position matter. (A site without terrain would instead say "terrain decides"; since D12, every site has terrain.)
@@ -40,9 +43,9 @@ The 10 sites are either **candidate sites** (possible future landing points: fou
 - It uses NASA's solar irradiance at the Moon (1361 W/m², [NASA NSSDCA Moon Fact Sheet](https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html)). Every assumption is listed on screen, and the result is labeled an **estimate**.
 - Comms is geometry only: a data rate would need antenna details.
 
-**Sun and Earth score (D17, prototype):** one number from 0 to 100 per site and landing date:
+**Sun and Earth score (D17):** one number from 0 to 100 per site and landing date:
 
-> score = 100 × (25·S + 20·E + 15·D + 10·G + 15·C + 15·T) ÷ 100
+> score = 100 × (25 × S + 20 × E + 15 × D + 10 × G + 15 × C + 15 × T) ÷ 100
 
 | Term | What it measures (0 to 1) |
 |---|---|
@@ -54,9 +57,10 @@ The 10 sites are either **candidate sites** (possible future landing points: fou
 | T | slip tolerance: how little the score drops if the landing moves up to ±3 days |
 
 - **What 100 means:** the Sun and Earth stay in view, well above the skyline, for the whole stay, and the answer holds if the date slips. **What it doesn't mean:** that the site is safe. Slopes, boulders, temperatures and landing hazards aren't included.
-- The **Educator** view shows the score and names the top site in plain words, always with these default weights.
+- The score is **this team's own formula, not a NASA standard.**
+- The **Educator** view shows the score and names the best candidate site in plain words, always with these default weights, and explains it in "Why this score?".
 - The **Researcher** view shows the formula and lets you change all six weights, with the ranking updating live.
-- Both give the same number at the default weights. A clickable **"Why these weights?"** explains the choice. The weights are this team's judgment, not a NASA standard.
+- Both give the same number at the default weights. In the Researcher view, a clickable **"Why these weights?"** gives one line of reasoning per weight.
 
 ## Run it locally
 Needs Node.js 18 or newer.
@@ -64,7 +68,7 @@ Needs Node.js 18 or newer.
 cd web
 npm install
 npm run dev          # app: http://localhost:5173/   panel test page: http://localhost:5173/panels.html
-npm run build        # type-check + production build into web/dist (copies the data files and the NASA Moon map)
+npm run build        # type-check + production build into web/dist (copies the data files)
 ```
 The data are static JSON files in `data/`. There is no backend.
 
@@ -96,58 +100,61 @@ The data are static JSON files in `data/`. There is no backend.
 | `node scripts/check_d28.mjs` | The mission requirements filter and the A/B scenario comparison (D28): every site's pass/fail and named failing limits match its own numbers. No limits means every site passes, and outside the data the result is "No data", never a guessed pass. The comparison values equal the per-site numbers, the differences point the right way, a scenario compared with itself is "about the same" everywhere, and swapping A and B mirrors every difference. |
 | `node scripts/check_d32.mjs` | The two reading levels (D32): every Educator tour caption has no digits or degrees and at most two short sentences, and says the same facts as the Researcher caption ("a little over one second" = 1.19–1.36 s). The best week equals the highest score of the dates shown. The monthly chart values equal a recount from the hourly data, the daily score equals the hourly score, and every eclipse marked at Malapert is on NASA's 2026–2029 list. The all-sites table has every site and landing date (14,550 rows). The Learn facts hold: the Malapert ridge, Apollo 11's Sun at 87.8° vs Malapert's 5.5°, sunrise to sunrise 29.58–29.63 days, and Earth's small wobble. |
 
-**Terrain (all 10 sites, prototype):**
+**Terrain (all 10 sites):**
 - Built from NASA's LOLA elevation maps (PDS Geosciences).
 - Method: look along a line every 0.1° of compass direction, include the Moon's curvature exactly, and keep searching until even the highest terrain on the Moon could no longer show above the skyline.
 - Each south-pole candidate uses the highest ground within 1 km of its representative point. The six past landings use their landed coordinates (LROC for IM-1, IM-2, Chandrayaan-3; NSSDCA for Apollo).
 - Map resolution near the site: 20 m (pole sites, IM-2), 30 m (IM-1; the three Apollo sites, from global 1024 px/deg tiles) or 60 m (Chandrayaan-3). Each site's maps are listed in `data/README.md`. At Malapert that is "a slope, not a summit"; per-site details are in `data/README.md`.
 - Moving the observer about 1 km changed Earth-in-view from 41% to 100% of the time. We report that openly (see `data/README.md`).
 
-## Data sources and credits
-- **Sun and Earth angles, Moon-fixed scene data:** NASA JPL Solar System Dynamics, Horizons System. https://ssd.jpl.nasa.gov/horizons/
-- **Terrain:** NASA LRO Lunar Orbiter Laser Altimeter (LOLA) GDR elevation maps, polar and global (cylindrical), PDS Geosciences Node. https://pds-geosciences.wustl.edu/missions/lro/lola.htm
-- **Moon surface image (visual only):** NASA's Scientific Visualization Studio, CGI Moon Kit (2025), https://svs.gsfc.nasa.gov/4720. Credit: NASA's Scientific Visualization Studio. NASA says it is "optimized for aesthetics, not science". Its orientation was checked against LOLA elevation before use.
-- **Site coordinates and landing times:**
-  - NASA NSSDCA (Apollo)
-  - LROC / Arizona State University (IM-1, IM-2, polar mosaic centres)
-  - ISRO (Chandrayaan-3)
-  - NASA (Artemis III candidate regions, 2024-10-28)
+## Third-party resources
+Everything this project uses that it did not make itself.
 
-  Each site's source and notes are in `data/sites.js`.
-- **NASA photos (Learn tab):** Apollo 8 Earthrise, "Image Credit: NASA", https://www.nasa.gov/image-article/apollo-8-earthrise/ ; Lunar South Pole (PIA13523), "Credits: NASA/GSFC/Arizona State University", https://science.nasa.gov/photojournal/the-lunar-south-pole . Resized for the web.
-- **Heading font (D32, being added to the app shell):** Urbanist, SIL Open Font License 1.1, self-hosted via @fontsource/urbanist (licence read from the npm package metadata).
-- **Software:** Three.js (MIT License), Vite, TypeScript. All in-app credits are on the site's **Credits** tab.
+**Data and imagery**
+- **NASA JPL Horizons** (Solar System Dynamics): every Sun and Earth direction, distance and Moon-fixed scene value. https://ssd.jpl.nasa.gov/horizons/ , API documentation https://ssd-api.jpl.nasa.gov/doc/horizons.html
+- **NASA LRO LOLA GDR elevation maps** (PDS Geosciences Node), polar and global: every terrain horizon and local slope. https://pds-geosciences.wustl.edu/missions/lro/lola.htm
+- **NASA SVS CGI Moon Kit** (2025), colour maps 2K and 4K, for the look of the 3D Moon only. Credit: NASA's Scientific Visualization Studio. https://svs.gsfc.nasa.gov/4720 (NASA: "optimized for aesthetics, not science"; its orientation was checked against LOLA before use.)
+- **NASA NSSDCA fact sheets** (Moon, Earth, Sun): solar irradiance 1361 W/m² and its mean distance, Sun and Earth radii. https://nssdc.gsfc.nasa.gov/planetary/factsheet/
+- **NASA GSFC lunar eclipse predictions** (Fred Espenak), used to check our eclipses. https://eclipse.gsfc.nasa.gov/LEdecade/LEdecade2021.html
+- **NASA science pages and releases** quoted in the tour, "Why the south pole?" and the Report: science.nasa.gov planet pages, NASA SVS 5229 (lunar seasons), the Artemis III candidate-region releases (2022, 2024), and Park et al. 2021 (JPL DE440). Each quote carries its link on screen and in `lib/tour.js` / `lib/research.js`.
+- **NASA photos** (Learn tab), resized for the web: Apollo 8 Earthrise, "Image Credit: NASA", https://www.nasa.gov/image-article/apollo-8-earthrise/ ; Lunar South Pole (PIA13523), "Credits: NASA/GSFC/Arizona State University", https://science.nasa.gov/photojournal/the-lunar-south-pole
+- **Site coordinates and landing times:** NASA NSSDCA (Apollo), LROC / Arizona State University (IM-1, IM-2, Chandrayaan-3, polar mosaic centres), ISRO (Chandrayaan-3 site box), NASA (Artemis III candidate regions, 2024-10-28). Each site's source and notes are in `data/sites.js`.
+
+**Software, fonts and code we build on**
+- **Three.js** and its OrbitControls (MIT License): the 3D Moon. https://threejs.org/
+- **Vite** (MIT License) and **TypeScript** (Apache License 2.0): build tools. **Node.js** runs the data scripts.
+- **OzAILabs SolarSystemSimulator**, forked and embedded as the Tour (its README describes the code as MIT-licensed). Its planet textures come from Solar System Scope (CC BY 4.0), Planet Pixel Emporium, NASA/USGS Astrogeology and Steve Albers, under their own terms. https://github.com/OzAILabs/SolarSystemSimulator , our fork https://github.com/advik09-beep/SolarSystemSimulator
+- **Starfield:** written for this project; visually informed by Hue Screen Starfield and etrepat/starfield (MIT License). No code or assets copied.
+- **Fonts (D33):** CMU Serif for headings, from the npm package `computer-modern` (the fonts are under the SIL Open Font License 1.1; the package's own code is MIT); Source Serif 4 for all other text and numbers, from `@fontsource/source-serif-4` (SIL Open Font License 1.1). Both are self-hosted. (Until the switch, the build also carries Urbanist, SIL OFL 1.1, from `@fontsource/urbanist`.)
+- **Hosting:** Vercel (static files, no backend).
+- **Test-only tools** (not shipped): happy-dom and esbuild, used to render the panels in automated tests.
+
+All in-app credits are under **Data and methods** on the site.
 
 ## Known limits
 - **The Sun and Earth are treated as discs (D19)**, with NASA's radii (Sun 695,700 km, Earth 6,378.137 km equatorial). Each hour has a sunlight fraction: the share of the Sun's disc above the terrain skyline and not covered by Earth during lunar eclipses. An hour counts as "lit" when at least half the disc is visible. Earth counts as in view only when its whole disc clears the skyline; partly hidden is "marginal". Not modelled: light bent or scattered by Earth's atmosphere during eclipses, the Sun's limb darkening, and the skyline curving within the disc's width.
 - **"Sunlight" is not power and "Earth in view" is not a guaranteed link.** They mean the body is above the horizon. The power calculator is an estimate with its assumptions listed (no dust, temperature or conversion losses; mean irradiance; Sun treated as a point).
-- **The Sun and Earth score is a prototype.** Its formula and default weights were proposed by Lane A (the team's judgment, not a NASA standard) and can be changed in the Researcher view. It is not a measure of overall site safety.
+- **The Sun and Earth score is this team's own formula, not a NASA standard.** Its default weights are the team's judgment and can be changed in the Researcher view. It is not a measure of overall site safety.
 - **Cabeus B's view toward Earth is set by ground 0.26–0.7 km away** (76% of Earth hours). That ground slopes downhill around a high point, so it decides how far *below* level Earth can be seen, not a ridge in the way. It's the same situation as Malapert's eastern bins (6°–8°). We kept the point on purpose.
-- **Terrain is modelled at all 10 sites, as a prototype.** Each horizon is for one point; nearby spots differ. The observer height (2 m mast) is assumed. Near-site maps are 20–60 m per pixel, so features smaller than that aren't resolved (e.g. the ~20 m crater IM-2 rests in).
+- **Terrain is modelled at all 10 sites.** Each horizon is for one point; nearby spots differ. The observer height (2 m mast) is assumed. Near-site maps are 20–60 m per pixel, so features smaller than that aren't resolved (e.g. the ~20 m crater IM-2 rests in).
 - **The four south-pole sites are representative points** of ~15 km candidate regions, not landing spots.
 - **Data are hourly.** Sunrise/sunset times are accurate to the hour.
 - **Fixed date range:** 2026–2029, plus 30 days around each past landing. Other dates show "unavailable".
 - **Site heights are not used** for the Sun/Earth angles: all sites sit on a 1,737.4 km sphere. The effect on the angles is very small, but it isn't measured.
 - **Coordinate frames:** most site sources don't state their coordinate frame. The Chandrayaan-3 landing time is from a secondary source and approximate; IM-2's is to the minute only.
 - **The LOLA maps are preliminary products** (labels say "preliminary LOLA data"): polar maps and the global 1024 px/deg tiles created 2017; the global 128 px/deg map created 2011. Newer adjusted maps exist and were not used.
-- **The 3D globe shows no terrain,** and its lighting is illustrative until the Moon-fixed Sun direction (already available from `getSceneState`) is wired into the scene.
+- **The 3D globe shows no terrain.** It is lit from the real Sun direction (JPL Horizons) for the chosen hour, but ridges and their shadows appear only in the horizon view. A faint fill light on the night side is a visual aid, not sunlight.
 - **Desktop browsers only** (a team decision). No phone layout.
 
-## How AI tools were used
-This project was built by two people working with two AI coding assistants. We want to be clear about who did what.
+## AI use
+**The code in this project was written with AI coding assistants, directed by the team.** The two team members decided what to build, checked the results and signed off every step. The assistants wrote the code and most of the documentation.
 
-- **Claude Code (Anthropic), with Sheldon (Lane A, "numbers"):**
-  - The download scripts, data files, `lib/visibility.js`, the terrain horizon method, the check scripts, `data/README.md`, and the three screen panels (side card, Compare dates, Stand here).
-  - It also helped write this README.
-  - It read the JPL Horizons, PDS and NASA documentation to confirm settings, and quoted them, rather than relying on memory.
-- **ChatGPT / Codex (OpenAI), with Advik (Lane B, "screen"):** the web app shell, the Three.js Moon globe, the NASA Moon map integration, the Credits tab and the Vercel deployment.
+- **Claude Code (Anthropic), with Sheldon (Lane A, "numbers"):** the data download scripts, the data files, everything in `lib/`, the terrain horizon method, the ten check scripts, `data/README.md`, the screen panels inside the site (side card, Compare grid, Stand here, Report and Learn, Planner) and this README. It read the JPL Horizons, PDS and NASA documentation to confirm settings and quoted them, rather than relying on memory.
+- **ChatGPT / Codex (OpenAI), with Advik (Lane B, "screen"):** the web app shell, the tabs and toolbar, the Three.js Moon and its lighting, the embedded Tour, the Data and methods page, and the Vercel deployment.
 - **The humans:**
-  - Made every decision: scope, the 10 sites, the verdict numbers, which point to use at Malapert.
+  - Made every decision (scope, the 10 sites, the verdict numbers, the score weights, which point to use at Malapert), recorded as signed decisions in [`PLAN.md`](PLAN.md).
   - Approved each step before the next one started.
   - Did the seven hand-checks in the Horizons web app themselves.
-  - Signed off milestones.
-- **Coordination:**
-  - Each AI could only edit its own folders.
-  - The two worked through a shared log, [`STATUS.md`](STATUS.md), against one plan, [`PLAN.md`](PLAN.md).
-  - No result was marked as passing unless a test had actually run.
+  - Ran the acceptance tests and signed off milestones.
+- **Coordination:** each assistant could edit only its own folders. The two worked through a shared log, [`STATUS.md`](STATUS.md), against one plan, [`PLAN.md`](PLAN.md). No result was marked as passing unless a test had actually run.
 - **AI can be confidently wrong, so the numbers don't rest on trust.** They rest on the hand-checks and the check scripts above, which anyone can rerun.

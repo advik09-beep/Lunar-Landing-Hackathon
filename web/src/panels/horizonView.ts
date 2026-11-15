@@ -181,7 +181,7 @@ export const mountHorizonView: MountPanel = (container, props) => {
     if (!data) return;
     const d = data, s = d.tl.samples[hour], n = d.tl.samples.length;
     const when = body.querySelector("output.when");
-    if (when) when.textContent = kid() ? `Day ${Math.floor(hour / 24) + 1} of ${Math.round(n / 24)}, ${s.utc.slice(11, 16)}` : `${fmtUtc(s.utc)} · day ${Math.floor(hour / 24) + 1} of ${Math.round(n / 24)}`;
+    if (when) when.textContent = kid() ? `Day ${Math.floor(hour / 24) + 1} of ${Math.round(n / 24)}, ${s.utc.slice(11, 16)}` : `${fmtUtc(s.utc)}; day ${Math.floor(hour / 24) + 1} of ${Math.round(n / 24)}`;
     const g = body.querySelector("g.now");
     if (g) {
       const sx = x(s.sunAz), sy = y(s.sunEl), ex = x(s.earthAz), ey = y(s.earthEl);
@@ -284,7 +284,7 @@ svg.pano { width: 100%; height: auto; display: block; margin-top: 8px; }
 .body.hidden circle { fill-opacity: .35; stroke-dasharray: 3 2; stroke: var(--_text); }
 .label { fill: var(--_text); font-size: 13px; font-weight: 700; paint-order: stroke; stroke: #0b1322; stroke-width: 3px; }
 .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; }
-.legend span { display: inline-flex; gap: 6px; align-items: center; }
+.legend span { display: inline-flex; gap: 6px; align-items: center; white-space: nowrap; }
 .controls { display: flex; align-items: center; gap: 8px; margin: 10px 0 4px; flex-wrap: wrap; }
 .controls label { display: flex; align-items: center; gap: 8px; font-size: .85rem; flex: 1; min-width: 260px; }
 .controls input[type=range] { flex: 1; }

@@ -6,7 +6,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 |-----|------|-----------|
 | Advik + ChatGPT (Lane B) | D32 COMPLETE — STOPPED | Five D32 shell items committed; final source commit d0ef0f6 verified Vercel READY. Human visual/readability review remains open. |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
-| Claude Code (Lane A) | D32 Lane A part done | Seven-year-old Educator screens, Learn / Report, kid tour captions, best week, all-sites download; stopped |
+| Claude Code (Lane A) | D33 items 1–5 done; item 6 (stay length) next | Text cleanup, icon symbols, Learn layout, Why this score?, README |
 
 Acceptance (both humans): steps 1, 2, 3, 6, 8 PASS; step 4 and 7 pending earlier findings. Signed: D7–D23 (see PLAN), **D24–D28** (title card + tour nav, tour captions, why the south pole, one clock, A/B scenarios + requirements filter). Rule: no status-only pushes.
 Waiting on Sheldon: read the new Educator screens on web/panels.html (level = Educator) and the Learn tab; confirm the two NASA photos and their captions.
@@ -1685,3 +1685,20 @@ SOUTH_POLE.sources;          // [{ name, url }]
 - Important verification gap: no browser-driven click/drag/scroll/screenshot session available in this audit. Tour controls/audio/captions, Explore globe/markers/lighting, shared clock, Compare, Planner, Learn/Report, Educator/Researcher mode, downloads, scientific calculations, accessibility, and visual contrast remain **UNVERIFIED**, not failed or passed.
 - Recommendations (not approved changes): visually test all tabs in both reading modes; check Tour overlay legibility and discoverability of Moon click; verify consistent glass contrast and distinct blue roles; confirm selected pin ring alignment; check loading/error/empty states and data provenance; test keyboard navigation, reduced motion, sound-off default, and every download. Preserve D7 desktop-only scope and D32 seven-year-old Educator copy.
 - No application source files modified; next action is a real browser interaction/screenshot audit and prioritized defect fixes, coordinated across Lane A/B. Do not claim comprehensive QA completion.
+
+### 2026-11-15 — D33 final cleanup, Lane A items 1–5 DONE (item 6 next)
+**Recorded:** D33 in PLAN.md and DESIGN.md → "Final cleanup (D33)".
+1. **Text:** no PROTOTYPE tags in any panel or /lib string; `prototype: true` in ranking/score objects is now `teamFormula: true`. New `SCORE_OWN_FORMULA` (exported from `lib/visibility.js`): "The Sun and Earth score is this team's own formula, not a NASA standard." It appears once in each Researcher score section (side card, Compare score box, Report). No middle-dot separators remain in the panels or /lib (the score formula now uses ×).
+2. **Symbols:** verdict and legend symbols are inline SVG icons (`verdictIcon`, `markIcon` in `web/src/panels/shared.ts`), with word labels kept. No ✓ ◐ ✕ ⚠ glyphs are drawn by the panels any more.
+3. **Learn:** diagrams capped at 560 px; in-diagram captions moved into one-line legends below each diagram (no overlaps); one divider per section; legend items never wrap mid-label.
+4. **Educator:** "Why these weights?" is now "Why this score?" in six short sentences ("Sunshine counts the most, because the lander needs power." … "Our team made these rules. They are not NASA rules."); the full text is in the teacher note. Researcher keeps "Why these weights?".
+5. **README** rewritten to match the site (four tabs, both levels, real lighting); new "AI use" section; "Third-party resources" lists every data source, image, library, font, the forked simulator and its textures, hosting and test-only tools.
+
+**Notes for Lane B (D33):**
+- **Fonts, licences checked from the npm tarballs:** `@fontsource/source-serif-4` 5.3.1 ships `LICENSE` = SIL Open Font License 1.1. `computer-modern` 0.1.3 is marked MIT on npm, but that covers only the packaging; the fonts ship `OFL.txt` (SIL OFL 1.1, Reserved Font Name "Computer Modern Unicode fonts"; using them unmodified is fine). Its CSS for headings is `computer-modern/cmu-serif.css` (family "CMU Serif").
+- Panels inherit body text from the page (Source Serif 4) and take headings from `--llp-heading-font`: set it to `"CMU Serif", serif`. Panels name no other font.
+- Add `SCORE_OWN_FORMULA` (one sentence) to Data and methods.
+- Middle dots still in Lane B files: `web/src/main.ts` lines ~92, 104, 149, 348, 428, 450, 471, 472; `web/src/educatorCopy.ts` 66; `web/src/overview.ts` 112–114.
+
+**Checks:** all ten scripts PASS; panel tests PASS (the D33 test adds: no PROTOTYPE or middle dots on any Researcher panel, the own-formula sentence in each score section, SVG icons only, the Learn layout rules). `cd web && npm run build` OK (after `npm ci` picked up Lane B's new font package).
+

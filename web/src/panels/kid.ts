@@ -60,7 +60,7 @@ export function weekStrip(samples: Sample[], hour: number): string {
   return `<svg class="week" viewBox="0 0 ${W} ${Hh + 20}" role="img" aria-label="${esc(`The week, day by day: sunshine on ${sunDays} of ${days} days.`)}">
     <rect x="0" y="0" width="${W}" height="${Hh}" class="night"/>${rects}${lines}
     <line x1="${cx}" x2="${cx}" y1="0" y2="${Hh}" class="now"/>${labels}</svg>
-    <p class="key"><span class="k sun"></span> Sunshine <span class="k earth"></span> Earth in sight <span class="k night"></span> Neither <span class="k now"></span> Now</p>`;
+    <p class="key"><span class="ki"><span class="k sun"></span>Sunshine</span><span class="ki"><span class="k earth"></span>Earth in sight</span><span class="ki"><span class="k night"></span>Neither</span><span class="ki"><span class="k now"></span>Now</span></p>`;
 }
 
 /** Now, in words: the Sun. */
@@ -90,7 +90,8 @@ h2, h3, h4 { font-family: var(--llp-heading-font, inherit); }
 .ring.sun .fill { fill: none; stroke: var(--_sun); stroke-width: 9; stroke-linecap: round; }
 .ring.earth .fill { fill: none; stroke: var(--_earth); stroke-width: 9; stroke-linecap: round; }
 .ring figcaption { display: grid; font-size: .95rem; }
-.ring figcaption span { color: var(--_muted); }
+.ring figcaption span { color: var(--_muted); white-space: nowrap; }
+.ring figcaption strong { white-space: nowrap; }
 .ic-sun { fill: var(--_sun); } .ic-ray { stroke: var(--_sun); stroke-width: 2.5; stroke-linecap: round; }
 .ic-earth { fill: var(--_earth); } .ic-land { fill: none; stroke: #0b1322; stroke-width: 2.5; stroke-linecap: round; }
 svg.week { width: 100%; height: auto; display: block; margin-top: 6px; }
@@ -99,7 +100,9 @@ svg.week { width: 100%; height: auto; display: block; margin-top: 6px; }
 .week .dayline { stroke: var(--_bg); stroke-width: 2; }
 .week .now { stroke: var(--_text); stroke-width: 2; stroke-dasharray: 4 2; }
 .week text { fill: var(--_muted); font-size: 12px; }
-.key { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; font-size: .82rem; color: var(--_muted); }
+.key { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; font-size: .82rem; color: var(--_muted); }
+.ki { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+svg.week { max-width: 700px; }
 .k { display: inline-block; width: 14px; height: 10px; border-radius: 2px; vertical-align: middle; }
 .k.sun { background: var(--_sun); } .k.earth { background: var(--_earth); } .k.night { background: rgba(255,255,255,.12); }
 .k.now { width: 2px; height: 12px; background: var(--_text); }

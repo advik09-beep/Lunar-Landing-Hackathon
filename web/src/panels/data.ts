@@ -59,7 +59,7 @@ export type Weights = { sunlight: number; earth: number; shortDark: number; shor
 export type RankFilter = "all" | "candidate" | "historic";
 export interface RankRow { siteId: string; name: string; shortName: string; category: "candidate" | "historic"; score: number | null; available: boolean;
   components?: Record<keyof Weights, number>; }
-export interface Ranking { landingDate: string; weights: Weights; isDefault: boolean; formula: string; prototype: true; filter: RankFilter; ranking: RankRow[] }
+export interface Ranking { landingDate: string; weights: Weights; isDefault: boolean; formula: string; teamFormula: true; filter: RankFilter; ranking: RankRow[] }
 
 interface Api {
   MOCK: boolean; API_VERSION: string; VERDICT_RULE: VerdictRule;
@@ -81,7 +81,7 @@ interface Api {
   TOUR_STOPS: { id: string; body: string; title: string; text: string; kidTitle: string; kidText: string; ours: string[]; sources: { name: string; url: string }[] }[];
   SOUTH_POLE: { oneLine: string; full: string[]; sources: { name: string; url: string }[] };
   APP_NAME: string; APP_TAGLINE: string; // D29
-  SCORE_LABEL: string; SCORE_MEANING: string; WEIGHT_REASONS: Record<keyof Weights, string>; WEIGHTS_STATEMENT: string; WEIGHTS_EDUCATOR_TEXT: string;
+  SCORE_LABEL: string; SCORE_OWN_FORMULA: string; SCORE_MEANING: string; WEIGHT_REASONS: Record<keyof Weights, string>; WEIGHTS_STATEMENT: string; WEIGHTS_EDUCATOR_TEXT: string;
 }
 
 export const V = raw as unknown as Api;

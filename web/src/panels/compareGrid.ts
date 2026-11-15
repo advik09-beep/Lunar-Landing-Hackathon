@@ -3,7 +3,7 @@
 // that day, straight from getDaily() (the daily summary). Timeline strip: hourly sunlight /
 // Earth-in-view for the selected site over the same dates, from getTimeline().
 import { V, type Verdict, type Weights, type RankFilter } from "./data";
-import { createPanelRoot, esc, pct, VERDICT_WORDS, EDGE_WORDS, addDays, whyWeights, WHY_WEIGHTS_CSS, WEIGHT_KEYS } from "./shared";
+import { verdictIcon, createPanelRoot, esc, pct, VERDICT_WORDS, EDGE_WORDS, addDays, whyWeights, WHY_WEIGHTS_CSS, WEIGHT_KEYS } from "./shared";
 import type { MountPanel, PanelProps } from "./types";
 import { KID_VERDICT, KID_CSS, kidDate, teacher } from "./kid";
 
@@ -90,7 +90,7 @@ export const mountCompareGrid: MountPanel = (container, props) => {
         const edgeWhy = r.verdict === "edge" ? ` (${EDGE_WORDS[model === "FLAT" ? "flat" : "lola"]})` : "";
         const tip = kid ? `${s.shortName}, landing ${kidDate(d)}: ${KID_VERDICT[r.verdict].label}.`
           : `${s.name}, landing ${d}: ${w.label}${edgeWhy}. Over ${days} days: sunlight ${pct(r.pctLit)}, Earth in view ${pct(r.pctComms)}, both ${pct(r.pctBoth)}, longest dark ${r.longestDarkHours} h.`;
-        return `<td class="${selCell ? "selcell" : ""}"><button type="button" class="v" data-verdict="${r.verdict}" data-action="cell" data-site="${s.id}" data-date="${d}" title="${esc(tip)}" aria-label="${esc(tip)}">${w.symbol}</button></td>`;
+        return `<td class="${selCell ? "selcell" : ""}"><button type="button" class="v" data-verdict="${r.verdict}" data-action="cell" data-site="${s.id}" data-date="${d}" title="${esc(tip)}" aria-label="${esc(tip)}">${verdictIcon(r.verdict, 16)}</button></td>`;
       }).join("");
       return `<tr class="${selRow ? "selrow" : ""}"><th scope="row"><button type="button" data-action="site" data-site="${s.id}" title="${esc(s.name)}" ${selRow ? 'aria-current="true"' : ""}>${esc(s.shortName)}</button>${model === "FLAT" ? ' <span class="tag" data-model="flat">FLAT</span>' : ""}${s.category === "historic" ? (kid ? ' <span class="tag hist" title="A lander really landed here">Landed here</span>' : ' <span class="tag hist" title="Historic landing, shown for comparison">Historic</span>') : ""}</th>${cells}</tr>`;
     }).join("");
@@ -107,10 +107,10 @@ export const mountCompareGrid: MountPanel = (container, props) => {
         <p class="muted">Each cell is the verdict for a ${days}-day stay that starts at 00:00 UTC on that date. Click a cell to select that site and date.</p>
       </header>
       <div class="legend" aria-label="Legend">
-        ${(Object.keys(VERDICT_WORDS) as Verdict[]).map((v) => `<span><b class="v" data-verdict="${v}" aria-hidden="true">${VERDICT_WORDS[v].symbol}</b> ${esc(VERDICT_WORDS[v].label)}</span>`).join("")}
+        ${(Object.keys(VERDICT_WORDS) as Verdict[]).map((v) => `<span><b class="v" data-verdict="${v}" aria-hidden="true">${verdictIcon(v, 16)}</b> ${esc(VERDICT_WORDS[v].label)}</span>`).join("")}
         <span><b class="v na" aria-hidden="true">–</b> No data</span>
       </div>
-      <p class="muted small">⚠ On the edge — ${[...terrain.values()].some((t) => t !== "lola") ? `FLAT rows: ${esc(EDGE_WORDS.flat)}. TERRAIN rows: ${esc(EDGE_WORDS.lola)}.` : `${esc(EDGE_WORDS.lola)} (every site uses a terrain horizon).`}</p>
+      <p class="muted small">${verdictIcon("edge", 14)} On the edge: ${[...terrain.values()].some((t) => t !== "lola") ? `FLAT rows: ${esc(EDGE_WORDS.flat)}. TERRAIN rows: ${esc(EDGE_WORDS.lola)}.` : `${esc(EDGE_WORDS.lola)} (every site uses a terrain horizon).`}</p>
       <nav class="window" aria-label="Move the date window">
         <button type="button" data-action="earlier">◀ ${SHIFT} days earlier</button>
         <span class="muted">${esc(dates[0])} to ${esc(dates[COLS - 1])}</span>
@@ -137,7 +137,7 @@ export const mountCompareGrid: MountPanel = (container, props) => {
     let top = "";
     try {
       const r = V.getRanking(current.landingDate, undefined, "candidate").ranking.find((x) => x.available);
-      if (r) top = ` For a landing on ${esc(current.landingDate)}, the top candidate site by our prototype ${esc(V.SCORE_LABEL)} is ${esc(r.shortName)} (${Math.round(r.score!)} out of 100).`;
+      if (r) top = ` For a landing on ${esc(current.landingDate)}, the top candidate site by our ${esc(V.SCORE_LABEL)} is ${esc(r.shortName)} (${Math.round(r.score!)} out of 100).`;
     } catch { /* no score outside the data */ }
     const R = V.VERDICT_RULE;
     return `<div class="kid">
@@ -147,7 +147,7 @@ export const mountCompareGrid: MountPanel = (container, props) => {
         <button type="button" data-action="score-educator" aria-pressed="true">Educator</button>
         <button type="button" data-action="score-researcher" aria-pressed="false">Researcher</button></div>`}
       <div class="legend" aria-label="Legend">
-        ${(Object.keys(VERDICT_WORDS) as Verdict[]).map((v) => `<span><b class="v" data-verdict="${v}" aria-hidden="true">${VERDICT_WORDS[v].symbol}</b> ${esc(KID_VERDICT[v].label)}</span>`).join("")}
+        ${(Object.keys(VERDICT_WORDS) as Verdict[]).map((v) => `<span><b class="v" data-verdict="${v}" aria-hidden="true">${verdictIcon(v, 16)}</b> ${esc(KID_VERDICT[v].label)}</span>`).join("")}
         <span><b class="v na" aria-hidden="true">–</b> No data</span>
       </div>
       <nav class="window" aria-label="Move the date window">
@@ -173,13 +173,14 @@ export const mountCompareGrid: MountPanel = (container, props) => {
     if (!box) return;
     const terms = WEIGHT_KEYS;
     box.innerHTML = `
-      <h3>${esc(V.SCORE_LABEL)} for a landing on ${esc(current.landingDate)} <span class="proto">PROTOTYPE</span></h3>
+      <h3>${esc(V.SCORE_LABEL)} for a landing on ${esc(current.landingDate)}</h3>
       <p class="meaning">${esc(V.SCORE_MEANING)}</p>
       ${current.level ? "" : `<div class="switch" role="group" aria-label="Reading level: Educator or Researcher">
         <button type="button" data-action="score-educator" aria-pressed="${scoreMode === "educator"}">Educator</button>
         <button type="button" data-action="score-researcher" aria-pressed="${scoreMode === "researcher"}">Researcher</button>
       </div>`}
       ${scoreMode === "researcher" ? `
+        <p class="small"><strong>${esc(V.SCORE_OWN_FORMULA)}</strong></p>
         <p class="small">${esc(V.SCORE_FORMULA_TEXT)}</p>
         <div class="weights">${terms.map(([k, w]) => `<label><span>${w}: ${esc(V.SCORE_TERMS[k])}</span>
           <input type="range" min="0" max="100" step="1" value="${weights[k]}" data-weight="${k}" aria-label="Weight ${w}"/> <b data-weight-label="${k}">${weights[k]}</b></label>`).join("")}</div>
@@ -204,7 +205,7 @@ export const mountCompareGrid: MountPanel = (container, props) => {
     const group = rankFilter === "candidate" ? "candidate site" : rankFilter === "historic" ? "historic landing" : "site";
     const histNote = (x: { category: string }) => (x.category === "historic" ? ` <span class="cmp">past landing, shown for comparison</span>` : "");
     if (scoreMode === "educator") {
-      out.innerHTML = `<p class="big">For a landing on ${esc(current.landingDate)}, the top ${group} by our prototype ${esc(V.SCORE_LABEL)} is <strong>${esc(top.shortName)}</strong>, scoring <strong>${Math.round(top.score!)}</strong> out of 100${top.category === "historic" ? " (a past landing, shown for comparison)" : ""}.</p>
+      out.innerHTML = `<p class="big">For a landing on ${esc(current.landingDate)}, the top ${group} by our ${esc(V.SCORE_LABEL)} is <strong>${esc(top.shortName)}</strong>, scoring <strong>${Math.round(top.score!)}</strong> out of 100${top.category === "historic" ? " (a past landing, shown for comparison)" : ""}.</p>
         <ol class="rank">${avail.map((x) => `<li${x.siteId === current.siteId ? ' class="sel"' : ""}>${esc(x.shortName)}: ${Math.round(x.score!)}${histNote(x)}</li>`).join("")}</ol>
         <p class="muted small">Historic landings are past missions, included so educators can compare them with candidate sites.</p>
         <p class="muted small">Uses the default weights. The Researcher view explains the calculation.</p>`;
@@ -288,6 +289,7 @@ h3 { margin: 18px 0 4px; font-size: .95rem; }
 p { margin: 6px 0; }
 .small { font-size: var(--_fs-sm); }
 .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 10px 0; font-size: .85rem; align-items: center; }
+.legend span { display: inline-flex; gap: 5px; align-items: center; white-space: nowrap; }
 .window { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 8px 0; font-size: .85rem; }
 .window button { padding: 5px 10px; border: 1px solid var(--_border); border-radius: 8px; background: transparent; color: inherit; }
 .scroll { overflow-x: auto; }
@@ -300,12 +302,9 @@ table.grid { width: 100%; table-layout: fixed; border-collapse: separate; border
 .grid th[scope="row"] button { border: 0; background: transparent; color: inherit; padding: 2px 0; text-align: left; font-size: .8rem; max-width: 230px; overflow: hidden; text-overflow: ellipsis; vertical-align: middle; }
 .grid tr.selrow th[scope="row"] button { font-weight: 700; }
 .corner { text-align: left; color: var(--_muted); font-weight: 500; }
-.v { display: inline-flex; align-items: center; justify-content: center; width: 100%; max-width: 34px; height: 24px; border-radius: 5px; border: 1px solid transparent; color: #0b1322; font-weight: 700; font-size: .85rem; line-height: 1; padding: 0; }
+.v { display: inline-flex; align-items: center; justify-content: center; width: 100%; max-width: 34px; height: 24px; border-radius: 5px; border: 1px solid transparent; background: rgba(255,255,255,.04); padding: 0; line-height: 1; }
 button.v { cursor: pointer; }
-.v[data-verdict="clear"] { background: var(--_clear); }
-.v[data-verdict="partial"] { background: transparent; border: 2px solid var(--_partial); color: var(--_partial); }
-.v[data-verdict="out"] { background: var(--_out); }
-.v[data-verdict="edge"] { background: var(--_edge); border: 1px dashed #0b1322; }
+.legend .v { width: auto; background: transparent; }
 .v.na, td.na span { display: inline-flex; align-items: center; justify-content: center; width: 100%; max-width: 34px; height: 24px; color: var(--_muted); background: transparent; border: 1px dashed var(--_border); border-radius: 5px; }
 td.selcell .v, td.selcell span { outline: 3px solid var(--_text); outline-offset: 1px; }
 .tag { display: inline-block; padding: 0 5px; border-radius: 5px; font-size: .62rem; font-weight: 700; letter-spacing: .05em; border: 1px solid currentColor; vertical-align: middle; }

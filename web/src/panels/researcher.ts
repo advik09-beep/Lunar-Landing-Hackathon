@@ -84,7 +84,7 @@ export const mountResearcher: MountPanel = (container, props) => {
       <header>
         <p class="audience">RESEARCHER VIEW — written for researchers and mission designers</p>
         <h2>${esc(s.name)}</h2>
-        <p class="muted">${esc(fmtCoords(s.lat, s.lon))} · ${s.category === "historic" ? "historic landing (a past mission, shown for comparison)" : "candidate site"} · 7-day stay from ${esc(current.landingDate)} 00:00 UTC</p>
+        <p class="muted">${esc(fmtCoords(s.lat, s.lon))}; ${s.category === "historic" ? "historic landing (a past mission, shown for comparison)" : "candidate site"}; 7-day stay from ${esc(current.landingDate)} 00:00 UTC</p>
         <div class="dl"><button type="button" data-action="download-json">Download full analysis (JSON)</button>
           <button type="button" data-action="download-csv">Download hourly data (CSV)</button>
           <button type="button" data-action="download-series">Download this site, 2026–2029 by month (CSV)</button>
@@ -147,7 +147,8 @@ export const mountResearcher: MountPanel = (container, props) => {
       </table>
       <p class="muted small">${esc(t.source ?? "")} ${esc(slope?.note ?? "")}</p>
 
-      <h3>${esc(V.SCORE_LABEL)} <span class="tag est">PROTOTYPE</span></h3>
+      <h3>${esc(V.SCORE_LABEL)}</h3>
+      <p class="small"><strong>${esc(V.SCORE_OWN_FORMULA)}</strong></p>
       <p class="meaning">${esc(V.SCORE_MEANING)}</p>
       <p class="small">${esc(V.SCORE_FORMULA_TEXT)}</p>
       <table><thead><tr><th>Weight</th><th>Term</th><th>Value</th><th>Default weight</th></tr></thead><tbody>
@@ -250,7 +251,7 @@ function chartsHtml(S: Any, landingDate: string): string {
   return `<figure class="chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(`Monthly sunlight and Earth in view, ${S.months[0].month} to ${S.months[n - 1].month}. Most sunlight ${best.month} (${best.pctLit.toFixed(0)}%), least ${worst.month} (${worst.pctLit.toFixed(0)}%).`)}">${yAx}${years}${bars}</svg>
       <figcaption class="small"><span class="sw sun"></span> sunlight <span class="sw earth"></span> Earth in view: share of each month's hours. Most sunlight ${esc(best.month)} (${best.pctLit.toFixed(1)}%), least ${esc(worst.month)} (${worst.pctLit.toFixed(1)}%).</figcaption></figure>
     <figure class="chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(`Sun and Earth score for every landing date 2026–2029, with ${S.eclipses.length} lunar eclipses marked.`)}">${yAx.replace(/%/g, "")}${years}${ecl}${sel}<polyline points="${pts}" class="score"/></svg>
-      <figcaption class="small"><span class="sw score"></span> ${esc(V.SCORE_LABEL)} (prototype, default weights) of the 7-day stay starting each day · <span class="sw ecl"></span> lunar eclipse seen at this site (${S.eclipses.length}) · <span class="sw sel"></span> your landing date.</figcaption></figure>
+      <figcaption class="small"><span class="sw score"></span> ${esc(V.SCORE_LABEL)} (default weights) of the 7-day stay starting each day; <span class="sw ecl"></span> lunar eclipse seen at this site (${S.eclipses.length}); <span class="sw sel"></span> your landing date.</figcaption></figure>
     <p class="muted small">${S.notes.map((x: string) => esc(x)).join(" ")}</p>`;
 }
 

@@ -148,3 +148,14 @@ The same values are exported as `THEME` from `web/src/panels/shared.ts` for code
 
 **Lane B builds:** the wordmark (`web/public/brand/lunlux-wordmark.png`) in place of the text title in the header and on the Tour; the icon (`web/public/brand/lunlux-icon.png`) as the browser tab icon; Urbanist for headings, self-hosted from `@fontsource/urbanist` (licence SIL OFL 1.1), set once with `--llp-heading-font`; the fourth tab labeled **Learn** in Educator and **Report** in Researcher; tour captions from `kidTitle` / `kidText` in Educator.
 
+## Final cleanup (D33, both humans, 2026-11-15)
+**Fonts, whole site:** headings in **CMU Serif**, all other text and numbers in **Source Serif 4**. Both are self-hosted from npm (`computer-modern`, `@fontsource/source-serif-4`) with their licence files confirmed. No other fonts. Lane B loads them; Lane A panels inherit body text from the page and take headings from `--llp-heading-font`.
+
+**Text:** no PROTOTYPE tags anywhere. One plain sentence in the Researcher score section and in Data and methods: "The Sun and Earth score is this team's own formula, not a NASA standard." No middle dots as separators; use a semicolon or spacing.
+
+**Lane A panels:**
+- Verdict and legend symbols are small drawn icons (inline SVG), not text characters, so they look the same on every computer. Each keeps its word label (never colour alone): Clear = filled green circle with a tick; Partial = hollow green ring with a half fill; Out = grey circle with a cross; On the edge = violet circle with a dashed ring and an exclamation mark.
+- Learn tab: diagrams no wider than about 560 px, labels that never overlap, one divider between sections, legend labels kept on one line.
+- Educator: "Why these weights?" becomes **"Why this score?"**, answered in words a seven-year-old understands. Researcher keeps "Why these weights?" with one line per weight.
+- Stay length (Researcher only): 1, 3, 7 or 14 days; Educator always uses one week.
+

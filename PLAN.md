@@ -245,6 +245,27 @@ and researchers get the numbers behind them.
   labeled by mode, and Educator tour captions are shown in Educator.
   Details: DESIGN.md, "Two reading levels (D32)".
 
+- D33 Final cleanup (both humans, 2026-11-15). Fonts, whole site:
+  headings in CMU Serif, all other text and numbers in Source Serif 4,
+  both self-hosted from npm (computer-modern and
+  @fontsource/source-serif-4, licence files confirmed); no other fonts.
+  Lane B loads them; panels inherit. Text, both lanes: no PROTOTYPE
+  tags; one plain sentence in the Researcher score section and in Data
+  and methods says the score is this team's own formula, not a NASA
+  standard; no middle dots as separators (semicolons or spacing).
+  Lane A, in order: (1) the text cleanup in every panel and /lib string;
+  (2) verdict and legend symbols drawn as small icons, not text
+  characters; (3) Learn tab: diagrams capped near 560 px wide, no
+  overlapping labels, no doubled dividers, legend labels on one line;
+  (4) Educator "Why these weights?" becomes "Why this score?" with an
+  answer a seven-year-old understands; (5) README matches the site, with
+  an "AI use" section (code written with AI coding assistants directed
+  by the team) and every third-party resource listed; push. Then (6)
+  stay length in Researcher only: 1, 3, 7 or 14 days, followed by
+  verdicts, metrics, score, grid, best week, report and downloads;
+  Educator stays at one week; time box 2 hours, else removed cleanly.
+  Details: DESIGN.md, "Final cleanup (D33)".
+
 ## Settled earlier (do not reopen without both humans)
 - 10 fixed sites: 3 Apollo, Chandrayaan-3, IM-1, IM-2, 4 south pole
   representative points.

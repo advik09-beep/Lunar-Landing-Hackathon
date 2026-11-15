@@ -5,7 +5,7 @@
 // All values come from /lib/visibility.js; nothing is calculated here except formatting.
 import { V, type Site, type State, type Summary, type Horizon, type Metrics, type Sample } from "./data";
 import { KID_VERDICT, KID_CSS, kidCategory, kidDate, kidSun, kidEarth, ring, weekStrip, teacher } from "./kid";
-import { createPanelRoot, esc, deg, az, pct, VERDICT_WORDS, verdictShort, addDays, fmtUtc, clampHour, whyWeights, WHY_WEIGHTS_CSS, WEIGHT_KEYS } from "./shared";
+import { verdictIcon, createPanelRoot, esc, deg, az, pct, VERDICT_WORDS, verdictShort, addDays, fmtUtc, clampHour, whyWeights, WHY_WEIGHTS_CSS, WEIGHT_KEYS } from "./shared";
 import type { MountPanel, PanelProps } from "./types";
 
 type Mode = "plain" | "numbers"; // shown as Educator / Researcher
@@ -103,7 +103,7 @@ export const mountSideCard: MountPanel = (container, props) => {
     body.innerHTML = `
       <header>
         <h2>${esc(site.name)}</h2>
-        <p class="muted">${esc(coords)} · stay of ${days} days from ${esc(current.landingDate)} 00:00 UTC</p>
+        <p class="muted">${esc(coords)}; stay of ${days} days from ${esc(current.landingDate)} 00:00 UTC</p>
         <p class="small"><span class="tag cat" data-cat="${site.category}">${site.category === "historic" ? "HISTORIC LANDING" : "CANDIDATE SITE"}</span> ${esc(V.SITE_CATEGORIES[site.category])}</p>
         ${pointNote ? `<p class="muted small">${esc(pointNote)}.</p>` : ""}
       </header>
@@ -112,7 +112,7 @@ export const mountSideCard: MountPanel = (container, props) => {
         <button type="button" data-action="mode-numbers" aria-pressed="true">Researcher</button>
       </div>`}
       <div class="verdict" data-verdict="${summary.verdict}">
-        <span class="symbol" aria-hidden="true">${w.symbol}</span>
+        <span class="symbol" aria-hidden="true">${verdictIcon(summary.verdict, 30)}</span>
         <div><strong>${esc(w.label)}</strong><span class="why-short">: ${esc(verdictShort(summary.verdict, state.horizonModel))}</span></div>
       </div>
       <p class="horizon-label"><span class="tag" data-model="${state.horizonModel}">${flat ? "FLAT" : "TERRAIN"}</span> ${esc(horizonLabel)}</p>
@@ -143,7 +143,7 @@ export const mountSideCard: MountPanel = (container, props) => {
           <button type="button" data-action="mode-plain" aria-pressed="true">Educator</button>
           <button type="button" data-action="mode-numbers" aria-pressed="false">Researcher</button></div>`}
         <div class="verdict" data-verdict="${summary.verdict}">
-          <span class="symbol" aria-hidden="true">${VERDICT_WORDS[summary.verdict].symbol}</span>
+          <span class="symbol" aria-hidden="true">${verdictIcon(summary.verdict, 30)}</span>
           <p class="lead"><strong>${esc(kv.sentence)}</strong></p>
         </div>
         <div class="rings">${ring(summary.pctLit, "sun", "Sunshine")}${ring(summary.pctComms, "earth", "Earth in sight")}</div>
@@ -192,18 +192,18 @@ export const mountSideCard: MountPanel = (container, props) => {
         ? ` Counting past landings too, the highest score belongs to ${top.siteId === site.id ? "this site" : esc(top.shortName)} (${Math.round(top.score!)}), a past landing shown for comparison.` : "";
       return `<div class="score"><h3>${esc(V.SCORE_LABEL)}</h3>
         <p class="big"><strong>${Math.round(me.score!)}</strong> out of 100.</p>
-        <details class="why-weights"><summary>Why these weights?</summary>
-          <p>Sunshine counts most, because the lander needs power.</p>
-          <p>Seeing Earth comes next.</p>
-          <p>A Sun and Earth high above the hills count too.</p>
-          <p>So does a week that stays good if the landing is late.</p>
-          <p>These weights are our team's choice, not a NASA rule.</p>
-          <p>The Researcher view lets you change them.</p>
-          ${teacher(`<p>${esc(V.WEIGHTS_EDUCATOR_TEXT)}</p>`, "Which matters more to you, sunshine or talking to Earth? Why?")}
+        <details class="why-weights why-score"><summary>Why this score?</summary>
+          <p>The score goes from 0 to 100.</p>
+          <p>A high score means lots of sunshine and lots of time seeing Earth.</p>
+          <p>Sunshine counts the most, because the lander needs power.</p>
+          <p>It also helps when the Sun and Earth are high above the hills.</p>
+          <p>And when the week stays good even if the landing is a few days late.</p>
+          <p>Our team made these rules. They are not NASA rules.</p>
+          ${teacher(`<p>${esc(V.WEIGHTS_EDUCATOR_TEXT)}</p><p>${esc(V.SCORE_OWN_FORMULA)} The Researcher view shows the formula and lets you change the weights.</p>`, "If you were planning a Moon landing, what would you count the most?")}
         </details>
         <p>${candLine}</p>
         ${teacher(`<p>${esc(V.SCORE_MEANING)}</p>
-          <p>This is a prototype score using the default weights. The top candidate site is ${topCand ? `${esc(topCand.shortName)} (${Math.round(topCand.score!)} out of 100)` : "not available"}.${histLine} The Researcher view explains the calculation.</p>`,
+          <p>It uses the default weights. The top candidate site is ${topCand ? `${esc(topCand.shortName)} (${Math.round(topCand.score!)} out of 100)` : "not available"}.${histLine} The Researcher view explains the calculation.</p>`,
           "What else, besides sunshine and Earth, might a lander need?")}
       </div>`;
     }
@@ -277,9 +277,10 @@ export const mountSideCard: MountPanel = (container, props) => {
     function scoreResearcher(): string {
       const r = V.getRanking(current.landingDate);
       const me = r.ranking.find((x) => x.siteId === site.id);
-      if (!me?.available) return `<h3>${esc(V.SCORE_LABEL)} <span class="proto">PROTOTYPE</span></h3><p class="muted">Not available for this landing date.</p>`;
+      if (!me?.available) return `<h3>${esc(V.SCORE_LABEL)}</h3><p class="muted">Not available for this landing date.</p>`;
       const W = V.SCORE_DEFAULT_WEIGHTS, c = me.components!;
-      return `<h3>${esc(V.SCORE_LABEL)} <span class="proto">PROTOTYPE</span></h3>
+      return `<h3>${esc(V.SCORE_LABEL)}</h3>
+        <p class="small"><strong>${esc(V.SCORE_OWN_FORMULA)}</strong></p>
         <p class="meaning">${esc(V.SCORE_MEANING)}</p>
         <p class="small">${esc(V.SCORE_FORMULA_TEXT)}</p>
         <table><thead><tr><th>Weight</th><th>Term</th><th>Value</th><th>Default weight</th></tr></thead><tbody>
@@ -368,12 +369,7 @@ p { margin: 6px 0; }
 .switch button { padding: 6px 16px; border: 0; background: transparent; color: inherit; }
 .switch button[aria-pressed="true"] { background: var(--_accent); font-weight: 650; }
 .verdict { display: flex; gap: 12px; align-items: center; padding: 10px 0; border-top: 1px solid var(--_divider); border-bottom: 1px solid var(--_divider); }
-.verdict .symbol { display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; border-radius: 50%; font-size: 1.1rem; line-height: 1; color: #0b1322; border: 2px solid transparent; }
-.verdict strong { font-size: 1.15rem; }
-.verdict[data-verdict="clear"] .symbol { background: var(--_clear); }
-.verdict[data-verdict="partial"] .symbol { background: transparent; border-color: var(--_partial); color: var(--_partial); }
-.verdict[data-verdict="out"] .symbol { background: var(--_out); }
-.verdict[data-verdict="edge"] .symbol { background: var(--_edge); border: 2px dashed #0b1322; }
+.verdict .symbol { display: inline-flex; width: 30px; height: 30px; flex: none; }
 .tag { display: inline-block; padding: 1px 7px; margin-right: 4px; border-radius: 6px; font-size: .72rem; font-weight: 700; letter-spacing: .06em; border: 1px solid currentColor; }
 .tag[data-model="flat"] { color: var(--_muted); }
 .tag[data-model="lola"] { color: var(--_clear); }

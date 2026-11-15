@@ -1,7 +1,7 @@
 // D28 planner panel: saved A/B scenario comparison and a mission requirements filter. Lane A owns this file.
 // Numbers and the plain-words differences come from /lib (compareScenarios, checkRequirements).
 import { V } from "./data";
-import { createPanelRoot, esc } from "./shared";
+import { createPanelRoot, esc, markIcon } from "./shared";
 import type { MountPanel, PanelProps } from "./types";
 
 type Any = any; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -95,7 +95,7 @@ export const mountPlanner: MountPanel = (container, props) => {
     if (!box) return;
     const nm = (id: string) => V.listSites().find((s) => s.id === id)?.shortName ?? id;
     box.innerHTML = saved.length
-      ? `<ul>${saved.map((p, i) => `<li>A: ${esc(nm(p.a.siteId))}, ${p.a.landingDate} · B: ${esc(nm(p.b.siteId))}, ${p.b.landingDate}
+      ? `<ul>${saved.map((p, i) => `<li>A: ${esc(nm(p.a.siteId))}, ${p.a.landingDate}; B: ${esc(nm(p.b.siteId))}, ${p.b.landingDate}
           <button type="button" data-action="load" data-i="${i}">Load</button> <button type="button" data-action="delete" data-i="${i}" aria-label="Delete saved pair ${i + 1}">Delete</button></li>`).join("")}</ul>
          <button type="button" data-action="download-saved">Download saved pairs (JSON)</button>`
       : `<p class="muted small">None yet. Use "Save this pair".</p>`;
@@ -114,7 +114,7 @@ export const mountPlanner: MountPanel = (container, props) => {
       const row = (name: string, va: string, vb: string) => `<tr><th>${esc(name)}</th><td>${esc(va)}</td><td>${esc(vb)}</td></tr>`;
       out.innerHTML = `<table><thead><tr><th></th><th>A: ${esc(c.a.shortName)}, ${c.a.landingDate}</th><th>B: ${esc(c.b.shortName)}, ${c.b.landingDate}</th></tr></thead><tbody>
         ${row("Verdict", verdict(c.a.verdict), verdict(c.b.verdict))}
-        ${row("Sun and Earth score (prototype)", f(c.a.score, 1), f(c.b.score, 1))}
+        ${row("Sun and Earth score", f(c.a.score, 1), f(c.b.score, 1))}
         ${row("Sunlight share", f(c.a.pctLit) + "%", f(c.b.pctLit) + "%")}
         ${row("Earth-in-view share", f(c.a.pctComms) + "%", f(c.b.pctComms) + "%")}
         ${row("Longest blackout", c.a.longestDarkHours + " h", c.b.longestDarkHours + " h")}
@@ -139,7 +139,7 @@ export const mountPlanner: MountPanel = (container, props) => {
     for (const [k, v] of Object.entries(req)) if (v.on && Number.isFinite(v.value)) limits[k] = v.value;
     const r = L.checkRequirements(current.landingDate, limits, reqFilter);
     out.innerHTML = `<p class="small"><strong>${r.passCount} of ${r.results.length}</strong> sites meet ${Object.keys(limits).length ? "every limit you set" : "your limits (none set: every site passes)"} for a stay from ${esc(current.landingDate)}.</p>
-      <ul class="reqlist">${r.results.map((x: Any) => `<li class="${x.pass ? "pass" : "fail"}"><span class="mark" aria-hidden="true">${x.pass ? "✓" : "✕"}</span>
+      <ul class="reqlist">${r.results.map((x: Any) => `<li class="${x.pass ? "pass" : "fail"}"><span class="mark" aria-hidden="true">${markIcon(x.pass)}</span>
         <strong>${x.pass ? "PASS" : x.available ? "FAIL" : "NO DATA"}</strong>
         <button type="button" data-action="site" data-site="${x.siteId}" title="${esc(x.name)}">${esc(x.shortName)}</button>${x.category === "historic" ? ' <span class="muted small">(historic landing, comparison)</span>' : ""}
         <div class="small">${esc(x.words)}</div></li>`).join("")}</ul>`;

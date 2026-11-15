@@ -58,7 +58,8 @@ const BASE_CSS = `
 .warn { color: var(--_warn); }
 button { font: inherit; cursor: pointer; }
 :focus-visible { outline: 2px solid var(--_focus); outline-offset: 2px; }
-h2, h3, h4 { font-family: var(--llp-heading-font, inherit); } /* D32: the shell sets its heading font (Urbanist) here */
+h2, h3, h4 { font-family: var(--llp-heading-font, inherit); } /* D33: the shell sets its heading font (CMU Serif) here */
+.vi { display: inline-block; vertical-align: middle; flex: none; }
 `;
 
 export const esc = (s: unknown): string =>
@@ -75,6 +76,25 @@ export const VERDICT_WORDS: Record<Verdict, { label: string; symbol: string; sho
   out: { label: "Out", symbol: "✕", short: "sunlight and Earth rarely in view together" },
   edge: { label: "On the edge", symbol: "⚠", short: "the Sun or Earth hugs the horizon, so terrain decides" }, // flat-horizon wording
 };
+
+/** D33: verdict symbols drawn as small inline SVG icons (not text characters), so they look the same on every
+ *  computer. The word label always goes with them (never colour alone). */
+export function verdictIcon(v: Verdict, size = 18): string {
+  const dark = "#0b1322";
+  const body = {
+    clear: `<circle cx="10" cy="10" r="9" style="fill:var(--_clear)"/><path d="M5.5 10.3l3 3 6-6.6" fill="none" stroke="${dark}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+    partial: `<circle cx="10" cy="10" r="8" fill="none" style="stroke:var(--_partial)" stroke-width="2.4"/><path d="M10 4.5a5.5 5.5 0 0 0 0 11z" style="fill:var(--_partial)"/>`,
+    out: `<circle cx="10" cy="10" r="9" style="fill:var(--_out)"/><path d="M6.6 6.6l6.8 6.8M13.4 6.6l-6.8 6.8" stroke="${dark}" stroke-width="2.2" stroke-linecap="round"/>`,
+    edge: `<circle cx="10" cy="10" r="9" style="fill:var(--_edge)"/><circle cx="10" cy="10" r="7.4" fill="none" stroke="${dark}" stroke-width="1.3" stroke-dasharray="2.2 1.8"/><path d="M10 5.6v5.4" stroke="${dark}" stroke-width="2.2" stroke-linecap="round"/><circle cx="10" cy="13.9" r="1.3" fill="${dark}"/>`,
+  }[v];
+  return `<svg class="vi" data-icon="${v}" width="${size}" height="${size}" viewBox="0 0 20 20" aria-hidden="true" focusable="false">${body}</svg>`;
+}
+/** Pass / fail icons for the requirements list (D33). */
+export function markIcon(pass: boolean, size = 16): string {
+  return pass
+    ? `<svg class="vi" data-icon="pass" width="${size}" height="${size}" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="9" style="fill:var(--_clear)"/><path d="M5.5 10.3l3 3 6-6.6" fill="none" stroke="#0b1322" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+    : `<svg class="vi" data-icon="fail" width="${size}" height="${size}" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="9" style="fill:var(--_warn)"/><path d="M6.6 6.6l6.8 6.8M13.4 6.6l-6.8 6.8" stroke="#0b1322" stroke-width="2.2" stroke-linecap="round"/></svg>`;
+}
 
 /** "On the edge" means different things by horizon model (Sheldon, 2026-11-14):
  *  flat sites: terrain isn't modelled, so terrain decides; terrain sites: terrain is already included,

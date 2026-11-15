@@ -77,7 +77,7 @@ bad({ panel: "tilted" }, /panel/, "rejects unknown panel type"); bad({ loadW: -1
 // 4. D17 "Sun and Earth score" (PROTOTYPE, with the 2026-11-14 amendment: clearance + slip tolerance).
 const date = "2026-11-14";
 const r = V.getRanking(date);
-ok(r.prototype === true && r.isDefault && JSON.stringify(r.weights) === JSON.stringify(V.SCORE_DEFAULT_WEIGHTS), "ranking is labeled prototype and uses the default weights");
+ok(r.teamFormula === true && r.isDefault && JSON.stringify(r.weights) === JSON.stringify(V.SCORE_DEFAULT_WEIGHTS), "ranking is labeled prototype and uses the default weights");
 ok(V.SCORE_LABEL === "Sun and Earth score" && /does not mean the site is safe/.test(V.SCORE_MEANING), "label 'Sun and Earth score' with a line on what 100 does and does not mean");
 ok(/not a NASA standard/.test(V.WEIGHTS_STATEMENT) && Object.keys(V.WEIGHT_REASONS).length === 6, "a reason for each of the six weights, stated as the team's judgment");
 let m4 = 0;

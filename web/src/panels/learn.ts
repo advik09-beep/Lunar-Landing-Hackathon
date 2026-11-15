@@ -116,7 +116,7 @@ export async function renderLearn(body: HTMLElement, current: PanelProps, isCurr
       <div class="photos">${LEARN_PHOTOS.map((p) => `<figure class="photo" data-photo="${p.id}">
         <img src="${p.src}" alt="${esc(p.alt)}" loading="lazy" width="320"/>
         <figcaption><p>${esc(p.kid)}</p>
-          <p class="credit">${esc(p.credit)} · <a href="${esc(p.page)}" target="_blank" rel="noopener">NASA source page</a></p>
+          <p class="credit">${esc(p.credit)}; <a href="${esc(p.page)}" target="_blank" rel="noopener">NASA source page</a></p>
           ${teacher(`<p>${esc(p.teacher)}</p>`, p.id === "earthrise" ? "Why does Earth look like it is rising in this photo?" : "Why might ice hide in the dark craters?")}</figcaption></figure>`).join("")}</div></section>
   </div>`;
 }
@@ -155,8 +155,8 @@ function ridgeSvg(r: { sunEl: number; sunAz: number; horizon: number[]; lit: boo
     <line x1="0" x2="${W}" y1="${y(0)}" y2="${y(0)}" class="level"/>
     <g class="sunpic hidden"><circle cx="${sx}" cy="${sy}" r="11"/></g>
     <path d="${d}L${W},${H}L0,${H}Z" class="ground"/><path d="${d}" class="hill"/>
-    <text x="${sx + 16}" y="${sy - 14}" class="lab">Sun (behind the hill)</text>
-    <text x="8" y="${y(0) - 6}" class="lab small">flat ground would be here</text></svg>`;
+    <text x="${sx > W / 2 ? sx - 16 : sx + 16}" y="${sy - 16}" class="lab" text-anchor="${sx > W / 2 ? "end" : "start"}">Sun (behind the hill)</text></svg>
+    <p class="key"><span class="ki"><span class="k line"></span>The real hills</span><span class="ki"><span class="k level"></span>Where flat ground would be</span></p>`;
 }
 function skySvg(maxEl: number, name: string, where: string): string {
   const W = 260, H = 150, cx = W / 2, gy = 120, R = 100, k = (Math.max(0, maxEl) * Math.PI) / 180;
@@ -173,9 +173,9 @@ function dayNightSvg(s: Sample[]): string {
   const W = 700, H = 46, bw = W / s.length;
   const bars = s.map((x, i) => (x.lit ? `<rect x="${(i * bw).toFixed(2)}" y="0" width="${(bw + 0.1).toFixed(2)}" height="${H}" class="sun"/>` : "")).join("");
   const weeks = Array.from({ length: Math.floor(s.length / 168) }, (_, k) => `<line x1="${((k + 1) * 168 * bw).toFixed(1)}" x2="${((k + 1) * 168 * bw).toFixed(1)}" y1="${H}" y2="${H + 6}" class="tick"/>`).join("");
-  return `<svg class="pic" viewBox="0 0 ${W} ${H + 22}" role="img" aria-label="About four months at Apollo 11: long stretches of sunshine and long nights.">
-    <rect width="${W}" height="${H}" class="night"/>${bars}${weeks}
-    <text x="0" y="${H + 18}" class="lab small">Each tick is one week. Gold is sunshine; dark is night.</text></svg>`;
+  return `<svg class="pic" viewBox="0 0 ${W} ${H + 8}" role="img" aria-label="About four months at Apollo 11: long stretches of sunshine and long nights.">
+    <rect width="${W}" height="${H}" class="night"/>${bars}${weeks}</svg>
+    <p class="key"><span class="ki"><span class="k sun"></span>Sunshine</span><span class="ki"><span class="k night"></span>Night</span><span class="ki">Each tick: one week</span></p>`;
 }
 function earthSvg(s: Sample[]): string {
   const W = 560, H = 200, lo = -90, hi = 90;
@@ -185,9 +185,9 @@ function earthSvg(s: Sample[]): string {
   const ex = x(s[0].earthAz), ey = y(s[0].earthEl);
   return `<svg class="pic" viewBox="0 0 ${W} ${H}" role="img" aria-label="Over a month, the Sun's dots spread across the whole sky, while Earth's dots stay in one small cluster.">
     <rect width="${W}" height="${y(0)}" class="sky"/><rect y="${y(0)}" width="${W}" height="${H - y(0)}" class="groundflat"/>
-    ${sun}${earth}<text x="${Math.min(W - 70, ex + 12)}" y="${ey - 10}" class="lab">Earth</text>
-    ${["N", "E", "S", "W"].map((c, i) => `<text x="${i * W / 4 + 4}" y="${H - 6}" class="lab small">${c}</text>`).join("")}
-    <text x="${W - 4}" y="16" class="lab small" text-anchor="end">gold dots: the Sun over one month</text></svg>`;
+    ${sun}${earth}<text x="${ex < W / 2 ? ex + 14 : ex - 14}" y="${Math.max(18, ey + 5)}" class="lab" text-anchor="${ex < W / 2 ? "start" : "end"}">Earth</text>
+    ${["N", "E", "S", "W"].map((c, i) => `<text x="${i * W / 4 + 4}" y="${H - 6}" class="lab small">${c}</text>`).join("")}</svg>
+    <p class="key"><span class="ki"><span class="k sun dot"></span>The Sun, every 6 hours for a month</span><span class="ki"><span class="k earth dot"></span>Earth, same times</span></p>`;
 }
 
 export const CARD_CSS = `
@@ -197,6 +197,9 @@ h3 { margin: 18px 0 6px; font-size: 1rem; }
 `;
 export const LEARN_CSS = `
 .learn section { padding-top: 10px; border-top: 1px solid var(--_divider); margin-top: 12px; }
+.learn h3 { border-top: 0; padding-top: 0; margin-top: 4px; } /* one divider per section (the section rule), not two */
+.learn svg.pic, .learn .pair, .learn .photos { max-width: 560px; }
+.k.dot { width: 10px; height: 10px; border-radius: 50%; } .k.line { height: 3px; background: var(--_horizon); } .k.level { height: 0; border-top: 2px dashed var(--_muted); }
 svg.pic { width: 100%; height: auto; display: block; margin: 6px 0; }
 .pic .sky, .sky-fig .sky { fill: var(--_sky); }
 .pic .level { stroke: var(--_muted); stroke-dasharray: 6 4; }
