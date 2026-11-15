@@ -75,17 +75,19 @@ https://www.nasa.gov/nasa-brand-center/images-and-media/
      Tour tab. The upstream README states "MIT", but no complete licence
      file was found (see THIRD_PARTY_LICENSE_AUDIT.md). It is not relicensed
      by this project.
-   - Its planet textures keep their own terms: Solar System Scope textures,
-     Creative Commons Attribution 4.0 International,
+   - Its planet textures: the fork now ships only the twelve Solar System
+     Scope images (Sun, Mercury, Venus, Earth day, Earth night, Moon, Mars,
+     Jupiter, Saturn, Saturn's rings, Uranus, Neptune), under Creative
+     Commons Attribution 4.0 International,
      https://www.solarsystemscope.com/textures/ ,
-     https://creativecommons.org/licenses/by/4.0/ ; USGS Astrogeology
-     mission mosaics, https://astrogeology.usgs.gov/ ; a Planet Pixel
-     Emporium map (redistribution restricted),
-     https://planetpixelemporium.com/planets.html ; and a Steve Albers
-     composite, https://stevealbers.net/albers/sos/sos.html . The open
+     https://creativecommons.org/licenses/by/4.0/ . The Pluto, Europa, Io,
+     Ganymede, Callisto and Titan textures were removed from the fork in
+     commit aa00c53 (those bodies are drawn untextured). Remaining open
      items are tracked in THIRD_PARTY_LICENSE_AUDIT.md.
 
 5. npm packages (installed at build time, not stored in this repository)
+   The presentation (presentation/) also uses reveal.js 6.0 (MIT),
+   https://revealjs.com/ , with Vite 7 (MIT) and the same two font packages.
    Each is under its own licence, in its folder under web/node_modules:
    - three 0.181 (MIT), https://threejs.org/
    - vite 5.4 (MIT), https://vite.dev/

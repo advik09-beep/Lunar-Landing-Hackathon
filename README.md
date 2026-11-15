@@ -143,14 +143,15 @@ Everything this project uses that it did not make itself, with its licence or te
 | Item | Used for | Licence | Source |
 |---|---|---|---|
 | Three.js and OrbitControls (npm `three`) | the 3D Moon | MIT | https://threejs.org/ |
-| Vite | build tool | MIT | https://vite.dev/ |
+| Vite | build tool (site: Vite 5; presentation: Vite 7) | MIT | https://vite.dev/ |
+| Reveal.js (npm `reveal.js` 6.0) | the presentation slides (`presentation/`) | MIT | https://revealjs.com/ |
 | TypeScript | build tool | Apache License 2.0 | https://www.typescriptlang.org/ |
 | `@types/three` | type definitions | MIT | npm |
 | CMU Serif (npm `computer-modern` 0.1.3) | headings | fonts: SIL Open Font License 1.1 (package files marked MIT) | https://github.com/stevenpetryk/computer-modern , https://cm-unicode.sourceforge.io/ |
 | Source Serif 4 (npm `@fontsource/source-serif-4` 5.3.1) | all other text and numbers | SIL Open Font License 1.1 | https://fontsource.org/fonts/source-serif-4 |
 | Other npm dependencies of the above | build | each under its own licence, listed in `web/package-lock.json` | npm |
 | OzAILabs SolarSystemSimulator, forked and deployed separately, embedded as the Tour | Tour tab | upstream README says "MIT"; no complete licence file found (see the audit). Not relicensed by us. | https://github.com/OzAILabs/SolarSystemSimulator , fork https://github.com/advik09-beep/SolarSystemSimulator |
-| Simulator planet textures | Tour tab | Solar System Scope: CC BY 4.0; USGS Astrogeology mosaics: per product; Planet Pixel Emporium map: redistribution restricted; Steve Albers composite: not cleared (see the audit) | https://www.solarsystemscope.com/textures/ , https://astrogeology.usgs.gov/ , https://planetpixelemporium.com/planets.html , https://stevealbers.net/albers/sos/sos.html |
+| Simulator planet textures: the twelve Solar System Scope images (Sun, Mercury, Venus, Earth day and night, Moon, Mars, Jupiter, Saturn and its rings, Uranus, Neptune). The Pluto, Europa, Io, Ganymede, Callisto and Titan textures were removed from the fork (commit aa00c53); those bodies are drawn untextured. | Tour tab | CC BY 4.0 | https://www.solarsystemscope.com/textures/ , https://creativecommons.org/licenses/by/4.0/ |
 | Starfield ideas: Hue Screen Starfield; etrepat/starfield (MIT) | look of the moving stars | no code or assets copied; our own code | https://www.huescreen.com/starfield/ , https://github.com/etrepat/starfield |
 | Node.js | runs the data scripts | MIT | https://nodejs.org/ |
 | Vercel | hosting (static files, no backend) | service | https://vercel.com/ |

@@ -37,7 +37,13 @@ ok(licOk && licOf("three") === "MIT" && licOf("vite") === "MIT" && licOf("typesc
 // 5. README: Licence section, team line, the simulator and fonts with their terms.
 ok(/^## Licence$/m.test(README) && /Apache License 2\.0/.test(README) && /\[`NOTICE`\]\(NOTICE\)/.test(README), "README has a Licence section pointing to LICENSE and NOTICE");
 ok(README.includes("by Sheldon Spence and Advik Chaudhary"), "README team line: by Sheldon Spence and Advik Chaudhary");
-ok(/OzAILabs SolarSystemSimulator/.test(README) && /CC BY 4\.0/.test(README) && /redistribution restricted/.test(README) && /SIL Open Font License 1\.1/.test(README) && /AI use/.test(README), "README lists the simulator and texture terms, the font licences and the AI use section");
+const removed = ["Pluto", "Europa", "Io", "Ganymede", "Callisto", "Titan"];
+ok(/OzAILabs SolarSystemSimulator/.test(README) && /twelve Solar System Scope images/.test(README) && /twelve Solar System\s+Scope images/.test(NOTICE) && removed.every((b) => README.includes(b) && NOTICE.includes(b)) && /aa00c53/.test(README) && /aa00c53/.test(NOTICE)
+  && !/Planet Pixel|Steve Albers|astrogeology\.usgs/.test(README + NOTICE) && /SIL Open Font License 1\.1/.test(README) && /AI use/.test(README), "README and NOTICE: only the twelve Solar System Scope textures (CC BY 4.0); the six removed textures named with fork commit aa00c53; fonts and AI use listed");
+// Presentation dependencies (presentation/package.json) are listed too.
+const ppkg = JSON.parse(read("../presentation/package.json"));
+const pdeps = Object.keys({ ...ppkg.dependencies, ...ppkg.devDependencies });
+ok(pdeps.every((d) => NOTICE.includes(d) || (d === "vite" && /Vite 7/.test(NOTICE))) && pdeps.every((d) => README.includes(d) || README.includes(d.replace(/\.js$/, ".js"))) && /Reveal\.js \(npm `reveal\.js` 6\.0\) \| the presentation slides \(`presentation\/`\) \| MIT/.test(README), `presentation dependencies listed with licences (${pdeps.join(", ")}); Reveal.js MIT`);
 
 if (fails) { console.error(`${fails} check(s) failed`); process.exit(1); }
 console.log("PASS");
