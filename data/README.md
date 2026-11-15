@@ -90,7 +90,8 @@ What it means for us (our own calculation, not a doc statement): after 2027-02-0
 | Smooth-sphere dip | 4.268° | 4.293° |
 | Horizon toward Earth (az 352°–358°) | ~+5.6°, set by ground 140–180 m away | −3.1° to −3.5°, set by terrain 120–160 km away |
 | Sun visible: flat → terrain | 50.4% → 29.1% | 50.4% → 45.8% |
-| Earth in view: flat → terrain | 69.1% → 41.2% | 69.2% → **100%** |
+| Earth in view: flat → terrain (original rule: Earth's centre above the skyline) | 69.1% → 41.2% | 69.2% → **100%** |
+| Earth in view over terrain, current rule (Earth's whole disc clear, D19) | the same or lower than 41.2% | **86.0%** |
 | 2026-09-19 06:00 UTC | Sun blocked (ridge 3.24 km east, 5.54°) | Sun blocked (ridge 1.84 km east, 6.03°) |
 
 **2. Moving the observer 200 m (earlier sensitivity runs; northern horizon, Earth's direction):**

@@ -107,7 +107,7 @@ The data are static JSON files in `data/`. There is no backend.
 - Method: look along a line every 0.1° of compass direction, include the Moon's curvature exactly, and keep searching until even the highest terrain on the Moon could no longer show above the skyline.
 - Each south-pole candidate uses the highest ground within 1 km of its representative point. The six past landings use their landed coordinates (LROC for IM-1, IM-2, Chandrayaan-3; NSSDCA for Apollo).
 - Map resolution near the site: 20 m (pole sites, IM-2), 30 m (IM-1; the three Apollo sites, from global 1024 px/deg tiles) or 60 m (Chandrayaan-3). Each site's maps are listed in `data/README.md`. At Malapert that is "a slope, not a summit"; per-site details are in `data/README.md`.
-- Moving the observer about 1 km changed Earth-in-view from 41% to 100% of the time. We report that openly (see `data/README.md`).
+- Moving the observer about 1 km more than doubled Earth-in-view: from 41% to 100% under the original rule (Earth's centre above the skyline). Under the current rule (Earth's whole disc clear) the chosen point gets 86%; the old point can only be the same or lower. We report that openly (see `data/README.md`).
 
 ## Licence
 The team's original code and text are licensed under the **Apache License 2.0** (see [`LICENSE`](LICENSE)), as approved by both team members on 2026-11-15 (PLAN.md, D34).

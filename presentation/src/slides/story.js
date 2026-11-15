@@ -59,12 +59,12 @@ export const closing = [
       </ul></article>
     <article class="glass-panel"><span class="tag earth-tag">HURDLES</span>
       <ul class="facts">
-        <li>At Malapert, moving the point about 1 km changed Earth contact from 41% to 100%, so we chose the exact point and say so.</li>
+        <li>At Malapert, moving the point about 1 km more than doubled Earth contact, so we chose the exact point and say so.</li>
         <li>Flat ground was wrong at the pole: the Sun stood above level yet hid behind a ridge 1.84 km away. We rebuilt on real terrain.</li>
         <li>Six outside images had unclear reuse terms, so we removed them.</li>
       </ul></article>
   </div>
   <footer>06 / HURDLES AND ACHIEVEMENTS</footer>
-  <aside class="notes">Every figure is from the repository. 7 of 7: check_ephem, largest difference 0.000391°. Apollo 17: the computed terrain horizon (data/ephem/apollo17/horizon.json) rises from 0.45° to 14.23°; the horizon code has nothing site-specific. 9 of 10: check_d19; the tenth (18 July 2027) is a graze missed by 0.9% of Earth's radius because Earth's atmosphere isn't modelled. Malapert: data/README.md, original point vs the high-ground point 1.000 km away, Earth in view over terrain 41.2% to 100% (2026–2029, before the whole-disc rule). Ridge: check_visibility, 19 September 2026 06:00 UTC, Sun 1.05° above level, skyline 6.03°, ridge 1.84 km east. Images: the simulator fork removed six textures with unclear reuse terms (fork commit aa00c53).</aside>
+  <aside class="notes">Every figure is from the repository. 7 of 7: check_ephem, largest difference 0.000391°. Apollo 17: the computed terrain horizon (data/ephem/apollo17/horizon.json) rises from 0.45° to 14.23°; the horizon code has nothing site-specific. 9 of 10: check_d19; the tenth (18 July 2027) is a graze missed by 0.9% of Earth's radius because Earth's atmosphere isn't modelled. Malapert: data/README.md, original point vs the high-ground point 1.000 km away, Earth in view over terrain went from 41.2% to 100% under the original Earth-centre rule (2026–2029); under the current whole-disc rule the chosen point gets 86.0%, and the old point can only be the same or lower, so the move more than doubled Earth contact under either rule. Ridge: check_visibility, 19 September 2026 06:00 UTC, Sun 1.05° above level, skyline 6.03°, ridge 1.84 km east. Images: the simulator fork removed six textures with unclear reuse terms (fork commit aa00c53).</aside>
 </section>`
 ];
