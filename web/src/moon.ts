@@ -286,13 +286,26 @@ export class LunarScene {
     return element;
   }
 
-  private positionMapLabel(element: HTMLDivElement, surfaceNormal: THREE.Vector3, offset: number): void {
+  private positionMapLabel(element: HTMLDivElement, surfaceNormal: THREE.Vector3, offset: number, besidePin = false): void {
     // No labels on the far side of the Moon; the foreground Moon always occludes them.
     if (surfaceNormal.dot(this.camera.position.clone().normalize()) < .09) { element.hidden = true; return; }
     const position = surfaceNormal.clone().multiplyScalar(offset).project(this.camera);
     if (position.z < -1 || position.z > 1) { element.hidden = true; return; }
-    element.style.left = ((position.x + 1) * .5 * this.container.clientWidth) + 'px';
-    element.style.top = ((1 - position.y) * .5 * this.container.clientHeight) + 'px';
+    const width = this.container.clientWidth;
+    const x = (position.x + 1) * .5 * width;
+    const y = (1 - position.y) * .5 * this.container.clientHeight;
+    if (besidePin) {
+      // Anchor at the actual pin rather than beyond it, then put text to the side.
+      // Flip left close to the right edge so the full site name stays readable.
+      const flip = x > width - 245;
+      element.style.left = (x + (flip ? -22 : 22)) + 'px';
+      element.style.top = y + 'px';
+      element.style.transform = flip ? 'translate(-100%, -50%)' : 'translate(0, -50%)';
+    } else {
+      element.style.left = x + 'px';
+      element.style.top = y + 'px';
+      element.style.transform = 'translate(-50%, -100%)';
+    }
     element.hidden = false;
   }
 
@@ -300,12 +313,12 @@ export class LunarScene {
     const selected = this.markers.find(marker => marker.site.id === this.selected);
     if (selected) {
       this.selectedNameLabel.textContent = selected.site.name;
-      this.positionMapLabel(this.selectedNameLabel, selected.normal, 1.14);
+      this.positionMapLabel(this.selectedNameLabel, selected.normal, 1.035, true);
     } else this.selectedNameLabel.hidden = true;
     const hovered = this.markers.find(marker => marker.site.id === this.hovered && marker.site.id !== this.selected);
     if (hovered) {
       this.hoveredNameLabel.textContent = hovered.site.name;
-      this.positionMapLabel(this.hoveredNameLabel, hovered.normal, 1.14);
+      this.positionMapLabel(this.hoveredNameLabel, hovered.normal, 1.035, true);
     } else this.hoveredNameLabel.hidden = true;
     if (this.earthOverheadSprite.visible) this.positionMapLabel(this.earthOverheadLabel, this.earthOverheadNormal, 1.14);
     else this.earthOverheadLabel.hidden = true;

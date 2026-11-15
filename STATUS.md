@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D34 item 3 — How we know | Item 2 production build READY; short Educator source list and content-size panel; checking build |
+| Advik + ChatGPT (Lane B) | D34 item 4 — globe pin label | Items 1–3 verified Vercel READY; side-aligned selected label; checking build |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | D34 Lane A part done | LICENSE + NOTICE, audit reply, Learn redesign, slider/compass/Stand here fixes, README licence; stopped |
 | Collaborative presentation | Initial web deck | Separate `presentation/` draft; Sheldon + Claude science review pending; build unverified |
@@ -1858,3 +1858,8 @@ Done within the 2-hour time box (all checks passing about 7 minutes after starti
 - Item 2 source commit `91d8636` Vercel `dpl_3GkkdggMXgdRAfUje8KdCiohZN7p` READY.
 - Educator now sees five short friendly source statements (NASA Sun/Earth, Moon hills, pictures, team score, third-party credit) and a `For the teacher` fold-out containing the full itemized licence/credit list. The glass panel fits its initial content rather than occupying a fixed viewport height; when the fold-out opens its height is capped and scrollable. Researcher layout remains unchanged.
 - Item 3 build pending.
+
+### 2026-11-15 — Lane B D34 item 4: label beside pin
+- Item 3 source commit `cff8258`, Vercel `dpl_4RVjmt4guSFaz4bVD5oDbQAWzqmW` READY.
+- Changed 3D selected/hover label projection to the actual pin origin at Moon radius 1.035 (instead of radial offset 1.14). Applied 22px side offset, vertical centering and a left-side flip near the canvas edge to keep text beside rather than over the selected pin.
+- Item 4 build pending; no browser-level visual claim.
