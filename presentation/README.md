@@ -2,7 +2,7 @@
 
 A standalone Reveal.js + Vite presentation. **This is the official LunLux presentation working deck, designated by the Lane B lead; it still needs changes and has not received final approval.** It is separate from production LunLux (`web/`).
 
-**Local preview link (on the computer running Vite only):** `http://127.0.0.1:5179/`. This is a loopback address, **not a public URL**; opening it on GitHub or another person's device will not show the slides unless that device is running the presentation server on port 5179. GitHub source: `presentation/index.html`. The separately deployed presentation is `https://lunlux-presentation-lunlux.vercel.app/` (currently protected by Vercel Authentication; access is not yet publicly verified).
+**Local preview link (on the computer running Vite only):** `http://127.0.0.1:5179/`. This is a loopback address, **not a public URL**; opening it on GitHub or another person's device will not show the slides unless that device is running the presentation server on port 5179. GitHub source: `presentation/index.html`. The public submission link is `https://lunlux-presentation.vercel.app/`. Vercel Authentication was disabled for this project's deployments on 2026-11-15; anonymous browser rendering still requires a human check.
 
 **Development:** `cd presentation && npm install && npm run dev`.
 
