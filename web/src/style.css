@@ -65,7 +65,8 @@ p { margin:8px 0; }
 .overview-caption,.overview-mission-message,.overview-footer { display:none; }
 .overview-title-card { position:absolute; z-index:8; left:0; bottom:0; width:min(640px,60%); display:flex; flex-direction:column; align-items:flex-start; text-align:left; padding:96px 64px 56px 32px; gap:16px; background:radial-gradient(ellipse at bottom left,#091322f5 15%,#091322d0 45%,#09132200 75%); }
 .overview-title-card h2 { margin:0; line-height:1; }
-.overview-wordmark { display:block; width:min(330px,100%); height:auto; }
+.overview-wordmark { display:block; width:min(198px,100%); height:auto; }
+body[data-view="overview"] .brand-wordmark { visibility:hidden; }
 .overview-title-card p { margin:0; max-width:31ch; }
 .overview-title-subtitle { font-size:1.1rem; line-height:1.4; }
 .overview-title-card > p:not(.overview-title-subtitle):not(.overview-audio-note) { font-size:.84rem; color:var(--llp-muted); }
