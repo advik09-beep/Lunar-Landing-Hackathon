@@ -13,8 +13,16 @@
 
 **Initial work:** Reveal.js 6 + Vite standalone `presentation/`, split slide modules, original animated CSS artwork, accessible external demo links, speaker notes.
 
-**Not yet verified:** dependency installation, production build, deployed URL, browser-level interaction, actual slide fit and live iframe support.
+**Build verification pending for this screenshot pass.** Browser-level visual QA and any standalone presentation URL remain separate; no iframe is embedded.
 
 **Next:** Claude checks scientific claims/sources in `src/slides/science.js`. ChatGPT verifies build/design and revises narrative. Both humans approve scope and demo sequence. Standalone Vercel deployment and iframe evaluation come after.
 
 **Rights:** Do not copy the Tour simulator or outside texture assets into slides pending documented sign-off. Both humans' NASA licensing approvals in the current PLAN/STATUS govern any future borrowed assets.
+
+### 2026-11-15 — Requested seven-slide screenshot pass
+- Exactly seven sections remain: cover, problem, validated evidence, workflow, two audiences, reflection, live demo.
+- 00 cover image with dark overlay, actual LunLux wordmark and both credited names; Solar System Scope CC BY 4.0 credit on cover.
+- 01 problem; 04 workflow; 02 Educator and 03 Researcher side by side; 05 demo.
+- Removed internal process status from displayed demo slide; technical evidence slide remains Claude's verified 7/7, 9/10 and Malapert ridge numbers.
+- Slide 6 reflection closing phrase moved above the footer. Speaker-only notes remain outside displayed slide content.
+- Awaiting independent presentation build and visual review; screenshots are project-owned app captures, 00 displays CC BY planet imagery with explicit source credit.

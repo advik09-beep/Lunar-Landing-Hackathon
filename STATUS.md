@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | Requested pass item 4/5 — Tour Moon handoff | Fork has tracked Moon callout + button; shell fallback button and matching text; shell build pending |
+| Advik + ChatGPT (Lane B) | Requested pass item 5/5 — seven-slide screenshot deck | Committed shot placements, cover credit/wordmark, footer fix; presentation build pending |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | Learn full width + Watch a month + Can you tell? done; slide 9 / 10 | stopped |
 | Collaborative presentation | Official working slides — changes required | Advik designated `presentation/` the official working deck; local preview `http://127.0.0.1:5179/` is not public. Revisions, Sheldon + Claude science review, build verification and final human approval pending. |
@@ -1894,3 +1894,7 @@ Done within the 2-hour time box (all checks passing about 7 minutes after starti
 ### 2026-11-15 — Five-item pass, item 4: final Tour stop
 - Simulator fork master `305fb62` provides an HTML label anchored to the Moon's projected position and a button; both say “Click here to go to the Moon”. The label has an animated tracking anchor during camera motion; button uses the existing trusted `lunar-navigator:open-explore` message. Fork production Vercel build `dpl_472sEe1jAfrzhDzUocZdiAWLTujm` READY.
 - Shell `web/src/main.ts` now renders the same words and a fallback Explore button inside the final Moon caption; other tour stops unchanged. No Lane A files touched. Awaiting shell build before deck item 5.
+
+### 2026-11-15 — Five-item pass, item 5: official seven-slide deck
+- The Tour final-stop shell build `dpl_9iMqoBUkucw7xiBKkHhopz35AhoA` READY. `presentation/` remains exactly seven slides; screenshots 00 cover background (dimmed, Solar System Scope CC BY 4.0 credit), 01 problem, 04 workflow, 02/03 side by side Educator/Researcher, 05 demo. Copied the exact existing team wordmark blob to presentation assets.
+- Removed internal process text from displayed demo; maintained speaker notes and Claude's scientific evidence slide; moved slide 6 closing thought away from footer. Presentation build and browser QA still require separate evidence; no wider licensing audit.

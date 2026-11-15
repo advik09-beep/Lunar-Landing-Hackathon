@@ -30,3 +30,51 @@ html,body{background:var(--dark)}
 .reveal .progress{color:var(--sun)}.reveal .controls{color:var(--text)}
 @keyframes appear{from{opacity:0;transform:translate(35px,20px) scale(.94)}to{opacity:1;transform:none}}@keyframes grow{from{transform:scaleY(.05)}to{transform:scaleY(1)}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* D35 final seven-slide screenshot composition. */
+.reveal .slides .page { padding-bottom:84px; }
+.reveal .slides .page.cover { background:linear-gradient(90deg,rgba(6,13,25,.96) 0%,rgba(6,13,25,.79) 47%,rgba(6,13,25,.60) 100%),url('/shots/00-cover-tour.png') center/cover no-repeat; }
+.cover .moon-art { display:none; }
+.cover .cover-content { padding-top:100px; max-width:830px; }
+.cover .kicker { font-size:26px; letter-spacing:.12em; color:var(--sun); }
+.reveal .cover h1.cover-brand { margin:22px 0; line-height:1; }
+.cover-wordmark { width:480px; max-height:145px; max-width:100%; object-fit:contain; object-position:left center; display:block; filter:drop-shadow(0 12px 30px #0008); }
+.cover .subtitle { font-size:39px; max-width:770px; }
+.cover .cover-question { font-size:29px; margin-top:26px; color:var(--text); }
+.cover .credit { margin-top:30px; font-size:23px; }
+.cover-photo-credit { position:absolute; z-index:3; bottom:36px; right:78px; font-size:16px; color:#d9e6f7; }
+.reveal .cover-photo-credit a { color:#d9e6f7; text-decoration:underline; text-underline-offset:3px; }
+.screenshot-frame { margin:0; border-radius:12px; overflow:hidden; border:1px solid var(--line); background:#0b1729; box-shadow:0 20px 50px rgba(0,0,0,.3); }
+.screenshot-frame img { display:block; width:100%; height:100%; object-fit:contain; }
+.screenshot-frame figcaption { box-sizing:border-box; height:32px; padding:6px 13px; font-size:15px; color:var(--muted); }
+.problem-slide .lead { font-size:26px; max-width:1150px; }
+.problem-layout { display:grid; grid-template-columns:.62fr 1.38fr; gap:30px; align-items:center; margin-top:25px; }
+.problem-points { display:flex; flex-direction:column; gap:22px; }
+.problem-points p { display:grid; grid-template-columns:38px 1fr; grid-template-rows:auto auto; column-gap:16px; align-items:center; }
+.problem-points p span { grid-row:1 / span 2; }
+.problem-points strong { font-size:27px; font-weight:600; }
+.problem-points small { color:var(--muted); font-size:20px; }
+.problem-layout .screenshot-frame { height:365px; }
+.problem-layout .screenshot-frame img { height:333px; }
+.workflow-layout { display:grid; grid-template-columns:.65fr 1.35fr; gap:28px; align-items:stretch; margin-top:26px; }
+.workflow-steps { display:flex; flex-direction:column; gap:12px; }
+.workflow-steps article { display:flex; align-items:flex-start; gap:20px; padding:16px 12px; border-bottom:1px solid var(--line); }
+.workflow-steps b { font-size:18px; color:var(--sun); font-weight:400; }
+.workflow-steps h3 { font-size:29px; margin:0 0 8px; }
+.workflow-steps p { font-size:19px; color:var(--muted); }
+.workflow-layout .screenshot-frame { height:376px; }
+.workflow-layout .screenshot-frame img { height:344px; }
+.workflow-caveat { font-size:17px; color:var(--muted); margin-top:14px!important; }
+.audience-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:26px; }
+.audience-card { display:flex; flex-direction:column; border-top:1px solid var(--line); padding-top:14px; }
+.audience-card h3 { font-size:36px; margin:12px 0 8px; }
+.audience-card > p { font-size:19px; color:var(--muted); margin-bottom:16px; }
+.audience-card .screenshot-frame { height:325px; }
+.audience-card .screenshot-frame img { height:100%; }
+.demo-slide .lead { font-size:26px; }
+.demo-slide .demo { grid-template-columns:1.5fr .6fr; align-items:center; margin-top:30px; gap:28px; }
+.demo-shot { height:396px; }
+.demo-shot img { height:364px; }
+.demo-links p { font-size:24px; color:var(--muted); margin:0 0 2px; }
+.reveal .demo-links a { font-size:20px; padding:18px; }
+.reveal .closing-thought { position:absolute; bottom:102px; left:95px; right:95px; margin:0!important; font-size:30px; }
