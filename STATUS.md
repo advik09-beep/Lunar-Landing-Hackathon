@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D33 2/10 — Tour brand | Fonts build READY; Tour wordmark reduced and header wordmark hidden; build check pending |
+| Advik + ChatGPT (Lane B) | D33 3/10 — Tour caption | Items 1–2 Vercel READY; bottom-left translucent caption with stronger blur; build pending |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | D33 Lane A part done (items 1–6) | Stay length 1/3/7/14 (Researcher) done within the time box; stopped |
 
@@ -1738,3 +1738,8 @@ Done within the 2-hour time box (all checks passing about 7 minutes after starti
 - Item 1 production Vercel build `dpl_DDec3FEnwvjbc9jV6r1bCfoHngsY` READY for `4654da2`.
 - Tour title wordmark width changed from 330 to 198 pixels (60%); small header logo is visually hidden only while Tour is open. No other views changed.
 - Item 2 deployment pending before item 3.
+
+### 2026-11-15 — Lane B D33 item 3: Tour caption card
+- Item 2 Vercel `dpl_BnqT6awjNLaHHoU9P3jDGMGpEy6R` READY for `136cd61`.
+- Caption repositioned to Tour title's bottom-left area, roughly 52% alpha with 26px blur, no border. The simulator remains full-bleed.
+- Item 3 build pending.
