@@ -506,9 +506,17 @@ if (embedUrl) {
           details.append(a);
         }
         caption.append(details);
-        const handoff = document.createElement('p');
-        handoff.className = 'moon-prompt';
-        handoff.textContent = 'Click on the Moon';
+        const handoff = document.createElement('div');
+        handoff.className = 'moon-handoff';
+        const prompt = document.createElement('p');
+        prompt.className = 'moon-prompt';
+        prompt.textContent = 'Click here to go to the Moon';
+        const action = document.createElement('button');
+        action.type = 'button';
+        action.className = 'moon-tour-action';
+        action.textContent = 'Click here to go to the Moon';
+        action.addEventListener('click', () => openView('explore'));
+        handoff.append(prompt, action);
         caption.append(handoff);
       }
       caption.hidden = false;

@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | Requested pass item 3/5 — short names | Selected 3D pin name now uses `shortName` in Educator, full name in Researcher; build pending |
+| Advik + ChatGPT (Lane B) | Requested pass item 4/5 — Tour Moon handoff | Fork has tracked Moon callout + button; shell fallback button and matching text; shell build pending |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | Learn full width + Watch a month + Can you tell? done; slide 9 / 10 | stopped |
 | Collaborative presentation | Official working slides — changes required | Advik designated `presentation/` the official working deck; local preview `http://127.0.0.1:5179/` is not public. Revisions, Sheldon + Claude science review, build verification and final human approval pending. |
@@ -1890,3 +1890,7 @@ Done within the 2-hour time box (all checks passing about 7 minutes after starti
 ### 2026-11-15 — Five-item pass, item 3: Educator site label
 - `web/src/moon.ts` now accepts the scientific site catalog's `shortName` field, uses it for the selected marker in Educator, and keeps full `name` in Researcher. Reading level changes refresh the label immediately via `setReadingLevel` from the shell. Hover labels remain unchanged; no Lane A files touched.
 - Item 2 build and its CSS follow-up both READY (`dpl_2BLGZ85f3N7dhZxFU4mbxKmbeE37`, `dpl_21UJa8ddPzq3zJghrmGKZtFyEg1X`). Item 3 build pending before Tour item 4.
+
+### 2026-11-15 — Five-item pass, item 4: final Tour stop
+- Simulator fork master `305fb62` provides an HTML label anchored to the Moon's projected position and a button; both say “Click here to go to the Moon”. The label has an animated tracking anchor during camera motion; button uses the existing trusted `lunar-navigator:open-explore` message. Fork production Vercel build `dpl_472sEe1jAfrzhDzUocZdiAWLTujm` READY.
+- Shell `web/src/main.ts` now renders the same words and a fallback Explore button inside the final Moon caption; other tour stops unchanged. No Lane A files touched. Awaiting shell build before deck item 5.

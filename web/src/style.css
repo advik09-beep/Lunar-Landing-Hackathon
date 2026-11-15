@@ -157,3 +157,8 @@ body[data-reading-level="educator"] #credits-view {
 .earth-explanation { position:absolute; z-index:6; right:12px; top:12px; width:min(310px, 50%); padding:16px; border:1px solid var(--llp-earth); border-radius:10px; background:var(--llp-glass); backdrop-filter:blur(var(--llp-glass-blur)); color:var(--llp-text); box-shadow:0 12px 28px #0009; font-size:.9rem; line-height:1.4; }
 .earth-explanation p { margin:8px 0 12px; color:var(--llp-muted); }
 .earth-explanation-close { font-size:.78rem; }
+
+/* D35 Moon handoff: a clear actionable fallback beside the 3D Moon callout. */
+.moon-handoff { display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding-top:8px; }
+.moon-tour-action { background:var(--llp-accent); color:var(--llp-text); font-weight:600; border-radius:99px; padding:9px 14px; }
+.moon-tour-action:focus-visible { outline:2px solid var(--llp-text); outline-offset:2px; }
