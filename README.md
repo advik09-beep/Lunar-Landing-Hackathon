@@ -2,7 +2,7 @@
 
 **Sunlight and Earth contact for lunar landing sites**
 
-**NASA Space Apps Challenge 2026, team of two (Sheldon and Advik)**
+**NASA Space Apps Challenge 2026, by Sheldon Spence and Advik Chaudhary**
 
 **Live site:** https://lunar-landing-hackathon.vercel.app (desktop browsers)
 
@@ -24,7 +24,7 @@ The site has four tabs plus a "Data and methods" link.
   - Educator: the grid plus one sentence naming the best week in the four weeks shown.
   - Researcher: also an hour-by-hour strip, the score ranking with six adjustable weights, a two-scenario (A/B) comparison with the differences in plain words, and a mission requirements filter (PASS or FAIL per site, failing limits named).
 - **Learn (Educator) / Report (Researcher):**
-  - Learn: a picture report from our data (a real ridge hiding the Sun, the low polar Sun, two-week days and nights, Earth staying in one spot) and two NASA photos with their exact credits.
+  - Learn: a picture report from our data, each section with the picture on the left and short sentences on the right (a real ridge hiding the Sun, the low polar Sun, two-week days and nights, Earth staying in one spot); three "Try it yourself" cards that open Explore at a preset place and date; "The ten places" cards; and five NASA photos with their exact credits.
   - Report: a full analysis of one site and stay (NASA's landing-region criteria and how we cover each, lighting and power, communications geometry with signal delay, lunar season and time of day, eclipses, best and worst months, terrain profile, maps and local slope, the score, other planets, what is NOT modelled, sources), charts across 2026–2029 (monthly sunlight and Earth in view; the daily score with lunar eclipses marked), and downloads: the full analysis (JSON), hourly data (CSV), this site by month (CSV) and every site and landing date (CSV).
 
 The 10 sites are either **candidate sites** (possible future landing points from four of NASA's Artemis III candidate regions: Peak near Cabeus B, Haworth, Malapert Massif, Nobile Rim 2) or **historic landings** (Apollo 11, 12 and 17, Chandrayaan-3, Intuitive Machines IM-1 and IM-2), shown as comparisons. The ranking can be filtered to all sites, candidates, or historic landings.
@@ -85,7 +85,7 @@ The data are static JSON files in `data/`. There is no backend.
 - Malapert (original point), 2026-11-20 06:00 UTC: Sun and Earth
 - Malapert (original point), 2026-11-17 08:00 UTC: Sun
 
-**Eleven check scripts** (run from the repo root; each prints `PASS` or stops with the failure):
+**Twelve check scripts** (run from the repo root; each prints `PASS` or stops with the failure):
 
 | Script | What it proves |
 |---|---|
@@ -100,6 +100,7 @@ The data are static JSON files in `data/`. There is no backend.
 | `node scripts/check_d28.mjs` | The mission requirements filter and the A/B scenario comparison (D28): every site's pass/fail and named failing limits match its own numbers. No limits means every site passes, and outside the data the result is "No data", never a guessed pass. The comparison values equal the per-site numbers, the differences point the right way, a scenario compared with itself is "about the same" everywhere, and swapping A and B mirrors every difference. |
 | `node scripts/check_d32.mjs` | The two reading levels (D32): every Educator tour caption has no digits or degrees and at most two short sentences, and says the same facts as the Researcher caption ("a little over one second" = 1.19–1.36 s). The best week equals the highest score of the dates shown. The monthly chart values equal a recount from the hourly data, the daily score equals the hourly score, and every eclipse marked at Malapert is on NASA's 2026–2029 list. The all-sites table has every site and landing date (14,550 rows). The Learn facts hold: the Malapert ridge, Apollo 11's Sun at 87.8° vs Malapert's 5.5°, sunrise to sunrise 29.58–29.63 days, and Earth's small wobble. |
 | `node scripts/check_d33.mjs` | The Researcher stay length (D33): for 1-, 3-, 7- and 14-day stays, every tenth daily row of every site equals a fresh calculation from the hourly data; the ranking, best stay, requirements, A/B comparison, all-sites table, series and monthly scores all use the chosen length; the 7-day results are unchanged. Shorter stays give more Clear-or-Out verdicts (1 day 75%, 7 days 55%, 14 days 29%). No /lib string carries a PROTOTYPE tag or a middle dot. |
+| `node scripts/check_d34.mjs` | Licence files (D34): `LICENSE` is byte-for-byte the official Apache License 2.0 text; `NOTICE` carries the team copyright and names every shipped image, every npm dependency and every Learn photo's exact credit and NASA page, all also in this README; the installed packages' licences match what NOTICE says. |
 
 **Terrain (all 10 sites):**
 - Built from NASA's LOLA elevation maps (PDS Geosciences).
@@ -108,27 +109,52 @@ The data are static JSON files in `data/`. There is no backend.
 - Map resolution near the site: 20 m (pole sites, IM-2), 30 m (IM-1; the three Apollo sites, from global 1024 px/deg tiles) or 60 m (Chandrayaan-3). Each site's maps are listed in `data/README.md`. At Malapert that is "a slope, not a summit"; per-site details are in `data/README.md`.
 - Moving the observer about 1 km changed Earth-in-view from 41% to 100% of the time. We report that openly (see `data/README.md`).
 
+## Licence
+The team's original code and text are licensed under the **Apache License 2.0** (see [`LICENSE`](LICENSE)), as approved by both team members on 2026-11-15 (PLAN.md, D34).
+
+That licence does **not** cover the outside items below. Each keeps its own licence or terms, listed with its source here and in [`NOTICE`](NOTICE). Open questions about the embedded simulator and its textures are tracked in [`THIRD_PARTY_LICENSE_AUDIT.md`](THIRD_PARTY_LICENSE_AUDIT.md).
+
+About NASA material, NASA's media usage guidelines say that NASA content "generally are not subject to copyright in the United States", that NASA should be acknowledged as the source, and that use must not imply endorsement. They also say NASA occasionally uses third-party copyrighted material. https://www.nasa.gov/nasa-brand-center/images-and-media/
+
 ## Third-party resources
-Everything this project uses that it did not make itself.
+Everything this project uses that it did not make itself, with its licence or terms.
 
-**Data and imagery**
-- **NASA JPL Horizons** (Solar System Dynamics): every Sun and Earth direction, distance and Moon-fixed scene value. https://ssd.jpl.nasa.gov/horizons/ , API documentation https://ssd-api.jpl.nasa.gov/doc/horizons.html
-- **NASA LRO LOLA GDR elevation maps** (PDS Geosciences Node), polar and global: every terrain horizon and local slope. https://pds-geosciences.wustl.edu/missions/lro/lola.htm
-- **NASA SVS CGI Moon Kit** (2025), colour maps 2K and 4K, for the look of the 3D Moon only. Credit: NASA's Scientific Visualization Studio. https://svs.gsfc.nasa.gov/4720 (NASA: "optimized for aesthetics, not science"; its orientation was checked against LOLA before use.)
-- **NASA NSSDCA fact sheets** (Moon, Earth, Sun): solar irradiance 1361 W/m² and its mean distance, Sun and Earth radii. https://nssdc.gsfc.nasa.gov/planetary/factsheet/
-- **NASA GSFC lunar eclipse predictions** (Fred Espenak), used to check our eclipses. https://eclipse.gsfc.nasa.gov/LEdecade/LEdecade2021.html
-- **NASA science pages and releases** quoted in the tour, "Why the south pole?" and the Report: science.nasa.gov planet pages, NASA SVS 5229 (lunar seasons), the Artemis III candidate-region releases (2022, 2024), and Park et al. 2021 (JPL DE440). Each quote carries its link on screen and in `lib/tour.js` / `lib/research.js`.
-- **NASA photos** (Learn tab), resized for the web: Apollo 8 Earthrise, "Image Credit: NASA", https://www.nasa.gov/image-article/apollo-8-earthrise/ ; Lunar South Pole (PIA13523), "Credits: NASA/GSFC/Arizona State University", https://science.nasa.gov/photojournal/the-lunar-south-pole
-- **Site coordinates and landing times:** NASA NSSDCA (Apollo), LROC / Arizona State University (IM-1, IM-2, Chandrayaan-3, polar mosaic centres), ISRO (Chandrayaan-3 site box), NASA (Artemis III candidate regions, 2024-10-28). Each site's source and notes are in `data/sites.js`.
+**Data**
+| Item | Used for | Licence / terms | Source |
+|---|---|---|---|
+| NASA JPL Horizons | every Sun and Earth direction, distance and Moon-fixed scene value (`data/ephem/`) | NASA/JPL data; acknowledged as the source | https://ssd.jpl.nasa.gov/horizons/ , https://ssd-api.jpl.nasa.gov/doc/horizons.html |
+| NASA LRO LOLA GDR elevation maps (PDS Geosciences Node) | every terrain horizon and local slope (`data/ephem/*/horizon.json`; raw maps not stored here) | publicly archived NASA mission data; acknowledged as the source | https://pds-geosciences.wustl.edu/missions/lro/lola.htm |
+| NASA NSSDCA fact sheets (Moon, Earth, Sun) | solar irradiance 1361 W/m² and its mean distance; Sun and Earth radii | NASA material (guidelines above) | https://nssdc.gsfc.nasa.gov/planetary/factsheet/ |
+| NASA GSFC lunar eclipse predictions (Fred Espenak) | checking our eclipses | NASA material (guidelines above) | https://eclipse.gsfc.nasa.gov/LEdecade/LEdecade2021.html |
+| NASA science pages and releases (science.nasa.gov planet pages, NASA SVS 5229, Artemis III candidate-region releases 2022 and 2024, Park et al. 2021 / JPL DE440) | short quotes in the tour, "Why the south pole?" and the Report, each with its link | quoted with attribution | links on screen and in `lib/tour.js`, `lib/research.js` |
+| Site coordinates and landing times: NASA NSSDCA (Apollo), LROC / Arizona State University (IM-1, IM-2, Chandrayaan-3, polar mosaic centres), ISRO (Chandrayaan-3 site box), NASA (Artemis III candidate regions, 2024-10-28) | the 10 sites | facts, cited per site | `data/sites.js` |
 
-**Software, fonts and code we build on**
-- **Three.js** and its OrbitControls (MIT License): the 3D Moon. https://threejs.org/
-- **Vite** (MIT License) and **TypeScript** (Apache License 2.0): build tools. **Node.js** runs the data scripts.
-- **OzAILabs SolarSystemSimulator**, forked and embedded as the Tour (its README describes the code as MIT-licensed). Its planet textures come from Solar System Scope (CC BY 4.0), Planet Pixel Emporium, NASA/USGS Astrogeology and Steve Albers, under their own terms. https://github.com/OzAILabs/SolarSystemSimulator , our fork https://github.com/advik09-beep/SolarSystemSimulator
-- **Starfield:** written for this project; visually informed by Hue Screen Starfield and etrepat/starfield (MIT License). No code or assets copied.
-- **Fonts (D33):** CMU Serif for headings, from the npm package `computer-modern` (the fonts are under the SIL Open Font License 1.1; the package's own code is MIT); Source Serif 4 for all other text and numbers, from `@fontsource/source-serif-4` (SIL Open Font License 1.1). Both are self-hosted. (Until the switch, the build also carries Urbanist, SIL OFL 1.1, from `@fontsource/urbanist`.)
-- **Hosting:** Vercel (static files, no backend).
-- **Test-only tools** (not shipped): happy-dom and esbuild, used to render the panels in automated tests.
+**Images** (all resized for the web except the Moon maps)
+| Item | Used for | Credit, exactly as given | Licence / terms | Source |
+|---|---|---|---|---|
+| NASA SVS CGI Moon Kit colour maps, 2K and 4K (2025) | the look of the 3D Moon (NASA: "optimized for aesthetics, not science") | NASA's Scientific Visualization Studio | NASA material (guidelines above) | https://svs.gsfc.nasa.gov/4720 |
+| Apollo 8 Earthrise | Learn tab | "Image Credit: NASA" | NASA material | https://www.nasa.gov/image-article/apollo-8-earthrise/ |
+| The Lunar South Pole (PIA13523) | Learn tab | "Credits: NASA/GSFC/Arizona State University" | as published by NASA with that credit | https://science.nasa.gov/photojournal/the-lunar-south-pole |
+| A Scientist on the Moon (Apollo 17) | Learn tab | "Credit: NASA" | NASA material | https://science.nasa.gov/resource/a-scientist-on-the-moon |
+| South Pole Illumination Map (PIA13720) | Learn tab | "Credits: NASA/GSFC/Arizona State University" | as published by NASA with that credit | https://science.nasa.gov/photojournal/south-pole-illumination-map |
+| NASA Releases New High-Resolution Earthrise Image (LRO) | Learn tab | "Image Credit: NASA/Goddard/Arizona State University" | as published by NASA with that credit | https://www.nasa.gov/image-article/nasa-releases-new-high-resolution-earthrise-image-2/ |
+
+**Software, fonts and code**
+| Item | Used for | Licence | Source |
+|---|---|---|---|
+| Three.js and OrbitControls (npm `three`) | the 3D Moon | MIT | https://threejs.org/ |
+| Vite | build tool | MIT | https://vite.dev/ |
+| TypeScript | build tool | Apache License 2.0 | https://www.typescriptlang.org/ |
+| `@types/three` | type definitions | MIT | npm |
+| CMU Serif (npm `computer-modern` 0.1.3) | headings | fonts: SIL Open Font License 1.1 (package files marked MIT) | https://github.com/stevenpetryk/computer-modern , https://cm-unicode.sourceforge.io/ |
+| Source Serif 4 (npm `@fontsource/source-serif-4` 5.3.1) | all other text and numbers | SIL Open Font License 1.1 | https://fontsource.org/fonts/source-serif-4 |
+| Other npm dependencies of the above | build | each under its own licence, listed in `web/package-lock.json` | npm |
+| OzAILabs SolarSystemSimulator, forked and deployed separately, embedded as the Tour | Tour tab | upstream README says "MIT"; no complete licence file found (see the audit). Not relicensed by us. | https://github.com/OzAILabs/SolarSystemSimulator , fork https://github.com/advik09-beep/SolarSystemSimulator |
+| Simulator planet textures | Tour tab | Solar System Scope: CC BY 4.0; USGS Astrogeology mosaics: per product; Planet Pixel Emporium map: redistribution restricted; Steve Albers composite: not cleared (see the audit) | https://www.solarsystemscope.com/textures/ , https://astrogeology.usgs.gov/ , https://planetpixelemporium.com/planets.html , https://stevealbers.net/albers/sos/sos.html |
+| Starfield ideas: Hue Screen Starfield; etrepat/starfield (MIT) | look of the moving stars | no code or assets copied; our own code | https://www.huescreen.com/starfield/ , https://github.com/etrepat/starfield |
+| Node.js | runs the data scripts | MIT | https://nodejs.org/ |
+| Vercel | hosting (static files, no backend) | service | https://vercel.com/ |
+| happy-dom, esbuild (test-only, not shipped) | rendering the panels in automated tests | MIT | npm |
 
 All in-app credits are under **Data and methods** on the site.
 
@@ -150,7 +176,7 @@ All in-app credits are under **Data and methods** on the site.
 ## AI use
 **The code in this project was written with AI coding assistants, directed by the team.** The two team members decided what to build, checked the results and signed off every step. The assistants wrote the code and most of the documentation.
 
-- **Claude Code (Anthropic), with Sheldon (Lane A, "numbers"):** the data download scripts, the data files, everything in `lib/`, the terrain horizon method, the eleven check scripts, `data/README.md`, the screen panels inside the site (side card, Compare grid, Stand here, Report and Learn, Planner) and this README. It read the JPL Horizons, PDS and NASA documentation to confirm settings and quoted them, rather than relying on memory.
+- **Claude Code (Anthropic), with Sheldon (Lane A, "numbers"):** the data download scripts, the data files, everything in `lib/`, the terrain horizon method, the twelve check scripts, `data/README.md`, the screen panels inside the site (side card, Compare grid, Stand here, Report and Learn, Planner) and this README. It read the JPL Horizons, PDS and NASA documentation to confirm settings and quoted them, rather than relying on memory.
 - **ChatGPT / Codex (OpenAI), with Advik (Lane B, "screen"):** the web app shell, the tabs and toolbar, the Three.js Moon and its lighting, the embedded Tour, the Data and methods page, and the Vercel deployment.
 - **The humans:**
   - Made every decision (scope, the 10 sites, the verdict numbers, the score weights, which point to use at Malapert), recorded as signed decisions in [`PLAN.md`](PLAN.md).

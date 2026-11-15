@@ -3,13 +3,17 @@
 // Lane A owns this file. Every number comes from /lib/visibility.js; nothing is calculated here except
 // picking maxima, run lengths and drawing positions from those numbers.
 import { V, type Sample } from "./data";
-import { createPanelRoot, esc } from "./shared";
-import { KID_CSS, kidDate, kidAmount, ring, teacher } from "./kid";
+import { createPanelRoot, esc, verdictIcon } from "./shared";
+import { KID_CSS, KID_VERDICT, kidDate, kidAmount, ring, teacher } from "./kid";
 import type { MountPanel, PanelProps } from "./types";
 import earthriseUrl from "./img/nasa_apollo8_earthrise.jpg";
 import southPoleUrl from "./img/nasa_pia13523_south_pole.jpg";
+import scientistUrl from "./img/nasa_apollo17_scientist_on_moon.jpg";
+import illuminationUrl from "./img/nasa_pia13720_south_pole_illumination.jpg";
+import lroEarthriseUrl from "./img/nasa_lro_earthrise_2015.jpg";
 
-/** NASA photos: official page and the credit line exactly as NASA gives it (checked 2026-11-14). */
+/** NASA photos: official page and the credit line exactly as NASA gives it (first two checked 2026-11-14,
+ *  the last three 2026-11-15, D34). Images resized for the web. */
 export const LEARN_PHOTOS = [
   { id: "earthrise", src: earthriseUrl, alt: "Earth rising above the grey edge of the Moon, against a black sky.",
     kid: "Earth seen from a spaceship flying around the Moon.",
@@ -19,7 +23,39 @@ export const LEARN_PHOTOS = [
     kid: "The Moon's south pole. Some deep craters here never get sunshine.",
     teacher: "Lunar South Pole (PIA13523): a mosaic from the camera on NASA's Lunar Reconnaissance Orbiter. Because the Sun stays near the horizon here, crater floors can stay in permanent shadow, which is where water ice can survive.",
     credit: "Credits: NASA/GSFC/Arizona State University", page: "https://science.nasa.gov/photojournal/the-lunar-south-pole" },
+  { id: "scientist", src: scientistUrl, alt: "An astronaut in a white spacesuit stands next to a flag on the grey Moon, with a small blue Earth high in the black sky.",
+    kid: "An astronaut on the Moon. The small dot above the flag is Earth.",
+    teacher: "A Scientist on the Moon. NASA's caption: “Scientist-astronaut Harrison H. Schmitt stands by the American flag during a moonwalk on the Apollo 17 mission. Home, that small dot in the blackness of space above the flag, is a quarter-million miles away.”",
+    credit: "Credit: NASA", page: "https://science.nasa.gov/resource/a-scientist-on-the-moon" },
+  { id: "illumination", src: illuminationUrl, alt: "A round grey map of the area around the Moon's south pole, with bright and dark patches and a big crater in the middle.",
+    kid: "A map of sunshine near the south pole. It shows which spots get sunshine and which stay dark.",
+    teacher: "South Pole Illumination Map (PIA13720), from NASA's Lunar Reconnaissance Orbiter camera. NASA's caption: “Multi-temporal illumination map of the lunar south pole, Shackleton crater (19 kilometers diameter, or 12 miles) is in the center.” It is built from many images over time, so it shows how often each spot is lit, not one moment.",
+    credit: "Credits: NASA/GSFC/Arizona State University", page: "https://science.nasa.gov/photojournal/south-pole-illumination-map" },
+  { id: "lro-earthrise", src: lroEarthriseUrl, alt: "Earth, blue and white, rising above the grey edge of the Moon.",
+    kid: "Earth seen by a NASA spacecraft that flies around the Moon.",
+    teacher: "NASA Releases New High-Resolution Earthrise Image. NASA's caption: “NASA's Lunar Reconnaissance Orbiter (LRO) recently captured a unique view of Earth from the spacecraft's vantage point in orbit around the moon.” NASA describes it as a composite image. As with Apollo 8, Earth seems to rise only because the spacecraft is moving.",
+    credit: "Image Credit: NASA/Goddard/Arizona State University", page: "https://www.nasa.gov/image-article/nasa-releases-new-high-resolution-earthrise-image-2/" },
 ] as const;
+
+/** D34 "Try it yourself": preset places and dates, chosen from our data, opened through the shell's
+ *  shareable-link parameters (tab, level, site, date, hour, view). */
+export const TRY_IT = Object.freeze([
+  { id: "hill", siteId: "sp_malapert", date: "2026-09-19", hour: 6, view: "horizon", title: "See a hill hide the Sun",
+    kid: "Stand at Malapert. The Sun is up, but a hill is in the way." },
+  { id: "sunny", siteId: "sp_malapert", date: "2026-11-22", hour: 0, view: "globe", title: "A sunny week near the south pole",
+    kid: "Land at Malapert this week. The Sun and Earth stay in sight all week." },
+  { id: "night", siteId: "apollo11", date: "2026-11-01", hour: 0, view: "globe", title: "A week of night at Apollo 11",
+    kid: "Land where Apollo 11 landed. It is night all week, but Earth stays in sight." },
+] as const);
+export const tryHref = (x: { siteId: string; date: string; hour: number; view: string }): string =>
+  `?tab=explore&level=educator&site=${encodeURIComponent(x.siteId)}&date=${x.date}&hour=${x.hour}&view=${x.view}`;
+
+/** "The ten places": where each site is, in words, from its latitude (no degrees shown). */
+export function placeWords(lat: number): string {
+  if (lat <= -80) return "Very close to the south pole.";
+  if (lat <= -60) return "Far in the south.";
+  return "Near the middle of the Moon.";
+}
 
 /** Fixed examples so the explainers say the same thing every time (checked by scripts/check_d32.mjs). */
 export const LEARN_EXAMPLES = Object.freeze({
@@ -75,51 +111,75 @@ export async function renderLearn(body: HTMLElement, current: PanelProps, isCurr
   } catch { mine = `<section class="mine"><h3>Your place</h3><p>We have no data for that week.</p></section>`; }
   const dn = F.dayNight, sunDays = Math.round(avg(dn.sunHours) / 24), nightDays = Math.round(avg(dn.nightHours) / 24);
   const r = F.ridge;
+  let week: Record<string, { verdict: keyof typeof KID_VERDICT; pctLit: number; pctComms: number } | null> = {};
+  try { const dly = (V as unknown as { getDaily(d: string, n: number): unknown }).getDaily(current.landingDate, 1) as { sites: Record<string, ({ verdict: keyof typeof KID_VERDICT; pctLit: number; pctComms: number } | null)[]> }; week = Object.fromEntries(Object.entries(dly.sites).map(([k, v]) => [k, v[0]])); } catch { week = {}; }
+  const two = (pic: string, words: string, cls = "") => `<section class="two ${cls}"><div class="pic-col">${pic}</div><div class="words">${words}</div></section>`;
   body.innerHTML = `<div class="kid learn">
     <header><h2>Learn: sunshine and Earth on the Moon</h2>
       <p class="lead">A lander needs sunshine for power. It needs to see Earth to send messages home.</p></header>
     ${mine}
 
-    <section><h3>1. A hill can hide the Sun</h3>
-      ${ridgeSvg(r)}
+    ${two(ridgeSvg(r), `<h3>1. A hill can hide the Sun</h3>
       <p>The Sun is up in the sky.</p>
       <p>But a tall hill is in the way.</p>
       <p>So the lander gets no sunshine.</p>
       ${teacher(`<p>Real skyline at Malapert (high ground near NASA's candidate region) on 19 September 2026 at 06:00 UTC. The Sun is ${r.sunEl.toFixed(2)} degrees above level, but the terrain skyline in that direction stands ${r.skylineDeg.toFixed(2)} degrees high, set by a ridge ${r.blockDistKm === null ? "nearby" : `${r.blockDistKm.toFixed(2)} km`} to the east. A flat-ground model would call this hour sunny; with terrain it is dark. Skyline from NASA's LOLA elevation maps, Sun position from NASA JPL Horizons.</p>`,
-        "Can you remember a time a building or a tree hid the Sun from you?")}</section>
+        "Can you remember a time a building or a tree hid the Sun from you?")}`)}
 
-    <section><h3>2. Near the poles, the Sun stays low</h3>
-      <div class="pair">${skySvg(F.highSunDeg, "Apollo 11", "near the middle of the Moon")}${skySvg(F.lowSunDeg, "Malapert", "near the south pole")}</div>
+    ${two(`<div class="pair">${skySvg(F.highSunDeg, "Apollo 11", "near the middle of the Moon")}${skySvg(F.lowSunDeg, "Malapert", "near the south pole")}</div>`, `<h3>2. Near the poles, the Sun stays low</h3>
       <p>Near the middle of the Moon, the Sun climbs high.</p>
       <p>Near the south pole, the Sun stays close to the ground.</p>
       <p>That is why hills matter so much there.</p>
       ${teacher(`<p>Highest Sun in the 30 days from 14 November 2026: Apollo 11 about ${Math.round(F.highSunDeg)} degrees above level, Malapert about ${Math.round(F.lowSunDeg)} degrees (NASA JPL Horizons). The Moon's axis is tilted only about 1.5 degrees, so at the poles the Sun always skims the horizon (NASA SVS 5229).</p>`,
-        "If the Sun stayed low all day where you live, what would your shadow look like?")}</section>
+        "If the Sun stayed low all day where you live, what would your shadow look like?")}`)}
 
-    <section><h3>3. A day on the Moon lasts about a month</h3>
-      ${dayNightSvg(dn.samples)}
+    ${two(dayNightSvg(dn.samples), `<h3>3. A day on the Moon lasts about a month</h3>
       <p>On the Moon, sunshine lasts about ${words(sunDays)} days.</p>
       <p>Then night lasts about ${words(nightDays)} days.</p>
       <p>On Earth, a whole day and night take just one day.</p>
       ${teacher(`<p>At Apollo 11 from 14 November 2026: complete sunshine stretches of ${list(dn.sunHours.map((h) => (h / 24).toFixed(1)))} days and nights of ${list(dn.nightHours.map((h) => (h / 24).toFixed(1)))} days. Sunrise to sunrise: ${list(dn.sunriseToSunriseDays.map((d) => d.toFixed(1)))} days (hourly data, so each is good to about an hour). One lunar day, noon to noon, averages about 29.5 Earth days.</p>`,
-        "What would you do during a night that lasts two weeks?")}</section>
+        "What would you do during a night that lasts two weeks?")}`)}
 
-    <section><h3>4. Earth stays in one spot</h3>
-      ${earthSvg(F.earth.samples)}
+    ${two(earthSvg(F.earth.samples), `<h3>4. Earth stays in one spot</h3>
       <p>The Sun crosses the Moon's sky.</p>
       <p>Earth stays in almost the same spot.</p>
       <p>That is because the Moon always shows Earth the same face.</p>
       ${teacher(`<p>At Apollo 11 over the 30 days from 14 November 2026, Earth's height stays between ${Math.round(F.earth.elMin)} and ${Math.round(F.earth.elMax)} degrees and its compass direction between ${Math.round(F.earth.azMin)} and ${Math.round(F.earth.azMax)} degrees, while the Sun goes from ${Math.round(F.earth.sunElMin)} to ${Math.round(F.earth.sunElMax)} degrees (below the ground at night). The small wobble is called libration. Positions from NASA JPL Horizons.</p>`,
-        "If Earth never moves in the Moon's sky, could you use it to find your way?")}</section>
+        "If Earth never moves in the Moon's sky, could you use it to find your way?")}`)}
 
-    <section><h3>5. Real NASA photos</h3>
-      <div class="photos">${LEARN_PHOTOS.map((p) => `<figure class="photo" data-photo="${p.id}">
-        <img src="${p.src}" alt="${esc(p.alt)}" loading="lazy" width="320"/>
-        <figcaption><p>${esc(p.kid)}</p>
+    <section class="tryit"><h3>5. Try it yourself</h3>
+      <p>Pick a card. The tool opens at that place and day.</p>
+      <div class="cards">${TRY_IT.map((t) => { const st = V.listSites().find((x) => x.id === t.siteId)!; return `<a class="card try" data-try="${t.id}" href="${tryHref(t)}">
+        <strong>${esc(t.title)}</strong><span>${esc(t.kid)}</span><span class="muted small">${esc(st.shortName)}, ${esc(kidDate(t.date))}</span><span class="go">Open it</span></a>`; }).join("")}</div>
+      ${teacher(`<p>Each card opens Explore in the Educator view at a place, date and hour chosen from our data: Malapert on 19 September 2026 at 06:00 UTC (the Sun ${r.sunEl.toFixed(2)} degrees above level, behind a ridge); Malapert in the week from 22 November 2026 (sunlight and Earth in view for all 168 hours); Apollo 11 in the week from 1 November 2026 (no sunlight, Earth in view the whole week).</p>`,
+        "Before you open a card, guess: will the lander have sunshine?")}</section>
+
+    <section class="places"><h3>6. The ten places</h3>
+      <p>These are the ten places in this tool. Pick one to visit it.</p>
+      <div class="cards">${V.listSites().map((st) => { const w = week[st.id]; return `<a class="card place" data-place="${st.id}" href="${tryHref({ siteId: st.id, date: current.landingDate, hour: 0, view: "globe" })}">
+        <strong>${w ? verdictIcon(w.verdict, 18) : ""} ${esc(st.shortName)}</strong>
+        <span>${esc(placeWords(st.lat))}</span>
+        <span>${st.landingDate ? `A lander landed here in ${st.landingDate.slice(0, 4)}.` : "A possible landing spot."}</span>
+        <span class="muted small">${w ? `This week: ${esc(KID_VERDICT[w.verdict].label.toLowerCase())}. Sunshine ${esc(kidAmount(w.pctLit))}.` : "No data for this week."}</span>
+        <span class="go">Visit</span></a>`; }).join("")}</div>
+      ${teacher(`<p>Six are past landings (Apollo 11, 12 and 17, Chandrayaan-3, IM-1, IM-2), shown for comparison; four are candidate points from NASA's Artemis III candidate regions. “This week” is the 7-day stay from ${esc(current.landingDate)}. Where each place is comes from its latitude; landing years come from each site's source in the data.</p>`,
+        "Which place would you pick for a lander that must talk to Earth all the time?")}</section>
+
+    <section class="photos-sec"><h3>7. Real NASA photos</h3>
+      ${LEARN_PHOTOS.map((p) => `<figure class="photo two" data-photo="${p.id}">
+        <div class="pic-col"><img src="${p.src}" alt="${esc(p.alt)}" loading="lazy" width="320"/></div>
+        <figcaption class="words"><p>${esc(p.kid)}</p>
           <p class="credit">${esc(p.credit)}; <a href="${esc(p.page)}" target="_blank" rel="noopener">NASA source page</a></p>
-          ${teacher(`<p>${esc(p.teacher)}</p>`, p.id === "earthrise" ? "Why does Earth look like it is rising in this photo?" : "Why might ice hide in the dark craters?")}</figcaption></figure>`).join("")}</div></section>
+          ${teacher(`<p>${esc(p.teacher)}</p>`, PHOTO_Q[p.id])}</figcaption></figure>`).join("")}</section>
   </div>`;
 }
+const PHOTO_Q: Record<string, string> = {
+  earthrise: "Why does Earth look like it is rising in this photo?",
+  "south-pole": "Why might ice hide in the dark craters?",
+  scientist: "Find Earth in the photo. Why does it look so small?",
+  illumination: "Where on this map would you put a lander that needs power?",
+  "lro-earthrise": "This spacecraft is moving. How does that make Earth seem to rise?",
+};
 
 export const mountLearn: MountPanel = (container, props) => {
   const { host, root } = createPanelRoot(container, "learn", CARD_CSS + KID_CSS + LEARN_CSS);
@@ -198,7 +258,17 @@ h3 { margin: 18px 0 6px; font-size: 1rem; }
 export const LEARN_CSS = `
 .learn section { padding-top: 10px; border-top: 1px solid var(--_divider); margin-top: 12px; }
 .learn h3 { border-top: 0; padding-top: 0; margin-top: 4px; } /* one divider per section (the section rule), not two */
-.learn svg.pic, .learn .pair, .learn .photos { max-width: 560px; }
+.learn svg.pic, .learn .pair { max-width: 560px; }
+.learn .two { display: grid; grid-template-columns: minmax(0, 560px) minmax(15rem, 1fr); gap: 20px; align-items: start; } /* D34: picture left, words right */
+.learn .two .words h3 { margin-top: 2px; }
+.learn figure.two { margin: 14px 0 0; }
+.learn figure.two img { max-width: 360px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; margin: 8px 0; max-width: 980px; }
+.card { display: grid; gap: 4px; align-content: start; padding: 10px 12px; border-radius: 10px; background: rgba(255,255,255,.05); color: var(--_text); text-decoration: none; }
+.card:hover, .card:focus-visible { background: rgba(255,255,255,.10); }
+.card strong { display: flex; gap: 6px; align-items: center; }
+.card .go { color: var(--_link); text-decoration: underline; font-size: .85rem; }
+.small { font-size: var(--_fs-sm); }
 .k.dot { width: 10px; height: 10px; border-radius: 50%; } .k.line { height: 3px; background: var(--_horizon); } .k.level { height: 0; border-top: 2px dashed var(--_muted); }
 svg.pic { width: 100%; height: auto; display: block; margin: 6px 0; }
 .pic .sky, .sky-fig .sky { fill: var(--_sky); }

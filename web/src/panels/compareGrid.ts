@@ -323,8 +323,8 @@ svg.strip { width: 100%; height: auto; display: block; }
 .switch { display: inline-flex; margin: 6px 0; border: 1px solid var(--_border); border-radius: 999px; overflow: hidden; }
 .switch button { padding: 4px 14px; border: 0; background: transparent; color: inherit; font-size: .85rem; }
 .switch button[aria-pressed="true"] { background: var(--_accent); font-weight: 650; }
-.weights { display: grid; gap: 4px; margin: 6px 0; font-size: .82rem; }
-.weights label { display: grid; grid-template-columns: 1fr 160px 32px; gap: 8px; align-items: center; }
+.weights { display: grid; grid-template-columns: auto 160px 2.5rem; justify-content: start; gap: 4px 10px; align-items: center; margin: 6px 0; font-size: .82rem; } /* D34: each slider sits right beside its label */
+.weights label { display: contents; }
 .reset { padding: 4px 10px; border: 1px solid var(--_border); border-radius: 8px; background: transparent; color: inherit; font-size: .8rem; }
 ol.rank { margin: 6px 0; padding-left: 22px; font-size: .88rem; }
 .rank li.sel, .ranktable tr.sel td { font-weight: 700; }

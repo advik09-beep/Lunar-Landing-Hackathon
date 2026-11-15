@@ -1,0 +1,100 @@
+LunLux: Sunlight and Earth contact for lunar landing sites
+Copyright 2026 Sheldon Spence and Advik Chaudhary
+
+The team's original code and text in this repository are licensed under the
+Apache License, Version 2.0 (see LICENSE).
+
+The Apache License does NOT cover the items below. Each keeps its own terms,
+listed with its source. Where an item is NASA material, NASA should be
+acknowledged as the source, and its use must not imply NASA endorsement.
+
+NASA's media usage guidelines say: "NASA content - images, audio, video, and
+media files used in the rendition of 3-dimensional models, such as texture
+maps and polygon data in any format - generally are not subject to copyright
+in the United States." They also note that NASA occasionally uses
+third-party copyright-protected material.
+https://www.nasa.gov/nasa-brand-center/images-and-media/
+
+1. NASA data (in data/)
+   - data/ephem/*/<year>.json, landing.json, data/ephem/_scene/*.json and the
+     daily summaries derived from them: Sun and Earth directions and
+     distances from NASA JPL Horizons (Solar System Dynamics, Jet Propulsion
+     Laboratory). https://ssd.jpl.nasa.gov/horizons/
+   - data/ephem/*/horizon.json: terrain horizons computed from NASA LRO
+     Lunar Orbiter Laser Altimeter (LOLA) GDR elevation maps, PDS
+     Geosciences Node. https://pds-geosciences.wustl.edu/missions/lro/lola.htm
+     (The raw maps are not stored in this repository.)
+   - data/checks/: values queried from NASA JPL Horizons.
+   - Site coordinates and landing times in data/sites.js are facts taken
+     from the sources listed for each site (NASA NSSDCA, LROC / Arizona
+     State University, ISRO, NASA).
+
+2. NASA imagery (in web/)
+   - web/public/moon/lroc_color_2k.jpg and lroc_color_4k.jpg: NASA's
+     Scientific Visualization Studio, CGI Moon Kit.
+     Credit: NASA's Scientific Visualization Studio.
+     https://svs.gsfc.nasa.gov/4720
+   - web/src/panels/img/nasa_apollo8_earthrise.jpg (resized): Apollo 8
+     Earthrise. "Image Credit: NASA".
+     https://www.nasa.gov/image-article/apollo-8-earthrise/
+   - web/src/panels/img/nasa_pia13523_south_pole.jpg (resized): The Lunar
+     South Pole (PIA13523). "Credits: NASA/GSFC/Arizona State University".
+     https://science.nasa.gov/photojournal/the-lunar-south-pole
+   - web/src/panels/img/nasa_apollo17_scientist_on_moon.jpg (resized): A
+     Scientist on the Moon (Apollo 17). "Credit: NASA".
+     https://science.nasa.gov/resource/a-scientist-on-the-moon
+   - web/src/panels/img/nasa_pia13720_south_pole_illumination.jpg (resized):
+     South Pole Illumination Map (PIA13720).
+     "Credits: NASA/GSFC/Arizona State University".
+     https://science.nasa.gov/photojournal/south-pole-illumination-map
+   - web/src/panels/img/nasa_lro_earthrise_2015.jpg (resized): NASA Releases
+     New High-Resolution Earthrise Image.
+     "Image Credit: NASA/Goddard/Arizona State University".
+     https://www.nasa.gov/image-article/nasa-releases-new-high-resolution-earthrise-image-2/
+   - Quoted NASA and JPL text in lib/tour.js and lib/research.js is quoted
+     from the pages linked next to each quote.
+
+3. Fonts (installed from npm, served with the site)
+   - CMU Serif (Computer Modern Unicode), npm package computer-modern 0.1.3.
+     The fonts are under the SIL Open Font License 1.1 (OFL.txt in the
+     package; Reserved Font Name "Computer Modern Unicode fonts"); the
+     package's own files are marked MIT.
+     https://github.com/stevenpetryk/computer-modern ,
+     https://cm-unicode.sourceforge.io/
+   - Source Serif 4, npm package @fontsource/source-serif-4 5.3.1, SIL Open
+     Font License 1.1 (LICENSE in the package).
+     https://fontsource.org/fonts/source-serif-4
+   - SIL Open Font License 1.1:
+     https://openfontlicense.org/open-font-license-official-text/
+
+4. The forked solar-system simulator (Tour tab)
+   - Not stored in this repository. It is a separately deployed fork,
+     https://github.com/advik09-beep/SolarSystemSimulator , of
+     OzAILabs/SolarSystemSimulator,
+     https://github.com/OzAILabs/SolarSystemSimulator , embedded in the
+     Tour tab. The upstream README states "MIT", but no complete licence
+     file was found (see THIRD_PARTY_LICENSE_AUDIT.md). It is not relicensed
+     by this project.
+   - Its planet textures keep their own terms: Solar System Scope textures,
+     Creative Commons Attribution 4.0 International,
+     https://www.solarsystemscope.com/textures/ ,
+     https://creativecommons.org/licenses/by/4.0/ ; USGS Astrogeology
+     mission mosaics, https://astrogeology.usgs.gov/ ; a Planet Pixel
+     Emporium map (redistribution restricted),
+     https://planetpixelemporium.com/planets.html ; and a Steve Albers
+     composite, https://stevealbers.net/albers/sos/sos.html . The open
+     items are tracked in THIRD_PARTY_LICENSE_AUDIT.md.
+
+5. npm packages (installed at build time, not stored in this repository)
+   Each is under its own licence, in its folder under web/node_modules:
+   - three 0.181 (MIT), https://threejs.org/
+   - vite 5.4 (MIT), https://vite.dev/
+   - typescript 5.9 (Apache License 2.0), https://www.typescriptlang.org/
+   - @types/three 0.181 (MIT)
+   - computer-modern and @fontsource/source-serif-4 (see 3)
+   - and their dependencies, listed in web/package-lock.json.
+
+6. Names and marks
+   - "NASA" and NASA insignia are NASA's. The LunLux name, wordmark and icon
+     (web/public/brand/) are the team's; the Apache License grants no
+     trademark rights (Section 6).

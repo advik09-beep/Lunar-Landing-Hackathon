@@ -267,10 +267,11 @@ function profileSvg(h: number[]): string {
   const W = 720, Hh = 120, lo = Math.floor(Math.min(-1, ...h)), hi = Math.ceil(Math.max(1, ...h));
   const y = (e: number) => 8 + ((hi - e) / (hi - lo)) * (Hh - 24);
   const pts = h.map((e, i) => `${((i / 359) * W).toFixed(1)},${y(e).toFixed(1)}`).join(" ");
-  const ticks = ["N", "E", "S", "W", "N"].map((c, i) => `<text x="${Math.min(W - 10, i * W / 4)}" y="${Hh - 2}">${c}</text>`).join("");
+  // D34: compass letters are HTML under the chart, so they stay at normal text size whatever the chart width.
   return `<svg class="profile" viewBox="0 0 ${W} ${Hh}" role="img" aria-label="Terrain horizon elevation by azimuth, ${lo} to ${hi} degrees">
-    <line x1="0" x2="${W}" y1="${y(0)}" y2="${y(0)}" class="zero"/><polyline points="${pts}" class="hz"/>${ticks}
-    <text x="4" y="12">${hi}°</text><text x="4" y="${y(0) - 3}">0°</text><text x="4" y="${Hh - 14}">${lo}°</text></svg>`;
+    <line x1="0" x2="${W}" y1="${y(0)}" y2="${y(0)}" class="zero"/><polyline points="${pts}" class="hz"/>
+    <text x="4" y="12">${hi}°</text><text x="4" y="${y(0) - 3}">0°</text><text x="4" y="${Hh - 14}">${lo}°</text></svg>
+    <div class="compass-row" aria-hidden="true"><span>N</span><span>E</span><span>S</span><span>W</span><span>N</span></div>`;
 }
 
 const CSS = `
@@ -296,6 +297,7 @@ svg.profile { width: 100%; height: auto; display: block; margin: 6px 0; }
 .profile .hz { fill: none; stroke: var(--_horizon); stroke-width: 1.5; }
 .profile .zero { stroke: var(--_muted); stroke-dasharray: 4 3; }
 .profile text { fill: var(--_muted); font-size: 10px; }
+.compass-row { display: flex; justify-content: space-between; font-size: var(--_fs-md); color: var(--_muted); margin: -2px 0 6px; }
 svg { overflow: visible; }
 .chart { margin: 6px 0 10px; } .chart svg { width: 100%; height: auto; display: block; }
 .chart .b-sun { fill: var(--_sun); } .chart .b-earth { fill: var(--_earth); }

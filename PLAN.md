@@ -266,6 +266,22 @@ and researchers get the numbers behind them.
   Educator stays at one week; time box 2 hours, else removed cleanly.
   Details: DESIGN.md, "Final cleanup (D33)".
 
+- D34 Submission readiness (both humans, 2026-11-15). Licence: both
+  humans approve Apache License 2.0 for the team's original code and
+  text; a root LICENSE and a NOTICE listing what it does NOT cover (NASA
+  data and imagery, fonts, the forked simulator and its textures, npm
+  packages), each with its own licence and source. Lane A reviews
+  THIRD_PARTY_LICENSE_AUDIT.md and answers Lane B in STATUS.md. Lane A
+  work: (1) Learn tab, Educator, seven-year-old bar: two columns per
+  section (picture left, words right), three "Try it yourself" cards that
+  open the tool at a preset place and date, "The ten places" cards, and
+  up to three more NASA photos only where the official page and exact
+  credit line are confirmed; (2) Researcher weight sliders beside their
+  labels, terrain-chart compass letters at normal size, and Stand here
+  hides its own time slider when the shell supplies the hour; (3) README
+  Licence section with every outside item and its licence; (4) README
+  team line "by Sheldon Spence and Advik Chaudhary".
+
 ## Settled earlier (do not reopen without both humans)
 - 10 fixed sites: 3 Apollo, Chandrayaan-3, IM-1, IM-2, 4 south pole
   representative points.

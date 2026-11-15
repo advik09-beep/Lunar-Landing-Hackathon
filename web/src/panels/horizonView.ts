@@ -132,6 +132,8 @@ export const mountHorizonView: MountPanel = (container, props) => {
       </svg>`;
     }
     function controlsHtml(n: number, label: string): string {
+      // D34: when the shell supplies the hour (onHourSelected), its toolbar slider is the one control; show only the time here.
+      if (current.onHourSelected) return `<div class="controls shell-hour"><output class="when"></output></div>`;
       return `<div class="controls">
         <button type="button" data-action="prev-hour" aria-label="One hour earlier">◀</button>
         <label>${label} <input type="range" data-action="hour" min="0" max="${n - 1}" step="1" value="${hour}"/></label>

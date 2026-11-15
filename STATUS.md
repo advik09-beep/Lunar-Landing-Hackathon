@@ -6,7 +6,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 |-----|------|-----------|
 | Advik + ChatGPT (Lane B) | D33 COMPLETE — STOPPED | All 10 D33 items implemented; item 10 production build e25d4c7 READY. Human browser QA remains open. |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
-| Claude Code (Lane A) | D33 Lane A part done (items 1–6) | Stay length 1/3/7/14 (Researcher) done within the time box; stopped |
+| Claude Code (Lane A) | D34 Lane A part done | LICENSE + NOTICE, audit reply, Learn redesign, slider/compass/Stand here fixes, README licence; stopped |
 
 Acceptance (both humans): steps 1, 2, 3, 6, 8 PASS; step 4 and 7 pending earlier findings. Signed: D7–D23 (see PLAN), **D24–D28** (title card + tour nav, tour captions, why the south pole, one clock, A/B scenarios + requirements filter). Rule: no status-only pushes.
 Waiting on Sheldon: read the new Educator screens on web/panels.html (level = Educator) and the Learn tab; confirm the two NASA photos and their captions.
@@ -1807,3 +1807,38 @@ Done within the 2-hour time box (all checks passing about 7 minutes after starti
 - **NASA challenge objectives source audit; not a browser interaction test:** Curated real landing sites; site/date grids and A/B comparison; Explore globe plus Sun/Earth horizon diagram; hourly and monthly timelines; Researcher elevation, time until next Sun/Earth visibility change, percentages, gap durations, power estimates; Educator/Researcher reading levels; actual NASA JPL Horizons ephemerides and LOLA terrain skyline models are present in source.
 - **Optional capabilities not implemented:** custom lunar coordinate input (deliberately cut per PLAN D6); arbitrary landing clock time (the hour slider inspects an hour within a stay starting 00:00 UTC, rather than changing touchdown time); automatic playback animation through a whole lunar day (manual hour slider and period charts exist); detailed 3D terrain mesh on the globe (smooth NASA imagery globe, scientific LOLA skyline in Horizon only). A broader mission-feasibility model (e.g. propulsion, hazards, full comms link budget) is also outside scope; the Sun/Earth score is a team-made score, not overall landing safety.
 - **Testing scope:** Vercel build READY verifies bundling and deployment, not that every visual interaction works. Human end-to-end review, mobile note check, NASA objective usability and signed step 4/7 acceptance remain open; no additional features authorized.
+
+### 2026-11-15 — D34 submission readiness: Lane A part DONE; reply to Lane B's licensing audit
+**Recorded:** D34 in PLAN.md (both humans): Apache License 2.0 for the team's original code and text.
+
+**Licence files (repo root):**
+- `LICENSE`: the official Apache License 2.0 text, downloaded from https://www.apache.org/licenses/LICENSE-2.0.txt (unchanged; SHA-256 `cfc7749b…3d30`).
+- `NOTICE`: copyright "Sheldon Spence and Advik Chaudhary", plus everything the licence does NOT cover, each with its own terms and source: NASA data (Horizons, LOLA/PDS, NSSDCA, site sources), NASA imagery (CGI Moon Kit maps and the five Learn photos with exact credits), quoted NASA/JPL text, fonts (CMU Serif via `computer-modern`: fonts OFL 1.1, package files MIT; Source Serif 4: OFL 1.1), the forked simulator and its textures (not relicensed; open items point to the audit), npm packages (three MIT, vite MIT, typescript Apache-2.0, @types/three MIT; licences read from `web/node_modules`), and names and marks (Apache §6 grants no trademark rights). NASA's media-usage wording is quoted from https://www.nasa.gov/nasa-brand-center/images-and-media/.
+
+**Reply to Lane B (THIRD_PARTY_LICENSE_AUDIT.md and the ACTION REQUIRED request):**
+1. **Licence consent:** D34 records both humans' approval of Apache 2.0 for the team's original code and text, so release gate 1 is met by the files above. The approval covers our own work only. It does not license the simulator fork, its textures or any third-party item, which is what NOTICE says.
+2. **Lane A review:** I agree with the audit's findings and gates 2–5 and 7 for the simulator. Pluto (Planet Pixel Emporium) and Europa (Steve Albers) remain blockers, and a one-word "MIT" in a README is not a complete grant. Those are Lane B items in the fork; Lane A has no files there. Note that D34 approved the licence only. The texture replacement plan is not signed in PLAN.md yet, so please get both humans' go before changing the fork.
+3. **Scientific data provenance (Lane A):**
+   - Every number comes from NASA/JPL Horizons, NASA LOLA maps on PDS, NASA NSSDCA fact sheets, or NASA GSFC eclipse predictions, each cited in README, NOTICE and `data/README.md`.
+   - Site coordinates are facts, cited per site in `data/sites.js`.
+   - No third-party code is in `/lib`, `/scripts` or `web/src/panels/`. The panels contain only the team's own code (written by AI coding assistants under the team's direction).
+4. **Images in Lane A panels:** five NASA photos, each opened on its official NASA page with the credit line copied exactly. Two are "NASA" (Apollo 8 Earthrise, Apollo 17 "A Scientist on the Moon"). Three are co-credited NASA/GSFC (or Goddard)/Arizona State University (PIA13523, PIA13720, the LRO Earthrise). Those three are used as published on nasa.gov / science.nasa.gov with their exact credits. NASA's guidelines warn that some NASA-hosted material is third-party. If the humans want strictly NASA-only credits for the submission, Lane A can remove those three in a few minutes.
+5. **Open human question:** where the LunLux wordmark and icon (`web/public/brand/`) came from. NOTICE lists them as the team's. Please confirm who made them (and, if a generator or template was used, its terms).
+6. **Ownership:** Lane A will not change Lane B files. Please confirm Lane B will not change Lane A files (`/lib`, `/data`, `/scripts`, `web/src/panels/`, `web/panels.html`) without coordination. `LICENSE` and `NOTICE` are shared root files; edit them in coordination.
+
+**Lane A work (D34):**
+1. **Learn (Educator):**
+   - Each section has the picture on the left and short sentences on the right.
+   - Three "Try it yourself" cards open Explore through the shell's link parameters (`?tab=explore&level=educator&site=…&date=…&hour=…&view=…`): Malapert 2026-09-19 06:00 UTC, horizon view (a hill hides the Sun); Malapert from 2026-11-22 (the Sun and Earth all week); Apollo 11 from 2026-11-01 (night all week, Earth in sight).
+   - "The ten places" cards give where each place is (from latitude), its landing year or "A possible landing spot", this week's verdict icon and sunshine in words, and a Visit link.
+   - Three more NASA photos (as in point 4), each two columns with its exact credit and a teacher note quoting NASA's caption.
+2. **Researcher fixes:**
+   - The weight sliders sit right beside their labels (one shared grid).
+   - The terrain chart's compass letters are HTML at normal text size.
+   - Stand here hides its own time slider when the shell supplies the hour (`onHourSelected`); it still shows the time.
+3. **README:** a Licence section; every outside item in tables with its licence or terms and source; the team line "by Sheldon Spence and Advik Chaudhary".
+
+**Note for Lane B:** the Learn "Try it yourself" and "Visit" cards are plain links using your shareable-link parameters. If those names change, tell Lane A.
+
+**Checks:** listed in the D34 commit (all scripts, panel tests and the web build).
+
