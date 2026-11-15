@@ -7,6 +7,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 | Advik + ChatGPT (Lane B) | D33 COMPLETE — STOPPED | All 10 D33 items implemented; item 10 production build e25d4c7 READY. Human browser QA remains open. |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | D34 Lane A part done | LICENSE + NOTICE, audit reply, Learn redesign, slider/compass/Stand here fixes, README licence; stopped |
+| Collaborative presentation | Initial web deck | Separate `presentation/` draft; Sheldon + Claude science review pending; build unverified |
 
 Acceptance (both humans): steps 1, 2, 3, 6, 8 PASS; step 4 and 7 pending earlier findings. Signed: D7–D23 (see PLAN), **D24–D28** (title card + tour nav, tour captions, why the south pole, one clock, A/B scenarios + requirements filter). Rule: no status-only pushes.
 Waiting on Sheldon: read the new Educator screens on web/panels.html (level = Educator) and the Learn tab; confirm the two NASA photos and their captions.
@@ -1842,3 +1843,9 @@ Done within the 2-hour time box (all checks passing about 7 minutes after starti
 
 **Checks:** listed in the D34 commit (all scripts, panel tests and the web build).
 
+
+### 2026-11-15 — Collaborative presentation scaffold, proposal
+- Advik confirmed animated web presentation with possible embedded live demo. Created isolated Reveal.js / Vite `presentation/` foundation, original CSS visuals, presenter notes and seven draft slides. The existing production LunLux app and scientific source files are unchanged.
+- Advik + ChatGPT lead narrative/design; Sheldon + Claude lead scientific source review. Shared presentation status and README establish ownership and safe GitHub coordination.
+- Demo is currently an external link to the same site/date/hour in Educator and Researcher; iframe and borrowed simulator images are NOT included pending browser and licensing checks.
+- Dependency install, build, browser QA, separate Vercel project and human narrative sign-off are NOT YET VERIFIED. The current PLAN D34 license/attribution decisions remain unaffected.
