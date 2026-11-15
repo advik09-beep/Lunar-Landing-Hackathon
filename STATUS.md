@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D32 COMPLETE — STOPPED | Five D32 shell items committed; final source commit d0ef0f6 verified Vercel READY. Human visual/readability review remains open. |
+| Advik + ChatGPT (Lane B) | D33 1/10 — fonts | Replaced Urbanist and system stack with self-hosted CMU Serif / Source Serif 4; build check pending |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | D33 Lane A part done (items 1–6) | Stay length 1/3/7/14 (Researcher) done within the time box; stopped |
 
@@ -1727,3 +1727,9 @@ Done within the 2-hour time box (all checks passing about 7 minutes after starti
 - Example: `?tab=compare&level=researcher&site=sp_malapert&date=2026-11-14&hour=6&stay=3`
 - Not part of a link (local to a panel or viewer): Compare custom weights and rank filter, calculator inputs, A/B picks and saved pairs (browser only), open fold-outs.
 
+
+### 2026-11-15 — Lane B D33 item 1: fonts
+- Re-read PLAN.md D33, DESIGN.md D33, latest STATUS.md and Lane A D33 completion notes. Lane A owns the panel fonts; shell sets `--llp-heading-font` and body `font-family` once.
+- Replaced Urbanist imports/dependency with `computer-modern/cmu-serif.css` and Source Serif 4 weights 400/600/700; headings CMU Serif, all other text Source Serif 4; removed system font stack. Updated package manifests and Data and methods credit.
+- Licenses: fonts' own licenses SIL OFL 1.1 (computer-modern npm wrapper MIT); confirmed by Lane A tarball check and npm package descriptions.
+- Awaiting Vercel build before D33 item 2.
