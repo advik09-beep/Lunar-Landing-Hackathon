@@ -43,7 +43,9 @@ if (!Array.isArray(sites) || sites.length !== 10 || sites.some(s => !s || typeof
   throw new Error('Expected exactly ten landing sites from the scientific data module');
 }
 
-const dateOrigin = '2026-11-14';
+// D35: open on today's date (UTC), kept inside the data range 2026-01-01 .. 2029-12-24 (the last full 7-day stay).
+// A date in a shared link still wins (below).
+const dateOrigin = new Date(Math.min(Math.max(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate()), Date.UTC(2026,0,1)), Date.UTC(2029,11,24))).toISOString().slice(0, 10);
 let selectedDate = dateOrigin;
 let selectedSite = sites[0].id;
 let readingLevel: 'educator' | 'researcher' = 'educator';
