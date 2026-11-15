@@ -49,7 +49,7 @@ p { margin:8px 0; }
 .toolbar-hour output { font-size:.75rem; color:var(--llp-muted); min-width:112px; }
 .clock-tip { position:relative; flex:none; }
 .clock-tip summary { cursor:pointer; list-style:none; font-size:1.1rem; color:var(--llp-muted); }
-.clock-tip p { position:absolute; top:24px; right:0; z-index:30; width:280px; margin:0; padding:12px 14px; background:var(--llp-glass); backdrop-filter:blur(var(--llp-glass-blur)); -webkit-backdrop-filter:blur(var(--llp-glass-blur)); border:0; border-radius:12px; font-size:.84rem; box-shadow:0 8px 32px #0008; white-space:normal; }
+.clock-tip p { position:absolute; top:24px; right:0; z-index:30; width:360px; margin:0; padding:12px 14px; background:var(--llp-glass); backdrop-filter:blur(var(--llp-glass-blur)); -webkit-backdrop-filter:blur(var(--llp-glass-blur)); border:0; border-radius:12px; font-size:.84rem; box-shadow:0 8px 32px #0008; white-space:normal; }
 .verdict-legend { display:flex; align-items:center; gap:8px; padding:0 0 12px; margin:0; }
 .verdict-chip { display:inline-flex; align-items:center; gap:6px; padding:4px 12px; border:1px solid var(--llp-divider); border-radius:99px; background:var(--llp-glass); color:var(--llp-text); font-size:.75rem; }
 .verdict-chip b { font-size:.84rem; }
@@ -89,7 +89,7 @@ p { margin:8px 0; }
 .scene-controls { position:absolute; left:0; bottom:8px; display:flex; align-items:center; gap:8px; padding:0; z-index:2; }
 .scene-controls button { font-size:.75rem; white-space:nowrap; }
 .scene-controls span { margin-left:auto; }
-.lighting-status { margin:0; padding:0 14px 8px; font-size:.75rem; color:var(--llp-muted); }
+.lighting-status { font-size:.84rem; color:var(--llp-muted); }
 .lighting-status[data-state="unavailable"] { color:var(--llp-warn); }
 .explore-south-pole-note { display:none; }
 .info-column { overflow:auto; min-height:0; overscroll-behavior:contain; padding-right:4px; }
@@ -108,3 +108,7 @@ p { margin:8px 0; }
 
 body[data-view="overview"] .topbar { position:relative; z-index:20; border-bottom-color:transparent; background:linear-gradient(#091322b0,transparent); }
 body[data-view="overview"] .site-footer { display:none; }
+
+.tour-info { position:absolute; z-index:9; bottom:24px; right:24px; }
+.tour-info p { top:auto; bottom:32px; }
+.moon-prompt { font-size:1.1rem; font-weight:600; color:var(--llp-text); }

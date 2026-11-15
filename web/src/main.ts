@@ -46,14 +46,20 @@ let moon: LunarScene | null = null;
 let overview: OverviewScene | null = null;
 let simulatorFrame: HTMLIFrameElement | null = null;
 let disposeOverviewMessages: (() => void) | null = null;
+function formatUtc(value: string): string {
+  return new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'UTC', weekday: 'long', day: 'numeric', month: 'short', year: 'numeric',
+    hour: '2-digit', minute: '2-digit', hourCycle: 'h23',
+  }).format(new Date(value)) + ' UTC';
+}
 function syncOverviewClock(): void {
   const frame = document.querySelector<HTMLIFrameElement>('#overview-stage iframe');
   if (!frame?.contentWindow) return;
   const utc = new Date(Date.parse(selectedDate + 'T00:00:00Z') + selectedHour * 3600000).toISOString();
   frame.contentWindow.postMessage({ type: 'lunar-navigator:set-clock', utc }, new URL(frame.src).origin);
   const status = document.getElementById('overview-clock-status');
-  if (status) status.textContent = 'Inspection moment: ' + utc.replace('T', ' ').slice(0, 16) +
-    ' UTC · Illustrative planetary positions; use Explore for site conditions.';
+  if (status) status.textContent = 'Inspection moment: ' + formatUtc(utc) +
+    '. Planet positions are illustrative; use Explore for site conditions.';
 }
 const verdictNames: Record<Verdict, string> = {
   clear: 'Clear',
@@ -80,7 +86,7 @@ app.innerHTML = [
   '    <label class="toolbar-site" for="site-picker">Site <select id="site-picker" aria-label="Landing site"></select></label>',
   '    <div class="toolbar-date"><button id="date-prev" type="button" aria-label="Move landing date seven days earlier">−7</button><label class="sr-only" for="landing-date">Landing date UTC</label><input id="landing-date" type="date" value="2026-11-14" aria-label="Landing date UTC"><button id="date-next" type="button" aria-label="Move landing date seven days later">+7</button></div>',
   '    <label class="toolbar-hour" for="hour-slider">Inspect <input id="hour-slider" type="range" min="0" max="167" value="0" step="1" aria-label="Moment inspected within the seven-day stay"><output id="hour-output" for="hour-slider">Day 1 · 00:00 UTC</output></label>',
-  '    <details class="clock-tip"><summary aria-label="About the date and inspection time">ⓘ</summary><p>The 7-day stay starts at 00:00 UTC on the landing date. The slider chooses the moment you inspect within that stay; it does not move the landing time. Hourly data. Drag the Moon to turn it; scroll to zoom. A faint light shows the night side; it is a visual aid, not sunlight.</p></details>',
+  '    <details class="clock-tip"><summary aria-label="About the date and inspection time">ⓘ</summary><p>The 7-day stay starts at 00:00 UTC on the landing date. The slider chooses the moment you inspect within that stay; it does not move the landing time. Hourly data.<br><br>Drag to turn the Moon; scroll to zoom. The Moon stays fixed while the Sun and Earth move around it. A faint light shows the night side; it is a visual aid, not sunlight. The globe is smooth; local terrain appears in Horizon.<br><br><span id="lighting-status" class="lighting-status" role="status" aria-live="polite">Loading sunlight for the chosen moment…</span></p></details>',
   '    <p id="data-status" class="sr-only" role="status" aria-live="polite">Loading conditions…</p>',
   '  </section>',
   '  <section id="verdict-legend" class="verdict-legend" aria-label="Seven-day verdict legend" hidden>',
@@ -95,7 +101,7 @@ app.innerHTML = [
   '      <p id="overview-mission-message" class="overview-mission-message">Of everything in the solar system, the Sun determines the sunlight available for a lunar lander\'s potential power, while Earth determines when a direct radio link is geometrically possible. Other planets: their gravity is already in our numbers. JPL planetary ephemerides include their gravitational effects; their light is negligible compared with sunlight. Radio from other planets is not modeled.</p>',
   '      <div id="overview-stage" class="overview-stage" aria-label="Solar system overview visualization"></div>',
   '      <div id="tour-science-caption" class="tour-science-caption" hidden aria-live="polite"></div>',
-  '      <p id="overview-clock-status" class="overview-clock-status" role="status">Simulator planetary ephemeris is not validated for the selected date.</p>',
+  '<details class="tour-info clock-tip"><summary aria-label="About the solar system scene">ⓘ</summary><p>Planet positions and sizes are illustrative. Use Explore for landing-site conditions.<br><br><span id="overview-clock-status" role="status">The selected moment is loading.</span></p></details>',
   '      <div id="overview-title-card" class="overview-title-card" role="region" aria-label="Solar system tour introduction"><h2>LunLux</h2><p class="overview-title-subtitle">Sunlight and Earth contact for lunar landing sites</p><p>Only the Sun and Earth determine the sunlight and direct Earth visibility we evaluate for a lunar lander. Other planets’ gravity is already included in NASA’s ephemerides.</p><div><button id="start-tour" type="button">Start tour</button><button id="skip-moon" type="button">Skip to the Moon</button></div><p class="overview-audio-note">Tour sound starts off. Use the speaker button for sound.</p></div>',
   '      <div class="overview-footer"><p id="overview-disclaimer">Choose the Moon to explore real landing sites and verified Sun/Earth visibility at your selected UTC date and hour.</p><button id="enter-explore" type="button">Explore the Moon and landing sites</button></div>',
   '    </div>',
@@ -106,7 +112,6 @@ app.innerHTML = [
   '      <div class="moon-window">',
   '        <div id="moon-stage" class="moon-stage" aria-label="Interactive 3D Moon with landing markers"></div>',
   '        <div class="scene-controls"><button type="button" id="reset-view">Reset view</button><button type="button" id="polar-view">South pole view</button></div>',
-  '        <p id="lighting-status" class="lighting-status sr-only" role="status" aria-live="polite">Loading Sun/Earth directions from JPL Horizons…</p>',
   '      </div>',
 
 
@@ -133,7 +138,7 @@ app.innerHTML = [
   '    <h3>Solar-system overview — upstream simulator</h3>',
   '    <p>Approved upstream: <a href="https://github.com/OzAILabs/SolarSystemSimulator" target="_blank" rel="noopener noreferrer">OzAILabs/SolarSystemSimulator</a>. The authors describe its source as MIT-licensed in the README. Its planetary textures are separately sourced from <a href="https://www.solarsystemscope.com/textures/" target="_blank" rel="noopener noreferrer">Solar System Scope</a> (CC BY 4.0), Planet Pixel Emporium, NASA/USGS Astrogeology and Steve Albers; attribution and individual reuse terms follow the upstream README. Our public <a href="https://github.com/advik09-beep/SolarSystemSimulator" target="_blank" rel="noopener noreferrer">GitHub fork</a> runs separately at <a href="https://solar-system-simulator-usmdo-club.vercel.app/" target="_blank" rel="noopener noreferrer">solar-system-simulator-usmdo-club.vercel.app</a>; the embedded simulator receives the shared UTC inspection clock, but its planetary positions are illustrative and not validated JPL ephemerides.</p>',
   '    <h3>Implementation and limitations</h3>',
-  '    <p>Moon-fixed Sun lighting uses verified hourly JPL Horizons scene data. Earth position and terrain visibility remain available in the Stand here horizon view. The globe has no terrain shadows; The explorer nebula is original procedural decorative artwork, not an observed or simulated lunar sky. Any future borrowed assets must be added here with attribution and license before release.</p>',
+  '    <p>Moon-fixed Sun lighting uses verified hourly JPL Horizons scene data. Earth position and terrain visibility remain available in the Stand here horizon view. The globe is smooth; local terrain appears in Horizon. A faint light shows the night side as a visual aid, not sunlight. The moving stars are decorative, not an observed lunar sky. Any future borrowed assets must be added here with attribution and license before release.</p>',
   '  </section>',
   '  <footer class="site-footer">NASA/JPL Horizons · NASA LRO LOLA · Hourly data</footer>',
   '</main>',
@@ -148,7 +153,7 @@ const find = <T extends HTMLElement>(id: string): T => {
 find<HTMLElement>('mock-notice').hidden = !MOCK;
 const sitePicker = find<HTMLSelectElement>('site-picker');
 const status = find<HTMLParagraphElement>('data-status');
-const lightingStatus = find<HTMLParagraphElement>('lighting-status');
+const lightingStatus = find<HTMLElement>('lighting-status');
 const select = find<HTMLInputElement>('landing-date');
 const hourSlider = find<HTMLInputElement>('hour-slider');
 const hourOutput = find<HTMLOutputElement>('hour-output');
@@ -290,9 +295,9 @@ function updateSceneLighting(): void {
     const sceneState = getSceneState(utc) as SceneState;
     moon?.setSceneState(sceneState);
     lightingStatus.textContent =
-      'JPL Horizons Sun lighting · ' + sceneState.sampleUtc +
-      ' · Earth ' + Math.round(sceneState.earth.distKm).toLocaleString() +
-      ' km away · Earth shown in Horizon. Decorative sky; no terrain shadows.';
+      'Sunlight shown for ' + formatUtc(sceneState.sampleUtc) +
+      '. Earth is ' + Math.round(sceneState.earth.distKm).toLocaleString() +
+      ' km away; its position is shown in Horizon. The stars are decorative.';
     lightingStatus.dataset.state = 'ready';
   } catch (error) {
     moon?.clearSceneState();
@@ -315,7 +320,7 @@ function setLandingDate(date: string): void {
   if (dataReady) {
     try {
       daily = getDaily(selectedDate, 1) as DailyResult;
-      status.textContent = '7-day stay starting ' + selectedDate + ' · hourly NASA/JPL Horizons data';
+      status.textContent = '7-day stay starting ' + formatUtc(selectedDate + 'T00:00:00Z') + ' · hourly NASA/JPL Horizons data';
     } catch (error) {
       daily = null;
       status.textContent = 'Conditions unavailable for the selected date.';
@@ -329,7 +334,7 @@ function renderClockHour(): void {
     .toISOString().slice(0, 16).replace('T', ' ');
   hourSlider.value = String(selectedHour);
   hourOutput.textContent = 'Day ' + (Math.floor(selectedHour / 24) + 1) + ' · ' + utc.slice(11) + ' UTC';
-  hourOutput.title = utc + ' UTC';
+  hourOutput.title = formatUtc(new Date(Date.parse(selectedDate + 'T00:00:00Z') + selectedHour * 3600000).toISOString());
 }
 
 let panelUpdateTimer = 0;
