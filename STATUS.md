@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Lane B lead + ChatGPT (Lane B) | FINAL SUBMISSION PRIORITY — licensing/source-provenance audit in progress | Human confirmed public project + presentation links work and slides contain no identifying names. Lane B reviewing simulator permissions, retained assets and citations; no legal clearance claimed. Submission remains with both humans. |
+| Lane B lead + ChatGPT (Lane B) | Final-submission references and Tour provenance — DOCUMENTED | Both submitted URLs and name-free slides confirmed by human. MIT Yale star source, NASA/JPL Tour caches and CC BY textures documented; five old screenshots removed. Residual upstream MIT copyright/notice and strict event license wording remain caveated, not cleared. |
 | Lane A lead (human) | D35 signed with the Lane B lead | 2026-11-15: D29–D35 signed; directed the D35 final look and deck pass (Lane A does the whole pass incl. web shell and deck); reviewing the recoloured site and the seven-page PDF |
 | Claude Code (Lane A) | CODE FROZEN for submission | No further changes unless a human reports a bug |
 | Collaborative presentation | Seven-slide screenshot pass deployed | Separate Vercel project `lunlux-presentation`, production build READY; all six screenshots and wordmark HTTP 200; final human visual QA pending |
@@ -19,6 +19,21 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 - **(4) Submission text — UPDATED OUTSIDE REPO:** Revised NASA project copy and a final checklist prepared for pasting into the challenge submission form. Submission copy is not a replacement for actual rights clearance.
 - **(5) Final submit — HUMAN PENDING:** The human team will submit once ready. No assistant claims to have submitted the project.
 - **Scope:** Preserve the scientific calculations, existing frozen application and seven-slide deck; prioritize source/permission fixes. Note any necessary code/asset changes explicitly with build checks before release.
+
+## 2026-11-15 — Final submission rights-review results (Lane B)
+
+**Human confirmations retained:** (1) project and seven-slide presentation links work; (2) no identifying names or details appear in the slides. **(5) Submission not performed** — human team will submit through NASA.
+
+**(3) Rights/provenance work actually completed:**
+- Identified `scripts/build-stars.js` from the separately deployed fork: its source is Bretton Wade's Yale Bright Star Catalog conversion, with explicit MIT `LICENSE` (Copyright 2016 Bretton Wade). Identified `scripts/build-asteroids.js` and `scripts/generate-horizons-cache.js` as sources for the JPL SBDB and Horizons caches. Sources independently checked against scripts and cache metadata; numeric caches were **not** regenerated/byte-compared.
+- Confirmed Solar System Scope's publisher expressly offers 12 retained textures under **CC BY 4.0** (sharing/adapting/commercial allowed with attribution). Credit, source link, license link, and reuse/modification-context notice are recorded in fork `NOTICE`. Original team Apache license does not claim these assets. Licensed background song `Borealis` by Scott Buckley already has composer and CC BY source notices.
+- Updated fork `NOTICE` (`8366c5e`, `fa74b70`) and README (`b0e92bd`) to document license references, derived astronomy data and distinctions. Updated LunLux README (`62e9aae`) and `NOTICE` (`380c6e5`), plus `THIRD_PARTY_LICENSE_AUDIT.md` (`1c6dc3c`, `94e1807`).
+- Removed five unverified legacy simulator showcase screenshots from `docs/screenshots/` and their README gallery (fork commits `15ea9ac`, `80a1383` through `dc804ff`). These are **docs-only** changes; no application or scientific algorithm edits. Latest simulator Vercel production deployment `dpl_3eTjR4DS4Nda9AWUjdHtLYroeWA7` reported **READY** after the doc-asset removals. End-to-end user clickthrough was reported separately as working; no new browser interaction test claimed.
+- Revised copy-ready submission text has been prepared separately, with direct source links and clarified provenance. NASA submission is still a human action.
+
+**Remaining non-fabricable evidence:** upstream OzAILabs simulator README expressly says MIT but does not include complete standalone copyright/license grant; the standard terms are linked, not falsely issued by us. NASA Space Apps 2026's strict third-party OSI wording leaves an interpretive question for CC BY media despite the publisher's explicit permissions. The previously unverified screenshot gallery was removed; no comprehensive binary-rights certification was done. These are documented in the audit, which still says **NOT CLEARED FOR SUBMISSION**, rather than claiming legal verification without authorization. Definitive clearance requires the relevant rights-holder or event organizer to confirm ambiguous permission, or replacement/removal of the affected content.
+
+**Next:** Both human team members review the final submission and submit; no new features or modifications to scientific outputs are requested.
 
 ## 2026-11-15 — A completely unofficial note for Claude
 
