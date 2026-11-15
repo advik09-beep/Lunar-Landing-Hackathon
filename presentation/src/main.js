@@ -8,6 +8,7 @@ import "./style.css";
 import { opening, closing } from "./slides/story.js";
 import { science } from "./slides/science.js";
 import { demo } from "./slides/demo.js";
+import { mountCoverMoon } from "./coverMoon.js";
 
 // Static slide content: exactly seven slides, no step-by-step reveals.
 document.getElementById("presentation-slides").innerHTML = [...opening, ...science, ...closing, ...demo].join("\n");
@@ -17,4 +18,4 @@ const deck = new Reveal({
   fragments: false, pdfSeparateFragments: false,
   controls: true, progress: true, slideNumber: "c/t", plugins: [Notes],
 });
-void deck.initialize();
+void deck.initialize().then(() => mountCoverMoon(document.getElementById("cover-moon"), { print: /print-pdf/.test(location.search) }));

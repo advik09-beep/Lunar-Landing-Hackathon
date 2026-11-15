@@ -1,69 +1,74 @@
-/* LunLux official seven-slide presentation: visual identity matches the app. */
+/* LunLux official seven-slide presentation: visual identity matches the app (D35 colours).
+   Near-black, dark grey glass, warm off-white text; only gold (Sun) and blue (Earth) are coloured. */
 :root {
-  --deep:#070f1e; --deep2:#0d1b32; --glass:rgba(20,35,58,.71);
-  --edge:rgba(180,200,234,.24); --text:#ecf3ff; --muted:#bacce3;
-  --indigo:#7770ed; --sun:#f2c14e; --earth:#5aa9e6;
+  --deep:#0A0A0B; --deep2:#141416; --glass:rgba(28,28,30,.90);
+  --edge:rgba(242,238,230,.16); --text:#F2EEE6; --muted:#A6A29B;
+  --moon:#E8E4DA; --on-moon:#0A0A0B; --sun:#F2C14E; --earth:#5AA9E6;
 }
 html,body,.reveal { background:var(--deep); }
 .reveal { color:var(--text); font-family:"Source Serif 4",serif; font-size:25px; }
 .reveal .slides { text-align:left; }
 .reveal .slides .page {
-  position:absolute; box-sizing:border-box; height:100%; overflow:hidden;
+  position:absolute; top:0; left:0; width:100%; box-sizing:border-box; height:100%; overflow:hidden; /* match Reveal's own slide box; position:relative put slides 2-7 below the screen */
   padding:62px 82px 82px;
   background:
-    radial-gradient(circle at 18% 23%,rgba(245,251,255,.28) 0 1px,transparent 2px) 0 0/109px 95px,
-    radial-gradient(circle at 80% 70%,rgba(245,251,255,.22) 0 1px,transparent 2px) 0 0/173px 137px,
-    radial-gradient(ellipse at 83% 10%,#1b284c 0%,#101d35 37%,#070f1e 77%);
+    radial-gradient(circle at 18% 23%,rgba(242,238,230,.28) 0 1px,transparent 2px) 0 0/109px 95px,
+    radial-gradient(circle at 80% 70%,rgba(242,238,230,.22) 0 1px,transparent 2px) 0 0/173px 137px,
+    radial-gradient(ellipse at 83% 10%,#232326 0%,#151517 37%,#0A0A0B 77%);
 }
 .reveal h1,.reveal h2,.reveal h3 { font-family:"CMU Serif",serif; font-weight:400; text-transform:none; color:var(--text); letter-spacing:-.034em; margin:0; }
 .reveal h2 { font-size:67px; line-height:1.07; max-width:1210px; margin:23px 0 26px; }
 .reveal h3 { font-size:36px; line-height:1.15; }
 .reveal p { line-height:1.38; margin:0; }
 .reveal .eyebrow,.reveal .tag,.reveal footer,.kicker { font-family:"Source Serif 4",serif; letter-spacing:.12em; text-transform:uppercase; }
-.reveal .eyebrow { font-size:18px; color:var(--sun); }
+.reveal .eyebrow { font-size:18px; color:var(--muted); }
 .reveal footer { position:absolute; left:82px; bottom:27px; color:var(--muted); font-size:15px; letter-spacing:.12em; }
 .glass-panel { background:var(--glass); border:1px solid var(--edge); border-radius:16px; backdrop-filter:blur(17px); box-shadow:0 20px 60px rgba(0,0,0,.18); }
-.reveal .tag { color:var(--sun); font-size:17px; font-weight:600; }
-.reveal .tag.earth-tag { color:var(--earth); }
-.screenshot-frame { position:relative; margin:0; overflow:hidden; min-width:0; border:1px solid rgba(189,207,239,.33); border-radius:13px; background:#0b192d; box-shadow:0 25px 65px #0008; }
+.reveal .tag { color:var(--text); font-size:17px; font-weight:600; }
+.reveal .tag.earth-tag { color:var(--text); }
+.screenshot-frame { position:relative; margin:0; overflow:hidden; min-width:0; border:1px solid var(--edge); border-radius:13px; background:#141416; box-shadow:0 25px 65px #0008; }
 .screenshot-frame img { display:block; width:100%; height:100%; object-fit:contain; }
-.screenshot-frame figcaption { position:absolute; left:0; right:0; bottom:0; box-sizing:border-box; padding:10px 15px; color:#dce9f8; font-size:16px; background:linear-gradient(transparent,#07101dec); }
+.screenshot-frame figcaption { position:absolute; left:0; right:0; bottom:0; box-sizing:border-box; padding:10px 15px; color:var(--text); font-size:16px; background:linear-gradient(transparent,#0A0A0Bec); }
 .visual-split { display:grid; grid-template-columns:minmax(0,1.93fr) minmax(0,.81fr); align-items:stretch; gap:28px; margin-top:28px; height:486px; }
 .hero-shot { width:100%; height:100%; }
 .hero-shot img { object-fit:contain; }
 .side-panel { display:flex; flex-direction:column; justify-content:center; padding:31px 28px; gap:28px; }
-.side-panel .panel-intro { font-size:27px; line-height:1.22; color:#e8eefb; margin-bottom:2px; }
+.side-panel .panel-intro { font-size:27px; line-height:1.22; color:var(--text); margin-bottom:2px; }
 .short-point { display:flex; align-items:center; gap:16px; font-size:26px; line-height:1.24; }
 .point-symbol { display:inline-block; flex:0 0 25px; width:25px; height:25px; border-radius:50%; background:var(--sun); box-shadow:0 0 22px #f2c14e66; }
-.terrain-symbol { border-radius:0; box-shadow:none; background:var(--earth); clip-path:polygon(0 100%,29% 46%,53% 77%,79% 9%,100% 100%); }
-.date-symbol { border:3px solid var(--indigo); background:transparent; box-shadow:none; border-radius:7px; }
+.terrain-symbol { border-radius:0; box-shadow:none; background:var(--muted); clip-path:polygon(0 100%,29% 46%,53% 77%,79% 9%,100% 100%); }
+.date-symbol { border:3px solid var(--text); background:transparent; box-shadow:none; border-radius:7px; }
 .cover { isolation:isolate; }
+/* D35 cover Moon: the site's NASA SVS map on a slowly turning 3D sphere, peeking in from the right edge. */
+.cover-moon { position:absolute; z-index:-1; top:20px; right:-300px; width:720px; height:720px; pointer-events:none; }
+.cover-moon canvas, .cover-moon img { display:block; width:100%; height:100%; }
+.reveal .cover .challenge { font-size:22px; color:var(--text); letter-spacing:.04em; text-transform:none; margin-top:10px; }
 .reveal .slides .page.cover {
-  background-image:linear-gradient(95deg,rgba(5,12,25,.95) 0%,rgba(5,12,25,.84) 43%,rgba(5,12,25,.65) 100%),url("/shots/00-cover-tour.png");
+  background-image:linear-gradient(95deg,#0A0A0B 0%,#0A0A0B 32%,rgba(10,10,11,.86) 52%,rgba(10,10,11,.72) 100%),url("/shots/00-cover-tour.png");
   background-size:cover,128% auto;
   background-position:center,center 73%;
   background-repeat:no-repeat;
 }
 .cover-panel { position:relative; margin-top:65px; width:800px; max-width:100%; padding:28px 40px 34px 0; }
-.reveal .cover .kicker { color:var(--sun); font-size:24px; }
+.reveal .cover .kicker { color:var(--muted); font-size:24px; }
 .reveal .cover h1 { margin:17px 0 18px; }
 .cover-wordmark { display:block; width:480px; max-height:145px; object-fit:contain; object-position:left center; filter:drop-shadow(0 8px 16px #0008); }
 .cover .subtitle { font-size:40px; line-height:1.18; max-width:740px; }
-.cover .cover-question { font-size:28px; color:#e5eeff; margin-top:24px; }
-.cover .cover-names { font-size:25px; margin-top:34px; color:#e3efff; }
+.cover .cover-question { font-size:28px; color:var(--text); margin-top:24px; }
+.cover .cover-names { font-size:25px; margin-top:34px; color:var(--text); }
 .cover .cover-names span { color:var(--muted); font-style:italic; }
-.cover-photo-credit { position:absolute; right:76px; bottom:31px; font-size:15px; color:#c7d7e9; }
+.cover-photo-credit { position:absolute; right:76px; bottom:31px; max-width:620px; text-align:right; font-size:15px; line-height:1.4; color:var(--muted); }
 .reveal .cover-photo-credit a { color:inherit; text-decoration:underline; }
-.reveal .cover footer { color:#e0e9f9; }
+.reveal .cover footer { color:var(--muted); }
 .reveal .stats { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; margin-top:56px; }
 .stats article { min-height:300px; display:flex; flex-direction:column; padding:27px 25px; background:var(--glass); border:1px solid var(--edge); border-radius:14px; }
-.stats strong { display:block; font:normal 83px/1.15 "CMU Serif",serif; color:var(--sun); white-space:nowrap; }
-.stats span { display:block; margin-top:20px; font-size:24px; line-height:1.26; color:#e0eaf8; }
-.reveal .lead { font-size:27px; line-height:1.28; max-width:1200px; color:#e1edff; }
+.stats strong { display:block; font:normal 83px/1.15 "CMU Serif",serif; color:var(--text); white-space:nowrap; }
+.stats span { display:block; margin-top:20px; font-size:24px; line-height:1.26; color:var(--text); }
+.reveal .lead { font-size:27px; line-height:1.28; max-width:1200px; color:var(--text); }
 .reveal .source { font-size:18px; margin-top:35px; color:var(--muted); }
 .workflow-steps { gap:0; padding:23px 27px; }
 .short-step { display:flex; gap:15px; align-items:flex-start; padding:20px 0; border-bottom:1px solid var(--edge); font-size:26px; line-height:1.2; }
-.short-step b { color:var(--sun); font:normal 19px "Source Serif 4",serif; }
+.short-step b { color:var(--muted); font:normal 19px "Source Serif 4",serif; }
 .step-caveat { color:var(--muted); font-size:17px; padding-top:24px; }
 .audience-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:25px; margin-top:26px; height:483px; }
 .audience-card { display:flex; flex-direction:column; padding:20px; overflow:hidden; }
@@ -74,16 +79,13 @@ html,body,.reveal { background:var(--deep); }
 .reflection-slide .twocol { display:grid; grid-template-columns:1fr 1fr; gap:28px; margin-top:55px; }
 .reflection-slide .twocol article { min-height:300px; padding:36px 38px; }
 .reflection-slide h3 { margin:21px 0 17px; }
-.reflection-slide .twocol p { font-size:27px; line-height:1.26; color:#dce8f8; }
-.reveal .closing-thought { position:absolute; left:82px; right:82px; bottom:99px; font-size:34px; color:#f2f5ff; margin:0; }
-.reveal .closing-thought em { color:var(--sun); }
+.reflection-slide .twocol p { font-size:27px; line-height:1.26; color:var(--text); }
 .reveal .demo-links { gap:20px; }
-.reveal .demo-links .link-button { display:block; box-sizing:border-box; width:100%; padding:17px 21px; border-radius:9px; color:white; background:var(--indigo); text-align:center; text-decoration:none; font-size:25px; font-weight:600; }
-.reveal .demo-links .link-button.secondary { background:rgba(90,169,230,.19); border:1px solid var(--earth); }
-.reveal .demo-links .link-button:focus-visible { outline:3px solid var(--sun); outline-offset:4px; }
-.demo-closer { margin-top:25px!important; font-family:"CMU Serif",serif; font-size:34px; color:var(--sun); }
-.reveal .progress { color:var(--indigo); }
-.reveal .controls { color:var(--indigo); }
+.reveal .demo-links .link-button { display:block; box-sizing:border-box; width:100%; padding:17px 21px; border-radius:9px; color:var(--on-moon); background:var(--moon); text-align:center; text-decoration:none; font-size:25px; font-weight:600; }
+.reveal .demo-links .link-button.secondary { background:transparent; color:var(--text); border:1px solid var(--text); }
+.reveal .demo-links .link-button:focus-visible { outline:3px solid var(--text); outline-offset:4px; }
+.reveal .progress { color:var(--moon); }
+.reveal .controls { color:var(--moon); }
 .reveal .fragment { opacity:1!important; visibility:visible!important; transform:none!important; }
 .reveal .slides > section { transition-duration:.33s!important; }
 @media(prefers-reduced-motion:reduce) { .reveal .slides > section { transition:none!important; } }
