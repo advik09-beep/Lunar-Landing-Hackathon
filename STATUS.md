@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D31 item 7 — in progress; built | Readable UTC dates; scene explanations and labeled fill-light details in info tips instead of caption strips. Removed technical header/caption jargon and obsolete nebula credit. |
+| Advik + ChatGPT (Lane B) | D31 COMPLETE — STOPPED | Seven presentation items built and deployed in order; desktop checks PASS |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | D31 Lane A part done | Glass panels, flat sections, hollow Partial, full-width grid; stopped |
 
@@ -576,6 +576,11 @@ Second task, only after the copy passes and with Advik's authorization: Step 4 T
 ### 2026-11-14 — D31 second presentation pass, item 7
 - Readable UTC dates; scene explanations and labeled fill-light details in info tips instead of caption strips. Removed technical header/caption jargon and obsolete nebula credit.
 - Files: web/src/main.ts, web/src/style.css. TypeScript and Vite/postbuild executed: PASS. Production: https://lunar-landing-hackathon.vercel.app . Each prior item's Vercel deployment checked READY before continuing; this commit's deployment check follows. Scientific APIs and Lane A panels unchanged.
+
+
+### 2026-11-14 — D31 second presentation pass, item verification
+- D31 items 1–7 complete. Desktop checks: edge-to-edge Tour; final Moon prompt and click into Explore; whole lit/faint-night Moon; centered ring; glass rgba(19,33,56,0.90) / blur(14px); indigo #4F46B8; uniform chips, none on Compare; plain UTC info tips. All seven Vercel builds READY. Reset view now preserves the selected site and restores its whole-Moon framing. Simulator final code 3adb74c5ee088a2668b1d3517fe0c1d5c54e0223 retains original selection path, removes timed handoff, and clears header sound control; TypeScript/Vite PASS. Final deployment verification follows; no new features or scientific/panel edits. STOP.
+- Files: web/src/moon.ts. TypeScript and Vite/postbuild executed: PASS. Production: https://lunar-landing-hackathon.vercel.app . Each prior item's Vercel deployment checked READY before continuing; this commit's deployment check follows. Scientific APIs and Lane A panels unchanged.
 
 ## Lane A
 

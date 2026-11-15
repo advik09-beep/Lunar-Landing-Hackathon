@@ -288,7 +288,7 @@ export class LunarScene {
 
   resetView(): void {
     this.setPoleCallouts(false);
-    this.selected = null;
+    if (this.selected) { this.focusSite(this.selected); return; }
     this.targetCamera = new THREE.Vector3(2.6, 1.4, 3.4);
     this.targetFocus = new THREE.Vector3(0, 0, 0);
   }
