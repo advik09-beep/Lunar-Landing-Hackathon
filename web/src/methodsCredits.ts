@@ -55,6 +55,12 @@ export function methodsCredits(sites: CitedSite[]): string[] {
       url("https://www.nasa.gov/image-article/nasa-releases-new-high-resolution-earthrise-image-2/", "NASA image page"),
       "Image Credit: NASA/Goddard/Arizona State University."),
     '</ul>',
+    '<h3>Background music</h3><ul class="rights-list">',
+    sourceItem("'Borealis' by Scott Buckley", "Creative Commons Attribution 4.0 International (CC BY 4.0); original recording streamed from the composer's website, volume reduced in the player",
+      url("https://www.scottbuckley.com.au/library/borealis/", "original music and download") + "; " +
+      url("https://creativecommons.org/licenses/by/4.0/", "CC BY 4.0 licence"),
+      "Music plays only after pressing Music on; it is off by default."),
+    '</ul>',
     '<h3>Self-hosted fonts</h3><ul class="rights-list">',
     sourceItem("CMU Serif (computer-modern 0.1.3)", "Font files: SIL Open Font License 1.1; npm wrapper: MIT",
       url("https://github.com/stevenpetryk/computer-modern", "computer-modern") + "; " +
