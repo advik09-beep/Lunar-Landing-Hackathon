@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D31 item 3 — in progress; built | Unboxed transparent Moon on shared moving stars; whole-Moon site-facing framing and a faint camera fill labeled as a visual aid in the info tip. |
+| Advik + ChatGPT (Lane B) | D31 item 4 — in progress; built | Selected ring shares its pin billboard, anchor and scale, keeping it concentric at every camera angle. Final-tour click correction in fork 7e3f3db7d81a1f9ecdb4f75d2d609044c135f195 built PASS. |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | D31 Lane A part done | Glass panels, flat sections, hollow Partial, full-width grid; stopped |
 
@@ -556,6 +556,11 @@ Second task, only after the copy passes and with Advik's authorization: Step 4 T
 ### 2026-11-14 — D31 second presentation pass, item 3
 - Unboxed transparent Moon on shared moving stars; whole-Moon site-facing framing and a faint camera fill labeled as a visual aid in the info tip.
 - Files: web/src/main.ts, web/src/moon.ts, web/src/style.css. TypeScript and Vite/postbuild executed: PASS. Production: https://lunar-landing-hackathon.vercel.app . Each prior item's Vercel deployment checked READY before continuing; this commit's deployment check follows. Scientific APIs and Lane A panels unchanged.
+
+
+### 2026-11-14 — D31 second presentation pass, item 4
+- Selected ring shares its pin billboard, anchor and scale, keeping it concentric at every camera angle. Final-tour click correction in fork 7e3f3db7d81a1f9ecdb4f75d2d609044c135f195 built PASS.
+- Files: web/src/moon.ts. TypeScript and Vite/postbuild executed: PASS. Production: https://lunar-landing-hackathon.vercel.app . Each prior item's Vercel deployment checked READY before continuing; this commit's deployment check follows. Scientific APIs and Lane A panels unchanged.
 
 ## Lane A
 

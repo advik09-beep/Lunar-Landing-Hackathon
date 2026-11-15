@@ -26,7 +26,7 @@ const toThree = ([x, y, z]: readonly number[]): THREE.Vector3 =>
 type Marker = {
   site: MoonSite;
   object: THREE.Sprite;
-  halo: THREE.Mesh;
+  halo: THREE.Sprite;
   normal: THREE.Vector3;
 };
 
@@ -56,6 +56,13 @@ export class LunarScene {
   private controls: OrbitControls;
   private markers: Marker[] = [];
   private pinTextures = new Map<Verdict, THREE.CanvasTexture>();
+  private readonly selectionTexture = (() => {
+    const canvas = document.createElement('canvas'); canvas.width = 96; canvas.height = 128;
+    const c = canvas.getContext('2d')!;
+    c.strokeStyle = '#ECF2FF'; c.lineWidth = 4;
+    c.beginPath(); c.arc(48, 44, 42, 0, Math.PI * 2); c.stroke();
+    return new THREE.CanvasTexture(canvas);
+  })();
   private pinTexture(verdict: Verdict): THREE.CanvasTexture {
     const cached = this.pinTextures.get(verdict); if (cached) return cached;
     const canvas = document.createElement('canvas'); canvas.width=96; canvas.height=128;
@@ -168,12 +175,15 @@ export class LunarScene {
       marker.center.set(.5,.12);
       marker.position.copy(normal).multiplyScalar(1.035);
       marker.userData.siteId = site.id;
-      const halo = new THREE.Mesh(
-        new THREE.RingGeometry(0.047, 0.058, 32),
-        new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.7, depthWrite: false, side: THREE.DoubleSide }),
-      );
-      halo.position.copy(normal).multiplyScalar(1.054);
-      halo.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal);
+      // Same billboard, anchor, size and position: ring stays concentric with the pin head
+      // from every camera angle, including the closely spaced south-pole sites.
+      const halo = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: this.selectionTexture, transparent: true, opacity: .85, depthWrite: false,
+      }));
+      halo.position.copy(marker.position);
+      halo.center.copy(marker.center);
+      halo.scale.copy(marker.scale);
+      halo.renderOrder = 1;
       halo.visible = false; // only the selected site has a ring
       this.scene.add(halo, marker);
       this.markers.push({ site, object: marker, halo, normal });
@@ -247,7 +257,7 @@ export class LunarScene {
       m.object.material.needsUpdate = true;
       // Never cover an opaque verdict-colored marker with a larger white halo.
       m.halo.visible = m.site.id === this.selected;
-      (m.halo.material as THREE.MeshBasicMaterial).opacity = m.site.id === this.selected ? .85 : .40;
+      m.halo.material.opacity = m.site.id === this.selected ? .85 : .40;
     }
     // Also expose marker meaning to assistive technology, not only colors.
     this.renderer.domElement.setAttribute('aria-label', '3D Moon markers by seven-day landing verdict: ' + descriptions.join('; '));
@@ -266,9 +276,8 @@ export class LunarScene {
     this.targetCamera = position;
     this.targetFocus = new THREE.Vector3();
     for (const m of this.markers) {
-      m.halo.scale.setScalar(m.site.id === id ? 1.3 : 1);
-      m.halo.visible = true;
-      (m.halo.material as THREE.MeshBasicMaterial).opacity = m.site.id === id ? 0.5 : 0.12;
+      m.halo.visible = m.site.id === id;
+      m.halo.material.opacity = .85;
     }
   }
 
@@ -318,6 +327,7 @@ export class LunarScene {
   destroy(): void {
     for (const texture of this.pinTextures.values()) texture.dispose();
     this.pinTextures.clear();
+    this.selectionTexture.dispose();
     cancelAnimationFrame(this.animationFrame);
     this.resizeObserver.disconnect();
     this.renderer.domElement.removeEventListener('pointerdown', this.onPointerDown);
