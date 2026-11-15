@@ -113,50 +113,69 @@ export async function renderLearn(body: HTMLElement, current: PanelProps, isCurr
   const r = F.ridge;
   let week: Record<string, { verdict: keyof typeof KID_VERDICT; pctLit: number; pctComms: number } | null> = {};
   try { const dly = (V as unknown as { getDaily(d: string, n: number): unknown }).getDaily(current.landingDate, 1) as { sites: Record<string, ({ verdict: keyof typeof KID_VERDICT; pctLit: number; pctComms: number } | null)[]> }; week = Object.fromEntries(Object.entries(dly.sites).map(([k, v]) => [k, v[0]])); } catch { week = {}; }
-  const two = (pic: string, words: string, cls = "") => `<section class="two ${cls}"><div class="pic-col">${pic}</div><div class="words">${words}</div></section>`;
+  const card = (pic: string, words: string) => `<section class="ex"><div class="pic-col">${pic}</div><div class="words">${words}</div></section>`;
+  const mStart = learnMonthStart(current.landingDate);
+  const watch = monthData(mStart);
+  const quiz = quizFor(current);
   body.innerHTML = `<div class="kid learn">
     <header><h2>Learn: sunshine and Earth on the Moon</h2>
       <p class="lead">A lander needs sunshine for power. It needs to see Earth to send messages home.</p></header>
     ${mine}
 
-    ${two(ridgeSvg(r), `<h3>1. A hill can hide the Sun</h3>
+    <div class="grid2">
+    ${card(ridgeSvg(r), `<h3>1. A hill can hide the Sun</h3>
       <p>The Sun is up in the sky.</p>
       <p>But a tall hill is in the way.</p>
       <p>So the lander gets no sunshine.</p>
       ${teacher(`<p>Real skyline at Malapert (high ground near NASA's candidate region) on 19 September 2026 at 06:00 UTC. The Sun is ${r.sunEl.toFixed(2)} degrees above level, but the terrain skyline in that direction stands ${r.skylineDeg.toFixed(2)} degrees high, set by a ridge ${r.blockDistKm === null ? "nearby" : `${r.blockDistKm.toFixed(2)} km`} to the east. A flat-ground model would call this hour sunny; with terrain it is dark. Skyline from NASA's LOLA elevation maps, Sun position from NASA JPL Horizons.</p>`,
         "Can you remember a time a building or a tree hid the Sun from you?")}`)}
-
-    ${two(`<div class="pair">${skySvg(F.highSunDeg, "Apollo 11", "near the middle of the Moon")}${skySvg(F.lowSunDeg, "Malapert", "near the south pole")}</div>`, `<h3>2. Near the poles, the Sun stays low</h3>
+    ${card(`<div class="pair">${skySvg(F.highSunDeg, "Apollo 11", "near the middle of the Moon")}${skySvg(F.lowSunDeg, "Malapert", "near the south pole")}</div>`, `<h3>2. Near the poles, the Sun stays low</h3>
       <p>Near the middle of the Moon, the Sun climbs high.</p>
       <p>Near the south pole, the Sun stays close to the ground.</p>
       <p>That is why hills matter so much there.</p>
       ${teacher(`<p>Highest Sun in the 30 days from 14 November 2026: Apollo 11 about ${Math.round(F.highSunDeg)} degrees above level, Malapert about ${Math.round(F.lowSunDeg)} degrees (NASA JPL Horizons). The Moon's axis is tilted only about 1.5 degrees, so at the poles the Sun always skims the horizon (NASA SVS 5229).</p>`,
         "If the Sun stayed low all day where you live, what would your shadow look like?")}`)}
-
-    ${two(dayNightSvg(dn.samples), `<h3>3. A day on the Moon lasts about a month</h3>
+    ${card(dayNightSvg(dn.samples), `<h3>3. A day on the Moon lasts about a month</h3>
       <p>On the Moon, sunshine lasts about ${words(sunDays)} days.</p>
       <p>Then night lasts about ${words(nightDays)} days.</p>
       <p>On Earth, a whole day and night take just one day.</p>
       ${teacher(`<p>At Apollo 11 from 14 November 2026: complete sunshine stretches of ${list(dn.sunHours.map((h) => (h / 24).toFixed(1)))} days and nights of ${list(dn.nightHours.map((h) => (h / 24).toFixed(1)))} days. Sunrise to sunrise: ${list(dn.sunriseToSunriseDays.map((d) => d.toFixed(1)))} days (hourly data, so each is good to about an hour). One lunar day, noon to noon, averages about 29.5 Earth days.</p>`,
         "What would you do during a night that lasts two weeks?")}`)}
-
-    ${two(earthSvg(F.earth.samples), `<h3>4. Earth stays in one spot</h3>
+    ${card(earthSvg(F.earth.samples), `<h3>4. Earth stays in one spot</h3>
       <p>The Sun crosses the Moon's sky.</p>
       <p>Earth stays in almost the same spot.</p>
       <p>That is because the Moon always shows Earth the same face.</p>
       ${teacher(`<p>At Apollo 11 over the 30 days from 14 November 2026, Earth's height stays between ${Math.round(F.earth.elMin)} and ${Math.round(F.earth.elMax)} degrees and its compass direction between ${Math.round(F.earth.azMin)} and ${Math.round(F.earth.azMax)} degrees, while the Sun goes from ${Math.round(F.earth.sunElMin)} to ${Math.round(F.earth.sunElMax)} degrees (below the ground at night). The small wobble is called libration. Positions from NASA JPL Horizons.</p>`,
         "If Earth never moves in the Moon's sky, could you use it to find your way?")}`)}
+    </div>
 
-    <section class="tryit"><h3>5. Try it yourself</h3>
+    <section class="watch"><h3>5. Watch a month</h3>
+      <p>Press play. Watch the Sun move for one month at two places.</p>
+      <div class="watch-ctl"><button type="button" class="play" data-action="play" aria-pressed="false">▶ Play</button>
+        <input type="range" class="month" min="0" max="${watch.n - 1}" step="1" value="0" aria-label="Time in the month"/>
+        <output class="month-when">Day 1</output></div>
+      <div class="grid2">${watch.sites.map((w) => `<figure class="sky-panel" data-watch="${w.siteId}">
+        ${watchSvg(w.horizon)}
+        <figcaption><strong>${esc(w.name)}</strong> <span class="now-words"></span></figcaption></figure>`).join("")}</div>
+      ${teacher(`<p>Hourly NASA JPL Horizons positions for the 30 days from ${esc(mStart)}, drawn over each site's real skyline from NASA's LOLA maps (the line). Left to right is the compass, north to north; up is height above level, on the same scale for both. Highest Sun this month: ${esc(watch.sites.map((w) => `${w.name} about ${Math.round(w.maxEl)} degrees`).join(", "))}. A faded Sun is below the skyline.</p>`,
+        "Why does the Sun at Malapert hide behind hills so often?")}</section>
+
+    <section class="quiz"><h3>6. Can you tell?</h3>
+      <p>${quiz ? `Think about ${esc(quiz.siteName)}, landing on ${esc(kidDate(current.landingDate))}. Tap an answer.` : "We have no data for that week. Pick another day."}</p>
+      ${quiz ? `<div class="grid3">${quiz.qs.map((q, i) => `<div class="q-card" data-q="${i}"><p class="q">${esc(q.q)}</p>
+        <div class="opts">${q.options.map((o, j) => `<button type="button" data-action="answer" data-q="${i}" data-o="${j}">${esc(o)}</button>`).join("")}</div>
+        <p class="answer" aria-live="polite"></p></div>`).join("")}</div>
+      ${teacher(quiz.teacherHtml, "Can you find a week where the answers change?")}` : ""}</section>
+
+    <section class="tryit"><h3>7. Try it yourself</h3>
       <p>Pick a card. The tool opens at that place and day.</p>
-      <div class="cards">${TRY_IT.map((t) => { const st = V.listSites().find((x) => x.id === t.siteId)!; return `<a class="card try" data-try="${t.id}" href="${tryHref(t)}">
+      <div class="grid3">${TRY_IT.map((t) => { const st = V.listSites().find((x) => x.id === t.siteId)!; return `<a class="card try" data-try="${t.id}" href="${tryHref(t)}">
         <strong>${esc(t.title)}</strong><span>${esc(t.kid)}</span><span class="muted small">${esc(st.shortName)}, ${esc(kidDate(t.date))}</span><span class="go">Open it</span></a>`; }).join("")}</div>
       ${teacher(`<p>Each card opens Explore in the Educator view at a place, date and hour chosen from our data: Malapert on 19 September 2026 at 06:00 UTC (the Sun ${r.sunEl.toFixed(2)} degrees above level, behind a ridge); Malapert in the week from 22 November 2026 (sunlight and Earth in view for all 168 hours); Apollo 11 in the week from 1 November 2026 (no sunlight, Earth in view the whole week).</p>`,
         "Before you open a card, guess: will the lander have sunshine?")}</section>
 
-    <section class="places"><h3>6. The ten places</h3>
-      <p>These are the ten places in this tool. Pick one to visit it.</p>
-      <div class="cards">${V.listSites().map((st) => { const w = week[st.id]; return `<a class="card place" data-place="${st.id}" href="${tryHref({ siteId: st.id, date: current.landingDate, hour: 0, view: "globe" })}">
+    <section class="places"><h3>8. The ten places</h3>
+      <div class="grid5">${V.listSites().map((st) => { const w = week[st.id]; return `<a class="card place" data-place="${st.id}" href="${tryHref({ siteId: st.id, date: current.landingDate, hour: 0, view: "globe" })}">
         <strong>${w ? verdictIcon(w.verdict, 18) : ""} ${esc(st.shortName)}</strong>
         <span>${esc(placeWords(st.lat))}</span>
         <span>${st.landingDate ? `A lander landed here in ${st.landingDate.slice(0, 4)}.` : "A possible landing spot."}</span>
@@ -165,14 +184,113 @@ export async function renderLearn(body: HTMLElement, current: PanelProps, isCurr
       ${teacher(`<p>Six are past landings (Apollo 11, 12 and 17, Chandrayaan-3, IM-1, IM-2), shown for comparison; four are candidate points from NASA's Artemis III candidate regions. “This week” is the 7-day stay from ${esc(current.landingDate)}. Where each place is comes from its latitude; landing years come from each site's source in the data.</p>`,
         "Which place would you pick for a lander that must talk to Earth all the time?")}</section>
 
-    <section class="photos-sec"><h3>7. Real NASA photos</h3>
-      ${LEARN_PHOTOS.map((p) => `<figure class="photo two" data-photo="${p.id}">
-        <div class="pic-col"><img src="${p.src}" alt="${esc(p.alt)}" loading="lazy" width="320"/></div>
-        <figcaption class="words"><p>${esc(p.kid)}</p>
+    <section class="photos-sec"><h3>9. Real NASA photos</h3>
+      <div class="grid5">${LEARN_PHOTOS.map((p) => `<figure class="photo card" data-photo="${p.id}">
+        <img src="${p.src}" alt="${esc(p.alt)}" loading="lazy" width="320"/>
+        <figcaption><p>${esc(p.kid)}</p>
           <p class="credit">${esc(p.credit)}; <a href="${esc(p.page)}" target="_blank" rel="noopener">NASA source page</a></p>
-          ${teacher(`<p>${esc(p.teacher)}</p>`, PHOTO_Q[p.id])}</figcaption></figure>`).join("")}</section>
+          ${teacher(`<p>${esc(p.teacher)}</p>`, PHOTO_Q[p.id])}</figcaption></figure>`).join("")}</div></section>
   </div>`;
+  wireWatch(body, watch);
+  wireQuiz(body, quiz);
 }
+
+// ---- "Watch a month" (2026-11-15): the Sun over one month at Apollo 11 and Malapert, from the hourly data ----
+const WATCH_SITES = ["apollo11", "sp_malapert"] as const;
+/** First day of the month shown: the chosen landing date, kept inside the 2026–2029 data. */
+export function learnMonthStart(landingDate: string): string {
+  const t = Math.min(Math.max(Date.parse(landingDate + "T00:00:00Z"), Date.parse("2026-01-01T00:00:00Z")), Date.parse("2029-12-01T00:00:00Z"));
+  return new Date(t).toISOString().slice(0, 10);
+}
+type WatchSite = { siteId: string; name: string; samples: Sample[]; horizon: number[]; maxEl: number };
+function monthData(start: string): { n: number; start: string; sites: WatchSite[] } {
+  const sites = WATCH_SITES.map((id) => {
+    const samples = V.getTimeline(id, `${start}T00:00:00Z`, 30).samples;
+    return { siteId: id, name: V.listSites().find((x) => x.id === id)!.shortName, samples, horizon: V.getHorizon(id).elevationDeg, maxEl: Math.max(...samples.map((s) => s.sunEl)) };
+  });
+  return { n: sites[0].samples.length, start, sites };
+}
+const WW = 520, WH = 220, ELO = -10, EHI = 90;
+const wx = (a: number) => ((((a % 360) + 360) % 360) / 360) * WW, wy = (e: number) => ((EHI - e) / (EHI - ELO)) * WH;
+function watchSvg(h: number[]): string {
+  let d = "";
+  for (let a = 0; a <= 360; a++) d += `${a ? "L" : "M"}${wx(a === 360 ? 359.999 : a).toFixed(1)},${wy(h[a % 360]).toFixed(1)}`;
+  return `<svg class="pic watchpic" viewBox="0 0 ${WW} ${WH + 18}" role="img" aria-label="The sky all the way around, with the real hills and the Sun.">
+    <rect width="${WW}" height="${WH}" class="sky"/>
+    <path d="${d}L${WW},${WH}L0,${WH}Z" class="ground"/><path d="${d}" class="hill"/>
+    <g class="sunpic"><circle class="sun-dot" cx="0" cy="0" r="9"/></g>
+    ${["N", "E", "S", "W", "N"].map((c, i) => `<text x="${Math.min(WW - 12, i * WW / 4 + 2)}" y="${WH + 15}" class="lab small">${c}</text>`).join("")}</svg>`;
+}
+const timers = new WeakMap<HTMLElement, number>();
+function wireWatch(body: HTMLElement, watch: { n: number; sites: WatchSite[] }): void {
+  const old = timers.get(body); if (old) { clearInterval(old); timers.delete(body); }
+  const slider = body.querySelector<HTMLInputElement>("input.month"), btn = body.querySelector<HTMLButtonElement>("button.play"), when = body.querySelector("output.month-when");
+  if (!slider || !btn || !when) return;
+  const show = (i: number) => {
+    when.textContent = `Day ${Math.floor(i / 24) + 1}`;
+    for (const w of watch.sites) {
+      const s = w.samples[i], fig = body.querySelector(`[data-watch="${w.siteId}"]`);
+      if (!fig) continue;
+      const dot = fig.querySelector<SVGCircleElement>("circle.sun-dot")!;
+      dot.setAttribute("cx", wx(s.sunAz).toFixed(1)); dot.setAttribute("cy", wy(Math.max(ELO + 1, s.sunEl)).toFixed(1));
+      dot.classList.toggle("hidden", !s.lit);
+      fig.querySelector(".now-words")!.textContent = s.lit ? "The Sun is shining." : s.sunEl > 0 ? "A hill hides the Sun." : "It is night.";
+    }
+  };
+  const stop = () => { const t = timers.get(body); if (t) clearInterval(t); timers.delete(body); btn.textContent = "▶ Play"; btn.setAttribute("aria-pressed", "false"); };
+  const play = () => {
+    if (Number(slider.value) >= watch.n - 1) slider.value = "0";
+    btn.textContent = "❚❚ Pause"; btn.setAttribute("aria-pressed", "true");
+    timers.set(body, window.setInterval(() => {
+      if (!body.contains(slider)) { stop(); return; }
+      const i = Math.min(watch.n - 1, Number(slider.value) + 3);
+      slider.value = String(i); show(i);
+      if (i >= watch.n - 1) stop();
+    }, 40) as unknown as number);
+  };
+  btn.addEventListener("click", () => (timers.has(body) ? stop() : play()));
+  slider.addEventListener("input", () => { stop(); show(Number(slider.value)); });
+  show(0);
+}
+
+// ---- "Can you tell?" (2026-11-15): three questions answered from the live data for the chosen week ----
+type Quiz = { siteName: string; qs: { q: string; options: string[]; correct: number; why: string }[]; teacherHtml: string };
+const amountChoice = (p: number) => (p >= 95 ? 0 : p > 3 ? 1 : 2); // all week / some of the week / not this week (same cut-offs as kidAmount)
+export function quizFor(current: Pick<PanelProps, "siteId" | "landingDate">): Quiz | null {
+  let daily: { sites: Record<string, ({ pctLit: number; pctComms: number } | null)[]> };
+  try { daily = (V as unknown as { getDaily(d: string, n: number): typeof daily }).getDaily(current.landingDate, 1); } catch { return null; }
+  const me = daily.sites[current.siteId]?.[0];
+  if (!me) return null;
+  const site = V.listSites().find((x) => x.id === current.siteId)!;
+  const otherId = current.siteId === "apollo11" ? "sp_malapert" : "apollo11";
+  const other = V.listSites().find((x) => x.id === otherId)!, them = daily.sites[otherId]?.[0];
+  const sun = amountChoice(me.pctLit), earth = amountChoice(me.pctComms);
+  const sunWords = ["Yes, all week.", "Only some of the week.", "No, not this week."], earthWords = sunWords;
+  const qs: Quiz["qs"] = [
+    { q: `Will the lander at ${site.shortName} get sunshine all week?`, options: ["All week", "Some of the week", "Not at all"], correct: sun, why: sunWords[sun] },
+    { q: `Can the lander at ${site.shortName} see Earth all week?`, options: ["All week", "Some of the week", "Not at all"], correct: earth, why: earthWords[earth] },
+  ];
+  if (them) {
+    const d = me.pctLit - them.pctLit;
+    const c = Math.abs(d) < 5 ? 2 : d > 0 ? 0 : 1;
+    qs.push({ q: `Which place gets more sunshine this week?`, options: [site.shortName, other.shortName, "About the same"], correct: c,
+      why: c === 2 ? "They get about the same." : `${c === 0 ? site.shortName : other.shortName} gets more.` });
+  }
+  const pc = (x: number) => `${x.toFixed(0)}%`;
+  const teacherHtml = `<p>Answers come from the 7-day stay from ${esc(current.landingDate)} 00:00 UTC. ${esc(site.shortName)}: sunlight ${pc(me.pctLit)} of the hours, Earth in view ${pc(me.pctComms)}.${them ? ` ${esc(other.shortName)}: sunlight ${pc(them.pctLit)}.` : ""} “All week” means at least 95%, “not at all” 3% or less, and “about the same” within 5 percentage points. Positions from NASA JPL Horizons over NASA LOLA terrain.</p>`;
+  return { siteName: site.shortName, qs, teacherHtml };
+}
+function wireQuiz(body: HTMLElement, quiz: Quiz | null): void {
+  if (!quiz) return;
+  body.querySelectorAll<HTMLButtonElement>("button[data-action=answer]").forEach((b) => b.addEventListener("click", () => {
+    const q = quiz.qs[Number(b.dataset.q)], pick = Number(b.dataset.o), card = b.closest(".q-card")!;
+    card.querySelectorAll("button").forEach((x) => x.classList.remove("picked", "right"));
+    b.classList.add("picked");
+    card.querySelector(`button[data-o="${q.correct}"]`)!.classList.add("right");
+    card.querySelector(".answer")!.textContent = (pick === q.correct ? "Yes! " : "Not quite. ") + q.why;
+  }));
+}
+
 const PHOTO_Q: Record<string, string> = {
   earthrise: "Why does Earth look like it is rising in this photo?",
   "south-pole": "Why might ice hide in the dark craters?",
@@ -259,10 +377,26 @@ export const LEARN_CSS = `
 .learn section { padding-top: 10px; border-top: 1px solid var(--_divider); margin-top: 12px; }
 .learn h3 { border-top: 0; padding-top: 0; margin-top: 4px; } /* one divider per section (the section rule), not two */
 .learn svg.pic, .learn .pair { max-width: 560px; }
-.learn .two { display: grid; grid-template-columns: minmax(0, 560px) minmax(15rem, 1fr); gap: 20px; align-items: start; } /* D34: picture left, words right */
-.learn .two .words h3 { margin-top: 2px; }
-.learn figure.two { margin: 14px 0 0; }
-.learn figure.two img { max-width: 360px; }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 22px; } /* full width, explainers two by two */
+.grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.grid5 { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; } /* ten places five across; photos in one row */
+.learn .ex { margin: 0; padding: 0; border: 0; }
+.learn .ex .pic-col svg.pic, .learn .ex .pair { margin-left: auto; margin-right: auto; }
+.learn .ex .words h3 { margin-top: 8px; }
+.watch-ctl { display: flex; gap: 10px; align-items: center; margin: 6px 0 10px; max-width: 700px; }
+.watch-ctl input { flex: 1; }
+.watch-ctl .play { padding: 6px 14px; border: 1px solid var(--_accent); border-radius: 8px; background: var(--_accent); color: inherit; font-weight: 650; white-space: nowrap; }
+.month-when { font-variant-numeric: tabular-nums; min-width: 4.5em; }
+.sky-panel { margin: 0; } .sky-panel figcaption { margin-top: 4px; } .now-words { color: var(--_muted); margin-left: 6px; }
+.sun-dot { fill: var(--_sun); stroke: #0b1322; stroke-width: 2; } .sun-dot.hidden { fill-opacity: .3; stroke-dasharray: 3 2; stroke: var(--_text); }
+.q-card { padding: 10px 12px; border-radius: 10px; background: rgba(255,255,255,.05); }
+.q-card .q { font-weight: 650; }
+.opts { display: flex; flex-wrap: wrap; gap: 6px; }
+.opts button { padding: 6px 10px; border: 1px solid var(--_border); border-radius: 8px; background: transparent; color: inherit; }
+.opts button.picked { border-color: var(--_text); }
+.opts button.right { background: var(--_accent); border-color: var(--_accent); }
+.answer { min-height: 1.4em; font-weight: 650; }
+.photo.card { margin: 0; } .photo.card img { width: 100%; height: auto; border-radius: 8px; display: block; }
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; margin: 8px 0; max-width: 980px; }
 .card { display: grid; gap: 4px; align-content: start; padding: 10px 12px; border-radius: 10px; background: rgba(255,255,255,.05); color: var(--_text); text-decoration: none; }
 .card:hover, .card:focus-visible { background: rgba(255,255,255,.10); }

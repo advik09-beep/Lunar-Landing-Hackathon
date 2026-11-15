@@ -6,7 +6,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 |-----|------|-----------|
 | Advik + ChatGPT (Lane B) | D34 item 5/5 — team byline | Items 1–4 Vercel READY; byline in Data and methods and Educator How we know; final build pending |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
-| Claude Code (Lane A) | D34 Lane A part done | LICENSE + NOTICE, audit reply, Learn redesign, slider/compass/Stand here fixes, README licence; stopped |
+| Claude Code (Lane A) | Learn full width + Watch a month + Can you tell? done; slide 9 / 10 | stopped |
 | Collaborative presentation | Initial web deck | Separate `presentation/` draft; Sheldon + Claude science review pending; build unverified |
 
 Acceptance (both humans): steps 1, 2, 3, 6, 8 PASS; step 4 and 7 pending earlier findings. Signed: D7–D23 (see PLAN), **D24–D28** (title card + tour nav, tour captions, why the south pole, one clock, A/B scenarios + requirements filter). Rule: no status-only pushes.
@@ -1868,3 +1868,12 @@ Done within the 2-hour time box (all checks passing about 7 minutes after starti
 - Item 4 commit `80062b1`, Vercel `dpl_Bo8afBdGcRSrcaQNS1Ee8qZ4MQHZ` READY.
 - The Data and methods project credit line now includes the exact words `by Sheldon Spence and Advik Chaudhary`. The Educator How we know display also names both contributors, rather than burying the attribution in the teacher details.
 - This is the final requested D34 source change. Item 5 deployment verification is pending. No wider third-party rights audit or further texture modifications were started.
+
+### 2026-11-15 — Screenshots, eclipse slide, Learn full width, "Watch a month", "Can you tell?" (Sheldon's request)
+- `presentation/public/shots/` committed as supplied (six app screenshots; each looked at before committing; app content only).
+- `presentation/src/slides/science.js`: "10 / 10" became **"9 / 10"**, captioned "of NASA's lunar eclipses for 2026-2029 found in our own data; the tenth is a faint graze that misses by under 1%". This matches `check_d19`: 9 events found directly; the 2027-07-18 penumbral misses solid-Earth contact by 0.9% of Earth's radius.
+- **Learn (Educator), full width with grids:** the four explainers two by two; "Try it yourself" three across; "The ten places" five across; the five NASA photos as one row of cards. The filler sentences were removed.
+- **"Watch a month":** a Play / Pause button and a 30-day hourly slider (from the chosen landing date, kept inside 2026–2029). Two skies side by side, Apollo 11 and Malapert, on the same height scale with each site's real LOLA skyline. The Sun moves from our hourly Horizons data, fades when below the skyline, and has one line of words ("The Sun is shining." / "A hill hides the Sun." / "It is night."). The teacher note gives the dates and each site's highest Sun that month.
+- **"Can you tell?":** three tap-to-answer questions for the chosen site and week. Will the lander get sunshine all week? Can it see Earth all week? Which place gets more sunshine this week, this site or Apollo 11 (Malapert when the site is Apollo 11)? Answers come from the live daily data: "all week" ≥ 95%, "not at all" ≤ 3%, "about the same" within 5 points. The teacher note gives the percentages.
+- **Checks:** all twelve scripts PASS; panel tests PASS. The Learn test now checks the grids, that the Watch Sun sits at the hourly-data position with the right words, Play/Pause, and that each quiz answer matches `getDaily`. `cd web && npm run build` OK.
+
