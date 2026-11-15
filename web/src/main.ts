@@ -106,7 +106,7 @@ app.innerHTML = [
   '  <header class="topbar">',
   '    <div class="brand"><span class="brand-kicker">NASA SPACE APPS 2026</span><img class="brand-wordmark" src="/brand/lunlux-wordmark.png" alt="LunLux" width="1934" height="495"><span class="brand-subtitle">Sunlight and Earth contact for lunar landing sites</span></div>',
   '    <nav class="primary-nav" aria-label="Main navigation"><button id="nav-overview" type="button" class="nav-active" aria-pressed="true">Tour</button><button id="nav-explore" type="button" aria-pressed="false">Explore</button><button id="nav-compare" type="button" aria-pressed="false">Compare</button><button id="nav-researcher" type="button" aria-pressed="false">Learn</button></nav>',
-  '    <div class="header-tools"><div class="reading-level" role="group" aria-label="Reading level"><button id="level-educator" aria-pressed="true" type="button">Educator</button><button id="level-researcher" aria-pressed="false" type="button">Researcher</button></div><button id="nav-credits" class="methods-link" type="button" aria-pressed="false">Data and methods</button></div>',
+  '    <div class="header-tools"><div class="reading-level" role="group" aria-label="Reading level"><button id="level-educator" aria-pressed="true" type="button">Educator</button><button id="level-researcher" aria-pressed="false" type="button">Researcher</button></div><button id="music-toggle" class="music-toggle" type="button" aria-pressed="false" aria-label="Play Borealis background music" title="Play background music: Borealis by Scott Buckley">🔇 Music off</button><button id="nav-credits" class="methods-link" type="button" aria-pressed="false">Data and methods</button></div>',
   '  </header>',
   '  <section class="intro-block">',
   '    <p class="eyebrow">THE MOON, FROM A NEW PERSPECTIVE</p>',
@@ -137,7 +137,7 @@ app.innerHTML = [
   '      <div id="overview-stage" class="overview-stage" aria-label="Solar system overview visualization"></div>',
   '      <div id="tour-science-caption" class="tour-science-caption" hidden aria-live="polite"></div>',
   '<details class="tour-info clock-tip"><summary aria-label="About the solar system scene">ⓘ</summary><p>Planet positions and sizes are illustrative. Use Explore for landing-site conditions.<br><br><span id="overview-clock-status" role="status">The selected moment is loading.</span></p></details>',
-  '      <div id="overview-title-card" class="overview-title-card" role="region" aria-label="Solar system tour introduction"><h2><img class="overview-wordmark" src="/brand/lunlux-wordmark.png" alt="LunLux" width="1934" height="495"></h2><p class="overview-title-subtitle">Sunlight and Earth contact for lunar landing sites</p><p>Only the Sun and Earth determine the sunlight and direct Earth visibility we evaluate for a lunar lander. Other planets’ gravity is already included in NASA’s ephemerides.</p><div><button id="start-tour" type="button">Start tour</button><button id="skip-moon" type="button">Skip to the Moon</button></div><p class="overview-audio-note">Tour sound starts off. Use the speaker button for sound.</p></div>',
+  '      <div id="overview-title-card" class="overview-title-card" role="region" aria-label="Solar system tour introduction"><h2><img class="overview-wordmark" src="/brand/lunlux-wordmark.png" alt="LunLux" width="1934" height="495"></h2><p class="overview-title-subtitle">Sunlight and Earth contact for lunar landing sites</p><p>Only the Sun and Earth determine the sunlight and direct Earth visibility we evaluate for a lunar lander. Other planets’ gravity is already included in NASA’s ephemerides.</p><div><button id="start-tour" type="button">Start tour</button><button id="skip-moon" type="button">Skip to the Moon</button></div><p class="overview-audio-note">Background music starts off. Use the Music button in the header to turn it on.</p></div>',
   '      <div class="overview-footer"><p id="overview-disclaimer">Choose the Moon to explore real landing sites and verified Sun/Earth visibility at your selected UTC date and hour.</p><button id="enter-explore" type="button">Explore the Moon and landing sites</button></div>',
   '    </div>',
   '  </section>',
@@ -175,6 +175,51 @@ const find = <T extends HTMLElement>(id: string): T => {
   if (!element) throw new Error('Missing UI element #' + id);
   return element as T;
 };
+
+// Background soundtrack: opt-in only, quiet, and shared across all four tabs.
+// The embedded simulator is already permanently muted in LunLux mode, so there
+// is no generated ambient pad competing with this track.
+// 'Borealis' by Scott Buckley, licensed CC BY 4.0: https://www.scottbuckley.com.au/library/borealis/
+const musicToggle = find<HTMLButtonElement>('music-toggle');
+const backgroundMusic = new Audio('https://www.scottbuckley.com.au/library/wp-content/uploads/2019/09/sb_borealis.mp3');
+backgroundMusic.preload = 'none'; // Do not download until the visitor opts in.
+backgroundMusic.loop = true;
+backgroundMusic.volume = 0.12;
+let musicEnabled = false;
+
+function syncMusicToggle(): void {
+  musicToggle.textContent = musicEnabled ? '🔊 Music on' : '🔇 Music off';
+  musicToggle.setAttribute('aria-pressed', String(musicEnabled));
+  musicToggle.setAttribute('aria-label', musicEnabled ? 'Pause Borealis background music' : 'Play Borealis background music');
+  musicToggle.title = musicEnabled ? 'Pause background music: Borealis by Scott Buckley' : 'Play background music: Borealis by Scott Buckley';
+}
+musicToggle.addEventListener('click', () => {
+  if (musicEnabled) {
+    musicEnabled = false;
+    backgroundMusic.pause();
+    syncMusicToggle();
+    return;
+  }
+  musicEnabled = true;
+  syncMusicToggle();
+  // play() happens in direct response to a visitor click (browser autoplay policy).
+  void backgroundMusic.play().catch(() => {
+    musicEnabled = false;
+    backgroundMusic.pause();
+    syncMusicToggle();
+    musicToggle.textContent = 'Music unavailable';
+    musicToggle.title = 'Could not load Borealis. Click to try again.';
+  });
+});
+// Stop audio when leaving the tab. Returning to LunLux never starts it automatically.
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && musicEnabled) {
+    musicEnabled = false;
+    backgroundMusic.pause();
+    syncMusicToggle();
+  }
+});
+syncMusicToggle();
 
 find<HTMLElement>('mock-notice').hidden = !MOCK;
 const sitePicker = find<HTMLSelectElement>('site-picker');
@@ -652,6 +697,7 @@ async function initializeSceneLighting(): Promise<void> {
 void initializeSceneLighting();
 
 window.addEventListener('pagehide', () => {
+  backgroundMusic.pause();
   moon?.destroy();
   overview?.destroy();
   disposeOverviewMessages?.();
