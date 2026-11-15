@@ -1,6 +1,7 @@
 import '@fontsource/urbanist/400.css';
 import '@fontsource/urbanist/600.css';
 import './style.css';
+import { syncShellCopy, syncTourSources } from './educatorCopy';
 import { listSites, loadDaily, getDaily, loadScene, getSceneState, MOCK, VERDICT_RULE, TOUR_STOPS, SOUTH_POLE } from '../../lib/visibility.js';
 import { LunarScene, type MoonSite, type Verdict, type SceneState } from './moon';
 import { OverviewScene } from './overview';
@@ -327,7 +328,7 @@ function setLandingDate(date: string): void {
   if (dataReady) {
     try {
       daily = getDaily(selectedDate, 1) as DailyResult;
-      status.textContent = '7-day stay starting ' + formatUtc(selectedDate + 'T00:00:00Z') + ' · hourly NASA/JPL Horizons data';
+      status.textContent = readingLevel === 'educator' ? 'Showing the week that starts on your day.' : '7-day stay starting ' + formatUtc(selectedDate + 'T00:00:00Z') + ' · hourly NASA/JPL Horizons data';
     } catch (error) {
       daily = null;
       status.textContent = 'Conditions unavailable for the selected date.';
@@ -340,8 +341,12 @@ function renderClockHour(): void {
   const utc = new Date(Date.parse(selectedDate + 'T00:00:00Z') + selectedHour * 3600000)
     .toISOString().slice(0, 16).replace('T', ' ');
   hourSlider.value = String(selectedHour);
-  hourOutput.textContent = 'Day ' + (Math.floor(selectedHour / 24) + 1) + ' · ' + utc.slice(11) + ' UTC';
-  hourOutput.title = formatUtc(new Date(Date.parse(selectedDate + 'T00:00:00Z') + selectedHour * 3600000).toISOString());
+  const day = Math.floor(selectedHour / 24) + 1;
+  const hour = selectedHour % 24;
+  const simpleTime = hour === 0 ? 'midnight' : hour === 12 ? 'noon' :
+    hour < 12 ? hour + ' in the morning' : hour < 18 ? (hour - 12) + ' in the afternoon' : (hour - 12) + ' at night';
+  hourOutput.textContent = readingLevel === 'educator' ? 'Day ' + day + ' · ' + simpleTime : 'Day ' + day + ' · ' + utc.slice(11) + ' UTC';
+  hourOutput.title = readingLevel === 'educator' ? 'The time you are looking at on day ' + day + '.' : formatUtc(new Date(Date.parse(selectedDate + 'T00:00:00Z') + selectedHour * 3600000).toISOString());
 }
 
 let panelUpdateTimer = 0;
@@ -454,6 +459,7 @@ if (embedUrl) {
         caption.append(handoff);
       }
       caption.hidden = false;
+      syncTourSources(readingLevel);
     }
     if (data && typeof data === 'object' &&
         data.type === 'lunar-navigator:open-explore' && data.body === 'moon') {
@@ -515,12 +521,15 @@ function syncReadingLevelUI(): void {
   find<HTMLElement>('researcher-view').setAttribute('aria-label', isEducator ? 'Learn about the Moon' : 'Researcher report');
   find<HTMLElement>('planner-view').hidden = activeView !== 'compare' || isEducator;
   document.body.dataset.readingLevel = readingLevel;
+  syncShellCopy(readingLevel);
+  renderClockHour();
 }
 for (const level of ['educator','researcher'] as const) {
   find<HTMLButtonElement>('level-' + level).addEventListener('click', () => {
     readingLevel = level;
     syncReadingLevelUI();
     refreshTourCaptionLanguage();
+    syncTourSources(readingLevel);
     for (const name of ['educator','researcher']) find<HTMLElement>('level-' + name).setAttribute('aria-pressed', String(name === level));
     for (const panel of [sideCard,compareGrid,horizonView,researcherView,plannerView]) panel?.update({level});
     updateAllPanels();

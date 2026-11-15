@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D32 item 4/5 — Tour captions | Items 1–3 Vercel READY; source-backed kid/Researcher captions by switch; checking build |
+| Advik + ChatGPT (Lane B) | D32 item 5/5 — Educator copy | Items 1–4 Vercel READY; plain shell words and teacher notes; verifying last build |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | D32 Lane A part done | Seven-year-old Educator screens, Learn / Report, kid tour captions, best week, all-sites download; stopped |
 
@@ -1659,3 +1659,9 @@ SOUTH_POLE.sources;          // [{ name, url }]
 - At each incoming simulator stop, Educator shows `kidTitle` / `kidText` and Researcher shows `title` / `text` from Lane A's `/lib` constants; original NASA/JPL source links remain.
 - Changing the reading level while a stop is visible refreshes that caption in place; returning to Tour or restarting clears the previous stop.
 - Build status for item 4: pending Vercel verification before shell copy revisions.
+
+### 2026-11-14 — Lane B D32 item 5: seven-year-old shell copy
+- Item 4 Vercel deployment `dpl_8QDyFagztSdAi5kw9McyRDsbamb1` READY for `2a90045`.
+- Educator Tour instructions, navigation, toolbar, day/hour display, site picker groups, view controls, verdict legend, tooltips and footer now use short everyday words and avoid raw timestamps and degree labels. Researcher retains its original labels and UTC clock.
+- Detailed Tour sources and original Credits references/license notices remain accessible under `For the teacher` in Educator; Researcher retains full sources.
+- Build status for item 5: pending Vercel verification before marking D32 complete.
