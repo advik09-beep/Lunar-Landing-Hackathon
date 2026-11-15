@@ -321,6 +321,29 @@ and researchers get the numbers behind them.
   the chart; screenshots 02 and 03 retaken; the PDF re-exported and
   checked page by page.
 
+- D37 Final site and deck pass (both humans, 2026-11-15). Lane B is not
+  editing. Site: (1) pins stay on their true spots (D36's spreading and
+  leader lines removed; pin colours and label placement kept); (2) verdict
+  colours wherever a verdict appears, matching the pins (green for
+  Clear / Great and Partial / Okay, with the Moon phase telling them
+  apart; coral for Out / Hard; violet for On the edge / Tricky), in the
+  Compare grid and legend, the Explore chips, the side card and the Learn
+  tab's ten places; gold still only the Sun, blue only Earth, everything
+  else black and grey; "Bright means a better week." reworded or removed;
+  (3) the slider-sticking bug reproduced in WebKit and fixed (address-bar
+  updates throttled and guarded), proven by dragging the hour slider end
+  to end repeatedly; (4) the team members' names removed from every
+  tracked file (site credits and byline, README, NOTICE "the LunLux team",
+  the deck cover; "Lane A lead" and "Lane B lead" in PLAN, STATUS,
+  data/README.md, code comments and presentation notes), confirmed by
+  search, check_d34 updated. Deck, exactly seven slides: the site's
+  drifting starfield on every slide (still in the PDF); section labels
+  following NASA's demo outline (01 Team and challenge; 02 Introduction;
+  03 NASA data; 04 How it works; 05 Who it is for; 06 Hurdles and
+  achievements; 07 Looking ahead); slide 6 with three verified
+  achievements and three verified hurdles; screenshots 01-05 retaken; the
+  PDF re-exported and checked page by page.
+
 ## Settled earlier (do not reopen without both humans)
 - 10 fixed sites: 3 Apollo, Chandrayaan-3, IM-1, IM-2, 4 south pole
   representative points.

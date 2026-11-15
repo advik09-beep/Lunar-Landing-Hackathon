@@ -28,8 +28,6 @@ type Marker = {
   site: MoonSite;
   object: THREE.Sprite;
   halo: THREE.Sprite;
-  anchor: THREE.Vector3;   // true pin position (D36)
-  leader: THREE.Line;      // thin line from the true spot to a spread-out pin (D36)
   normal: THREE.Vector3;
 };
 
@@ -101,7 +99,7 @@ export class LunarScene {
     const texture=new THREE.CanvasTexture(canvas); texture.colorSpace=THREE.SRGBColorSpace; this.pinTextures.set(verdict,texture); return texture;
   }
   private readonly poleCallouts: Array<{id:string;sprite:THREE.Sprite;leader:THREE.Line}> = [];
-  private pinHeads: Array<{ id: string; x: number; y: number }> = []; // D36: pin heads on screen after spreading
+  private pinHeads: Array<{ id: string; x: number; y: number }> = []; // pin heads on screen (for label placement)
   private raycaster = new THREE.Raycaster();
   private pointer = new THREE.Vector2();
   private selected: string | null = null;
@@ -275,11 +273,8 @@ export class LunarScene {
       halo.scale.copy(marker.scale);
       halo.renderOrder = 1;
       halo.visible = false; // only the selected site has a ring
-      const leader = new THREE.Line(new THREE.BufferGeometry().setFromPoints([normal.clone().multiplyScalar(1.004), marker.position.clone()]),
-        new THREE.LineBasicMaterial({ color: 0xF2EEE6, transparent: true, opacity: .9, depthTest: false }));
-      leader.visible = false; leader.renderOrder = 2;
-      this.scene.add(halo, marker, leader);
-      this.markers.push({ site, object: marker, halo, normal, anchor: marker.position.clone(), leader });
+      this.scene.add(halo, marker);
+      this.markers.push({ site, object: marker, halo, normal });
     }
 
     this.onPointerDown = (e) => { this.downPosition = { x: e.clientX, y: e.clientY }; this.targetCamera = null; };
@@ -340,7 +335,7 @@ export class LunarScene {
     return element;
   }
 
-  /** D36: put a site's name beside its pin as drawn (after spreading), on the side with fewer other pins. */
+  /** Put a site's name beside its pin, in the spot that covers the fewest other pins (D36, kept in D37). */
   private positionPinLabel(element: HTMLDivElement, m: Marker): void {
     if (!m.object.visible) { element.hidden = true; return; }
     const w = this.container.clientWidth, h = this.container.clientHeight;
@@ -512,62 +507,28 @@ export class LunarScene {
     }
     this.controls.update();
     this.inspectionLight.position.copy(this.camera.position);
-    this.spreadPins();
+    this.trackPins();
     this.updateMapLabels();
     this.renderer.render(this.scene, this.camera);
   };
 
-  /** D36: pins that overlap on screen are spread around their shared centre, with thin leader lines back
-   *  to their true spots. Screen-space only: each pin keeps its depth, so hit-testing still works. */
-  private spreadPins(): void {
+  /** D37: pins stay on their true spots. Each frame: hide pins on the far side (pins draw on top of the globe)
+   *  and record where each pin head is on screen, so site names can sit where they cover the fewest pins. */
+  private trackPins(): void {
     const h = Math.max(1, this.container.clientHeight), w = Math.max(1, this.container.clientWidth);
-    const toPx = (v: THREE.Vector3) => { const p = v.clone().project(this.camera); return { x: (p.x + 1) * w / 2, y: (1 - p.y) * h / 2, z: p.z }; };
     const tanHalf = Math.tan(THREE.MathUtils.degToRad(this.camera.fov) / 2);
-    const items = this.markers.map((m) => {
-      const facing = m.normal.dot(this.camera.position.clone().sub(m.anchor).normalize()) > 0.05;
-      const px = toPx(m.anchor);
-      const pxPerUnit = (h / 2) / (this.camera.position.distanceTo(m.anchor) * tanHalf);
-      const head = m.object.scale.x * pxPerUnit * 0.8; // pin head diameter on screen
-      // the head centre sits above the tip by about 0.6 of the sprite height
-      return { m, facing, x: px.x, y: px.y - m.object.scale.y * pxPerUnit * 0.6, z: px.z, head, tipX: px.x, tipY: px.y };
-    });
-    const vis = items.filter((i) => i.facing);
-    for (const it of items) {
-      it.m.object.position.copy(it.m.anchor); it.m.halo.position.copy(it.m.anchor); it.m.leader.visible = false;
-      it.m.object.visible = it.facing; // pins draw on top of the globe (no depth test), so hide the far side here
-      it.m.halo.visible = it.facing && it.m.site.id === this.selected;
+    this.pinHeads = [];
+    for (const m of this.markers) {
+      const facing = m.normal.dot(this.camera.position.clone().sub(m.object.position).normalize()) > 0.05;
+      m.object.visible = facing;
+      m.halo.visible = facing && m.site.id === this.selected;
+      if (!facing) continue;
+      const p = m.object.position.clone().project(this.camera);
+      const pxPerUnit = (h / 2) / (this.camera.position.distanceTo(m.object.position) * tanHalf);
+      this.pinHeads.push({ id: m.site.id, x: (p.x + 1) * w / 2, y: (1 - p.y) * h / 2 - m.object.scale.y * pxPerUnit * 0.54 });
     }
-    // Push overlapping pin heads apart a little at a time; each pin also feels a weak pull back to its true spot.
-    const pos = vis.map((v) => ({ x: v.x, y: v.y }));
-    for (let iter = 0; iter < 60; iter++) {
-      let moved = false;
-      for (let i = 0; i < vis.length; i++) for (let j = i + 1; j < vis.length; j++) {
-        // A whole pin (head and tip) is taller than wide, so keep pins apart in an ellipse 1.15 heads wide, 1.75 heads tall.
-        const hd = Math.max(vis[i].head, vis[j].head), ax = hd * 1.15, ay = hd * 1.75;
-        let dx = pos[j].x - pos[i].x, dy = pos[j].y - pos[i].y;
-        let n = Math.hypot(dx / ax, dy / ay);
-        if (n >= 1) continue;
-        if (n < 0.001) { dx = Math.cos(i + j) * ax * 0.1; dy = Math.sin(i + j) * ay * 0.1; n = 0.1; }
-        const f = (1 - n) / n / 2; // move each half the way to the ellipse edge
-        pos[i].x -= dx * f; pos[i].y -= dy * f; pos[j].x += dx * f; pos[j].y += dy * f;
-        moved = true;
-      }
-      for (let i = 0; i < vis.length; i++) { pos[i].x += (vis[i].x - pos[i].x) * 0.01; pos[i].y += (vis[i].y - pos[i].y) * 0.01; }
-      if (!moved) break;
-    }
-    this.pinHeads = vis.map((v, i) => ({ id: v.m.site.id, x: pos[i].x, y: pos[i].y }));
-    vis.forEach((v, i) => {
-      const dx = pos[i].x - v.x, dy = pos[i].y - v.y;
-      if (Math.hypot(dx, dy) < 2) return;
-      const sx = v.tipX + dx, sy = v.tipY + dy;
-      const world = new THREE.Vector3((sx / w) * 2 - 1, 1 - (sy / h) * 2, v.z).unproject(this.camera);
-      v.m.object.position.copy(world); v.m.halo.position.copy(world);
-      const attr = v.m.leader.geometry.attributes.position as THREE.BufferAttribute;
-      const tip = v.m.normal.clone().multiplyScalar(1.004);
-      attr.setXYZ(0, tip.x, tip.y, tip.z); attr.setXYZ(1, world.x, world.y, world.z); attr.needsUpdate = true;
-      v.m.leader.visible = true;
-    });
   }
+
 
   destroy(): void {
     this.selectedNameLabel.remove();

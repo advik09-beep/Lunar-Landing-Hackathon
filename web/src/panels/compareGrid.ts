@@ -150,7 +150,7 @@ export const mountCompareGrid: MountPanel = (container, props) => {
       <div class="legend" aria-label="Legend">
         ${(Object.keys(VERDICT_WORDS) as Verdict[]).map((v) => `<span><b class="v" data-verdict="${v}" aria-hidden="true">${verdictIcon(v, 22)}</b> ${esc(KID_VERDICT[v].label)}</span>`).join("")}
         <span><b class="v na" aria-hidden="true">–</b> No data</span>
-        <span class="bright-note">Bright means a better week.</span>
+        <span class="bright-note">Green is good, coral is hard, violet is tricky.</span>
       </div>
       <nav class="window" aria-label="Move the date window">
         <button type="button" data-action="earlier">◀ Earlier</button>

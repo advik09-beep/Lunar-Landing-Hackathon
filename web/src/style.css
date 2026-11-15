@@ -8,7 +8,7 @@
   --llp-text:#F2EEE6; --llp-muted:#A6A29B; --llp-warn:#F2EEE6; --llp-link:#F2EEE6;
   --llp-bg:#1C1C1E; --llp-page:#0A0A0B; --llp-border:#3A3A3C; --llp-accent:#E8E4DA; --llp-on-accent:#0A0A0B; --llp-focus:#F2EEE6;
   --llp-glass:rgba(28, 28, 30, 0.90); --llp-glass-blur:14px; --llp-divider:rgba(242, 238, 230, 0.16);
-  /* D36: globe pin bodies and the matching Explore legend chips only. */
+  /* D37: verdict colours wherever a verdict appears (pins, chips, Compare grid, side card, Learn). */
   --llp-pin-good:#4FBF7A; --llp-pin-out:#F28B82; --llp-pin-edge:#B48CF0; --llp-pin-ink:#0A0A0B;
   --llp-heading-font:"CMU Serif";
   font-family:"Source Serif 4";
@@ -60,7 +60,7 @@ p { margin:8px 0; }
 .clock-tip p { position:absolute; top:24px; right:0; z-index:30; width:360px; margin:0; padding:12px 14px; background:var(--llp-glass); backdrop-filter:blur(var(--llp-glass-blur)); -webkit-backdrop-filter:blur(var(--llp-glass-blur)); border:0; border-radius:12px; font-size:.84rem; box-shadow:0 8px 32px #0008; white-space:normal; }
 .verdict-legend { display:flex; align-items:center; gap:8px; padding:0 0 12px; margin:0; }
 .verdict-chip { display:inline-flex; align-items:center; gap:6px; padding:4px 12px; border:1px solid var(--llp-divider); border-radius:99px; background:var(--llp-glass); color:var(--llp-text); font-size:.75rem; }
-.verdict-chip { --_clear:var(--llp-clear); --_partial:var(--llp-partial); --_out:var(--llp-out); --_out-fill:var(--llp-out-fill); --_edge:var(--llp-edge); }
+.verdict-chip { --_clear:var(--llp-clear); --_partial:var(--llp-partial); --_out:var(--llp-out); --_out-fill:var(--llp-out-fill); --_edge:var(--llp-edge); --_bg:var(--llp-bg); --_pin-good:var(--llp-pin-good); --_pin-out:var(--llp-pin-out); --_pin-edge:var(--llp-pin-edge); --_pin-ink:var(--llp-pin-ink); }
 .bright-note { font-size:.75rem; color:var(--llp-muted); margin-left:4px; }
 /* D36: legend chips show the pin colours: a coloured ring with a dark outline around the grey phase icon. */
 .pin-swatch { display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:50%; border:2px solid var(--llp-pin-ink); box-shadow:inset 0 0 0 3px var(--pin); background:var(--llp-bg); flex:none; }

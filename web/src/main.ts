@@ -123,12 +123,12 @@ app.innerHTML = [
   '    <p id="data-status" class="sr-only" role="status" aria-live="polite">Loading conditions…</p>',
   '  </section>',
   '  <section id="verdict-legend" class="verdict-legend" aria-label="Seven-day verdict legend" hidden>',
-  `    <span class="verdict-chip clear" title="Sunlight and Earth both visible for at least ${VERDICT_RULE.CLEAR_PCT}% of the stay"><span class="pin-swatch" data-v="clear">${verdictIcon("clear",16)}</span> Clear</span>`,
-  `    <span class="verdict-chip partial" title="Sunlight and Earth visible together for part of the stay"><span class="pin-swatch" data-v="partial">${verdictIcon("partial",16)}</span> Partial</span>`,
-  `    <span class="verdict-chip out" title="Sunlight and Earth visible together for ${VERDICT_RULE.OUT_PCT}% or less of the stay"><span class="pin-swatch" data-v="out">${verdictIcon("out",16)}</span> Out</span>`,
-  `    <span class="verdict-chip edge" title="Sun or Earth grazes the skyline within ${VERDICT_RULE.EDGE_DEG}° for most of the stay; small position changes matter"><span class="pin-swatch" data-v="edge">${verdictIcon("edge",16)}</span> On the edge</span>`,
+  `    <span class="verdict-chip clear" title="Sunlight and Earth both visible for at least ${VERDICT_RULE.CLEAR_PCT}% of the stay">${verdictIcon("clear",22)} Clear</span>`,
+  `    <span class="verdict-chip partial" title="Sunlight and Earth visible together for part of the stay">${verdictIcon("partial",22)} Partial</span>`,
+  `    <span class="verdict-chip out" title="Sunlight and Earth visible together for ${VERDICT_RULE.OUT_PCT}% or less of the stay">${verdictIcon("out",22)} Out</span>`,
+  `    <span class="verdict-chip edge" title="Sun or Earth grazes the skyline within ${VERDICT_RULE.EDGE_DEG}° for most of the stay; small position changes matter">${verdictIcon("edge",22)} On the edge</span>`,
   '    <span class="verdict-chip earth-horizon-chip" title="Blue dashed circle: Earth is on the geometric horizon; terrain may block it"><span class="earth-dash-key" aria-hidden="true"></span> Earth on horizon</span>',
-  '    <span id="bright-note" class="bright-note">Bright means a better week.</span>',
+  '    <span id="bright-note" class="bright-note">Green is good, coral is hard, violet is tricky.</span>',
   '  </section>',
   '  <section id="overview-view" class="overview-view" aria-label="Sun Earth Moon overview">',
   '    <div class="overview-window">',
@@ -258,7 +258,23 @@ let plannerView: PanelHandle | null = null;
 type View = 'overview' | 'explore' | 'compare' | 'horizon' | 'researcher' | 'planner' | 'credits';
 let activeView: View = 'overview';
 let exploreMode: 'globe' | 'horizon' = linkedExplore;
+// D37: Safari/WebKit throws after 100 history.replaceState calls in a short window ("more than 100 times per
+// 10 seconds"), and that error used to escape the slider handler, freezing the controls. The address bar is now
+// updated at most a few times a second (with a final update after the last change), and an error here can never
+// stop the controls.
+const LINK_MIN_INTERVAL_MS = 300;
+let linkLastWrite = 0;
+let linkTimer: number | undefined;
 function syncShareLink(): void {
+  const wait = LINK_MIN_INTERVAL_MS - (performance.now() - linkLastWrite);
+  if (wait > 0) {
+    if (linkTimer === undefined) linkTimer = window.setTimeout(() => { linkTimer = undefined; syncShareLink(); }, wait);
+    return;
+  }
+  linkLastWrite = performance.now();
+  try { writeShareLink(); } catch (error) { console.warn('Could not update the address bar', error); }
+}
+function writeShareLink(): void {
   const url = new URL(window.location.href);
   const tab = activeView === 'overview' ? 'tour' :
     activeView === 'researcher' ? (readingLevel === 'educator' ? 'learn' : 'report') :

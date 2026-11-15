@@ -37,7 +37,7 @@ export const THEME = Object.freeze({
   glass: "rgba(28, 28, 30, 0.90)", glassBlur: "14px",
   divider: "rgba(242, 238, 230, 0.16)",
   horizon: "#E8E2D0", ground: "#262626", groundLine: "#3A3A3A", sky: "#121214",
-  // D36: globe pin bodies only (and the matching Explore legend chips). Nothing else uses these.
+  // D37: verdict colours, used wherever a verdict appears (pins, legend chips, Compare grid, side card, Learn).
   pinGood: "#4FBF7A", pinOut: "#F28B82", pinEdge: "#B48CF0", pinNone: "#A6A29B", pinInk: "#0A0A0B",
 });
 
@@ -52,6 +52,7 @@ const BASE_CSS = `
   --_link: var(--llp-link, ${THEME.link}); --_bg: var(--llp-bg, ${THEME.bg}); --_border: var(--llp-border, ${THEME.border});
   --_accent: var(--llp-accent, ${THEME.accent}); --_on-accent: var(--llp-on-accent, ${THEME.onAccent}); --_focus: var(--llp-focus, ${THEME.focus});
   --_out-fill: var(--llp-out-fill, ${THEME.outFill});
+  --_pin-good: var(--llp-pin-good, ${THEME.pinGood}); --_pin-out: var(--llp-pin-out, ${THEME.pinOut}); --_pin-edge: var(--llp-pin-edge, ${THEME.pinEdge}); --_pin-ink: var(--llp-pin-ink, ${THEME.pinInk});
   --_horizon: var(--llp-horizon, ${THEME.horizon}); --_ground: var(--llp-ground, ${THEME.ground});
   --_ground-line: var(--llp-ground-line, ${THEME.groundLine}); --_sky: var(--llp-sky, ${THEME.sky});
   --_glass: var(--llp-glass, ${THEME.glass}); --_glass-blur: var(--llp-glass-blur, ${THEME.glassBlur}); --_divider: var(--llp-divider, ${THEME.divider});
@@ -87,15 +88,16 @@ export const VERDICT_WORDS: Record<Verdict, { label: string; symbol: string; sho
 /** D33: verdict symbols drawn as small inline SVG icons (not text characters), so they look the same on every
  *  computer. The word label always goes with them (never colour alone). */
 export function verdictIcon(v: Verdict, size = 18): string {
-  // D35: Moon phases in greys. Clear = full bright disc; Partial = half-lit disc; Out = dark disc, thin outline;
-  // On the edge = dashed ring with a centre dot. The word label always goes with them.
-  const body = {
-    clear: `<circle cx="10" cy="10" r="8.6" style="fill:var(--_clear);stroke:var(--_clear)" stroke-width="1"/>`,
-    partial: `<circle cx="10" cy="10" r="8" style="fill:var(--_out-fill);stroke:var(--_partial)" stroke-width="1.6"/><path d="M10 2a8 8 0 0 1 0 16z" style="fill:var(--_partial)"/>`,
-    out: `<circle cx="10" cy="10" r="8" style="fill:var(--_out-fill);stroke:var(--_out)" stroke-width="1.3"/>`,
-    edge: `<circle cx="10" cy="10" r="8" fill="none" style="stroke:var(--_edge)" stroke-width="1.6" stroke-dasharray="2.6 2.2"/><circle cx="10" cy="10" r="2.2" style="fill:var(--_edge)"/>`,
+  // D37: the verdict colour as a ring with a dark outline (green Clear and Partial, coral Out, violet On the edge),
+  // holding the grey Moon phase that tells Clear from Partial. Same look as the globe pins. Word labels always go with it.
+  const ring = { clear: "var(--_pin-good)", partial: "var(--_pin-good)", out: "var(--_pin-out)", edge: "var(--_pin-edge)" }[v];
+  const phase = {
+    clear: `<circle cx="10" cy="10" r="4.8" style="fill:var(--_clear)"/>`,
+    partial: `<circle cx="10" cy="10" r="4.5" style="fill:var(--_out-fill);stroke:var(--_partial)" stroke-width="1"/><path d="M10 5.5a4.5 4.5 0 0 1 0 9z" style="fill:var(--_partial)"/>`,
+    out: `<circle cx="10" cy="10" r="4.5" style="fill:var(--_out-fill);stroke:var(--_out)" stroke-width="1"/>`,
+    edge: `<circle cx="10" cy="10" r="4.4" fill="none" style="stroke:var(--_edge)" stroke-width="1.1" stroke-dasharray="1.7 1.4"/><circle cx="10" cy="10" r="1.4" style="fill:var(--_edge)"/>`,
   }[v];
-  return `<svg class="vi" data-icon="${v}" width="${size}" height="${size}" viewBox="0 0 20 20" aria-hidden="true" focusable="false">${body}</svg>`;
+  return `<svg class="vi" data-icon="${v}" width="${size}" height="${size}" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="9.2" style="fill:${ring};stroke:var(--_pin-ink)" stroke-width="1.2"/><circle cx="10" cy="10" r="6.6" style="fill:var(--_bg)"/>${phase}</svg>`;
 }
 /** Pass / fail icons for the requirements list (D33). */
 export function markIcon(pass: boolean, size = 16): string {
