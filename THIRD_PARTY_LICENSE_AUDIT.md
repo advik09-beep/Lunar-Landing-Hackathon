@@ -75,3 +75,7 @@ A blanket Apache 2.0 license **must not** be placed on the simulator fork as tho
 - Planet Pixel Emporium copyright: https://planetpixelemporium.com/planets.html
 - Steve Albers Europa provenance: https://stevealbers.net/albers/sos/sos.html
 - NASA Space Apps terms: https://www.spaceappschallenge.org/legal/
+
+## Coordination handoff — pending sign-off (2026-11-15)
+
+This audit is a **proposed remediation plan**, not a license grant or proof of NASA compliance. See the STATUS.md “ACTION REQUIRED” section for the exact sign-off wording. Sheldon and Advik must separately consent to Apache-2.0 for their original contributions; Claude Code should review scientific-data provenance and Lane A impact. **Do not begin texture replacement or the complete rights audit until both humans approve.** The existing Pluto/Europa files remain unresolved, and a source README saying “MIT” is not a substitute for a verified complete grant.

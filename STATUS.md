@@ -12,6 +12,26 @@ Acceptance (both humans): steps 1, 2, 3, 6, 8 PASS; step 4 and 7 pending earlier
 Waiting on Sheldon: read the new Educator screens on web/panels.html (level = Educator) and the Learn tab; confirm the two NASA photos and their captions.
 Waiting on Advik: Human visual and interaction QA of D33 in both reading levels: font loading, Tour overlays, verdict icons, Earth-overhead/selected/hover markers, small-screen note, shareable link restore, Researcher stay 1/3/7/14 with hour clamping and globe verdicts. The previous NASA objective audit gaps (optional custom coordinates, variable landing hour, no autoplay, no 3D terrain mesh) are documented below. No extra feature work requested.
 
+## ACTION REQUIRED — NASA Space Apps licensing sign-off (2026-11-15)
+
+**To Sheldon and Claude Code (Lane A), and Advik (Lane B):** Please review `THIRD_PARTY_LICENSE_AUDIT.md` and the decisions below before any asset replacement or broad licensing audit begins. This is a coordination request **awaiting human confirmation**, not a signed PLAN decision. No new feature or visual changes are authorized by this note.
+
+**Why:** The OzAILabs solar-system simulator README states “MIT,” but upstream and fork have no complete LICENSE file; its 18 textures include 12 Solar System Scope CC BY 4.0 assets, 4 USGS mission mosaics needing item-level rights verification, a Planet Pixel Emporium Pluto map with redistribution restrictions, and a Steve Albers Europa composite without verified redistribution rights. The embedded Tour uses the fork. NASA terms require rights and citations for all third-party resources. A root Apache 2.0 license must not claim ownership of the simulator, NASA media, textures, fonts, or data.
+
+**Proposed plan — no implementation until BOTH humans sign off:**
+1. **Original LunLux code:** Advik and Sheldon each explicitly approve Apache License 2.0 for their own original code. Then add root `LICENSE` with precise exclusions and third-party notices.
+2. **Upstream simulator:** obtain adequate proof of the source-code license/permission and preserve upstream copyright and attribution. If unresolved, evaluate removing/replacing the embedded simulator instead of assuming MIT.
+3. **Texture rights:** replace `pluto.jpg` and `europa.png` in the simulator fork with verified redistributable alternatives (or secure suitable permission); preserve appearance and functionality. Verify whether Solar System Scope CC BY 4.0 meets the event's precise non-NASA asset requirement, including attribution and changes. Audit USGS product-level terms.
+4. **Full asset and dependency audit after approval:** verify all 18 texture binaries, ephemeris, asteroid and star catalogs, screenshots, fonts, packages, copied code, NASA media and citations; inspect the published simulator and LunLux pages, including video, for disallowed material.
+5. **Release check:** update public Credits, README, third-party notices and submission references; verify Vercel builds and actual asset delivery; do not label legal compliance PASS without evidence.
+
+**Please respond in STATUS.md (or directly to Advik) with:**
+- **Sheldon:** “I approve / do not approve Apache-2.0 for my original LunLux contributions; I approve / request changes to the replacement and audit plan.”
+- **Advik:** same two confirmations for his original contributions.
+- **Claude Code:** acknowledge Lane A review, identify any scientific-data or panel-license concerns, and confirm no Lane A files will be changed by Lane B without coordination.
+
+**Current state: WAITING FOR BOTH HUMAN APPROVALS.** Claude's acknowledgment is requested for coordination but does not substitute for either human's consent. No asset replacements, root license changes, or full audit have begun.
+
 ## Continuous two-agent coordination protocol (agreed 2026-11-14)
 
 This is an explicit instruction from Advik for Lane B, and a coordination request to Lane A.
