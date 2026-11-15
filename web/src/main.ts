@@ -48,6 +48,7 @@ let moon: LunarScene | null = null;
 let overview: OverviewScene | null = null;
 let simulatorFrame: HTMLIFrameElement | null = null;
 let disposeOverviewMessages: (() => void) | null = null;
+let shownTourStopId: string | null = null;
 function formatUtc(value: string): string {
   return new Intl.DateTimeFormat('en-GB', {
     timeZone: 'UTC', weekday: 'long', day: 'numeric', month: 'short', year: 'numeric',
@@ -202,11 +203,13 @@ find<HTMLElement>('globe-mode').addEventListener('click', () => setExploreMode('
 find<HTMLElement>('horizon-mode').addEventListener('click', () => setExploreMode('horizon'));
 
 function showTourTitle(): void {
+  shownTourStopId = null;
   find<HTMLElement>('tour-science-caption').hidden = true;
   openView('overview');
   find<HTMLElement>('overview-title-card').hidden = false;
 }
 function startSolarTour(): void {
+  shownTourStopId = null;
   find<HTMLElement>('tour-science-caption').hidden = true;
   find<HTMLElement>('overview-title-card').hidden = true;
   openView('overview');
@@ -406,12 +409,13 @@ if (embedUrl) {
     if (data && typeof data === 'object' && data.type === 'lunar-navigator:tour-stop') {
       const stop = TOUR_STOPS.find((item: { id: string }) => item.id === data.bodyId);
       if (!stop) return;
+      shownTourStopId = stop.id;
       const caption = find<HTMLElement>('tour-science-caption');
       caption.replaceChildren();
       const title = document.createElement('strong');
-      title.textContent = stop.title;
+      title.textContent = readingLevel === 'educator' ? stop.kidTitle : stop.title;
       const body = document.createElement('p');
-      body.textContent = stop.text;
+      body.textContent = readingLevel === 'educator' ? stop.kidText : stop.text;
       caption.append(title, body);
       const sources = document.createElement('p');
       sources.append('Sources: ');
@@ -495,6 +499,16 @@ find<HTMLElement>('compare-view').append(find<HTMLElement>('planner-view'));
 for (const name of ['overview', 'explore', 'compare', 'horizon', 'researcher', 'planner', 'credits'] as View[]) {
   if (name !== 'overview') document.getElementById('nav-' + name)?.addEventListener('click', () => openView(name));
 }
+function refreshTourCaptionLanguage(): void {
+  if (!shownTourStopId) return;
+  const stop = TOUR_STOPS.find((item: { id: string }) => item.id === shownTourStopId);
+  const caption = find<HTMLElement>('tour-science-caption');
+  const heading = caption.querySelector<HTMLElement>(':scope > strong');
+  const body = caption.querySelector<HTMLParagraphElement>(':scope > p');
+  if (!stop || !heading || !body) return;
+  heading.textContent = readingLevel === 'educator' ? stop.kidTitle : stop.title;
+  body.textContent = readingLevel === 'educator' ? stop.kidText : stop.text;
+}
 function syncReadingLevelUI(): void {
   const isEducator = readingLevel === 'educator';
   find<HTMLButtonElement>('nav-researcher').textContent = isEducator ? 'Learn' : 'Report';
@@ -506,6 +520,7 @@ for (const level of ['educator','researcher'] as const) {
   find<HTMLButtonElement>('level-' + level).addEventListener('click', () => {
     readingLevel = level;
     syncReadingLevelUI();
+    refreshTourCaptionLanguage();
     for (const name of ['educator','researcher']) find<HTMLElement>('level-' + name).setAttribute('aria-pressed', String(name === level));
     for (const panel of [sideCard,compareGrid,horizonView,researcherView,plannerView]) panel?.update({level});
     updateAllPanels();

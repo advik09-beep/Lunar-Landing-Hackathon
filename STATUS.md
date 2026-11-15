@@ -4,7 +4,7 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 
 | Who | Step | Doing now |
 |-----|------|-----------|
-| Advik + ChatGPT (Lane B) | D32 item 3/5 — mode labels | Items 1–2 Vercel READY; Learn / Report mode labels and levels; checking build |
+| Advik + ChatGPT (Lane B) | D32 item 4/5 — Tour captions | Items 1–3 Vercel READY; source-backed kid/Researcher captions by switch; checking build |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
 | Claude Code (Lane A) | D32 Lane A part done | Seven-year-old Educator screens, Learn / Report, kid tour captions, best week, all-sites download; stopped |
 
@@ -1653,3 +1653,9 @@ SOUTH_POLE.sources;          // [{ name, url }]
 - Fourth tab is **Learn** in Educator, **Report** in Researcher; the tab's accessible label updates too.
 - Confirmed `currentPanelProps()` passes `level` at mount for side card, Compare, Horizon, Learn/Report and Planner; `updatePanel` passes `level` for all, and switch calls `panel.update({level})`. The planner shell stays hidden in Educator.
 - Build status for item 3: pending Vercel verification before adapting the Tour captions.
+
+### 2026-11-14 — Lane B D32 item 4: reading-level Tour captions
+- Item 3 Vercel deployment `dpl_CXSAvsohuJsW1uikt1UHdLrG1Gnx` READY for `9ff744b`.
+- At each incoming simulator stop, Educator shows `kidTitle` / `kidText` and Researcher shows `title` / `text` from Lane A's `/lib` constants; original NASA/JPL source links remain.
+- Changing the reading level while a stop is visible refreshes that caption in place; returning to Tour or restarting clears the previous stop.
+- Build status for item 4: pending Vercel verification before shell copy revisions.
