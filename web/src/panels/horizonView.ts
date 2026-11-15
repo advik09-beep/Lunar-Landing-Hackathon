@@ -6,12 +6,13 @@
 import { V, type Horizon, type Timeline, type Sample } from "./data";
 import { createPanelRoot, esc, deg, az, fmtUtc, clampHour } from "./shared";
 import type { MountPanel, PanelProps } from "./types";
+import { KID_CSS, kidDate, kidSun, kidEarth, teacher } from "./kid";
 
 const W = 1080, PX_PER_DEG = W / 360;   // 3 px per degree of azimuth
 const H = 300, PAD_T = 14, PAD_B = 26;  // drawing height and margins (px)
 
 export const mountHorizonView: MountPanel = (container, props) => {
-  const { host, root } = createPanelRoot(container, "horizonview", CSS);
+  const { host, root } = createPanelRoot(container, "horizonview", CSS + KID_CSS);
   const body = document.createElement("section");
   body.className = "card";
   root.append(body);
@@ -88,8 +89,11 @@ export const mountHorizonView: MountPanel = (container, props) => {
     return d;
   }
 
+  const kid = () => current.level === "educator"; // D32: Educator wording, no degrees
+
   function drawStatic() {
     const d = data!;
+    const k = kid();
     const flat = d.horizon.model === "flat";
     const n = d.tl.samples.length;
     // Horizon polyline: bin i covers [i-0.5, i+0.5) deg, drawn as steps.
@@ -103,21 +107,12 @@ export const mountHorizonView: MountPanel = (container, props) => {
     const grid: string[] = [];
     const step = d.yMax - d.yMin > 60 ? 15 : d.yMax - d.yMin > 25 ? 10 : 5;
     for (let e = d.yMin; e <= d.yMax; e += step) {
-      grid.push(`<line x1="0" x2="${W}" y1="${y(e)}" y2="${y(e)}" class="${e === 0 ? "level" : "grid"}"/><text x="4" y="${y(e) - 3}" class="axis">${e > 0 ? "+" : ""}${e}°</text>`);
+      grid.push(`<line x1="0" x2="${W}" y1="${y(e)}" y2="${y(e)}" class="${e === 0 ? "level" : "grid"}"/>${k ? "" : `<text x="4" y="${y(e) - 3}" class="axis">${e > 0 ? "+" : ""}${e}°</text>`}`);
     }
     const compass = ["N", "NE", "E", "SE", "S", "SW", "W", "NW", "N"].map((c, i) =>
-      `<line x1="${i * 45 * PX_PER_DEG}" x2="${i * 45 * PX_PER_DEG}" y1="${PAD_T}" y2="${H - PAD_B}" class="grid"/><text x="${Math.min(W - 12, Math.max(2, i * 45 * PX_PER_DEG - 6))}" y="${H - 8}" class="axis compass">${c} ${i * 45 === 360 ? "" : `${i * 45}°`}</text>`).join("");
-    const desc = flat
-      ? "Flat horizon: terrain is not modelled at this site, so the horizon is the level line (0°) in every direction."
-      : `Terrain horizon from LOLA elevation data for one point${d.horizon.observer ? ` (${heightWords(d.horizon.observer.groundHeightM)}, ${d.horizon.observer.mastM} m assumed mast)` : ""}. Nearby spots differ, especially toward Earth.`;
-
-    body.innerHTML = `
-      <header>
-        <h2>Stand here: ${esc(d.name)}</h2>
-        <p class="muted">Looking all the way around: compass direction left to right (N → E → S → W → N), height above level up and down. ${V.VERDICT_RULE.STAY_DAYS}-day stay from ${esc(current.landingDate)} 00:00 UTC.</p>
-        <p class="small"><span class="tag" data-model="${d.horizon.model}">${flat ? "FLAT" : "TERRAIN"}</span> ${esc(desc)}</p>
-      </header>
-      <svg class="pano" viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="pano-desc">
+      `<line x1="${i * 45 * PX_PER_DEG}" x2="${i * 45 * PX_PER_DEG}" y1="${PAD_T}" y2="${H - PAD_B}" class="grid"/><text x="${Math.min(W - 12, Math.max(2, i * 45 * PX_PER_DEG - 6))}" y="${H - 8}" class="axis compass">${c}${k || i * 45 === 360 ? "" : ` ${i * 45}°`}</text>`).join("");
+    function panoSvg(kidMode: boolean): string {
+      return `<svg class="pano" viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="pano-desc">
         <desc id="pano-desc">Panorama of the horizon with the Sun and Earth paths over the stay.</desc>
         <defs>
           <pattern id="ground" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
@@ -129,23 +124,55 @@ export const mountHorizonView: MountPanel = (container, props) => {
         ${compass}
         <path d="${ground}" class="ground"/>
         <path d="${hz}" class="horizon"/>
-        <text x="${W - 4}" y="${y(0) - 4}" class="axis level-label" text-anchor="end">level 0°</text>
+        ${kidMode ? "" : `<text x="${W - 4}" y="${y(0) - 4}" class="axis level-label" text-anchor="end">level 0°</text>`}
         <path d="${pathD(d.tl.samples, "sun")}" class="path sun-path"/>
         <path d="${pathD(d.tl.samples, "earth")}" class="path earth-path"/>
         <g class="now"></g>
-      </svg>
+      </svg>`;
+    }
+    function controlsHtml(n: number, label: string): string {
+      return `<div class="controls">
+        <button type="button" data-action="prev-hour" aria-label="One hour earlier">◀</button>
+        <label>${label} <input type="range" data-action="hour" min="0" max="${n - 1}" step="1" value="${hour}"/></label>
+        <button type="button" data-action="next-hour" aria-label="One hour later">▶</button>
+        <output class="when"></output>
+      </div>`;
+    }
+    const desc = flat
+      ? "Flat horizon: terrain is not modelled at this site, so the horizon is the level line (0°) in every direction."
+      : `Terrain horizon from LOLA elevation data for one point${d.horizon.observer ? ` (${heightWords(d.horizon.observer.groundHeightM)}, ${d.horizon.observer.mastM} m assumed mast)` : ""}. Nearby spots differ, especially toward Earth.`;
+
+    const site = V.listSites().find((x) => x.id === current.siteId)!;
+    body.innerHTML = k ? `
+      <div class="kid"><header>
+        <h2>Stand here: ${esc(site.shortName)}</h2>
+        <p>Turn all the way around. The bumpy line is the hills.</p>
+        <p class="muted">Landing on ${esc(kidDate(current.landingDate))}. Move the slider to change the time.</p>
+      </header></div>
+      ${panoSvg(true)}
+      <p class="small legend">
+        <span><svg width="26" height="10" aria-hidden="true"><line x1="0" y1="5" x2="26" y2="5" class="horizon"/></svg> hills</span>
+        <span><svg width="26" height="10" aria-hidden="true"><rect width="26" height="10" class="ground"/></svg> ground</span>
+        <span><svg width="26" height="10" aria-hidden="true"><line x1="0" y1="5" x2="26" y2="5" class="path sun-path"/></svg> where the Sun goes</span>
+        <span><svg width="26" height="10" aria-hidden="true"><line x1="0" y1="5" x2="26" y2="5" class="path earth-path"/></svg> where Earth goes</span>
+      </p>
+      ${controlsHtml(n, "Time")}
+      <ul class="readout kid-readout" aria-live="polite"></ul>
+      <div class="kid">${teacher(`<p>${esc(desc.replace(/ \(0°\)/, ""))}</p><p>Left to right is the compass: north, east, south, west, north. Up is higher in the sky. The Sun and Earth paths cover the ${V.VERDICT_RULE.STAY_DAYS}-day stay from ${esc(current.landingDate)} 00:00 UTC, one point per hour. A body counts as seen only when it is above the skyline; this is possible sunlight or a possible direct line of sight to Earth, not guaranteed power or a guaranteed link.</p>`,
+        "Why can a hill hide the Sun even in the daytime?")}</div>` : `
+      <header>
+        <h2>Stand here: ${esc(d.name)}</h2>
+        <p class="muted">Looking all the way around: compass direction left to right (N → E → S → W → N), height above level up and down. ${V.VERDICT_RULE.STAY_DAYS}-day stay from ${esc(current.landingDate)} 00:00 UTC.</p>
+        <p class="small"><span class="tag" data-model="${d.horizon.model}">${flat ? "FLAT" : "TERRAIN"}</span> ${esc(desc)}</p>
+      </header>
+      ${panoSvg(false)}
       <p class="small legend">
         <span><svg width="26" height="10" aria-hidden="true"><line x1="0" y1="5" x2="26" y2="5" class="horizon"/></svg> horizon (${flat ? "flat" : "terrain"})</span>
         <span><svg width="26" height="10" aria-hidden="true"><rect width="26" height="10" class="ground"/></svg> hatched = ground</span>
         <span><svg width="26" height="10" aria-hidden="true"><line x1="0" y1="5" x2="26" y2="5" class="path sun-path"/></svg> Sun path (solid)</span>
         <span><svg width="26" height="10" aria-hidden="true"><line x1="0" y1="5" x2="26" y2="5" class="path earth-path"/></svg> Earth path (dotted)</span>
       </p>
-      <div class="controls">
-        <button type="button" data-action="prev-hour" aria-label="One hour earlier">◀</button>
-        <label>Hour of the stay <input type="range" data-action="hour" min="0" max="${n - 1}" step="1" value="${hour}"/></label>
-        <button type="button" data-action="next-hour" aria-label="One hour later">▶</button>
-        <output class="when"></output>
-      </div>
+      ${controlsHtml(n, "Hour of the stay")}
       <ul class="readout" aria-live="polite"></ul>
       <p class="muted small">Sun and Earth are treated as points (centres). Data are hourly. “In view” means above the ${flat ? "flat" : "terrain"} horizon: possible sunlight or a possible direct line of sight to Earth, not guaranteed power or a guaranteed link.</p>`;
   }
@@ -154,7 +181,7 @@ export const mountHorizonView: MountPanel = (container, props) => {
     if (!data) return;
     const d = data, s = d.tl.samples[hour], n = d.tl.samples.length;
     const when = body.querySelector("output.when");
-    if (when) when.textContent = `${fmtUtc(s.utc)} · day ${Math.floor(hour / 24) + 1} of ${Math.round(n / 24)}`;
+    if (when) when.textContent = kid() ? `Day ${Math.floor(hour / 24) + 1} of ${Math.round(n / 24)}, ${s.utc.slice(11, 16)}` : `${fmtUtc(s.utc)} · day ${Math.floor(hour / 24) + 1} of ${Math.round(n / 24)}`;
     const g = body.querySelector("g.now");
     if (g) {
       const sx = x(s.sunAz), sy = y(s.sunEl), ex = x(s.earthAz), ey = y(s.earthEl);
@@ -171,6 +198,12 @@ export const mountHorizonView: MountPanel = (container, props) => {
         </g>`;
     }
     const ro = body.querySelector("ul.readout");
+    if (ro && kid()) {
+      const bin = Math.round(s.sunAz) % 360, dist = d.horizon.blockDistKm?.[bin];
+      const hill = !s.lit && s.sunEl > 0 && dist !== undefined ? ` The hill is about ${dist < 1 ? `${Math.round(dist * 1000)} metres` : `${Math.max(1, Math.round(dist))} km`} away.` : "";
+      ro.innerHTML = `<li><strong>Sun:</strong> ${esc(kidSun(s))}${esc(hill)}</li><li><strong>Earth:</strong> ${esc(kidEarth(s))}</li>`;
+      return;
+    }
     const sunExtra = s.eclipseFraction > 0 && s.sunSkylineFraction > 0 ? ` <em>Lunar eclipse: Earth's shadow covers ${Math.round(s.eclipseFraction * 100)}% of the Sun's disc.</em>`
       : s.sunFraction > 0 && s.sunFraction < 1 ? ` <em>${Math.round(s.sunFraction * 100)}% of the Sun's disc is above the skyline.</em>` : "";
     const earthExtra = s.earthMarginal ? ` <em>Marginal: Earth's disc is partly hidden by the skyline; it counts as in view only when the whole disc clears.</em>` : "";
@@ -182,7 +215,9 @@ export const mountHorizonView: MountPanel = (container, props) => {
     update(next) {
       const changed = (next.siteId !== undefined && next.siteId !== current.siteId) ||
         (next.landingDate !== undefined && next.landingDate !== current.landingDate);
+      const levelChanged = next.level !== undefined && next.level !== current.level;
       current = { ...current, ...next };
+      if (levelChanged && !changed && data) { drawStatic(); drawDynamic(); }
       if (next.hour !== undefined) hour = clampHour(next.hour, V.VERDICT_RULE.STAY_DAYS * 24);
       else if (changed && !current.onHourSelected) hour = 0; // v1.1 behaviour: new site/date starts at hour 1
       if (changed) load();

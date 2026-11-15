@@ -78,7 +78,7 @@ interface Api {
   scoreOf(m: Metrics, weights?: Partial<Weights>): { score: number | null; components: Record<keyof Weights, number>; weights: Weights };
   SCORE_DEFAULT_WEIGHTS: Weights; SCORE_TERMS: Record<keyof Weights, string>; SCORE_FORMULA_TEXT: string;
   SOLAR_IRRADIANCE_W_M2: number; SOLAR_IRRADIANCE_SOURCE: string;
-  TOUR_STOPS: { id: string; body: string; title: string; text: string; ours: string[]; sources: { name: string; url: string }[] }[];
+  TOUR_STOPS: { id: string; body: string; title: string; text: string; kidTitle: string; kidText: string; ours: string[]; sources: { name: string; url: string }[] }[];
   SOUTH_POLE: { oneLine: string; full: string[]; sources: { name: string; url: string }[] };
   APP_NAME: string; APP_TAGLINE: string; // D29
   SCORE_LABEL: string; SCORE_MEANING: string; WEIGHT_REASONS: Record<keyof Weights, string>; WEIGHTS_STATEMENT: string; WEIGHTS_EDUCATOR_TEXT: string;

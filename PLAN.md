@@ -221,6 +221,30 @@ and researchers get the numbers behind them.
   Partial becomes a hollow green outline; the dates grid uses the full
   width; one short "Hour by hour" line. Details: DESIGN.md.
 
+- D32 Two real reading levels and the brand (both humans, 2026-11-14).
+  Educator: a seven-year-old understands every Educator screen: pictures
+  first, one short sentence at a time, everyday words, no degrees; each
+  Educator section may carry a small "For the teacher" fold-out with the
+  fuller explanation and one question for the class. Researcher: the
+  full data, plus charts across 2026-2029 and downloads. Lane A: side
+  card Educator = two rings (gold sunlight, blue Earth), a week-long day
+  and night strip and one plain verdict sentence; Compare Educator = the
+  dates grid plus one sentence naming the best week, with the two-
+  scenario and requirements tools only in Researcher; the fourth tab is
+  "Learn" in Educator (a picture report from our data: a ridge hiding the
+  Sun at a real skyline, the low polar Sun, two-week days and nights,
+  Earth staying in one spot, plus real NASA photos with their official
+  source page and exact credit, nothing with non-NASA copyright, small
+  files) and "Report" in Researcher (charts across 2026-2029 with
+  eclipses marked, an all-sites download); tour captions in a seven-
+  year-old version for Educator, same facts and sources; panels take the
+  heading font from a shell variable. Lane B: the LunLux wordmark
+  replaces the text title in the header and on the Tour, the icon is the
+  browser tab icon (web/public/brand/), headings use Urbanist self-hosted
+  from @fontsource/urbanist (SIL Open Font License 1.1), the fourth tab is
+  labeled by mode, and Educator tour captions are shown in Educator.
+  Details: DESIGN.md, "Two reading levels (D32)".
+
 ## Settled earlier (do not reopen without both humans)
 - 10 fixed sites: 3 Apollo, Chandrayaan-3, IM-1, IM-2, 4 south pole
   representative points.

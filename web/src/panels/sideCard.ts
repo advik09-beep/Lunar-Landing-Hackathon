@@ -3,14 +3,15 @@
 // horizon model, source and coverage, an Educator / Researcher switch, and a CSV download.
 // v1.2: Sun and Earth status are shown at the shared hour of the stay (props.hour, default 0).
 // All values come from /lib/visibility.js; nothing is calculated here except formatting.
-import { V, type Site, type State, type Summary, type Horizon, type Metrics } from "./data";
+import { V, type Site, type State, type Summary, type Horizon, type Metrics, type Sample } from "./data";
+import { KID_VERDICT, KID_CSS, kidCategory, kidDate, kidSun, kidEarth, ring, weekStrip, teacher } from "./kid";
 import { createPanelRoot, esc, deg, az, pct, VERDICT_WORDS, verdictShort, addDays, fmtUtc, clampHour, whyWeights, WHY_WEIGHTS_CSS, WEIGHT_KEYS } from "./shared";
 import type { MountPanel, PanelProps } from "./types";
 
 type Mode = "plain" | "numbers"; // shown as Educator / Researcher
 
 export const mountSideCard: MountPanel = (container, props) => {
-  const { host, root } = createPanelRoot(container, "sidecard", CSS + WHY_WEIGHTS_CSS);
+  const { host, root } = createPanelRoot(container, "sidecard", CSS + WHY_WEIGHTS_CSS + KID_CSS);
   const body = document.createElement("section");
   body.className = "card";
   body.setAttribute("aria-live", "polite");
@@ -19,7 +20,7 @@ export const mountSideCard: MountPanel = (container, props) => {
   let current: PanelProps = { ...props };
   let mode: Mode = props.level === "researcher" ? "numbers" : "plain"; // v1.3: follows the shell's level when given
   let token = 0;
-  let view: { site: Site; state: State; summary: Summary; horizon: Horizon; start: string; metrics: Metrics } | null = null;
+  let view: { site: Site; state: State; summary: Summary; horizon: Horizon; start: string; metrics: Metrics; samples: Sample[] } | null = null;
   // D16 power calculator inputs (Researcher view); kept while the panel lives.
   const calc = { areaM2: 1, effPct: 30, panel: "tracking" as "tracking" | "fixed-flat", loadW: 100 };
 
@@ -66,7 +67,8 @@ export const mountSideCard: MountPanel = (container, props) => {
       const summary = V.getSummary(site.id, start, V.VERDICT_RULE.STAY_DAYS);
       const horizon = V.getHorizon(site.id);
       const metrics = V.getMetrics(site.id, start, V.VERDICT_RULE.STAY_DAYS);
-      view = { site, state, summary, horizon, start, metrics };
+      const samples = V.getTimeline(site.id, start, V.VERDICT_RULE.STAY_DAYS).samples; // D32 Educator week strip
+      view = { site, state, summary, horizon, start, metrics, samples };
       paint();
       renderCalc();
     } catch (err) {
@@ -93,6 +95,7 @@ export const mountSideCard: MountPanel = (container, props) => {
     const days = V.VERDICT_RULE.STAY_DAYS;
     const coords = `${Math.abs(site.lat).toFixed(5)}°${site.lat < 0 ? "S" : "N"}, ${Math.abs(site.lon).toFixed(5)}°${site.lon < 0 ? "W" : "E"}`;
     const pointNote = site.category === "candidate" ? site.note.split(" (")[0] : "";
+    if (mode === "plain") { body.innerHTML = kidCard(); return; } // D32: Educator = seven-year-old card
     const horizonLabel = flat
       ? "Flat horizon: terrain is not modelled at this site."
       : "Terrain horizon from LOLA elevation data (one point; nearby spots differ, especially toward Earth).";
@@ -105,15 +108,15 @@ export const mountSideCard: MountPanel = (container, props) => {
         ${pointNote ? `<p class="muted small">${esc(pointNote)}.</p>` : ""}
       </header>
       ${current.level ? "" : `<div class="switch" role="group" aria-label="Reading level: Educator or Researcher">
-        <button type="button" data-action="mode-plain" aria-pressed="${mode === "plain"}">Educator</button>
-        <button type="button" data-action="mode-numbers" aria-pressed="${mode === "numbers"}">Researcher</button>
+        <button type="button" data-action="mode-plain" aria-pressed="false">Educator</button>
+        <button type="button" data-action="mode-numbers" aria-pressed="true">Researcher</button>
       </div>`}
       <div class="verdict" data-verdict="${summary.verdict}">
         <span class="symbol" aria-hidden="true">${w.symbol}</span>
         <div><strong>${esc(w.label)}</strong><span class="why-short">: ${esc(verdictShort(summary.verdict, state.horizonModel))}</span></div>
       </div>
       <p class="horizon-label"><span class="tag" data-model="${state.horizonModel}">${flat ? "FLAT" : "TERRAIN"}</span> ${esc(horizonLabel)}</p>
-      ${mode === "plain" ? plain() : numbers()}
+      ${numbers()}
       <nav class="days" aria-label="Change landing date">
         <button type="button" data-action="prev-day">◀ Day before</button>
         <button type="button" data-action="next-day">Day after ▶</button>
@@ -123,42 +126,86 @@ export const mountSideCard: MountPanel = (container, props) => {
         <button type="button" data-action="open-compare">Compare other dates</button>
       </nav>` : ""}`;
 
-    function plain(): string {
+    // ---- D32 Educator card: pictures first, one short sentence at a time, no degrees ----
+    function kidCard(): string {
+      const kv = KID_VERDICT[summary.verdict];
+      const h = hourNow(), day = Math.floor(h / 24) + 1;
+      const R = V.VERDICT_RULE;
+      const latLon = `latitude ${Math.abs(site.lat).toFixed(2)} ${site.lat < 0 ? "south" : "north"}, longitude ${Math.abs(site.lon).toFixed(2)} ${site.lon < 0 ? "west" : "east"}`;
       return `
-        <p class="why">${esc(whySentence(summary, flat))}</p>
-        <h3>${esc(atHour(state))}</h3>
-        <ul class="status">
-          <li><strong>Sunlight:</strong> ${state.lit ? "yes" : "no"}${esc(sunNote(state))}</li>
-          <li><strong>Earth in view:</strong> ${state.comms ? "yes" : "no"}${esc(earthNote(state))}</li>
-        </ul>
-        <p class="muted small">“Sunlight” means the Sun is above the horizon, not a promise of power. “Earth in view” means a possible direct line of sight, not a guaranteed link.</p>
+      <div class="kid">
+        <header>
+          <h2>${esc(site.shortName)}</h2>
+          <p class="muted">${esc(kidCategory(site.category))}</p>
+          <p>Landing on ${esc(kidDate(current.landingDate))}. We look at one week.</p>
+        </header>
+        ${current.level ? "" : `<div class="switch" role="group" aria-label="Reading level: Educator or Researcher">
+          <button type="button" data-action="mode-plain" aria-pressed="true">Educator</button>
+          <button type="button" data-action="mode-numbers" aria-pressed="false">Researcher</button></div>`}
+        <div class="verdict" data-verdict="${summary.verdict}">
+          <span class="symbol" aria-hidden="true">${VERDICT_WORDS[summary.verdict].symbol}</span>
+          <p class="lead"><strong>${esc(kv.sentence)}</strong></p>
+        </div>
+        <div class="rings">${ring(summary.pctLit, "sun", "Sunshine")}${ring(summary.pctComms, "earth", "Earth in sight")}</div>
+        <h3>The week, day by day</h3>
+        ${weekStrip(view!.samples, h)}
+        <h3>Now: day ${day} of the week</h3>
+        <p class="now-sun">${esc(kidSun(state))}</p>
+        <p class="now-earth">${esc(kidEarth(state))}</p>
+        ${teacher(`
+          <p>${esc(site.name)} (${esc(latLon)}). ${esc(V.SITE_CATEGORIES[site.category])}</p>
+          <p>The week is a ${R.STAY_DAYS}-day stay from ${esc(current.landingDate)} 00:00 UTC. Over that week: sunlight ${pct(summary.pctLit)} of the hours, Earth in view ${pct(summary.pctComms)}, both together ${pct(summary.pctBoth)}, longest dark stretch ${summary.longestDarkHours} hours. “Now” is ${esc(fmtUtc(state.sampleUtc))}.</p>
+          <p>How the week is rated: Tricky if the Sun or Earth sits within ${R.EDGE_DEG} degrees of the skyline for more than half the week (checked first); Great if the Sun and Earth are both in view at least ${R.CLEAR_PCT}% of the hours; Hard if ${R.OUT_PCT}% or less; Okay otherwise.</p>
+          <p>The skyline comes from NASA's LOLA elevation maps for one point; the Sun and Earth positions come from NASA JPL Horizons. “Sunshine” means the Sun can be seen, not a promise of power. “Earth in sight” means a possible direct line of sight, not a guaranteed radio link.</p>`,
+          "Why does the lander need to see both the Sun and Earth?")}
         ${scoreEducator()}
         <details class="why-weights south-pole"><summary>Why the south pole?</summary>
-          ${V.SOUTH_POLE.full.map((p) => `<p>${esc(p)}</p>`).join("")}
-          <p class="muted small">Sources: ${V.SOUTH_POLE.sources.map((x) => `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.name)}</a>`).join("; ")}</p>
-        </details>`;
+          <p>There is ice in dark craters there.</p>
+          <p>Some high spots get sunshine for a long time.</p>
+          <p>But the Sun stays low, so hills can hide it.</p>
+          ${teacher(`${V.SOUTH_POLE.full.map((p) => `<p>${esc(p)}</p>`).join("")}
+            <p class="small">Sources: ${V.SOUTH_POLE.sources.map((x) => `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.name)}</a>`).join("; ")}</p>`,
+            "Why might ice stay frozen in a crater that never gets sunshine?")}
+        </details>
+        <nav class="days" aria-label="Change landing date">
+          <button type="button" data-action="prev-day">◀ Day before</button>
+          <button type="button" data-action="next-day">Day after ▶</button>
+        </nav>
+        ${current.onOpenView ? `<nav class="exits" aria-label="Open another view">
+          <button type="button" data-action="open-horizon">Stand here</button>
+          <button type="button" data-action="open-compare">Try other days</button>
+        </nav>` : ""}
+      </div>`;
     }
 
-    // D17 Educator: one score, default weights, top site named in plain words, no formula.
+    // D17 Educator score in D32 words: one number, the best candidate place named; the details are for the teacher.
     function scoreEducator(): string {
       const r = V.getRanking(current.landingDate);
       const me = r.ranking.find((x) => x.siteId === site.id);
       const top = r.ranking[0];
       const topCand = V.getRanking(current.landingDate, undefined, "candidate").ranking.find((x) => x.available);
-      if (!me?.available || !top?.available) return `<div class="score"><h3>${esc(V.SCORE_LABEL)} <span class="proto">PROTOTYPE</span></h3><p class="muted">Not available for this landing date.</p></div>`;
-      // D21: name the top candidate site; past landings are comparisons, never proposals.
+      if (!me?.available || !top?.available) return `<div class="score"><h3>${esc(V.SCORE_LABEL)}</h3><p class="muted">No score for this day.</p></div>`;
       const candLine = topCand
-        ? (topCand.siteId === site.id ? `This is the top candidate site for a landing on ${esc(current.landingDate)}.` : `The top candidate site for a landing on ${esc(current.landingDate)} is <strong>${esc(topCand.shortName)}</strong> (${Math.round(topCand.score!)} out of 100).`)
+        ? (topCand.siteId === site.id ? "This is the best candidate place to land this week." : `Best candidate place to land this week: <strong>${esc(topCand.shortName)}</strong>.`)
         : "";
-      const allLine = top.category === "historic"
-        ? ` Counting past landings too, the highest score belongs to ${top.siteId === site.id ? "this site" : esc(top.shortName)} (${Math.round(top.score!)}), a past landing shown for comparison.`
-        : "";
-      const topLine = candLine + allLine;
-      return `<div class="score"><h3>${esc(V.SCORE_LABEL)} <span class="proto">PROTOTYPE</span></h3>
-        <p class="big"><strong>${Math.round(me.score!)}</strong> out of 100 for this site. ${whyWeights("educator")}</p>
-        <p>${topLine}</p>
-        <p class="meaning">${esc(V.SCORE_MEANING)}</p>
-        <p class="muted small">Uses the default weights. The Researcher view explains the calculation.</p></div>`;
+      const histLine = top.category === "historic"
+        ? ` Counting past landings too, the highest score belongs to ${top.siteId === site.id ? "this site" : esc(top.shortName)} (${Math.round(top.score!)}), a past landing shown for comparison.` : "";
+      return `<div class="score"><h3>${esc(V.SCORE_LABEL)}</h3>
+        <p class="big"><strong>${Math.round(me.score!)}</strong> out of 100.</p>
+        <details class="why-weights"><summary>Why these weights?</summary>
+          <p>Sunshine counts most, because the lander needs power.</p>
+          <p>Seeing Earth comes next.</p>
+          <p>A Sun and Earth high above the hills count too.</p>
+          <p>So does a week that stays good if the landing is late.</p>
+          <p>These weights are our team's choice, not a NASA rule.</p>
+          <p>The Researcher view lets you change them.</p>
+          ${teacher(`<p>${esc(V.WEIGHTS_EDUCATOR_TEXT)}</p>`, "Which matters more to you, sunshine or talking to Earth? Why?")}
+        </details>
+        <p>${candLine}</p>
+        ${teacher(`<p>${esc(V.SCORE_MEANING)}</p>
+          <p>This is a prototype score using the default weights. The top candidate site is ${topCand ? `${esc(topCand.shortName)} (${Math.round(topCand.score!)} out of 100)` : "not available"}.${histLine} The Researcher view explains the calculation.</p>`,
+          "What else, besides sunshine and Earth, might a lander need?")}
+      </div>`;
     }
 
     function numbers(): string {
@@ -310,36 +357,6 @@ export const mountSideCard: MountPanel = (container, props) => {
 };
 
 function csvCell(s: string): string { return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; }
-
-function whySentence(s: Summary, flat: boolean): string {
-  const both = pct(s.pctBoth), lit = pct(s.pctLit), com = pct(s.pctComms);
-  switch (s.verdict) {
-    case "clear": return `Sunlight and Earth are in view together ${both} of the stay.`;
-    case "partial": return `Sunlight and Earth are in view together only ${both} of the stay (sunlight ${lit}, Earth ${com}).`;
-    case "out": return `Sunlight and Earth are in view together just ${both} of the stay (sunlight ${lit}, Earth ${com}).`;
-    case "edge": {
-      const who = s.pctSunEdge > 50 && s.pctEarthEdge > 50 ? "The Sun and Earth stay" : s.pctSunEdge > 50 ? "The Sun stays" : "Earth stays";
-      return flat
-        ? `${who} within 2° of the horizon for most of the stay, so terrain decides — and this site uses a flat horizon, so treat the answer as uncertain.`
-        : `${who} within 2° of the terrain skyline for most of the stay: grazing the skyline, so small changes in position matter.`;
-    }
-  }
-}
-function sunNote(st: State): string {
-  if (st.eclipseFraction > 0 && st.sunSkylineFraction > 0) return ` — lunar eclipse: Earth covers ${Math.round(st.eclipseFraction * 100)}% of the Sun's disc`;
-  if (st.sunFraction > 0 && st.sunFraction < 1) return ` — ${Math.round(st.sunFraction * 100)}% of the Sun's disc is above the skyline`;
-  if (st.horizonModel === "flat") return st.lit ? ` — the Sun is ${deg(st.sunEl, 1)} above the horizon` : ` — the Sun is below the horizon`;
-  if (st.sunEl > 0 && !st.lit) return ` — the Sun is ${deg(st.sunEl, 1)} above level but hidden behind terrain`;
-  if (st.sunEl <= 0 && st.lit) return ` — the Sun is below level but visible over lower terrain from this high point`;
-  return st.lit ? ` — the Sun clears the terrain by ${deg(st.sunMarginDeg, 1)}` : ` — the Sun is below the terrain horizon`;
-}
-function earthNote(st: State): string {
-  if (st.earthMarginal) return ` — marginal: Earth's disc is partly hidden by the skyline (centre ${deg(st.earthMarginDeg, 2)} from it; Earth counts as in view only when its whole disc clears)`;
-  if (st.horizonModel === "flat") return st.comms ? ` — Earth is ${deg(st.earthEl, 1)} above the horizon` : ` — Earth is below the horizon`;
-  if (st.earthEl > 0 && !st.comms) return ` — Earth is ${deg(st.earthEl, 1)} above level but hidden behind terrain`;
-  if (st.earthEl <= 0 && st.comms) return ` — Earth is below level but visible over lower terrain from this high point`;
-  return st.comms ? ` — Earth clears the terrain by ${deg(st.earthMarginDeg, 1)}` : ` — Earth is below the terrain horizon`;
-}
 
 const CSS = `
 .card { padding: var(--_pad); border: 0; border-radius: 14px; background: var(--_glass); backdrop-filter: blur(var(--_glass-blur)); -webkit-backdrop-filter: blur(var(--_glass-blur)); line-height: 1.5; }

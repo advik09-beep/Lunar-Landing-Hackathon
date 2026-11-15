@@ -5,6 +5,7 @@
 import { V, type Verdict, type Weights, type RankFilter } from "./data";
 import { createPanelRoot, esc, pct, VERDICT_WORDS, EDGE_WORDS, addDays, whyWeights, WHY_WEIGHTS_CSS, WEIGHT_KEYS } from "./shared";
 import type { MountPanel, PanelProps } from "./types";
+import { KID_VERDICT, KID_CSS, kidDate, teacher } from "./kid";
 
 const COLS = 28;          // landing dates shown at once
 const BEFORE = 7;         // columns before the selected date when the window is (re)centred
@@ -14,7 +15,7 @@ interface DailyRow { date: string; pctLit: number; pctComms: number; pctBoth: nu
 interface Daily { sites: Record<string, (DailyRow | null)[]>; STAY_DAYS: number }
 
 export const mountCompareGrid: MountPanel = (container, props) => {
-  const { host, root } = createPanelRoot(container, "comparegrid", CSS + WHY_WEIGHTS_CSS);
+  const { host, root } = createPanelRoot(container, "comparegrid", CSS + WHY_WEIGHTS_CSS + KID_CSS);
   const body = document.createElement("section");
   body.className = "card";
   root.append(body);
@@ -45,7 +46,7 @@ export const mountCompareGrid: MountPanel = (container, props) => {
     if (action === "cell" && site && date) { current.onSiteSelected(site); current.onDateSelected(date); }
     else if (action === "site" && site) current.onSiteSelected(site);
     else if (action === "date" && date) current.onDateSelected(date);
-    else if (action === "score-educator" || action === "score-researcher") { scoreMode = action === "score-educator" ? "educator" : "researcher"; renderScoreBox(); }
+    else if (action === "score-educator" || action === "score-researcher") { scoreMode = action === "score-educator" ? "educator" : "researcher"; render(); }
     else if (action === "reset-weights") { weights = { ...V.SCORE_DEFAULT_WEIGHTS }; renderScoreBox(); }
     else if (action === "earlier") { windowStart = addDays(windowStart, -SHIFT); render(); }
     else if (action === "later") { windowStart = addDays(windowStart, SHIFT); render(); }
@@ -68,6 +69,7 @@ export const mountCompareGrid: MountPanel = (container, props) => {
     const terrain = new Map(V.getCoverage().sites.map((c) => [c.siteId, c.terrain]));
     const dates = Array.from({ length: COLS }, (_, i) => addDays(windowStart, i));
     const days = daily.STAY_DAYS;
+    const kid = scoreMode === "educator"; // D32: Educator = grid + one best-week sentence; strip, score box and tools in Researcher
 
     const head = dates.map((d) => {
       const sel = d === current.landingDate;
@@ -86,16 +88,18 @@ export const mountCompareGrid: MountPanel = (container, props) => {
         if (!r) return `<td class="na${selCell ? " selcell" : ""}" title="${esc(`${s.name}, ${d}: no data for this stay`)}"><span aria-label="${esc(`${s.name}, ${d}: no data`)}">–</span></td>`;
         const w = VERDICT_WORDS[r.verdict];
         const edgeWhy = r.verdict === "edge" ? ` (${EDGE_WORDS[model === "FLAT" ? "flat" : "lola"]})` : "";
-        const tip = `${s.name}, landing ${d}: ${w.label}${edgeWhy}. Over ${days} days: sunlight ${pct(r.pctLit)}, Earth in view ${pct(r.pctComms)}, both ${pct(r.pctBoth)}, longest dark ${r.longestDarkHours} h.`;
+        const tip = kid ? `${s.shortName}, landing ${kidDate(d)}: ${KID_VERDICT[r.verdict].label}.`
+          : `${s.name}, landing ${d}: ${w.label}${edgeWhy}. Over ${days} days: sunlight ${pct(r.pctLit)}, Earth in view ${pct(r.pctComms)}, both ${pct(r.pctBoth)}, longest dark ${r.longestDarkHours} h.`;
         return `<td class="${selCell ? "selcell" : ""}"><button type="button" class="v" data-verdict="${r.verdict}" data-action="cell" data-site="${s.id}" data-date="${d}" title="${esc(tip)}" aria-label="${esc(tip)}">${w.symbol}</button></td>`;
       }).join("");
-      return `<tr class="${selRow ? "selrow" : ""}"><th scope="row"><button type="button" data-action="site" data-site="${s.id}" title="${esc(s.name)}" ${selRow ? 'aria-current="true"' : ""}>${esc(s.shortName)}</button>${model === "FLAT" ? ' <span class="tag" data-model="flat">FLAT</span>' : ""}${s.category === "historic" ? ' <span class="tag hist" title="Historic landing, shown for comparison">Historic</span>' : ""}</th>${cells}</tr>`;
+      return `<tr class="${selRow ? "selrow" : ""}"><th scope="row"><button type="button" data-action="site" data-site="${s.id}" title="${esc(s.name)}" ${selRow ? 'aria-current="true"' : ""}>${esc(s.shortName)}</button>${model === "FLAT" ? ' <span class="tag" data-model="flat">FLAT</span>' : ""}${s.category === "historic" ? (kid ? ' <span class="tag hist" title="A lander really landed here">Landed here</span>' : ' <span class="tag hist" title="Historic landing, shown for comparison">Historic</span>') : ""}</th>${cells}</tr>`;
     }).join("");
 
-    const strip = await stripHtml(current.siteId, dates, days);
+    const strip = kid ? "" : await stripHtml(current.siteId, dates, days);
     if (my !== token) return;
     const ms = Math.round(performance.now() - t0);
-    queueMicrotask(renderScoreBox);
+    if (!kid) queueMicrotask(renderScoreBox);
+    if (kid) { body.innerHTML = kidHtml(head, rows, dates, days); return; }
 
     body.innerHTML = `
       <header>
@@ -119,6 +123,48 @@ export const mountCompareGrid: MountPanel = (container, props) => {
       ${strip}
       <section class="score-box" aria-label="Best-site score"></section>
       <p class="muted small">Each cell summarises a 7-day stay; the strip shows it hour by hour. ${[...terrain.values()].some((t) => t !== "lola") ? "FLAT rows use a flat horizon; other rows use" : "Every site uses"} a terrain horizon from NASA's LOLA elevation maps, for one point per site.</p>`;
+  }
+
+  // ---- D32 Educator: the grid in plain words plus one sentence naming the best week ----
+  function kidHtml(head: string, rows: string, dates: string[], days: number): string {
+    const site = V.listSites().find((s) => s.id === current.siteId);
+    let bw: { best: { date: string; score: number; pctBoth: number } | null; rule: string } | null = null;
+    try { bw = (V as unknown as { getBestWeek(id: string, d: string, n: number): typeof bw }).getBestWeek(current.siteId, dates[0], dates.length); } catch { bw = null; }
+    const best = bw?.best;
+    const bestLine = best && site
+      ? `<p class="lead best-week">For <strong>${esc(site.shortName)}</strong>, the best week to land in these four weeks starts on <strong>${esc(kidDate(best.date))}</strong>. <button type="button" class="pick" data-action="date" data-date="${best.date}">Pick that day</button></p>`
+      : `<p class="lead best-week">We have no data for these weeks.</p>`;
+    let top = "";
+    try {
+      const r = V.getRanking(current.landingDate, undefined, "candidate").ranking.find((x) => x.available);
+      if (r) top = ` For a landing on ${esc(current.landingDate)}, the top candidate site by our prototype ${esc(V.SCORE_LABEL)} is ${esc(r.shortName)} (${Math.round(r.score!)} out of 100).`;
+    } catch { /* no score outside the data */ }
+    const R = V.VERDICT_RULE;
+    return `<div class="kid">
+      <header><h2>Which day is best to land?</h2>
+        <p>Each square is one landing day. Pick a square to look at it.</p></header>
+      ${current.level ? "" : `<div class="switch" role="group" aria-label="Reading level: Educator or Researcher">
+        <button type="button" data-action="score-educator" aria-pressed="true">Educator</button>
+        <button type="button" data-action="score-researcher" aria-pressed="false">Researcher</button></div>`}
+      <div class="legend" aria-label="Legend">
+        ${(Object.keys(VERDICT_WORDS) as Verdict[]).map((v) => `<span><b class="v" data-verdict="${v}" aria-hidden="true">${VERDICT_WORDS[v].symbol}</b> ${esc(KID_VERDICT[v].label)}</span>`).join("")}
+        <span><b class="v na" aria-hidden="true">–</b> No data</span>
+      </div>
+      <nav class="window" aria-label="Move the date window">
+        <button type="button" data-action="earlier">◀ Earlier</button>
+        <span class="muted">${esc(kidDate(dates[0]))} to ${esc(kidDate(dates[dates.length - 1]))}</span>
+        <button type="button" data-action="later">Later ▶</button>
+      </nav>
+      <div class="scroll"><table class="grid"><colgroup><col class="sitecol"/></colgroup>
+        <thead><tr><th scope="col" class="corner">Place</th>${head}</tr></thead>
+        <tbody>${rows}</tbody>
+      </table></div>
+      ${bestLine}
+      ${teacher(`<p>Each square rates a ${days}-day stay that starts at 00:00 UTC on that date. Great: the Sun and Earth are both in view at least ${R.CLEAR_PCT}% of the hours. Hard: ${R.OUT_PCT}% or less. Tricky: the Sun or Earth sits within ${R.EDGE_DEG} degrees of the skyline for more than half the week (checked first). Okay: everything else.</p>
+        <p>${esc(bw?.rule ?? "")}${top}</p>
+        <p>Historic landings are past missions, included so classes can compare them with candidate sites. The Researcher view adds the hour-by-hour strip, the score with its weights, and the two-plan and requirements tools.</p>`,
+        "Why does a good week at one place turn into a hard week a few days later?")}
+    </div>`;
   }
 
   // ---- D17: best-site score for the selected landing date (PROTOTYPE) ----
@@ -221,7 +267,7 @@ export const mountCompareGrid: MountPanel = (container, props) => {
   return {
     update(next) {
       const hourChanged = next.hour !== undefined && next.hour !== current.hour;
-      if (next.level && next.level !== scoreMode) { scoreMode = next.level; current = { ...current, level: next.level }; renderScoreBox(); }
+      if (next.level && next.level !== scoreMode) { scoreMode = next.level; current = { ...current, level: next.level }; render(); }
       const siteChanged = next.siteId !== undefined && next.siteId !== current.siteId;
       const dateChanged = next.landingDate !== undefined && next.landingDate !== current.landingDate;
       current = { ...current, ...next };
@@ -294,4 +340,5 @@ ol.rank { margin: 6px 0; padding-left: 22px; font-size: .88rem; }
 .strip .nodata-bg { fill: transparent; }
 .strip .hatch { stroke: var(--_border); stroke-width: 2; }
 .strip text { fill: var(--_muted); font-size: 11px; }
+.pick { margin-left: 6px; padding: 3px 10px; border: 1px solid var(--_accent); border-radius: 8px; background: var(--_accent); color: inherit; font-size: .85rem; }
 `;

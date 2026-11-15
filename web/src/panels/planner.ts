@@ -151,6 +151,8 @@ export const mountPlanner: MountPanel = (container, props) => {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
+  // D32: the two-scenario and requirements tools are Researcher-only; in Educator the panel hides itself.
+  host.hidden = current.level === "educator"; host.style.display = host.hidden ? "none" : "";
   paint();
   renderCompare();
   renderRequirements();
@@ -158,6 +160,7 @@ export const mountPlanner: MountPanel = (container, props) => {
     update(next) {
       const dateChanged = next.landingDate !== undefined && next.landingDate !== current.landingDate;
       current = { ...current, ...next };
+      host.hidden = current.level === "educator"; host.style.display = host.hidden ? "none" : "";
       if (dateChanged) { paint(); renderRequirements(); renderCompare(); }
     },
     destroy() { token++; host.remove(); },

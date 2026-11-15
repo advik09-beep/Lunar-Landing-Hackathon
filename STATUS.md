@@ -6,11 +6,11 @@ PLAN.md v2 is the one plan and wins over this file. This header is the live boar
 |-----|------|-----------|
 | Advik + ChatGPT (Lane B) | D31 COMPLETE — STOPPED | Seven presentation items built and deployed in order; desktop checks PASS |
 | Sheldon (Lane A human) | — | Evening planning stop 2026-11-14: D24–D28 signed; status notes folded into real commits from now on |
-| Claude Code (Lane A) | D31 Lane A part done | Glass panels, flat sections, hollow Partial, full-width grid; stopped |
+| Claude Code (Lane A) | D32 Lane A part done | Seven-year-old Educator screens, Learn / Report, kid tour captions, best week, all-sites download; stopped |
 
 Acceptance (both humans): steps 1, 2, 3, 6, 8 PASS; step 4 and 7 pending earlier findings. Signed: D7–D23 (see PLAN), **D24–D28** (title card + tour nav, tour captions, why the south pole, one clock, A/B scenarios + requirements filter). Rule: no status-only pushes.
-Waiting on Sheldon: review the revised captions, the south-pole one-liner and the D28 planner on web/panels.html.
-Waiting on Advik: mount mountPlanner (D28); refresh the tour captions and the south-pole one-line from /lib (texts changed); D27 status.
+Waiting on Sheldon: read the new Educator screens on web/panels.html (level = Educator) and the Learn tab; confirm the two NASA photos and their captions.
+Waiting on Advik: D32 shell items: wordmark in header and Tour, icon as tab icon, Urbanist via --llp-heading-font, fourth tab labeled Learn / Report by mode, Educator tour captions (kidTitle / kidText); earlier: mount mountPlanner (D28), D27 status.
 
 ## Continuous two-agent coordination protocol (agreed 2026-11-14)
 
@@ -1607,4 +1607,32 @@ SOUTH_POLE.sources;          // [{ name, url }]
 - **Dates grid:** full panel width (fixed-width site column, stretching day columns).
 - **"Hour by hour" note:** now one line, "Top half: sunlight. Bottom half: Earth in view. Outline: your stay; dashed line: the chosen hour."
 - **Checks:** all nine check scripts PASS. Panel tests PASS, with the theme test extended for D31 (hollow Partial, glass + no border + one variable, indigo accent, no nested boxes, full-width grid, one-line note). `/web` build OK.
+
+### 2026-11-14 — D32 two reading levels: Lane A part DONE (panel interface v1.4, API 1.10.0)
+**Recorded:** D32 in PLAN.md; DESIGN.md → "Two reading levels (D32)". Brand files `web/public/brand/lunlux-wordmark.png` and `lunlux-icon.png` committed as Sheldon asked (Lane B uses them).
+
+**Educator (seven-year-old bar), all panels follow `level`:**
+- Side card: two rings (gold sunshine, blue Earth in sight) in words, a week strip, one verdict sentence, "Now: day N" in one sentence each, the score as one number with the best candidate place, child-level "Why these weights?" and "Why the south pole?". No degrees, coordinates or timestamps outside the "For the teacher" fold-outs, which give the full explanation and one class question.
+- Compare: dates grid with child words plus one sentence naming the best week (`getBestWeek`) and a "Pick that day" button. Strip, score box and weights only in Researcher.
+- Horizon view: no angle labels; the Sun and Earth in words, with how far away a hiding hill is.
+- Planner: hides itself in Educator (its host gets `display: none`), back in Researcher.
+- Fourth tab: `mountResearcher` shows **Learn** in Educator (also exported as `mountLearn`) and **Report** in Researcher.
+
+**Learn:** "Your place" rings, then four picture explainers from our data (Malapert ridge 2026-09-19 06:00 UTC, Sun +1.05° behind a ridge 1.84 km east; highest Sun in 30 days Apollo 11 87.8° vs Malapert 5.5°; Apollo 11 sunrise to sunrise 29.58–29.63 days; Earth's small wobble vs the Sun's sweep), plus two NASA photos:
+- Apollo 8 Earthrise, credit exactly "Image Credit: NASA", https://www.nasa.gov/image-article/apollo-8-earthrise/ (40 KB).
+- Lunar South Pole PIA13523, credit exactly "Credits: NASA/GSFC/Arizona State University", https://science.nasa.gov/photojournal/the-lunar-south-pole (69 KB).
+- Skipped: the Apollo 11 surface photo (its NASA page gave no readable credit) and a NASA "Full Moon" image (a rendering whose page could not be verified).
+
+**Report:** charts across 2026–2029 (monthly sunlight and Earth in view; daily score with each lunar eclipse at the site marked and the landing date shown) and two new downloads: this site by month, and all sites × every landing date (14,550 rows).
+
+**/lib (API 1.10.0):** `getBestWeek(siteId, startDate, days)`, `getSiteSeries(siteId)`, `getAllSitesTable()`; `TOUR_STOPS[i].kidTitle` / `.kidText` (no digits or degrees, at most two sentences of ≤ 16 words; same facts and sources as the Researcher captions).
+
+**Notes for Lane B:**
+1. Label the fourth tab by mode: **Learn** (Educator) / **Report** (Researcher). Pass `level` to `mountResearcher` as for the other panels (`update({ level })` switches it).
+2. Heading font: set `--llp-heading-font` once (e.g. `"Urbanist", system-ui, sans-serif`) on a parent of the panels; panel `h2`/`h3`/`h4` use it. `@fontsource/urbanist` reports licence OFL-1.1, version 5.3.0 (npm metadata).
+3. Pass `level` to `mountPlanner` too; it hides itself in Educator. If its container has a shell heading, hide that as well.
+4. Tour captions: show `kidTitle` / `kidText` in Educator and `title` / `text` in Researcher; sources are the same.
+5. Brand (D32): `web/public/brand/lunlux-wordmark.png` replaces the text title in the header and on the Tour; `lunlux-icon.png` is the tab icon.
+
+**Checks:** all ten scripts PASS (new `check_d32`: kid captions, best week = highest score, series = hourly recount, every Malapert eclipse on NASA's list, all-sites table, Learn facts, brand and photo files). Panel tests PASS, with the new D32 test: no degrees in Educator text, sentences ≤ 20 words, rings and strip equal the data, best week, planner hidden, exact photo credits, charts, all-sites CSV. Older tests were updated where they checked the old Educator wording, and the stale flat-horizon wording test was retired. `cd web && npm run build` OK.
 

@@ -5,12 +5,14 @@
 import { V } from "./data";
 import { createPanelRoot, esc, deg, az, pct, fmtUtc, whyWeights, WHY_WEIGHTS_CSS, WEIGHT_KEYS } from "./shared";
 import type { MountPanel, PanelProps } from "./types";
+import { renderLearn, LEARN_CSS } from "./learn";
+import { KID_CSS } from "./kid";
 
 type Any = any; // eslint-disable-line @typescript-eslint/no-explicit-any
 const L = V as unknown as Record<string, Any>;
 
 export const mountResearcher: MountPanel = (container, props) => {
-  const { host, root } = createPanelRoot(container, "researcher", CSS + WHY_WEIGHTS_CSS);
+  const { host, root } = createPanelRoot(container, "researcher", CSS + WHY_WEIGHTS_CSS + KID_CSS + LEARN_CSS);
   const body = document.createElement("section");
   body.className = "card";
   root.append(body);
@@ -31,11 +33,15 @@ export const mountResearcher: MountPanel = (container, props) => {
     const a = (e.target as HTMLElement).closest<HTMLElement>("[data-action]")?.dataset.action;
     if (a === "download-json") downloadJson();
     else if (a === "download-csv") downloadCsv();
+    else if (a === "download-all") downloadAll();
+    else if (a === "download-series") downloadSeries();
   });
 
   async function load() {
     const my = ++token;
     analysis = null;
+    // D32: the fourth tab is "Learn" in the Educator view (a picture report for children) and "Report" in the Researcher view.
+    if (current.level === "educator") { await renderLearn(body, current, () => my === token); return; }
     const site = V.listSites().find((s) => s.id === current.siteId);
     if (!site) { body.innerHTML = `<p class="warn">Unknown site.</p>`; return; }
     body.innerHTML = `<p class="muted">Loading the full analysis for ${esc(site.name)}…</p>`;
@@ -52,6 +58,7 @@ export const mountResearcher: MountPanel = (container, props) => {
         metrics: V.getMetrics(site.id, start),
         conditions: L.getConditions(site.id, start),
         months: L.getMonthlyScores(site.id),
+        series: L.getSiteSeries(site.id), // D32 charts across 2026–2029
         score: L.getScore(site.id, current.landingDate),
         rankingAll: V.getRanking(current.landingDate),
         nasaCriteria: L.NASA_SITE_CRITERIA, criteriaCoverage: L.CRITERIA_COVERAGE,
@@ -79,8 +86,13 @@ export const mountResearcher: MountPanel = (container, props) => {
         <h2>${esc(s.name)}</h2>
         <p class="muted">${esc(fmtCoords(s.lat, s.lon))} · ${s.category === "historic" ? "historic landing (a past mission, shown for comparison)" : "candidate site"} · 7-day stay from ${esc(current.landingDate)} 00:00 UTC</p>
         <div class="dl"><button type="button" data-action="download-json">Download full analysis (JSON)</button>
-          <button type="button" data-action="download-csv">Download hourly data (CSV)</button></div>
+          <button type="button" data-action="download-csv">Download hourly data (CSV)</button>
+          <button type="button" data-action="download-series">Download this site, 2026–2029 by month (CSV)</button>
+          <button type="button" data-action="download-all">Download all sites, every landing date 2026–2029 (CSV)</button></div>
       </header>
+
+      <h3>Across 2026–2029</h3>
+      ${chartsHtml(A.series, current.landingDate)}
 
       <h3>What NASA weighs when choosing a landing region</h3>
       <ul class="small">${A.nasaCriteria.map((q: Any) => `<li>“${esc(q.text)}” <a href="${esc(q.url)}" target="_blank" rel="noopener">${esc(q.source)}</a></li>`).join("")}</ul>
@@ -190,16 +202,57 @@ export const mountResearcher: MountPanel = (container, props) => {
     save(`lunlux_${analysis.site.id}_${current.landingDate}_hourly.csv`, [...head, ...s.map((r) => cols.map((k) => (r as unknown as Record<string, unknown>)[k]).join(","))].join("\n") + "\n", "text/csv");
   }
 
+  function downloadAll() {
+    const t = L.getAllSitesTable();
+    const head = [`# app,${V.APP_NAME} — ${V.APP_TAGLINE}`, `# api_version,${V.API_VERSION}`, `# ${t.note}`,
+      `# weights,${WEIGHT_KEYS.map(([k, w]) => `${w}=${t.weights[k]}`).join(" ")}`, "# percentages are shares of the stay's hours; hours are whole hours; clearance 0..1", t.columns.join(",")];
+    save("lunlux_all-sites_2026-2029.csv", [...head, ...t.rows.map((r: unknown[]) => r.join(","))].join("\n") + "\n", "text/csv");
+  }
+  function downloadSeries() {
+    if (!analysis) return;
+    const S = analysis.series;
+    const lines = [`# app,${V.APP_NAME} — ${V.APP_TAGLINE}`, `# site_id,${S.siteId}`, `# range,${S.startUtc}..${S.endUtc}`, ...S.notes.map((n: string) => `# ${n}`),
+      "month,hours,pct_sunlight,pct_earth_in_view,pct_both,mean_score,eclipse_hours",
+      ...S.months.map((m: Any) => { const sc = S.scores.filter((x: Any) => x.date.startsWith(m.month)); const ec = S.eclipses.filter((e: Any) => e.start.startsWith(m.month)).reduce((a: number, e: Any) => a + e.hours, 0);
+        return [m.month, m.hours, m.pctLit.toFixed(2), m.pctComms.toFixed(2), m.pctBoth.toFixed(2), sc.length ? (sc.reduce((a: number, x: Any) => a + x.score, 0) / sc.length).toFixed(1) : "", ec].join(","); })];
+    save(`lunlux_${S.siteId}_2026-2029_monthly.csv`, lines.join("\n") + "\n", "text/csv");
+  }
+
   load();
   return {
     update(next) {
-      const changed = (next.siteId !== undefined && next.siteId !== current.siteId) || (next.landingDate !== undefined && next.landingDate !== current.landingDate);
+      const changed = (next.siteId !== undefined && next.siteId !== current.siteId) || (next.landingDate !== undefined && next.landingDate !== current.landingDate)
+        || (next.level !== undefined && next.level !== current.level);
       current = { ...current, ...next };
       if (changed) load();
     },
     destroy() { token++; host.remove(); },
   };
 };
+
+// D32 Report charts: monthly sunlight and Earth in view (bars), daily score (line), eclipses marked.
+function chartsHtml(S: Any, landingDate: string): string {
+  const W = 760, H = 150, padL = 34, padB = 22, n = S.months.length, bw = (W - padL) / n;
+  const y = (p: number) => 6 + ((100 - p) / 100) * (H - padB - 6);
+  const bars = S.months.map((m: Any, i: number) => {
+    const x0 = padL + i * bw;
+    return `<rect x="${(x0 + 1).toFixed(1)}" y="${y(m.pctLit).toFixed(1)}" width="${(bw / 2 - 1.5).toFixed(1)}" height="${(y(0) - y(m.pctLit)).toFixed(1)}" class="b-sun"><title>${m.month}: sunlight ${m.pctLit.toFixed(1)}%</title></rect>`
+      + `<rect x="${(x0 + bw / 2).toFixed(1)}" y="${y(m.pctComms).toFixed(1)}" width="${(bw / 2 - 1.5).toFixed(1)}" height="${(y(0) - y(m.pctComms)).toFixed(1)}" class="b-earth"><title>${m.month}: Earth in view ${m.pctComms.toFixed(1)}%</title></rect>`;
+  }).join("");
+  const t0 = Date.parse(S.startUtc), t1 = Date.parse(S.endUtc), tx = (iso: string) => padL + ((Date.parse(iso.length === 10 ? iso + "T00:00:00Z" : iso) - t0) / (t1 - t0)) * (W - padL);
+  const years = ["2026", "2027", "2028", "2029"].map((yr) => `<text x="${tx(yr + "-01-01").toFixed(1)}" y="${H - 6}" class="ax">${yr}</text><line x1="${tx(yr + "-01-01").toFixed(1)}" x2="${tx(yr + "-01-01").toFixed(1)}" y1="6" y2="${H - padB}" class="yl"/>`).join("");
+  const yAx = [0, 50, 100].map((p) => `<text x="2" y="${(y(p) + 4).toFixed(1)}" class="ax">${p}%</text><line x1="${padL}" x2="${W}" y1="${y(p).toFixed(1)}" y2="${y(p).toFixed(1)}" class="gl"/>`).join("");
+  const pts = S.scores.map((p: Any) => `${tx(p.date).toFixed(1)},${y(p.score).toFixed(1)}`).join(" ");
+  const ecl = S.eclipses.map((e: Any) => `<g class="ecl"><line x1="${tx(e.start).toFixed(1)}" x2="${tx(e.start).toFixed(1)}" y1="6" y2="${H - padB}"/><circle cx="${tx(e.start).toFixed(1)}" cy="10" r="4"/><title>Lunar eclipse at this site: ${e.start.replace("T", " ").slice(0, 16)} UTC, ${e.hours} h, up to ${Math.round(e.maxCoveredPct)}% of the Sun covered</title></g>`).join("");
+  const sel = landingDate >= S.startUtc.slice(0, 10) && landingDate <= S.endUtc.slice(0, 10) ? `<line x1="${tx(landingDate).toFixed(1)}" x2="${tx(landingDate).toFixed(1)}" y1="6" y2="${H - padB}" class="sel"/>` : "";
+  const best = S.months.reduce((a: Any, m: Any) => (m.pctLit > a.pctLit ? m : a), S.months[0]);
+  const worst = S.months.reduce((a: Any, m: Any) => (m.pctLit < a.pctLit ? m : a), S.months[0]);
+  return `<figure class="chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(`Monthly sunlight and Earth in view, ${S.months[0].month} to ${S.months[n - 1].month}. Most sunlight ${best.month} (${best.pctLit.toFixed(0)}%), least ${worst.month} (${worst.pctLit.toFixed(0)}%).`)}">${yAx}${years}${bars}</svg>
+      <figcaption class="small"><span class="sw sun"></span> sunlight <span class="sw earth"></span> Earth in view: share of each month's hours. Most sunlight ${esc(best.month)} (${best.pctLit.toFixed(1)}%), least ${esc(worst.month)} (${worst.pctLit.toFixed(1)}%).</figcaption></figure>
+    <figure class="chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(`Sun and Earth score for every landing date 2026–2029, with ${S.eclipses.length} lunar eclipses marked.`)}">${yAx.replace(/%/g, "")}${years}${ecl}${sel}<polyline points="${pts}" class="score"/></svg>
+      <figcaption class="small"><span class="sw score"></span> ${esc(V.SCORE_LABEL)} (prototype, default weights) of the 7-day stay starting each day · <span class="sw ecl"></span> lunar eclipse seen at this site (${S.eclipses.length}) · <span class="sw sel"></span> your landing date.</figcaption></figure>
+    <p class="muted small">${S.notes.map((x: string) => esc(x)).join(" ")}</p>`;
+}
 
 function fmtCoords(lat: number, lon: number): string {
   return `${Math.abs(lat).toFixed(5)}°${lat < 0 ? "S" : "N"}, ${Math.abs(lon).toFixed(5)}°${lon < 0 ? "W" : "E"}`;
@@ -240,4 +293,15 @@ svg.profile { width: 100%; height: auto; display: block; margin: 6px 0; }
 .profile .hz { fill: none; stroke: var(--_horizon); stroke-width: 1.5; }
 .profile .zero { stroke: var(--_muted); stroke-dasharray: 4 3; }
 .profile text { fill: var(--_muted); font-size: 10px; }
+svg { overflow: visible; }
+.chart { margin: 6px 0 10px; } .chart svg { width: 100%; height: auto; display: block; }
+.chart .b-sun { fill: var(--_sun); } .chart .b-earth { fill: var(--_earth); }
+.chart .gl { stroke: rgba(255,255,255,.07); } .chart .yl { stroke: rgba(255,255,255,.12); }
+.chart .ax { fill: var(--_muted); font-size: 10px; }
+.chart .score { fill: none; stroke: var(--_text); stroke-width: 1; }
+.chart .ecl line { stroke: var(--_warn); stroke-dasharray: 2 2; } .chart .ecl circle { fill: var(--_warn); }
+.chart .sel { stroke: var(--_link); stroke-width: 2; }
+.sw { display: inline-block; width: 12px; height: 8px; border-radius: 2px; vertical-align: middle; }
+.sw.sun { background: var(--_sun); } .sw.earth { background: var(--_earth); } .sw.score { background: var(--_text); height: 2px; }
+.sw.ecl { background: var(--_warn); width: 8px; border-radius: 50%; } .sw.sel { background: var(--_link); width: 3px; }
 `;

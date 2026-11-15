@@ -58,6 +58,7 @@ const BASE_CSS = `
 .warn { color: var(--_warn); }
 button { font: inherit; cursor: pointer; }
 :focus-visible { outline: 2px solid var(--_focus); outline-offset: 2px; }
+h2, h3, h4 { font-family: var(--llp-heading-font, inherit); } /* D32: the shell sets its heading font (Urbanist) here */
 `;
 
 export const esc = (s: unknown): string =>

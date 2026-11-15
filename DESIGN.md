@@ -133,3 +133,18 @@ The same values are exported as `THEME` from `web/src/panels/shared.ts` for code
 
 **Dates grid:** uses the full width of its panel (columns stretch; site names in a fixed first column).
 
+## Two reading levels (D32, both humans, 2026-11-14)
+**The bar:** a seven-year-old understands every Educator screen. Pictures first, one short sentence at a time, everyday words, no degrees, no raw timestamps. Adults get a small **"For the teacher"** fold-out in each Educator section: the fuller explanation plus one question for the class. Researcher keeps every number, adds charts across 2026–2029 and downloads.
+
+**Lane A panels (done):**
+- **Side card, Educator:** the short site name and "A lander really landed here." / "A place picked as a possible landing spot."; one verdict sentence with its symbol ("Great week", "Okay week", "Hard week", "Tricky week"); **two rings** (gold = sunshine, blue = Earth in sight) labeled in words ("all week", "most of the week", "about half the week", "a little of the week", "not this week"); a **week strip** (one column per day, gold top = sunshine, blue bottom = Earth in sight, dashed line = now); "Now: day 3 of the week" with one sentence each for the Sun and Earth ("The Sun is up, but a hill is hiding it."); the score as one number with the best candidate place named and a child-level "Why these weights?"; "Why the south pole?" in three short sentences.
+- **Compare, Educator:** the dates grid with child words in the legend, and one sentence naming the best week in the four weeks shown (the 7-day stay with the highest default-weight score), with a "Pick that day" button. The hour-by-hour strip, the score box and the two-scenario / requirements tools appear only in Researcher (the planner hides itself in Educator).
+- **Horizon view, Educator:** no angle labels; "The bumpy line is the hills."; one sentence each for the Sun and Earth, including how far away a hiding hill is.
+- **Fourth tab:** **Learn** in Educator (`mountResearcher` shows it when `level` is "educator"; also exported as `mountLearn`), **Report** in Researcher.
+  - Learn: "Your place" rings, then five picture explainers from our data: (1) a hill can hide the Sun (the real Malapert skyline on 2026-09-19 06:00 UTC); (2) near the poles the Sun stays low (Apollo 11 vs Malapert, highest Sun in 30 days); (3) a day lasts about a month (four months of sunshine and night at Apollo 11); (4) Earth stays in one spot (a month of Sun and Earth positions at Apollo 11); (5) two NASA photos with their exact credit line and official page: Apollo 8 Earthrise ("Image Credit: NASA") and Lunar South Pole PIA13523 ("Credits: NASA/GSFC/Arizona State University"), each under 100 KB.
+  - Report: two charts across 2026–2029 (monthly sunlight and Earth in view; the daily Sun and Earth score with every lunar eclipse seen at the site marked and the landing date shown), and downloads for this site by month and for **all sites, every landing date**.
+- **Tour captions:** `kidTitle` / `kidText` on every stop (no digits, no degrees, at most two sentences of 16 words or fewer), same facts and sources as the Researcher captions.
+- **Heading font:** panel headings use `var(--llp-heading-font, inherit)`.
+
+**Lane B builds:** the wordmark (`web/public/brand/lunlux-wordmark.png`) in place of the text title in the header and on the Tour; the icon (`web/public/brand/lunlux-icon.png`) as the browser tab icon; Urbanist for headings, self-hosted from `@fontsource/urbanist` (licence SIL OFL 1.1), set once with `--llp-heading-font`; the fourth tab labeled **Learn** in Educator and **Report** in Researcher; tour captions from `kidTitle` / `kidText` in Educator.
+

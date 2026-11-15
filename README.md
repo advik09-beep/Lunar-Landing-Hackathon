@@ -9,8 +9,8 @@
 Pick a lunar landing site and a landing date. The tool tells you, for a 7-day stay, whether the **Sun** (sunlight for power) and **Earth** (a direct line of sight for radio) are above the local horizon, for how long, and what changes if the date slips.
 
 It has two reading levels:
-- **Plain:** a verdict in words with one sentence of why, for teachers and the public.
-- **Numbers:** angles, margins, sources and a CSV download, for mission planners and researchers.
+- **Educator:** written so a seven-year-old understands it: pictures first (sunshine and Earth rings, a week-long day and night strip), one short sentence at a time, no degrees. Each section has a small "For the teacher" fold-out with the fuller explanation and a question for the class.
+- **Researcher:** angles, margins, every metric, charts across 2026–2029, sources and downloads, for mission planners and researchers.
 
 ## What you can do
 - **Explore in 3D:** a Moon globe (NASA imagery) with 10 sites, each colored *and* labeled by verdict for the chosen landing date: ✓ Clear, ◐ Partial, ✕ Out, ⚠ On the edge (grazing the skyline, so small changes in position matter).
@@ -20,7 +20,8 @@ It has two reading levels:
   - NASA's landing-region criteria and how we cover each, lighting and power with the calculator, communications geometry with signal delay, lunar season and time of day, eclipses, best and worst months, the terrain profile with its maps and local slope, and the score formula.
   - A note on other planets, a list of what is NOT modelled, and all sources.
   - Downloadable as JSON (full analysis) or CSV (hourly).
-- **Planner:**
+- **Learn (Educator) / Report (Researcher):** Learn is a picture report for children built from our data (a real ridge hiding the Sun, the low polar Sun, two-week days and nights, Earth staying in one spot) plus two NASA photos with their credits. Report adds charts across 2026–2029 (monthly sunlight and Earth in view, the daily score with lunar eclipses marked) and a download of every site and landing date.
+- **Planner (Researcher view):**
   - Compare two scenarios (site + landing date) side by side, with the differences in plain words. Pairs can be saved in your browser and downloaded.
   - A mission requirements filter: set limits such as longest blackout, longest gap without Earth, minimum sunlight or Earth-in-view share, and steepest slope. Every site shows PASS or FAIL with the failing limit named.
 - **Stand here:** a 360° horizon panorama with the Sun and Earth paths over the stay. Every site uses a real terrain horizon from NASA's LOLA laser altimeter, so you can see the Sun blocked by a ridge.
@@ -80,7 +81,7 @@ The data are static JSON files in `data/`. There is no backend.
 - Malapert (original point), 2026-11-20 06:00 UTC: Sun and Earth
 - Malapert (original point), 2026-11-17 08:00 UTC: Sun
 
-**Nine check scripts** (run from the repo root; each prints `PASS` or stops with the failure):
+**Ten check scripts** (run from the repo root; each prints `PASS` or stops with the failure):
 
 | Script | What it proves |
 |---|---|
@@ -93,6 +94,7 @@ The data are static JSON files in `data/`. There is no backend.
 | `node scripts/check_d20.mjs` | Researcher view (D18/D20/D22) facts, each against an independent fact:<br>- **Signal delay** = Earth distance ÷ speed of light (1.26–1.35 s).<br>- **Lunar local time** reads noon (12.02 h) at the hour the Sun is highest.<br>- **Season** = the sub-solar latitude from JPL, with NASA SVS 5229 quoted.<br>- The 2026-03-03 **eclipse** appears in the right stay.<br>- The Sun's **compass sweep** in a fully sunlit pole-region stay equals the sub-solar longitude change (84.6°).<br>- **Month averages** equal the averaged scores.<br>- Every site has a **local slope**.<br>- The **NASA criteria, D22 note and sources** are present. |
 | `node scripts/check_tour.mjs` | The ten solar-system tour captions (D25) and the "Why the south pole?" text (D26): ten stops in order, two sentences each, NASA/JPL sources. Every figure we call ours is recomputed: Venus is the brightest planet from the Moon at about 2 billionths of the Sun's light (JPL Horizons magnitudes), sunlight 1,310–1,415 W/m², signal delay 1.2–1.4 s, one lunar day 29.53 Earth days, and Earth never more than about 11° above level at the candidate sites. |
 | `node scripts/check_d28.mjs` | The mission requirements filter and the A/B scenario comparison (D28): every site's pass/fail and named failing limits match its own numbers. No limits means every site passes, and outside the data the result is "No data", never a guessed pass. The comparison values equal the per-site numbers, the differences point the right way, a scenario compared with itself is "about the same" everywhere, and swapping A and B mirrors every difference. |
+| `node scripts/check_d32.mjs` | The two reading levels (D32): every Educator tour caption has no digits or degrees and at most two short sentences, and says the same facts as the Researcher caption ("a little over one second" = 1.19–1.36 s). The best week equals the highest score of the dates shown. The monthly chart values equal a recount from the hourly data, the daily score equals the hourly score, and every eclipse marked at Malapert is on NASA's 2026–2029 list. The all-sites table has every site and landing date (14,550 rows). The Learn facts hold: the Malapert ridge, Apollo 11's Sun at 87.8° vs Malapert's 5.5°, sunrise to sunrise 29.58–29.63 days, and Earth's small wobble. |
 
 **Terrain (all 10 sites, prototype):**
 - Built from NASA's LOLA elevation maps (PDS Geosciences).
@@ -112,6 +114,8 @@ The data are static JSON files in `data/`. There is no backend.
   - NASA (Artemis III candidate regions, 2024-10-28)
 
   Each site's source and notes are in `data/sites.js`.
+- **NASA photos (Learn tab):** Apollo 8 Earthrise, "Image Credit: NASA", https://www.nasa.gov/image-article/apollo-8-earthrise/ ; Lunar South Pole (PIA13523), "Credits: NASA/GSFC/Arizona State University", https://science.nasa.gov/photojournal/the-lunar-south-pole . Resized for the web.
+- **Heading font (D32, being added to the app shell):** Urbanist, SIL Open Font License 1.1, self-hosted via @fontsource/urbanist (licence read from the npm package metadata).
 - **Software:** Three.js (MIT License), Vite, TypeScript. All in-app credits are on the site's **Credits** tab.
 
 ## Known limits

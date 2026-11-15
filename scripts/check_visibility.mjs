@@ -10,7 +10,7 @@ const throwsMsg = (fn, re, msg) => { try { fn(); ok(false, msg + " (did not thro
 const T = "2026-11-14T12:00:00Z";
 
 ok(typeof V.MOCK === "boolean", "MOCK boolean");
-ok(V.API_VERSION === "1.9.0", "API_VERSION 1.9.0");
+ok(V.API_VERSION === "1.10.0", "API_VERSION 1.10.0");
 has(V.READY, ["listSites", "getState", "getSummary", "loadSite", "getCoverage", "getTimeline", "loadDaily", "getDaily", "setDataBase", "loadScene", "getSceneState", "getHorizon"], "READY");
 ok(V.READY.getSceneState === true && V.READY.getHorizon === true, "READY.getSceneState and getHorizon true");
 ok(V.VERDICT_RULE.STAY_DAYS === 7 && V.VERDICT_RULE.CLEAR_PCT === 90 && V.VERDICT_RULE.OUT_PCT === 10 && V.VERDICT_RULE.EDGE_DEG === 2, "verdict numbers 7/90/10/2");
